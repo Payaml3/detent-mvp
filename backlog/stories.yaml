@@ -40,6 +40,7 @@ stories:
     - "The README explains setup in under 10 commands"
   pri: Must
   est: 0.5
+  done: [1, 2, 3]
   deps: []
   trace: [A7.prototype, B5.security]
   ms: M0
@@ -55,6 +56,7 @@ stories:
     - "Settings load via pydantic-settings; no setting is read from os.environ elsewhere"
   pri: Must
   est: 0.25
+  done: [0, 1, 2]
   deps: [FND-01]
   trace: [A6.no_custody, L8]
   ms: M0
@@ -71,6 +73,7 @@ stories:
     - "Partial unique indexes from the domain model exist (one in-flight attempt, one confirmed attempt per payment)"
   pri: Must
   est: 0.5
+  done: [0, 1, 2, 3]
   deps: [FND-01]
   trace: [A2b.states, A2.Intent]
   ms: M0
@@ -86,6 +89,7 @@ stories:
     - "Role checks run on the server; hiding a button is never the only control"
   pri: Must
   est: 0.5
+  done: [0, 1, 2]
   deps: [FND-03]
   trace: [B3.rule_changes, B3.kill_switch, A2.Exceptions]
   ms: M0
@@ -101,6 +105,7 @@ stories:
     - "Tests use a frozen clock"
   pri: Must
   est: 0.25
+  done: [0, 1, 2]
   deps: [FND-01]
   trace: [B3.exceptions, MVP.flow]
   ms: M0
@@ -116,6 +121,7 @@ stories:
     - "Job runs, failures and durations are logged with the payment ID where relevant"
   pri: Must
   est: 0.5
+  done: [0, 1, 2]
   deps: [FND-03]
   trace: [B5.resilience]
   ms: M0
@@ -146,6 +152,7 @@ stories:
     - "Keys, secrets, full wallet private data and invoice bodies are never logged (tested with a log capture)"
   pri: Should
   est: 0.25
+  done: [0, 1]
   deps: [FND-01]
   trace: [B5.security, B3.incident]
   ms: M0
@@ -161,6 +168,7 @@ stories:
     - "Public testnets are used only in nightly runs and the live demo"
   pri: Must
   est: 0.5
+  done: [0, 2]
   deps: [FND-01]
   trace: [L3, A5.gate]
   ms: M0
@@ -1538,6 +1546,7 @@ stories:
     - "The denylist lives in a CI secret, never in the repo; the check scans code, fixtures and docs"
   pri: Must
   est: 0.25
+  done: [0]
   deps: [FND-01]
   trace: [B1.independence, B6.former_employer]
   ms: M0

@@ -15,9 +15,9 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 **Acceptance criteria**
 
 - [ ] `make test`, `make lint` (ruff) and `make typecheck` (mypy, strict on `detent/domain`) pass locally and in GitHub Actions on every push
-- [ ] CI starts a Postgres 16 service and runs Alembic migrations before tests
-- [ ] `.env.example` lists every setting; a secret scanner runs as a pre-commit hook and in CI
-- [ ] The README explains setup in under 10 commands
+- [x] CI starts a Postgres 16 service and runs Alembic migrations before tests
+- [x] `.env.example` lists every setting; a secret scanner runs as a pre-commit hook and in CI
+- [x] The README explains setup in under 10 commands
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** none · **Traces to:** A7.prototype, B5.security
 
@@ -27,9 +27,9 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] Given a configured chain ID outside {84532 Base Sepolia, 11155111 Ethereum Sepolia, 31337 local}, when the app or worker starts, then it exits with a clear error
-- [ ] Given an API key prefix `sk_live_`, when any request uses it, then it is rejected with 403 `live_mode_unavailable`
-- [ ] Settings load via pydantic-settings; no setting is read from os.environ elsewhere
+- [x] Given a configured chain ID outside {84532 Base Sepolia, 11155111 Ethereum Sepolia, 31337 local}, when the app or worker starts, then it exits with a clear error
+- [x] Given an API key prefix `sk_live_`, when any request uses it, then it is rejected with 403 `live_mode_unavailable`
+- [x] Settings load via pydantic-settings; no setting is read from os.environ elsewhere
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** A6.no_custody, L8
 
@@ -39,10 +39,10 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] IDs are prefixed UUIDv7 strings (`pay_`, `att_`, `dec_`, `exc_`, `dep_`, `evt_`, `org_`)
-- [ ] Money is stored as integer minor units plus an ISO currency code; no floats anywhere in money paths
-- [ ] Every table carries `org_id`; every query in the repository layer filters by it
-- [ ] Partial unique indexes from the domain model exist (one in-flight attempt, one confirmed attempt per payment)
+- [x] IDs are prefixed UUIDv7 strings (`pay_`, `att_`, `dec_`, `exc_`, `dep_`, `evt_`, `org_`)
+- [x] Money is stored as integer minor units plus an ISO currency code; no floats anywhere in money paths
+- [x] Every table carries `org_id`; every query in the repository layer filters by it
+- [x] Partial unique indexes from the domain model exist (one in-flight attempt, one confirmed attempt per payment)
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** A2b.states, A2.Intent
 
@@ -52,9 +52,9 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] One shared password protects the console; after login the viewer picks an acting user
-- [ ] Every write records the acting user ID and role in the audit log
-- [ ] Role checks run on the server; hiding a button is never the only control
+- [x] One shared password protects the console; after login the viewer picks an acting user
+- [x] Every write records the acting user ID and role in the audit log
+- [x] Role checks run on the server; hiding a button is never the only control
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-03 · **Traces to:** B3.rule_changes, B3.kill_switch, A2.Exceptions
 
@@ -64,9 +64,9 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] All code reads time from a Clock service; a lint rule or test fails on direct `datetime.now()` in `detent/`
-- [ ] In demo mode the console can advance the clock by 15 min, 1 h or 1 day; outside demo mode the control is absent
-- [ ] Tests use a frozen clock
+- [x] All code reads time from a Clock service; a lint rule or test fails on direct `datetime.now()` in `detent/`
+- [x] In demo mode the console can advance the clock by 15 min, 1 h or 1 day; outside demo mode the control is absent
+- [x] Tests use a frozen clock
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** B3.exceptions, MVP.flow
 
@@ -76,9 +76,9 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] Jobs are claimed with `SELECT ... FOR UPDATE SKIP LOCKED`; each job is idempotent
-- [ ] Killing the worker mid-job and restarting it never duplicates a side effect (tested)
-- [ ] Job runs, failures and durations are logged with the payment ID where relevant
+- [x] Jobs are claimed with `SELECT ... FOR UPDATE SKIP LOCKED`; each job is idempotent
+- [x] Killing the worker mid-job and restarting it never duplicates a side effect (tested)
+- [x] Job runs, failures and durations are logged with the payment ID where relevant
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-03 · **Traces to:** B5.resilience
 
@@ -100,8 +100,8 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] Every HTTP request gets a `request_id`, returned in the `Request-Id` header
-- [ ] Log lines include `payment_id` when one is in context
+- [x] Every HTTP request gets a `request_id`, returned in the `Request-Id` header
+- [x] Log lines include `payment_id` when one is in context
 - [ ] Keys, secrets, full wallet private data and invoice bodies are never logged (tested with a log capture)
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** B5.security, B3.incident
@@ -112,9 +112,9 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] `make chain` starts anvil and deploys MockUSDC; addresses are written to a test config
+- [x] `make chain` starts anvil and deploys MockUSDC; addresses are written to a test config
 - [ ] The EVM adapter runs its contract tests against the local chain in CI
-- [ ] Public testnets are used only in nightly runs and the live demo
+- [x] Public testnets are used only in nightly runs and the live demo
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** L3, A5.gate
 
@@ -1235,7 +1235,7 @@ _The operating-model processes that need software: incidents, independence check
 
 **Acceptance criteria**
 
-- [ ] The denylist lives in a CI secret, never in the repo; the check scans code, fixtures and docs
+- [x] The denylist lives in a CI secret, never in the repo; the check scans code, fixtures and docs
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** B1.independence, B6.former_employer
 

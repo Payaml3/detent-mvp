@@ -36,6 +36,10 @@ def main() -> int:
     if len(by_id) != len(stories):
         errors.append("duplicate story IDs")
     for s in stories:
+        bad = [i for i in s.get("done", []) if not (isinstance(i, int) and 0 <= i < len(s["ac"]))]
+        if bad:
+            errors.append(f"{s['id']}: 'done' lists unknown acceptance-criterion indices {bad}")
+    for s in stories:
         for c in s["trace"]:
             if c not in codes:
                 errors.append(f"{s['id']}: unknown trace code {c}")
@@ -89,7 +93,8 @@ def main() -> int:
             out += [f"### {s['id']} · {s['title']}", "",
                     f"**As a** {s['as']}, **I want** {s['want']}, **so that** {s['so']}.", "",
                     "**Acceptance criteria**", ""]
-            out += [f"- [ ] {a}" for a in s["ac"]]
+            done = set(s.get("done", []))  # indices of ticked acceptance criteria
+            out += [f"- [{'x' if i in done else ' '}] {a}" for i, a in enumerate(s["ac"])]
             out += ["", f"**Priority:** {s['pri']} · **Estimate:** {s['est']:g} d · **Milestone:** "
                     f"{s['ms']} {MS_NAMES[s['ms']]} · **Depends on:** {', '.join(s['deps']) or 'none'} · "
                     f"**Traces to:** {', '.join(s['trace'])}", ""]
