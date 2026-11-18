@@ -339,6 +339,7 @@ stories:
   deps: [POL-02, INT-04]
   trace: [A2b.unusual, A2b.raw_facts]
   ms: S3
+  done: [0, 1, 2, 3]
 - id: POL-06
   epic: POL
   title: A block is final
@@ -354,6 +355,7 @@ stories:
   deps: [POL-02, EXE-01]
   trace: [A6.block_final, A2b.rule, L5]
   ms: S3
+  done: [0, 2]
 - id: POL-07
   epic: POL
   title: Versioned rule changes with two approvers
@@ -876,6 +878,7 @@ stories:
   deps: [POL-02, FND-05]
   trace: [A2.Exceptions, B3.exceptions]
   ms: S3
+  done: [0, 2]
 - id: EXC-02
   epic: EXC
   title: Raw facts first
@@ -890,6 +893,7 @@ stories:
   deps: [EXC-01, INT-04]
   trace: [A2b.raw_facts, L6]
   ms: S3
+  done: [0, 1]
 - id: EXC-03
   epic: EXC
   title: Investigation agent with cited evidence
@@ -921,6 +925,7 @@ stories:
   deps: [EXC-01, EXE-03]
   trace: [A2.Exceptions, A6.block_final, L6]
   ms: S3
+  done: [0, 1, 2]
 - id: EXC-05
   epic: EXC
   title: Double-approval safety
@@ -935,6 +940,7 @@ stories:
   deps: [EXC-04]
   trace: [L3, A6.retry_rule]
   ms: S3
+  done: [0, 1]
 - id: EXC-06
   epic: EXC
   title: Deadline sweeper - a timeout never becomes an approval
@@ -963,6 +969,7 @@ stories:
   deps: [FND-03]
   trace: [B3.exceptions]
   ms: S3
+  done: [1]
 - id: EXC-08
   epic: EXC
   title: Exceptions by API
@@ -1171,6 +1178,7 @@ stories:
   deps: [FND-04]
   trace: [L8, BR.category, D.honesty]
   ms: S3
+  done: [0, 1, 2]
 - id: CON-02
   epic: CON
   title: Overview screen
@@ -1211,6 +1219,7 @@ stories:
   deps: [CON-01, EXC-04]
   trace: [A2.Exceptions, A2b.raw_facts]
   ms: S3
+  done: [0]
 - id: CON-05
   epic: CON
   title: Invoice drop and agent proposal screen

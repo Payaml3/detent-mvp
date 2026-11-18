@@ -180,10 +180,10 @@ Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 0 | Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event | done | `integration/test_registry.py::test_editing_a_destination_updates_last_changed_and_audits`<br>`integration/test_registry.py::test_fixture_counterparties_are_seeded` |
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 1 | Each counterparty exposes payment count and median amount, computed from confirmed payments | done | `integration/test_registry.py::test_stats_are_computed_from_confirmed_payments` |
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 2 | Counterparties are seeded from fixtures and editable in the console | done | `integration/test_registry.py::test_fixture_counterparties_are_seeded`<br>`integration/test_registry.py::test_destination_editable_in_console_by_payments_lead_only` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 0 | Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 1 | No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 0 | Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS` | done | `unit/test_policy_engine.py::test_new_wallet_and_unregistered_address_escalate`<br>`unit/test_policy_engine.py::test_changed_details_escalates_with_who_and_when` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 1 | No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT` | done | `unit/test_policy_engine.py::test_first_payment_escalates_and_above_norm_is_not_evaluated` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | done | `unit/test_policy_engine.py::test_above_norm`<br>`unit/test_policy_engine.py::test_above_norm_ignores_history_in_another_currency` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | done | `unit/test_policy_engine.py::test_above_norm_evidence_has_the_ratio`<br>`unit/test_policy_engine.py::test_changed_details_evidence_has_old_and_new`<br>`integration/test_registry.py::test_changed_details_shows_the_old_address` |
 
 ## FR-015 · Intents (proposed)
 
@@ -305,10 +305,10 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks); [POL-05 criteria](.
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 0 | Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 1 | No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 0 | Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS` | done | `unit/test_policy_engine.py::test_new_wallet_and_unregistered_address_escalate`<br>`unit/test_policy_engine.py::test_changed_details_escalates_with_who_and_when` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 1 | No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT` | done | `unit/test_policy_engine.py::test_first_payment_escalates_and_above_norm_is_not_evaluated` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | done | `unit/test_policy_engine.py::test_above_norm`<br>`unit/test_policy_engine.py::test_above_norm_ignores_history_in_another_currency` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | done | `unit/test_policy_engine.py::test_above_norm_evidence_has_the_ratio`<br>`unit/test_policy_engine.py::test_changed_details_evidence_has_old_and_new`<br>`integration/test_registry.py::test_changed_details_shows_the_old_address` |
 
 ## FR-027 · Policy (confirmed)
 
@@ -318,10 +318,10 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 0 | Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 1 | No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
-| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 0 | Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS` | done | `unit/test_policy_engine.py::test_new_wallet_and_unregistered_address_escalate`<br>`unit/test_policy_engine.py::test_changed_details_escalates_with_who_and_when` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 1 | No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT` | done | `unit/test_policy_engine.py::test_first_payment_escalates_and_above_norm_is_not_evaluated` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | done | `unit/test_policy_engine.py::test_above_norm`<br>`unit/test_policy_engine.py::test_above_norm_ignores_history_in_another_currency` |
+| [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | done | `unit/test_policy_engine.py::test_above_norm_evidence_has_the_ratio`<br>`unit/test_policy_engine.py::test_changed_details_evidence_has_old_and_new`<br>`integration/test_registry.py::test_changed_details_shows_the_old_address` |
 
 ## FR-028 · Policy (confirmed)
 
@@ -331,9 +331,9 @@ Sources: [Invariant 4](../../CLAUDE.md#non-negotiable-invariants); [POL-06 crite
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 0 | BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
+| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 0 | BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it | done | `integration/test_transition.py::test_terminal_states_never_change`<br>`integration/test_schema.py::test_terminal_payment_status_is_frozen` |
 | [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 1 | Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked` | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
-| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10) | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
+| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10) | done | `unit/test_policy_engine.py::test_resubmission_after_block_escalates` |
 
 ## FR-029 · Policy (confirmed)
 
@@ -343,9 +343,9 @@ Sources: [POL-06 criteria](../../backlog/user-stories.md#pol-06); [spec/09 §att
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 0 | BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
+| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 0 | BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it | done | `integration/test_transition.py::test_terminal_states_never_change`<br>`integration/test_schema.py::test_terminal_payment_status_is_frozen` |
 | [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 1 | Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked` | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
-| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10) | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
+| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10) | done | `unit/test_policy_engine.py::test_resubmission_after_block_escalates` |
 
 ## FR-030 · Policy (confirmed)
 
@@ -417,9 +417,9 @@ Sources: [spec/04 §re-runs-after-approval-exc-04-exe-03](../../spec/04-policy.m
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 0 | Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 0 | Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode | done | `integration/test_cases.py::test_approval_reruns_policy_and_proceeds`<br>`integration/test_cases.py::test_changed_facts_after_escalation_open_a_new_case`<br>`integration/test_cases.py::test_a_new_block_on_rerun_stays_blocked`<br>`chain/test_review_loop.py::test_first_payment_escalates_is_approved_and_sent_once` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | done | `integration/test_cases.py::test_reject_is_terminal_and_needs_a_reason` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | done | `integration/test_cases.py::test_initiator_cannot_approve`<br>`integration/test_cases.py::test_api_approval_errors` |
 | [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 0 | Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid | planned | integration: `apps/api/tests/integration/test_exe_03.py` |
 | [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 1 | If the decision is older than the configured age or the rule version changed, policy re-runs first | done | `chain/test_send_once.py::test_stale_decision_reruns_policy_first`<br>`chain/test_send_once.py::test_new_rule_version_reruns_policy_before_sending`<br>`chain/test_send_once.py::test_fresh_decision_is_not_rerun` |
 | [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 2 | Any failed check moves the payment to HELD with the reason; nothing is sent | done | `chain/test_send_once.py::test_kill_switch_holds_before_sending`<br>`chain/test_send_once.py::test_insufficient_balance_holds_before_sending`<br>`chain/test_send_once.py::test_prefunded_daily_limit_holds` |
@@ -788,9 +788,9 @@ Sources: [spec/04 §rule-set-format](../../spec/04-policy.md#rule-set-format); [
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 0 | Owner assignment rules by case type and amount, in config | planned | integration: `apps/api/tests/integration/test_exc_01.py` |
+| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 0 | Owner assignment rules by case type and amount, in config | done | `integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline`<br>`integration/test_cases.py::test_owner_is_the_reviewer_with_fewest_open_cases` |
 | [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 1 | Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions) | planned | integration: `apps/api/tests/integration/test_exc_01.py` |
-| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 2 | Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited | planned | integration: `apps/api/tests/integration/test_exc_01.py` |
+| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 2 | Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited | done | `integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline`<br>`integration/test_cases.py::test_approval_reruns_policy_and_proceeds` |
 
 ## FR-071 · Exceptions (proposed)
 
@@ -800,9 +800,9 @@ Sources: [EXC-01 criteria](../../backlog/user-stories.md#exc-01); [spec/04 §rul
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 0 | Owner assignment rules by case type and amount, in config | planned | integration: `apps/api/tests/integration/test_exc_01.py` |
+| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 0 | Owner assignment rules by case type and amount, in config | done | `integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline`<br>`integration/test_cases.py::test_owner_is_the_reviewer_with_fewest_open_cases` |
 | [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 1 | Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions) | planned | integration: `apps/api/tests/integration/test_exc_01.py` |
-| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 2 | Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited | planned | integration: `apps/api/tests/integration/test_exc_01.py` |
+| [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 2 | Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited | done | `integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline`<br>`integration/test_cases.py::test_approval_reruns_policy_and_proceeds` |
 
 ## FR-072 · Exceptions (confirmed)
 
@@ -812,8 +812,8 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-02](../../backlog/user-stories.md#exc-02) | S3 | 0 | Top of the case: payee as registered, full checksummed wallet address, first seen and last changed times, amount against the counterparty's median, each rule hit with its parameters, and the mandate scope | planned | integration: `apps/api/tests/integration/test_exc_02.py` |
-| [EXC-02](../../backlog/user-stories.md#exc-02) | S3 | 1 | The agent's evidence and recommendation sit below, collapsed by default | planned | integration: `apps/api/tests/integration/test_exc_02.py` |
+| [EXC-02](../../backlog/user-stories.md#exc-02) | S3 | 0 | Top of the case: payee as registered, full checksummed wallet address, first seen and last changed times, amount against the counterparty's median, each rule hit with its parameters, and the mandate scope | done | `integration/test_console_review.py::test_case_page_shows_raw_facts_first` |
+| [EXC-02](../../backlog/user-stories.md#exc-02) | S3 | 1 | The agent's evidence and recommendation sit below, collapsed by default | done | `integration/test_console_review.py::test_case_page_shows_raw_facts_first` |
 
 ## FR-073 · Exceptions (confirmed)
 
@@ -836,9 +836,9 @@ Sources: [EXC-04 criteria](../../backlog/user-stories.md#exc-04); [Invariant 8](
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 0 | Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 0 | Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode | done | `integration/test_cases.py::test_approval_reruns_policy_and_proceeds`<br>`integration/test_cases.py::test_changed_facts_after_escalation_open_a_new_case`<br>`integration/test_cases.py::test_a_new_block_on_rerun_stays_blocked`<br>`chain/test_review_loop.py::test_first_payment_escalates_is_approved_and_sent_once` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | done | `integration/test_cases.py::test_reject_is_terminal_and_needs_a_reason` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | done | `integration/test_cases.py::test_initiator_cannot_approve`<br>`integration/test_cases.py::test_api_approval_errors` |
 
 ## FR-075 · Exceptions (proposed)
 
@@ -848,9 +848,9 @@ Sources: [spec/00 §who-uses-the-mvp](../../spec/00-product-context.md#who-uses-
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 0 | Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
-| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 0 | Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode | done | `integration/test_cases.py::test_approval_reruns_policy_and_proceeds`<br>`integration/test_cases.py::test_changed_facts_after_escalation_open_a_new_case`<br>`integration/test_cases.py::test_a_new_block_on_rerun_stays_blocked`<br>`chain/test_review_loop.py::test_first_payment_escalates_is_approved_and_sent_once` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | done | `integration/test_cases.py::test_reject_is_terminal_and_needs_a_reason` |
+| [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | done | `integration/test_cases.py::test_initiator_cannot_approve`<br>`integration/test_cases.py::test_api_approval_errors` |
 | [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 0 | GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve` | planned | integration: `apps/api/tests/integration/test_exc_08.py` |
 | [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 1 | Same rules as the console: re-run, separation of duties, 409 on double approval | planned | integration: `apps/api/tests/integration/test_exc_08.py` |
 
@@ -862,8 +862,8 @@ Sources: [EXC-05 criteria](../../backlog/user-stories.md#exc-05)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-05](../../backlog/user-stories.md#exc-05) | S3 | 0 | Row lock plus version check; the second approval gets 409 `already_resolved` | planned | integration: `apps/api/tests/integration/test_exc_05.py` |
-| [EXC-05](../../backlog/user-stories.md#exc-05) | S3 | 1 | Fault suite includes parallel approvals from console and API | planned | concurrency: `apps/api/tests/concurrency/test_exc_05.py` |
+| [EXC-05](../../backlog/user-stories.md#exc-05) | S3 | 0 | Row lock plus version check; the second approval gets 409 `already_resolved` | done | `integration/test_cases.py::test_parallel_approvals_one_wins`<br>`integration/test_cases.py::test_api_approval_errors` |
+| [EXC-05](../../backlog/user-stories.md#exc-05) | S3 | 1 | Fault suite includes parallel approvals from console and API | done | `integration/test_cases.py::test_parallel_approvals_through_api_and_console` |
 
 ## FR-077 · Exceptions (confirmed)
 
@@ -876,7 +876,7 @@ Sources: [Invariant 7](../../CLAUDE.md#non-negotiable-invariants); [EXC-06 crite
 | [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 0 | Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline | planned | integration: `apps/api/tests/integration/test_exc_06.py` |
 | [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 1 | The count of payments approved by timeout is always 0 and is reported | planned | fault: `apps/api/tests/integration/test_exc_06.py` |
 | [EXC-07](../../backlog/user-stories.md#exc-07) | S3 | 0 | Counterparty updates, owner assignments and incident notices are stored with recipient, template and body | planned | integration: `apps/api/tests/integration/test_exc_07.py` |
-| [EXC-07](../../backlog/user-stories.md#exc-07) | S3 | 1 | Nothing in the prototype sends real email | planned | integration: `apps/api/tests/integration/test_exc_07.py` |
+| [EXC-07](../../backlog/user-stories.md#exc-07) | S3 | 1 | Nothing in the prototype sends real email | done | `integration/test_console_review.py::test_outbox_lists_assignment_notices`<br>`manual:the prototype has no email provider; outbox rows are never sent` |
 
 ## FR-078 · Exceptions (proposed)
 
@@ -1003,9 +1003,9 @@ Sources: [spec/07 §07--back-office-console](../../spec/07-console.md#07--back-o
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [CON-01](../../backlog/user-stories.md#con-01) | S3 | 0 | Jinja and htmx; navigation: Overview, Payments, Exceptions, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings | planned | console: `apps/api/tests/integration/test_con_01.py` |
-| [CON-01](../../backlog/user-stories.md#con-01) | S3 | 1 | A banner on every page: 'Prototype · test networks · simulated bank rail' | planned | console: `apps/api/tests/integration/test_con_01.py` |
-| [CON-01](../../backlog/user-stories.md#con-01) | S3 | 2 | Wording uses 'agentic payment controls' and names the three layers (decision, orchestration, operations); never 'payments company' or 'payment provider' | planned | console: `apps/api/tests/integration/test_con_01.py` |
+| [CON-01](../../backlog/user-stories.md#con-01) | S3 | 0 | Jinja and htmx; navigation: Overview, Payments, Exceptions, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings | done | `integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording`<br>`integration/test_console_review.py::test_unbuilt_sections_say_so` |
+| [CON-01](../../backlog/user-stories.md#con-01) | S3 | 1 | A banner on every page: 'Prototype · test networks · simulated bank rail' | done | `integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording` |
+| [CON-01](../../backlog/user-stories.md#con-01) | S3 | 2 | Wording uses 'agentic payment controls' and names the three layers (decision, orchestration, operations); never 'payments company' or 'payment provider' | done | `integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording` |
 
 ## FR-091 · Console (confirmed)
 
@@ -1018,7 +1018,7 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 | [CON-02](../../backlog/user-stories.md#con-02) | S6 | 0 | Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events | planned | console: `apps/api/tests/integration/test_con_02.py` |
 | [CON-02](../../backlog/user-stories.md#con-02) | S6 | 1 | Refreshes by htmx polling | planned | console: `apps/api/tests/integration/test_con_02.py` |
 | [CON-03](../../backlog/user-stories.md#con-03) | S3 | 0 | Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button | planned | console: `apps/api/tests/integration/test_con_03.py` |
-| [CON-04](../../backlog/user-stories.md#con-04) | S3 | 0 | Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason | planned | console: `apps/api/tests/integration/test_con_04.py` |
+| [CON-04](../../backlog/user-stories.md#con-04) | S3 | 0 | Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason | done | `integration/test_console_review.py::test_exceptions_queue_filters_and_countdown`<br>`integration/test_console_review.py::test_console_approve_requires_reason_and_permission` |
 | [CON-05](../../backlog/user-stories.md#con-05) | S5 | 0 | Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force | planned | console: `apps/api/tests/integration/test_con_05.py` |
 | [CON-05](../../backlog/user-stories.md#con-05) | S5 | 1 | 'Submit as agent' calls the public API with the agent's key and shows the decision | planned | console: `apps/api/tests/integration/test_con_05.py` |
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 0 | Active version, history and diff; propose and approve per POL-07 | planned | console: `apps/api/tests/integration/test_con_06.py` |

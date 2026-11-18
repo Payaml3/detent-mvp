@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Payments{% endblock %}
+{% block main %}
+<h1>Payments</h1>
+<form method="get" class="filters">
+  <label>Status
+    <select name="status" onchange="this.form.submit()">
+      <option value="">Any</option>
+      {% for s in ["RECEIVED","ESCALATED","READY","HELD","SUBMITTED","UNKNOWN","CONFIRMED","FAILED","FAILED_FINAL","BLOCKED","REJECTED","CANCELLED","SHADOWED"] %}
+      <option value="{{ s }}" {{ 'selected' if status == s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+<table>
+  <thead><tr><th>Payment</th><th>Status</th><th>Payee</th><th>Amount</th><th>Source</th><th>Reference</th><th>Created</th></tr></thead>
+  <tbody>
+  {% for p in payments %}
+    <tr><td class="mono"><a href="/console/payments/{{ p.id }}">{{ p.id }}</a></td><td><span class="st st-{{ p.status|lower }}">{{ p.status }}</span></td>
+        <td>{{ p.payee or '' }}</td><td class="num">{{ p.amount }}</td><td>{{ p.source }}</td><td>{{ p.reference or '' }}</td>
+        <td>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">No payments yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

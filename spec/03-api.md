@@ -139,6 +139,7 @@ The signature header is `Detent-Signature: t=1764756000,v1=<hex HMAC-SHA256(secr
 - `unknown_version`
 - `mandate_invalid`
 - `self_approval_forbidden`
+- `insufficient_role` (the acting user's role may not perform the action, G-06)
 - `kill_switch_engaged`
 - `not_cancellable`
 - `validation_error`

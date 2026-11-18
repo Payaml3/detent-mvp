@@ -33,7 +33,8 @@ slices:
   stories: [EXE-01, EXE-02, EXE-03, EXE-04, RAL-01, RAL-02]
 
 - id: S3
-  name: "Escalate, review raw facts, approve with a policy re-run"
+  name: "Escalate, review raw facts, approve with a policy re-run (done)"
+  status: done
   goal: "The human loop: unusual payments escalate to an owned case, the reviewer sees raw facts first, approval re-runs the rules."
   exit: >-
     A first payment escalates FIRST_PAYMENT into a case with owner and deadline; in the console the reviewer sees the

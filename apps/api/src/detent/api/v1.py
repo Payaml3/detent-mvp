@@ -7,10 +7,13 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, Query, Request
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import text
 
 from detent.api.auth import Principal, authenticate, require
-from detent.api.errors import error_response
+from detent.api.errors import ErrorType, error_response
+from detent.audit.log import Actor
+from detent.exceptions.cases import CaseError, approve, reject
 from detent.intents.service import IntentRequest, payment_view, submit_intent
 from detent.logging import request_id_var
 
@@ -150,3 +153,62 @@ def list_payment_intents(
     return JSONResponse(
         {"data": data, "has_more": has_more, "next_cursor": ids[-1] if has_more and ids else None}
     )
+
+
+# --------------------------------------------------------------------------------- exceptions (EXC-04)
+class ResolutionIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str = Field(min_length=1, max_length=2000)
+
+
+def _resolve_case(
+    request: Request, case_id: str, body: ResolutionIn, principal: Principal, action: str
+) -> JSONResponse:
+    require(principal, "exceptions:approve")
+    if not body.reason.strip():
+        return error_response(
+            422,
+            "invalid_request",
+            "validation_error",
+            "A reason is required.",
+            request_id=_rid(),
+            param="reason",
+        )
+    rt = request.app.state.runtime
+    actor = Actor(principal.user_id, principal.role)
+    try:
+        fn = approve if action == "approve" else reject
+        res = fn(
+            rt.engine, rt.clock, case_id=case_id, org_id=principal.org_id, actor=actor, reason=body.reason
+        )
+    except CaseError as exc:
+        kinds: dict[int, ErrorType] = {404: "not_found", 403: "permission", 409: "conflict"}
+        return error_response(
+            exc.status,
+            kinds.get(exc.status, "conflict"),
+            exc.code,
+            str(exc) or exc.code,
+            request_id=_rid(),
+        )
+    return JSONResponse(
+        {
+            "case_id": res.case_id,
+            "payment_id": res.payment_id,
+            "payment_status": res.payment_status,
+            "new_case_id": res.new_case_id,
+        }
+    )
+
+
+@router.post("/exceptions/{case_id}/approve")
+def approve_exception(
+    request: Request, case_id: str, body: ResolutionIn, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    return _resolve_case(request, case_id, body, principal, "approve")
+
+
+@router.post("/exceptions/{case_id}/reject")
+def reject_exception(
+    request: Request, case_id: str, body: ResolutionIn, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    return _resolve_case(request, case_id, body, principal, "reject")

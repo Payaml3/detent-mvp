@@ -238,6 +238,7 @@ def changed_details(f: Facts, r: RuleSet) -> CheckResult:
             {
                 "destination_id": d.id,
                 "current": d.address or d.account_masked,
+                "previous": d.previous,
                 "last_changed_at": d.last_changed_at.isoformat(),
                 "changed_by": d.last_changed_by,
             },
@@ -264,7 +265,13 @@ def above_norm(f: Facts, r: RuleSet) -> CheckResult:
     if cp.median.currency != f.amount.currency:  # G-13
         return _skip(n, f"not evaluated: no confirmed history in {f.amount.currency.value}")
     ratio_limit = Decimal(cp.median.amount_minor) * u.above_norm_multiplier
-    ev = {"amount": _m(f.amount), "median": _m(cp.median), "multiplier": str(u.above_norm_multiplier)}
+    ratio = (Decimal(f.amount.amount_minor) / Decimal(cp.median.amount_minor)).quantize(Decimal("0.01"))
+    ev = {
+        "amount": _m(f.amount),
+        "median": _m(cp.median),
+        "ratio": str(ratio),
+        "multiplier": str(u.above_norm_multiplier),
+    }
     if Decimal(f.amount.amount_minor) > ratio_limit:
         return CheckResult(n, "ESCALATE", "ABOVE_NORM", ev)
     return CheckResult(n, "PASS", evidence=ev)

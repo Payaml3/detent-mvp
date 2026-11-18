@@ -42,7 +42,7 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | S0 Foundation (done) | 9 | 3.25 | 3.5 |
 | S1 A platform payout is decided through the API (done) | 11 | 5.75 | 5.75 |
 | S2 An EXECUTE decision is sent exactly once (done) | 6 | 3.75 | 3.75 |
-| S3 Escalate, review raw facts, approve with a policy re-run | 10 | 4.75 | 4.75 |
+| S3 Escalate, review raw facts, approve with a policy re-run (done) | 10 | 4.75 | 4.75 |
 | S4 Never paid twice | 10 | 5.25 | 5.25 |
 | S5 An AI agent proposes the $18,500 invoice inside a mandate | 11 | 4.5 | 4.75 |
 | S6 Operations around escalations | 6 | 3.75 | 3.75 |

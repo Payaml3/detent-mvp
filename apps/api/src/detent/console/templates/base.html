@@ -27,6 +27,16 @@
       {% endif %}
     </div>
   </header>
+  {% if user %}
+  <nav class="nav" aria-label="Console">
+    {% for href, label in [("/console/", "Overview"), ("/console/payments", "Payments"), ("/console/exceptions", "Exceptions"),
+                           ("/console/reconciliation", "Reconciliation"), ("/console/rails", "Rails"), ("/console/policy", "Policy"),
+                           ("/console/mandates", "Mandates"), ("/console/counterparties", "Counterparties"), ("/console/outbox", "Outbox"),
+                           ("/console/audit", "Audit"), ("/console/evaluation", "Evaluation"), ("/console/settings", "Settings")] %}
+    <a href="{{ href }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+  {% endif %}
   <main>{% block main %}{% endblock %}</main>
   <footer>Fictional demo data. {{ brand }} is a working name. Agentic payment controls: decision, orchestration and operations.</footer>
 </body>

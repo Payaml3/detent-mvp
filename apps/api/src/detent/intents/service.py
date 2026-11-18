@@ -229,7 +229,14 @@ def load_destination(
             )
             return DestinationFacts(dst_id, False, dest.address, None, now, now, None)
     return DestinationFacts(
-        r.id, True, r.address, r.account_masked, r.first_seen_at, r.last_changed_at, r.last_changed_by
+        r.id,
+        True,
+        r.address,
+        r.account_masked,
+        r.first_seen_at,
+        r.last_changed_at,
+        r.last_changed_by,
+        previous_details(conn, org_id, r.id),
     )
 
 
@@ -346,6 +353,17 @@ _DEC_SQL = (
 )
 
 
+def _open_case_ref(conn: Connection, org_id: str, payment_id: str) -> dict[str, Any] | None:
+    r = conn.execute(
+        text(
+            "SELECT id, owner_id, deadline_at FROM exception_cases WHERE org_id=:o AND payment_id=:p "
+            "AND status IN ('OPEN','HELD_OVERDUE') ORDER BY created_at DESC, id DESC LIMIT 1"
+        ),
+        {"o": org_id, "p": payment_id},
+    ).one_or_none()
+    return {"id": r.id, "owner": r.owner_id, "deadline_at": _iso(r.deadline_at)} if r else None
+
+
 def payment_view(
     conn: Connection, org_id: str, payment_id: str, *, detail: bool = False
 ) -> dict[str, Any] | None:
@@ -376,7 +394,7 @@ def payment_view(
         },
         "reference": p.reference,
         "decision": decisions[-1] if decisions else None,
-        "exception": None,  # exception cases arrive with EXC-01 (slice S3)
+        "exception": _open_case_ref(conn, org_id, payment_id),
         "awaiting_send_click": p.awaiting_send_click,
         "created_at": _iso(p.created_at),
     }
@@ -652,6 +670,13 @@ def _record(
         reason=f"decision {outcome}",
         awaiting_send_click=awaiting,
     )
+    if status is Status.ESCALATED:
+        from detent.exceptions.cases import open_case
+
+        reasons = [
+            ch["reason"] for ch in checks if ch.get("result") in ("ESCALATE", "BLOCK") and ch.get("reason")
+        ]
+        open_case(conn, clock, org_id=c.org_id, payment_id=pid, reasons=reasons, rules=policy.rules)
     view = payment_view(conn, c.org_id, pid)
     assert view is not None
     if c.decision_only:
@@ -716,6 +741,21 @@ def build_facts(
     )
 
 
+def previous_details(conn: Connection, org_id: str, destination_id: str | None) -> str | None:
+    """The address or account before the destination's last change, from its audit event."""
+    if destination_id is None:
+        return None
+    old = conn.execute(
+        text(
+            "SELECT payload->'old' FROM audit_events WHERE org_id=:o AND subject_id=:d AND "
+            "kind='destination.changed' "
+            "ORDER BY seq DESC LIMIT 1"
+        ),
+        {"o": org_id, "d": destination_id},
+    ).scalar_one_or_none()
+    return (old.get("address") or old.get("account_masked")) if old else None
+
+
 def load_destination_by_id(conn: Connection, org_id: str, destination_id: str) -> DestinationFacts:
     r = conn.execute(
         text(
@@ -725,17 +765,83 @@ def load_destination_by_id(conn: Connection, org_id: str, destination_id: str) -
         {"o": org_id, "d": destination_id},
     ).one()
     return DestinationFacts(
-        r.id, True, r.address, r.account_masked, r.first_seen_at, r.last_changed_at, r.last_changed_by
+        r.id,
+        True,
+        r.address,
+        r.account_masked,
+        r.first_seen_at,
+        r.last_changed_at,
+        r.last_changed_by,
+        previous_details(conn, org_id, r.id),
     )
 
 
-def reevaluate(
-    conn: Connection, clock: Clock, *, org_id: str, payment_id: str, screening: Screening, reason: str
-) -> tuple[Evaluation, ActivePolicy]:
-    """Re-run every check with the active rule version on an existing payment (EXE-03; spec/04 Re-runs).
+# Facts that must be unchanged for an approval to cover the reasons it saw (spec/04, D-01).
+_APPROVAL_BASIS = (
+    ("amount",),
+    ("network",),
+    ("destination", "id"),
+    ("destination", "address"),
+    ("destination", "account_masked"),
+    ("destination", "last_changed_at"),
+    ("counterparty", "id"),
+    ("counterparty", "kyb_status"),
+    ("counterparty", "allowlisted"),
+)
+# A system failure is never something a person can approve away (fail closed).
+_NEVER_APPROVABLE = {"SYSTEM_UNAVAILABLE"}
 
+
+def _basis(facts: dict[str, Any]) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for path in _APPROVAL_BASIS:
+        v: Any = facts
+        for k in path:
+            v = v.get(k) if isinstance(v, dict) else None
+        out[".".join(path)] = v
+    return out
+
+
+def approval_covers(
+    result: Evaluation, approved: list[str], before: dict[str, Any] | None, now: dict[str, Any]
+) -> tuple[bool, list[str]]:
+    """D-01: EXECUTE only if every remaining ESCALATE reason was approved and the facts behind it are
+    unchanged. Returns (covered, what changed)."""
+    if result.outcome != "ESCALATE":
+        return False, []
+    remaining = set(result.reasons)
+    if not remaining <= set(approved) or remaining & _NEVER_APPROVABLE:
+        return False, []
+    if before is None:
+        return False, ["no escalation snapshot"]
+    b, n = _basis(before), _basis(now)
+    changed = sorted(k for k in b if b[k] != n[k])
+    return not changed, changed
+
+
+def reevaluate(
+    conn: Connection,
+    clock: Clock,
+    *,
+    org_id: str,
+    payment_id: str,
+    screening: Screening,
+    reason: str,
+    approved_reasons: list[str] | None = None,
+) -> tuple[Evaluation, ActivePolicy]:
+    """Re-run every check with the active rule version on an existing payment (EXE-03, EXC-04; spec/04).
+
+    With ``approved_reasons`` (an approval), the outcome is EXECUTE only when the approval covers every
+    remaining ESCALATE reason and the facts behind them are unchanged (D-01); any BLOCK still blocks.
     Records a new decision and its audit event in the caller's transaction. Any error is the caller's
     to handle as a hold (fail closed)."""
+    before = conn.execute(
+        text(
+            "SELECT inputs_snapshot FROM decisions WHERE org_id=:o AND payment_id=:p "
+            "ORDER BY decided_at DESC, id DESC LIMIT 1"
+        ),
+        {"o": org_id, "p": payment_id},
+    ).scalar_one_or_none()
     p = conn.execute(
         text(
             "SELECT source, counterparty_id, destination_id, amount_minor, currency, network_constraint, "
@@ -765,14 +871,22 @@ def reevaluate(
         already_counted=amount if in_flight else None,
     )
     result = evaluate(facts, policy.rules)
+    facts_json = _jsonable(facts)
+    changed: list[str] = []
+    if approved_reasons is not None:
+        covered, changed = approval_covers(
+            result, approved_reasons, (before or {}).get("facts") if before else None, facts_json
+        )
+        if covered:
+            result = Evaluation("EXECUTE", result.checks)
     now = clock.now()
     dec_id = new_id(Prefix.DEC, now)
     checks = [ch.to_json() for ch in result.checks]
     conn.execute(
         text(
             "INSERT INTO decisions (id, org_id, payment_id, outcome, policy_version_id, policy_hash, "
-            "inputs_snapshot, checks, decided_at, actor) VALUES (:id, :o, :p, :out, :pv, :ph, "
-            "CAST(:snap AS jsonb), CAST(:checks AS jsonb), :t, 'system:policy')"
+            "inputs_snapshot, checks, approved_reasons, decided_at, actor) VALUES (:id, :o, :p, :out, :pv, "
+            ":ph, CAST(:snap AS jsonb), CAST(:checks AS jsonb), :appr, :t, 'system:policy')"
         ),
         {
             "id": dec_id,
@@ -782,9 +896,15 @@ def reevaluate(
             "pv": policy.id,
             "ph": policy.rules.content_hash,
             "snap": json.dumps(
-                {"facts": _jsonable(facts), "rule_version": policy.version, "rerun_reason": reason}
+                {
+                    "facts": facts_json,
+                    "rule_version": policy.version,
+                    "rerun_reason": reason,
+                    "changed": changed,
+                }
             ),
             "checks": json.dumps(checks),
+            "appr": list(approved_reasons or []),
             "t": now,
         },
     )
@@ -802,6 +922,8 @@ def reevaluate(
             "policy_hash": policy.rules.content_hash,
             "checks": checks,
             "rerun_reason": reason,
+            "approved_reasons": list(approved_reasons or []),
+            "changed_since_escalation": changed,
         },
     )
     return result, policy

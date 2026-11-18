@@ -40,3 +40,23 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .user.current { border-width: 2px; }
 .facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
 .facts dt { color: var(--muted); }
+.nav { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 8px 24px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.nav a { color: var(--ink); text-decoration: none; }
+.nav a:hover { color: var(--blue); }
+.layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 16px 0 24px; }
+table { width: 100%; border-collapse: collapse; background: #fff; margin: 8px 0 24px; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; font-size: 13px; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.small { font-size: 12px; }
+.filters { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+.filters label { margin: 0; }
+.filters select { display: block; padding: 6px; margin-top: 4px; }
+label.inline input { display: inline; width: auto; }
+.late { color: #c62828; font-weight: 600; }
+.r-block td { background: #fdecea; }
+.r-escalate td { background: #fff6e0; }
+.note { background: #fff; border-left: 4px solid var(--amber); padding: 8px 12px; }
+.card + .card { margin-top: 16px; }
+.timeline { padding-left: 20px; }
+section.card, details.card { margin-bottom: 16px; }

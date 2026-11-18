@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Case {{ case.id }}{% endblock %}
+{% block main %}
+<h1>Case <span class="mono">{{ case.id }}</span></h1>
+<p>{{ case.status }} · tier {{ case.tier }} · owner {{ case.owner_name or 'none' }}{% if case.backup_name %} (backup {{ case.backup_name }}){% endif %} · {{ countdown }}
+  · payment <a class="mono" href="/console/payments/{{ case.payment_id }}">{{ case.payment_id }}</a></p>
+
+<section class="card" data-section="raw-facts">
+  <h2>Raw facts</h2>
+  <dl class="facts">
+    <dt>Payee as registered</dt><dd>{{ f.payee }} · KYB {{ f.kyb }} · {{ 'allowlisted' if f.allowlisted else 'not allowlisted' }}</dd>
+    <dt>Destination</dt><dd class="mono">{{ f.address or f.account_masked }}{% if f.verified == false %} (unverified){% endif %}</dd>
+    <dt>Network</dt><dd>{{ f.network }}</dd>
+    <dt>First seen</dt><dd>{{ f.first_seen.strftime('%Y-%m-%d %H:%M') if f.first_seen else 'unknown' }} UTC</dd>
+    <dt>Last changed</dt><dd>{{ f.last_changed.strftime('%Y-%m-%d %H:%M') if f.last_changed else 'unknown' }} UTC{% if f.changed_by %} by {{ f.changed_by }}{% endif %}</dd>
+    <dt>Amount</dt><dd>{{ f.amount }}</dd>
+    <dt>Median</dt><dd>{% if f.median %}{{ f.median }} over {{ f.payment_count }} confirmed payments{% if f.ratio %} · this is {{ f.ratio }}× the median{% endif %}{% else %}no confirmed payments yet{% endif %}</dd>
+    <dt>Mandate scope</dt><dd>{% if f.source == 'agent' %}<span class="mono">{{ f.mandate }}</span> (verification arrives with MND-02){% else %}Not applicable: platform intent{% endif %}</dd>
+    <dt>Reference</dt><dd>{{ f.reference or '' }}</dd>
+  </dl>
+  <h3>Rule hits</h3>
+  <ul>
+  {% for h in f.hits %}<li><strong>{{ h.reason }}</strong> ({{ h.check }}, {{ h.result }}){% if h.evidence %}: <span class="mono">{% for k, v in h.evidence.items() %}{{ k }}: {{ v }}{% if not loop.last %}; {% endif %}{% endfor %}</span>{% endif %}</li>{% endfor %}
+  </ul>
+</section>
+
+<details class="card" data-section="agent-evidence">
+  <summary>Agent evidence and recommendation</summary>
+  <p class="muted">No agent evidence for this case. The investigation agent arrives in a later slice; its recommendation never changes the decision.</p>
+</details>
+
+{% if case.status == 'RESOLVED' %}
+<p class="card">Resolved: <strong>{{ case.resolution }}</strong> by {{ case.resolved_by }} · {{ case.resolution_reason }}</p>
+{% elif can_decide %}
+<section class="card">
+  <h2>Decide</h2>
+  <form method="post" action="/console/exceptions/{{ case.id }}/approve">
+    <label>Reason (required)<input name="reason" required maxlength="2000"></label>
+    <button class="primary">Approve and re-run the rules</button>
+    <button formaction="/console/exceptions/{{ case.id }}/reject">Reject</button>
+  </form>
+  <p class="muted small">Approving re-runs every check with the active rule version. A block stays blocked; a new reason opens a new case.</p>
+</section>
+{% else %}
+<p class="muted">You can't decide this case: approval needs the reviewer, backup owner or payments lead role, and never the person who started the payment.</p>
+{% endif %}
+{% endblock %}

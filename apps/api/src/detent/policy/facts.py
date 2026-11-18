@@ -42,6 +42,7 @@ class DestinationFacts:
     first_seen_at: datetime
     last_changed_at: datetime
     last_changed_by: str | None
+    previous: str | None = None  # the address or account before the last change, from the audit log
 
 
 @dataclass(frozen=True, slots=True)

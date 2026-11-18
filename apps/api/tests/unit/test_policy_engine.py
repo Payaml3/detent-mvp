@@ -270,3 +270,22 @@ def test_a_crashing_check_fails_closed(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_checks_never_see_free_text() -> None:
     assert not any(f.name in {"notes", "reference", "invoice_text"} for f in dataclasses.fields(Facts))
+
+
+def test_above_norm_evidence_has_the_ratio() -> None:  # POL-05: raw facts as evidence
+    c = by_name(evaluate(routine(amount=usdc("9000.00")), RULES))["above_norm"]
+    assert c.evidence["ratio"] == "5.00" and c.evidence["median"] == "1800.00"  # type: ignore[attr-defined]
+
+
+def test_changed_details_evidence_has_old_and_new() -> None:
+    d = dataclasses.replace(
+        routine().destination,
+        last_changed_at=NOW - timedelta(days=1),
+        last_changed_by="usr_pl",
+        previous="0x1111111111111111111111111111111111111111",
+    )
+    c = by_name(evaluate(routine(destination=d), RULES))["changed_details"]
+    assert (
+        c.evidence["previous"] == "0x1111111111111111111111111111111111111111"
+        and c.evidence["current"] == ADDR
+    )  # type: ignore[attr-defined]

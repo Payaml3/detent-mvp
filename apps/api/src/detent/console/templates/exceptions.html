@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Exceptions{% endblock %}
+{% block main %}
+<h1>Exceptions</h1>
+<form method="get" class="filters">
+  <label>Owner <select name="owner"><option value="">Anyone</option>{% for o in owners %}<option value="{{ o.id }}" {{ 'selected' if filters.owner == o.id }}>{{ o.display_name }}</option>{% endfor %}</select></label>
+  <label>Tier <select name="tier"><option value="">Any</option>{% for t in [1,2,3] %}<option value="{{ t }}" {{ 'selected' if filters.tier == t }}>{{ t }}</option>{% endfor %}</select></label>
+  <label class="inline"><input type="checkbox" name="overdue" value="1" {{ 'checked' if filters.overdue }}> Overdue only</label>
+  <button>Filter</button>
+</form>
+<table>
+  <thead><tr><th>Case</th><th>Payment</th><th>Reasons</th><th>Amount</th><th>Tier</th><th>Owner</th><th>Deadline</th></tr></thead>
+  <tbody>
+  {% for c in cases %}
+    <tr><td class="mono"><a href="/console/exceptions/{{ c.id }}">{{ c.id }}</a></td><td class="mono">{{ c.payment_id }}</td>
+      <td>{{ c.reasons|join(', ') }}</td><td class="num">{{ c.amount }}</td><td>{{ c.tier }}</td><td>{{ c.owner_name or '' }}</td>
+      <td class="{{ 'late' if c.late }}">{{ c.countdown }}</td></tr>
+  {% else %}<tr><td colspan="7" class="muted">Nothing waiting.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

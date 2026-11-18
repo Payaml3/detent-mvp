@@ -146,3 +146,34 @@ RAL-02:
   0: ["chain/test_rail_contract.py::test_prepare_submit_status", "chain/test_rail_contract.py::test_adapter_refuses_a_non_test_chain",
       "chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms"]
   1: ["chain/test_rail_contract.py::test_explorer_link", "chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms"]
+POL-05:
+  0: ["unit/test_policy_engine.py::test_new_wallet_and_unregistered_address_escalate", "unit/test_policy_engine.py::test_changed_details_escalates_with_who_and_when"]
+  1: ["unit/test_policy_engine.py::test_first_payment_escalates_and_above_norm_is_not_evaluated"]
+  2: ["unit/test_policy_engine.py::test_above_norm", "unit/test_policy_engine.py::test_above_norm_ignores_history_in_another_currency"]
+  3: ["unit/test_policy_engine.py::test_above_norm_evidence_has_the_ratio", "unit/test_policy_engine.py::test_changed_details_evidence_has_old_and_new",
+      "integration/test_registry.py::test_changed_details_shows_the_old_address"]
+POL-06:
+  0: ["integration/test_transition.py::test_terminal_states_never_change", "integration/test_schema.py::test_terminal_payment_status_is_frozen"]
+  2: ["unit/test_policy_engine.py::test_resubmission_after_block_escalates"]
+EXC-01:
+  0: ["integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline", "integration/test_cases.py::test_owner_is_the_reviewer_with_fewest_open_cases"]
+  2: ["integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline", "integration/test_cases.py::test_approval_reruns_policy_and_proceeds"]
+EXC-02:
+  0: ["integration/test_console_review.py::test_case_page_shows_raw_facts_first"]
+  1: ["integration/test_console_review.py::test_case_page_shows_raw_facts_first"]
+EXC-04:
+  0: ["integration/test_cases.py::test_approval_reruns_policy_and_proceeds", "integration/test_cases.py::test_changed_facts_after_escalation_open_a_new_case",
+      "integration/test_cases.py::test_a_new_block_on_rerun_stays_blocked", "chain/test_review_loop.py::test_first_payment_escalates_is_approved_and_sent_once"]
+  1: ["integration/test_cases.py::test_reject_is_terminal_and_needs_a_reason"]
+  2: ["integration/test_cases.py::test_initiator_cannot_approve", "integration/test_cases.py::test_api_approval_errors"]
+EXC-05:
+  0: ["integration/test_cases.py::test_parallel_approvals_one_wins", "integration/test_cases.py::test_api_approval_errors"]
+  1: ["integration/test_cases.py::test_parallel_approvals_through_api_and_console"]
+EXC-07:
+  1: ["integration/test_console_review.py::test_outbox_lists_assignment_notices", "manual:the prototype has no email provider; outbox rows are never sent"]
+CON-01:
+  0: ["integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording", "integration/test_console_review.py::test_unbuilt_sections_say_so"]
+  1: ["integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording"]
+  2: ["integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording"]
+CON-04:
+  0: ["integration/test_console_review.py::test_exceptions_queue_filters_and_countdown", "integration/test_console_review.py::test_console_approve_requires_reason_and_permission"]

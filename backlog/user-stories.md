@@ -244,12 +244,12 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS`
-- [ ] No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT`
-- [ ] Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM`
-- [ ] Each hit stores the raw fact (address, timestamps, median, ratio) as evidence
+- [x] Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS`
+- [x] No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT`
+- [x] Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM`
+- [x] Each hit stores the raw fact (address, timestamps, median, ratio) as evidence
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** POL-02, INT-04 · **Traces to:** A2b.unusual, A2b.raw_facts
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** POL-02, INT-04 · **Traces to:** A2b.unusual, A2b.raw_facts
 
 ### POL-06 · A block is final
 
@@ -257,11 +257,11 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it
+- [x] BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it
 - [ ] Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked`
-- [ ] A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10)
+- [x] A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** POL-02, EXE-01 · **Traces to:** A6.block_final, A2b.rule, L5
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** POL-02, EXE-01 · **Traces to:** A6.block_final, A2b.rule, L5
 
 ### POL-07 · Versioned rule changes with two approvers
 
@@ -677,11 +677,11 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Owner assignment rules by case type and amount, in config
+- [x] Owner assignment rules by case type and amount, in config
 - [ ] Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions)
-- [ ] Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited
+- [x] Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** POL-02, FND-05 · **Traces to:** A2.Exceptions, B3.exceptions
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** POL-02, FND-05 · **Traces to:** A2.Exceptions, B3.exceptions
 
 ### EXC-02 · Raw facts first
 
@@ -689,10 +689,10 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Top of the case: payee as registered, full checksummed wallet address, first seen and last changed times, amount against the counterparty's median, each rule hit with its parameters, and the mandate scope
-- [ ] The agent's evidence and recommendation sit below, collapsed by default
+- [x] Top of the case: payee as registered, full checksummed wallet address, first seen and last changed times, amount against the counterparty's median, each rule hit with its parameters, and the mandate scope
+- [x] The agent's evidence and recommendation sit below, collapsed by default
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** EXC-01, INT-04 · **Traces to:** A2b.raw_facts, L6
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** EXC-01, INT-04 · **Traces to:** A2b.raw_facts, L6
 
 ### EXC-03 · Investigation agent with cited evidence
 
@@ -713,11 +713,11 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode
-- [ ] Reject -> REJECTED (terminal); a reason is required for both
-- [ ] The approver can't be the user who initiated the intent
+- [x] Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode
+- [x] Reject -> REJECTED (terminal); a reason is required for both
+- [x] The approver can't be the user who initiated the intent
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** EXC-01, EXE-03 · **Traces to:** A2.Exceptions, A6.block_final, L6
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** EXC-01, EXE-03 · **Traces to:** A2.Exceptions, A6.block_final, L6
 
 ### EXC-05 · Double-approval safety
 
@@ -725,10 +725,10 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Row lock plus version check; the second approval gets 409 `already_resolved`
-- [ ] Fault suite includes parallel approvals from console and API
+- [x] Row lock plus version check; the second approval gets 409 `already_resolved`
+- [x] Fault suite includes parallel approvals from console and API
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** EXC-04 · **Traces to:** L3, A6.retry_rule
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** EXC-04 · **Traces to:** L3, A6.retry_rule
 
 ### EXC-06 · Deadline sweeper - a timeout never becomes an approval
 
@@ -748,9 +748,9 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 **Acceptance criteria**
 
 - [ ] Counterparty updates, owner assignments and incident notices are stored with recipient, template and body
-- [ ] Nothing in the prototype sends real email
+- [x] Nothing in the prototype sends real email
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** FND-03 · **Traces to:** B3.exceptions
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** FND-03 · **Traces to:** B3.exceptions
 
 ### EXC-08 · Exceptions by API
 
@@ -917,11 +917,11 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Jinja and htmx; navigation: Overview, Payments, Exceptions, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings
-- [ ] A banner on every page: 'Prototype · test networks · simulated bank rail'
-- [ ] Wording uses 'agentic payment controls' and names the three layers (decision, orchestration, operations); never 'payments company' or 'payment provider'
+- [x] Jinja and htmx; navigation: Overview, Payments, Exceptions, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings
+- [x] A banner on every page: 'Prototype · test networks · simulated bank rail'
+- [x] Wording uses 'agentic payment controls' and names the three layers (decision, orchestration, operations); never 'payments company' or 'payment provider'
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** FND-04 · **Traces to:** L8, BR.category, D.honesty
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** FND-04 · **Traces to:** L8, BR.category, D.honesty
 
 ### CON-02 · Overview screen
 
@@ -942,7 +942,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 - [ ] Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** CON-01, AUD-01 · **Traces to:** A2.Prove, A2.Decide
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** CON-01, AUD-01 · **Traces to:** A2.Prove, A2.Decide
 
 ### CON-04 · Exceptions queue screen
 
@@ -950,9 +950,9 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason
+- [x] Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** CON-01, EXC-04 · **Traces to:** A2.Exceptions, A2b.raw_facts
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** CON-01, EXC-04 · **Traces to:** A2.Exceptions, A2b.raw_facts
 
 ### CON-05 · Invoice drop and agent proposal screen
 

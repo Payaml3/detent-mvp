@@ -119,3 +119,39 @@ def test_destination_editable_in_console_by_payments_lead_only(engine: Engine, c
             ).scalar()
             == new
         )
+
+
+def test_changed_details_shows_the_old_address(engine: Engine, clock: FrozenClock) -> None:
+    import uuid
+
+    from conftest import make_settings
+    from decision_helpers import PEPPER, payout
+    from detent.api.app import create_app
+    from pydantic import SecretStr
+
+    d = setup_decision_org(engine, clock)
+    old = d.wallets["WALLET_BLUEFIN_BASE"]
+    new = "0x5555555555555555555555555555555555555555"
+    with engine.begin() as c:
+        update_destination(
+            c, clock, d.id, "dst_bluefin_base", address=new, actor=Actor("usr_x", "payments_lead")
+        )
+    app = create_app(
+        make_settings(d.id, api_key_pepper=SecretStr(PEPPER)),
+        engine=engine,
+        clock=clock,
+        configure_logging=False,
+    )
+    with TestClient(app) as c:
+        j = c.post(
+            "/v1/payment_intents",
+            headers={**d.auth(), "Idempotency-Key": str(uuid.uuid4())},
+            json=payout(
+                "cpt_bluefin",
+                "10.00",
+                "USDC",
+                {"kind": "evm_wallet", "network": "base-sepolia", "address": new},
+            ),
+        ).json()
+    ch = next(x for x in j["decision"]["checks"] if x["check"] == "changed_details")
+    assert ch["evidence"]["previous"] == old and ch["evidence"]["current"] == new

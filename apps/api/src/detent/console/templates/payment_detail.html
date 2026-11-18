@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Payment {{ p.id }}{% endblock %}
+{% block main %}
+<h1>Payment <span class="mono">{{ p.id }}</span></h1>
+<p><span class="st st-{{ p.status|lower }}">{{ p.status }}</span> · {{ p.amount.amount }} {{ p.amount.currency }} · {{ p.source }}{% if p.reference %} · {{ p.reference }}{% endif %}
+  {% if p.exception %} · <a href="/console/exceptions/{{ p.exception.id }}">Open case</a>{% endif %}
+  <button disabled title="Replay arrives with AUD-02">Replay</button></p>
+
+<h2>Decisions</h2>
+{% for d in p.decisions %}
+<section class="card">
+  <p><strong>{{ d.outcome }}</strong> · rule version {{ d.policy_version }} · <span class="mono">{{ d.policy_hash[:12] }}</span> · {{ d.decided_at }}
+    {% if d.approved_reasons %} · approved reasons: {{ d.approved_reasons|join(', ') }}{% endif %}</p>
+  <table>
+    <thead><tr><th>Check</th><th>Result</th><th>Reason</th><th>Evidence</th></tr></thead>
+    <tbody>
+    {% for c in d.checks %}
+      <tr class="r-{{ c.result|lower }}"><td class="mono">{{ c.check }}</td><td>{{ c.result }}</td><td>{{ c.reason or '' }}</td>
+        <td class="mono small">{% for k, v in (c.evidence or {}).items() %}{{ k }}: {{ v }}{% if not loop.last %}; {% endif %}{% endfor %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+
+<h2>Route</h2>
+{% set last = p.decisions[-1] if p.decisions else None %}
+{% if last and last.route %}<pre class="mono">{{ last.route }}</pre>{% else %}<p class="muted">Rail chosen from the destination network: {{ p.destination.network }}. Scored routing arrives with RAL-06.</p>{% endif %}
+
+<h2>Attempts</h2>
+<table>
+  <thead><tr><th>#</th><th>Rail</th><th>Status</th><th>Failure class</th><th>Nonce</th><th>Transaction</th><th>Submitted</th></tr></thead>
+  <tbody>
+  {% for a in p.attempts %}
+    <tr><td>{{ a.attempt_no }}</td><td>{{ a.rail }}</td><td>{{ a.status }}</td><td>{{ a.failure_class or '' }}</td><td>{{ a.nonce if a.nonce is not none else '' }}</td>
+      <td class="mono">{% if explorer.get(a.id) %}<a href="{{ explorer[a.id] }}" rel="noopener">{{ a.tx_hash }}</a>{% else %}{{ a.tx_hash or '' }}{% endif %}</td>
+      <td>{{ a.submitted_at or '' }}</td></tr>
+  {% else %}<tr><td colspan="7" class="muted">No attempts.</td></tr>{% endfor %}
+  </tbody>
+</table>
+
+<h2>Ledger postings</h2>
+{% if p.postings %}
+<table><tbody>{% for x in p.postings %}<tr><td class="mono">{{ x.account }}</td><td>{{ x.direction }}</td><td class="num">{{ x.amount.amount }} {{ x.amount.currency }}</td></tr>{% endfor %}</tbody></table>
+{% else %}<p class="muted">No postings. The ledger arrives with LED-01.</p>{% endif %}
+
+<h2>Timeline</h2>
+<ol class="timeline">
+{% for e in p.events %}<li><span class="mono">{{ e.at }}</span> <strong>{{ e.kind }}</strong> <span class="muted">{{ e.actor }}</span>
+  {% if e.payload.get('reason') %} · {{ e.payload.reason }}{% endif %}{% if e.payload.get('to') %} → {{ e.payload.to }}{% endif %}</li>{% endfor %}
+</ol>
+{% endblock %}
