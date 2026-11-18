@@ -7,6 +7,7 @@ send triggers produce one transaction.
 
 from __future__ import annotations
 
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 
@@ -14,9 +15,11 @@ import pytest
 from chain_helpers import ChainOrg, balance, needs_chain, setup_chain_org, w3
 from detent import devchain
 from detent.clock import FrozenClock
+from detent.domain.money import Currency, Money
 from detent.execution import nonces
-from detent.execution.send import send_payment
+from detent.execution.send import apply_rail_status, send_payment
 from detent.policy.screening import MockScreening
+from detent.rails.base import AttemptView
 from sqlalchemy import Engine, text
 
 pytestmark = [pytest.mark.db, *needs_chain]
@@ -42,9 +45,37 @@ def attempts(engine: Engine, org: str, pid: str) -> list[object]:
 
 
 def send(engine: Engine, clock: FrozenClock, co: ChainOrg, pid: str) -> str:
-    return send_payment(
+    st = send_payment(
         engine, clock, co.adapters, org_id=co.id, payment_id=pid, screening=MockScreening.from_fixture()
-    ).value
+    )
+    # A receipt can lag the broadcast on a busy machine; the confirmation poller asks again. So do we.
+    for _ in range(50):
+        if st.value != "SUBMITTED":
+            break
+        time.sleep(0.1)
+        a = attempts(engine, co.id, pid)[-1]
+        view = AttemptView(
+            a.id,
+            pid,
+            a.attempt_no,
+            a.rail_id,
+            a.idempotency_key,  # type: ignore[attr-defined]
+            _amount(engine, co.id, pid),
+            co.payee,
+            a.nonce,
+            a.raw_tx,
+            a.tx_hash,  # type: ignore[attr-defined]
+        )
+        st = apply_rail_status(engine, clock, co.adapter, co.id, view)
+    return st.value
+
+
+def _amount(engine: Engine, org: str, pid: str) -> Money:
+    with engine.connect() as c:
+        minor = c.execute(
+            text("SELECT amount_minor FROM payment_intents WHERE org_id=:o AND id=:p"), {"o": org, "p": pid}
+        ).scalar()
+    return Money(int(minor), Currency.USDC)
 
 
 @pytest.fixture

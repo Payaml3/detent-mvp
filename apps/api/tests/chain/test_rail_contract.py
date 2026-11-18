@@ -89,6 +89,11 @@ def test_prepare_submit_status(adapter: tuple[RailAdapter, str], chain: devchain
     res = a.submit(v)
     assert res.rail_reference == p.tx_hash
     st = a.status(v)
+    for _ in range(50):  # the receipt can lag the broadcast slightly on a busy machine
+        if st.state == "CONFIRMED":
+            break
+        time.sleep(0.1)
+        st = a.status(v)
     assert st.state == "CONFIRMED" and st.confirmations >= 1
     assert balance(chain, payee) == 5_000_000
     # Re-broadcasting the same signed transaction is the same transaction: no second transfer.
