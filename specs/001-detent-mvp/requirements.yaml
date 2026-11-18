@@ -92,7 +92,7 @@ requirements:
 - {id: FR-028, area: Policy, layer: decision, status: confirmed, stories: [POL-06],
    src: ["inv:4", "story:POL-06"],
    text: "A block is final: approve, retry, reroute or resubmit of a blocked payment returns 409 payment_blocked and the database rejects any status change away from BLOCKED or REJECTED."}
-- {id: FR-029, area: Policy, layer: decision, status: proposed, decision: [C-05], stories: [POL-06],
+- {id: FR-029, area: Policy, layer: decision, status: confirmed, decision: [C-05, D-10], stories: [POL-06],
    src: ["story:POL-06", "spec/09#attacks-evl-02-at-least-100-scenarios-pass--0-unauthorised-executions"],
    text: "A new intent to the same counterparty or destination address within 24 hours of a block escalates RESUBMISSION_AFTER_BLOCK with a link to the blocked payment, whatever the amount."}
 - {id: FR-030, area: Policy, layer: decision, status: confirmed, stories: [POL-07],
@@ -107,7 +107,7 @@ requirements:
 - {id: FR-033, area: Policy, layer: decision, status: confirmed, stories: [POL-09],
    src: ["inv:9", "spec/01#fail-safe"],
    text: "Any failure in a decision path (database, screening, policy load, model) gives ESCALATE SYSTEM_UNAVAILABLE handled by the organisation's fail-safe; no error ever becomes EXECUTE."}
-- {id: FR-034, area: Policy, layer: decision, status: proposed, decision: [C-03], stories: [POL-09, EXE-01],
+- {id: FR-034, area: Policy, layer: decision, status: confirmed, decision: [C-03, D-09], stories: [POL-09, EXE-01],
    src: ["spec/02#payment-state-machine", "spec/01#fail-safe"],
    text: "With fail-safe 'hold', a payment whose decision failed moves RECEIVED to HELD; with 'manual_queue' it moves to ESCALATED."}
 - {id: FR-035, area: Policy, layer: decision, status: confirmed, decision: [D-01], stories: [EXC-04, EXE-03],
@@ -310,7 +310,7 @@ requirements:
 - {id: FR-104, area: Webhooks, layer: portal, status: proposed, decision: [G-20], stories: [WHK-03],
    src: ["spec/03#webhooks"],
    text: "Webhook retries back off at 1 min, 5 min, 30 min, 2 h, 6 h and 24 h, then the delivery is marked failed."}
-- {id: FR-113, area: Webhooks, layer: portal, status: proposed, decision: [C-19], stories: [WHK-01, WHK-02],
+- {id: FR-113, area: Webhooks, layer: portal, status: confirmed, decision: [C-19, D-12], stories: [WHK-01, WHK-02],
    src: ["spec/03#webhooks", "spec/02#entities"],
    text: "Webhook signing secrets are shown once and stored encrypted (not hashed), because every delivery is signed with the plaintext secret."}
 - {id: FR-105, area: Dashboard, layer: portal, status: confirmed,
@@ -320,9 +320,9 @@ requirements:
 - {id: FR-106, area: Sandbox, layer: portal, status: confirmed, stories: [SBX-01, SBX-02, SBX-03],
    src: ["spec/08#sandbox-sbx", "spec/06#sandbox-test-values-sbx-01"],
    text: "Sandbox test values trigger every path; quotas and abuse limits apply; expired organisations get 403 organisation_expired; (Should) opt-in real testnet mode from a capped faucet wallet."}
-- {id: FR-107, area: Sandbox, layer: portal, status: open, decision: [C-04], stories: [SBX-04],
+- {id: FR-107, area: Sandbox, layer: portal, status: confirmed, decision: [C-04, D-08], stories: [SBX-04],
    src: ["story:SBX-04", "inv:12"],
-   text: "Sandbox reset clears an organisation's test data without deleting audit or ledger rows (method to be decided: proposed new data generation)."}
+   text: "Sandbox reset starts a new data generation: earlier intents, cases, ledger and logs are hidden from the API and dashboard but never deleted; keys, webhooks and settings are kept."}
 - {id: FR-108, area: Sandbox, layer: portal, status: proposed, decision: [G-18, G-19], stories: [DSH-01, SBX-04],
    src: ["spec/08#sandbox-sbx"],
    text: "A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days (pending legal review)."}

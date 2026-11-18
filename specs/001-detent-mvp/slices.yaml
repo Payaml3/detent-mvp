@@ -1,7 +1,7 @@
-# PROPOSED (decision C-17): end-to-end milestone slices. Every backlog story appears in exactly one
-# slice. Stories, estimates and acceptance criteria are unchanged; only the build order changes.
-# tools/build_spec.py checks: full coverage, no story twice, and no dependency in a later slice.
-# If the founder approves, each story's `ms` in backlog/stories.yaml can be updated to its slice.
+# The build order: end-to-end milestone slices (founder decision D-11, 18 Nov 2026, resolving C-17).
+# Every backlog story is in exactly one slice, and its `ms` in backlog/stories.yaml is the slice ID.
+# tools/build_spec.py checks: full coverage, no story twice, `ms` matches, and no dependency in a later
+# slice. tools/build_backlog.py reads the order and names from here.
 
 slices:
 - id: S0

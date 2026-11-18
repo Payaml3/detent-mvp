@@ -10,7 +10,7 @@ Detent is agentic payment controls in three layers. The plan keeps the architect
 `spec/01` and that M0 has started (one Python service, a worker, two simulator apps and Postgres). It adds two
 things: contracts for every interface, and a re-sliced build order. The new order is nine small end-to-end
 prototype slices (S1 to S9) and four portal slices (P1 to P4); each ends in a demonstrable exit check. The re-slicing
-is **proposed** (C-17); the stories themselves are unchanged.
+was **decided** by the founder (D-11); the stories themselves are unchanged.
 
 ## Technical Context
 
@@ -40,11 +40,11 @@ is **proposed** (C-17); the stories themselves are unchanged.
 |---|---|---|
 | I. The AI proposes; the policy decides | Agents live in `detent.agents` with read-only repositories; the one write path is `propose_payment_intent` through `/v1` with a mandate-bound key; an import-linter contract (S5) forbids imports of execution, rails and approval code; the policy reads typed fields only ([contracts/internal.md](contracts/internal.md#3-agent-output-schemas)) | Pass |
 | II. Exactly once | Partial unique indexes, terminal and final-attempt triggers, and `transition()` under `FOR UPDATE` (S2); nonce and raw transaction stored before broadcast; UNKNOWN resolver resends only the same transaction (D-02) | Pass (database part done in M0) |
-| III. Blocks final; timeouts never approve; fail closed | Terminal trigger (done); the re-run rule (D-01); the deadline sweeper never approves; `SYSTEM_UNAVAILABLE` routing; the kill switch read inside the lock | Pass, with C-03 open (RECEIVED → HELD) |
+| III. Blocks final; timeouts never approve; fail closed | Terminal trigger (done); the re-run rule (D-01); the deadline sweeper never approves; `SYSTEM_UNAVAILABLE` routing; the kill switch read inside the lock | Pass (RECEIVED → HELD added, D-09) |
 | IV. Evidence by construction | Hash-chained audit in the same transaction (done); append-only ledger; replay from `agent_calls` | Pass |
 | V. Test networks, integer money, isolation, Clock | All enforced and tested in M0 | Pass |
 | VI. Test-first | [tasks.md](tasks.md) puts a test task before every implementation task; [traceability.md](traceability.md) gives each criterion a test | Pass |
-| VII. No invented rules | 19 proposed and 1 open requirements are marked as such and wait for the founder ([decisions.md](decisions.md)) | Pass, conditional on founder review |
+| VII. No invented rules | 16 proposed requirements are marked as such and wait for the founder ([decisions.md](decisions.md)) | Pass, conditional on founder review |
 
 **Post-design re-check (after Phase 1)**: the data model and contracts add no new business rule beyond the register.
 Three M0 artefacts encode proposed rules (permission cells, enum values); they are listed in
@@ -130,7 +130,7 @@ flowchart LR
 
 ## Milestones
 
-**Proposed (C-17)**: build in end-to-end slices instead of layers. Each slice ends in an exit check you can run or
+**Decided (D-11)**: build in end-to-end slices instead of layers. Each slice ends in an exit check you can run or
 demo. Every one of the 146 stories is in exactly one slice, and no story comes before one of its dependencies
 (`tools/build_spec.py` checks both). Source: [slices.yaml](slices.yaml). Day counts are the backlog's estimates.
 

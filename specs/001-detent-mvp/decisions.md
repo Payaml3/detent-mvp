@@ -35,9 +35,9 @@ original documents would let me check every Proposed item below against them.
 |---|---|---|---|---|
 | C-01 | Approval re-runs the policy, but the re-run finds the same escalation reasons (FIRST_PAYMENT, ABOVE_AUTO_LIMIT), so an approved payment re-escalates forever | spec/04 Principles; EXC-04; spec/02 state machine | Re-run executes only if every remaining ESCALATE reason was approved with unchanged evidence; new reasons re-escalate; BLOCK still blocks. Written into spec/04 "Re-runs after approval" | **Confirmed** 2026-11-18 (founder "approve" of pre-M0 item 1) |
 | C-02 | `timeout_before_forward` expects a retry, but the resolver has no evidence path when the transaction never left | spec/06 UNKNOWN resolution vs fault table | Resolver re-broadcasts the same signed raw transaction (same hash); never signs a new one while UNKNOWN. Written into spec/06 | **Confirmed** 2026-11-18 (item 2) |
-| C-03 | `fail_safe: hold` must hold a payment whose *decision* failed, but RECEIVED has no transition to HELD | spec/01 Fail-safe; POL-09; spec/02 state machine | Add RECEIVED → HELD (reason SYSTEM_UNAVAILABLE) for `hold`; `manual_queue` uses RECEIVED → ESCALATED | **Proposed** |
-| C-04 | Sandbox reset "deletes intents, cases, ledger and logs", but ledger and audit rows are never deleted | SBX-04 vs invariant 12, "Things never to do" | Reset starts a new data generation for the sandbox organisation: rows stay, every query filters on the current generation, the audit chain records the reset. No row is deleted | **Open** (needs founder: this touches an invariant) |
-| C-05 | Resubmission after block matches "same payee, same amount", but the attack suite expects "tiny amount changes" to be caught | POL-06 AC3 vs spec/09 Block bypass | Match on same counterparty **or** same destination address within the window, any amount → ESCALATE `RESUBMISSION_AFTER_BLOCK` | **Proposed** |
+| C-03 | `fail_safe: hold` must hold a payment whose *decision* failed, but RECEIVED has no transition to HELD | spec/01 Fail-safe; POL-09; spec/02 state machine | Add RECEIVED → HELD (reason SYSTEM_UNAVAILABLE) for `hold`; `manual_queue` uses RECEIVED → ESCALATED | **Confirmed** 2026-11-18 (founder, D-09) |
+| C-04 | Sandbox reset "deletes intents, cases, ledger and logs", but ledger and audit rows are never deleted | SBX-04 vs invariant 12, "Things never to do" | Reset starts a new data generation for the sandbox organisation: rows stay, every query filters on the current generation, the audit chain records the reset. No row is deleted | **Confirmed** 2026-11-18 (founder, D-08) |
+| C-05 | Resubmission after block matches "same payee, same amount", but the attack suite expects "tiny amount changes" to be caught | POL-06 AC3 vs spec/09 Block bypass | Match on same counterparty **or** same destination address within the window, any amount → ESCALATE `RESUBMISSION_AFTER_BLOCK` | **Confirmed** 2026-11-18 (founder, D-10) |
 | C-06 | Rule activation: spec/04 needs the compliance lead only for loosening changes; POL-07 records the compliance lead's attestation on every activation | spec/04 Rule changes step 3; POL-07 AC2, AC3 | The compliance lead is one of the two approvers on every activation (satisfies both texts) | **Proposed** |
 | C-07 | Owners and deadlines "by tier" and "by type and amount" (EXC-01), but the rule set configures deadlines by case type only and "tier" is never defined | EXC-01 vs spec/04 `deadlines`, `owners` | Tier = deadline class from the rule set (`payout_above_auto_limit` = tier 1, `payout_other` = tier 2, `deposit_exception` = tier 3, `unknown_stuck` = tier 1); no amount bands in the MVP | **Proposed** |
 | C-08 | The loosening detector's list differs between spec/04 (six bullets) and POL-07 ("shorter screening scope") | spec/04; POL-07 AC2 | Use the union of both lists | **Proposed** |
@@ -49,9 +49,9 @@ original documents would let me check every Proposed item below against them.
 | C-14 | The Auditor persona reads the audit log, replays and exports, but the role list has no auditor | spec/00 Personas; spec/02 `users.role` | Add a read-only `auditor` role | **Proposed** |
 | C-15 | The rule set blocks KYB status `unknown`, but spec/02 lists only verified, pending, failed | default-policy.yaml `kyb_status`; spec/02 | Allow `unknown` (already in the M0 migration's CHECK) | **Proposed** |
 | C-16 | The changed-wallet invoice's expected decision is "ESCALATE or BLOCK", which is not a deterministic test oracle | fixtures/invoices/expected-outputs.yaml | Resolved by G-01: an unregistered address is recorded as a new destination and escalates NEW_WALLET (plus the agent flag) | **Proposed** |
-| C-17 | Milestones M1 to M5 build the layers in order, so no money moves end to end until M3 and nothing is clickable until M4; your request asks for small end-to-end milestones | backlog/milestones.md | Re-slice the same stories into vertical slices S1 to S9 ([plan.md](plan.md#milestones), [slices.yaml](slices.yaml)). No story changes, only its milestone | **Proposed** |
+| C-17 | Milestones M1 to M5 build the layers in order, so no money moves end to end until M3 and nothing is clickable until M4; your request asks for small end-to-end milestones | backlog/milestones.md | Re-slice the same stories into vertical slices S1 to S9 ([plan.md](plan.md#milestones), [slices.yaml](slices.yaml)). No story changes, only its milestone | **Confirmed** 2026-11-18 (founder, D-11) |
 | C-18 | `spec/product-definition.md` named a competitor in its wording rules; the founder doesn't want competitor names in the repository | product-definition.md "Rules for wording" | Keep the rule, drop the name: "Avoid the terms 'trust layer' and 'guardrails' (a competitor's wording)". Not a former employer, so no independence issue | **Confirmed** 2026-11-18 (founder: "our competitor and we don't need it here") |
-| C-19 | Webhook signing secrets are "hashed and shown once", but Detent must sign every delivery with the plaintext secret, which a hash can't give back | spec/02 `webhook_endpoints`; spec/10 `WEBHOOK_SECRET_PEPPER`; spec/03 signature | Store the secret encrypted with the credentials key (Fernet, as for rail credentials, RAL-09); still shown once | **Proposed** |
+| C-19 | Webhook signing secrets are "hashed and shown once", but Detent must sign every delivery with the plaintext secret, which a hash can't give back | spec/02 `webhook_endpoints`; spec/10 `WEBHOOK_SECRET_PEPPER`; spec/03 signature | Store the secret encrypted with the credentials key (Fernet, as for rail credentials, RAL-09); still shown once | **Confirmed** 2026-11-18 (founder, D-12) |
 
 ## Missing business rules (G)
 
@@ -104,6 +104,12 @@ original documents would let me check every Proposed item below against them.
 | D-05 | `counters` table, `VARCHAR(8)` currency, `org_id` on every table (spec/02) | 2026-11-18 | Same; commit b90b953 |
 | D-06 | FND-08 (structured logs) is part of M0 | 2026-11-18 | Same; commit 19ed765 |
 | D-07 | C-18: the named company is a competitor, not a former employer; keep the wording rule without its name, and keep competitor names out of the repository | 2026-11-18 | Founder reply in this session |
+| D-08 | C-04: sandbox reset starts a new data generation; nothing is deleted; audit and ledger stay append-only (SBX-04 criterion rewritten) | 2026-11-18 | Founder answer to the decision questions |
+| D-09 | C-03: a failed decision moves RECEIVED → HELD under fail-safe `hold`, RECEIVED → ESCALATED under `manual_queue` (spec/01, spec/02, `domain/states.py`) | 2026-11-18 | Same |
+| D-10 | C-05: resubmission after a block matches the same counterparty or the same destination address within the window, whatever the amount (POL-06 criterion rewritten, spec/04) | 2026-11-18 | Same |
+| D-11 | C-17: build in end-to-end slices S0 to S9 and P1 to P4; each story's milestone is its slice; milestones.md and the prompts follow them | 2026-11-18 | Same |
+| D-12 | C-19: webhook signing secrets are stored encrypted with the credentials key, not hashed; still shown once (spec/02, spec/10) | 2026-11-18 | Same |
+| D-13 | EVL-08 (latency benchmark) is promoted from Should to Must | 2026-11-18 | Same |
 
 ### Technical decisions already implemented in M0 (no business rule involved)
 
@@ -129,8 +135,6 @@ All of these are reversible with a new forward migration if you decide otherwise
 
 ## Questions for the founder, by impact
 
-1. **C-13: scope and timeline.** Full scope (about 12 weeks), prototype first (M0 to M7, about 8.5 weeks), or trim?
-2. **C-17: milestone order.** Adopt the end-to-end slices S1 to S9 instead of the layered M1 to M7?
-3. **C-04: sandbox reset.** May reset bypass the append-only rule for sandbox organisations, or should it start a new data generation (my proposal)?
-4. **G-06, G-05, G-08, G-09: approval authority.** Confirm who may approve, approve after a deadline, approve by API and click Send.
-5. All other Proposed items: approve as a batch, or list the ones to change.
+1. **C-13: scope and timeline.** Full scope (about 12 weeks), prototype first (S0 to S9), or trim?
+2. **G-06, G-05, G-08, G-09: approval authority.** Confirm who may approve, approve after a deadline, approve by API and click Send.
+3. All other Proposed items: approve as a batch, or list the ones to change.

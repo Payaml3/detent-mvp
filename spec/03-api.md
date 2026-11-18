@@ -39,7 +39,7 @@ Base URL (placeholder): `https://sandbox.api.<domain>/v1`. Every request uses TL
 | POST `/kill_switch` and DELETE `/kill_switch` | admin | EXE-08 | Engage, and release (payments lead only) |
 | GET `/reconciliation/runs`, GET `/reconciliation/breaks` | read | LED-06 | Results and breaks |
 | GET `/events` | read | API-07 | Polling alternative to webhooks |
-| POST `/sandbox/reset` | admin | SBX-04 | Reset the organisation's test data |
+| POST `/sandbox/reset` | admin | SBX-04 | Reset the organisation's test data by starting a new data generation; nothing is deleted (D-08) |
 | POST `/sandbox/scenarios` | admin | DSH-07 | Force the next payment's scenario: `timeout_unknown`, `rail_failure`, `flagged_address` |
 
 ## Create a payout intent

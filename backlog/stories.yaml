@@ -43,7 +43,7 @@ stories:
   done: [0, 1, 2, 3]
   deps: []
   trace: [A7.prototype, B5.security]
-  ms: M0
+  ms: S0
 - id: FND-02
   epic: FND
   title: Settings and test-network guard
@@ -59,7 +59,7 @@ stories:
   done: [0, 1, 2]
   deps: [FND-01]
   trace: [A6.no_custody, L8]
-  ms: M0
+  ms: S0
 - id: FND-03
   epic: FND
   title: Baseline schema and ID conventions
@@ -76,7 +76,7 @@ stories:
   done: [0, 1, 2, 3]
   deps: [FND-01]
   trace: [A2b.states, A2.Intent]
-  ms: M0
+  ms: S0
 - id: FND-04
   epic: FND
   title: Demo login and acting-user switcher
@@ -92,7 +92,7 @@ stories:
   done: [0, 1, 2]
   deps: [FND-03]
   trace: [B3.rule_changes, B3.kill_switch, A2.Exceptions]
-  ms: M0
+  ms: S0
 - id: FND-05
   epic: FND
   title: Controllable clock
@@ -108,7 +108,7 @@ stories:
   done: [0, 1, 2]
   deps: [FND-01]
   trace: [B3.exceptions, MVP.flow]
-  ms: M0
+  ms: S0
 - id: FND-06
   epic: FND
   title: Background worker and job loop
@@ -124,7 +124,7 @@ stories:
   done: [0, 1, 2]
   deps: [FND-03]
   trace: [B5.resilience]
-  ms: M0
+  ms: S0
 - id: FND-07
   epic: FND
   title: Deploy to an EU region
@@ -139,7 +139,7 @@ stories:
   est: 0.5
   deps: [FND-06]
   trace: [B5.hosting, B4.infra, A5.data]
-  ms: M7
+  ms: S9
 - id: FND-08
   epic: FND
   title: Structured logs and request IDs
@@ -155,7 +155,7 @@ stories:
   done: [0, 1]
   deps: [FND-01]
   trace: [B5.security, B3.incident]
-  ms: M0
+  ms: S0
 - id: FND-09
   epic: FND
   title: Local EVM with a mock USDC for tests
@@ -171,7 +171,7 @@ stories:
   done: [0, 2]
   deps: [FND-01]
   trace: [L3, A5.gate]
-  ms: M0
+  ms: S0
 
 # ---------------- INT Payment intents ----------------
 - id: INT-01
@@ -189,7 +189,7 @@ stories:
   est: 0.5
   deps: [FND-03]
   trace: [A2.Intent, A2b.states]
-  ms: M1
+  ms: S1
 - id: INT-02
   epic: INT
   title: Idempotent creates
@@ -204,7 +204,7 @@ stories:
   est: 0.5
   deps: [INT-01]
   trace: [A2.Execute, A6.retry_rule, D.standards, L3]
-  ms: M1
+  ms: S1
 - id: INT-03
   epic: INT
   title: Read and list intents
@@ -219,7 +219,7 @@ stories:
   est: 0.25
   deps: [INT-01]
   trace: [A2.Prove, D.standards]
-  ms: M1
+  ms: S1
 - id: INT-04
   epic: INT
   title: Counterparty registry with wallet history
@@ -234,7 +234,7 @@ stories:
   est: 0.5
   deps: [FND-03]
   trace: [A2.Policy, A2b.unusual, A2b.raw_facts]
-  ms: M1
+  ms: S1
 - id: INT-05
   epic: INT
   title: Cancel an intent before it is sent
@@ -248,7 +248,7 @@ stories:
   est: 0.25
   deps: [EXE-01]
   trace: [A2.Intent]
-  ms: M12
+  ms: L
 
 # ---------------- POL Policy ----------------
 - id: POL-01
@@ -265,7 +265,7 @@ stories:
   est: 0.5
   deps: [FND-03]
   trace: [A2.Policy, A6.client_rules, B3.rule_changes]
-  ms: M1
+  ms: S1
 - id: POL-02
   epic: POL
   title: Decision engine and precedence
@@ -281,7 +281,7 @@ stories:
   est: 0.5
   deps: [POL-01, INT-01]
   trace: [A2.Decide, A6.block_final, A1.reviews]
-  ms: M1
+  ms: S1
 - id: POL-03
   epic: POL
   title: Compliance checks (KYB, allowlist, screening, Travel Rule, network)
@@ -299,7 +299,7 @@ stories:
   est: 1.0
   deps: [POL-02, INT-04]
   trace: [A2.Policy, B4.risk_data]
-  ms: M1
+  ms: S1
 - id: POL-04
   epic: POL
   title: Limits and daily caps
@@ -314,7 +314,7 @@ stories:
   est: 0.5
   deps: [POL-02]
   trace: [A2.Policy, A2b.unusual]
-  ms: M1
+  ms: S1
 - id: POL-05
   epic: POL
   title: Unusual activity as checkable rules
@@ -330,7 +330,7 @@ stories:
   est: 0.5
   deps: [POL-02, INT-04]
   trace: [A2b.unusual, A2b.raw_facts]
-  ms: M1
+  ms: S3
 - id: POL-06
   epic: POL
   title: A block is final
@@ -340,12 +340,12 @@ stories:
   ac:
     - "BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it"
     - "Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked`"
-    - "A new intent to the same payee for the same amount within 24 h of a block is escalated with a link to the blocked one"
+    - "A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10)"
   pri: Must
   est: 0.5
   deps: [POL-02, EXE-01]
   trace: [A6.block_final, A2b.rule, L5]
-  ms: M3
+  ms: S3
 - id: POL-07
   epic: POL
   title: Versioned rule changes with two approvers
@@ -361,7 +361,7 @@ stories:
   est: 0.75
   deps: [POL-01, FND-04]
   trace: [B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding]
-  ms: M4
+  ms: S6
 - id: POL-08
   epic: POL
   title: Decision-only API
@@ -375,7 +375,7 @@ stories:
   est: 0.5
   deps: [POL-02]
   trace: [A2.Decide, A3.shadow]
-  ms: M1
+  ms: S1
 - id: POL-09
   epic: POL
   title: Fail closed
@@ -389,7 +389,7 @@ stories:
   est: 0.25
   deps: [POL-02]
   trace: [A6.fail_closed, B5.failsafe]
-  ms: M1
+  ms: S1
 
 # ---------------- AGT Mandates and instruction agent ----------------
 - id: MND-01
@@ -406,7 +406,7 @@ stories:
   est: 0.5
   deps: [FND-03]
   trace: [A2.Mandate]
-  ms: M2
+  ms: S5
 - id: MND-02
   epic: AGT
   title: Mandate check in the policy
@@ -421,7 +421,7 @@ stories:
   est: 0.5
   deps: [MND-01, POL-02]
   trace: [A2.Mandate, A5.proposes, D.sandbox]
-  ms: M2
+  ms: S5
 - id: MND-03
   epic: AGT
   title: Revoke a mandate
@@ -435,7 +435,7 @@ stories:
   est: 0.25
   deps: [MND-02, EXE-03]
   trace: [A2.Mandate]
-  ms: M3
+  ms: S5
 - id: AGT-01
   epic: AGT
   title: Instruction agent turns an invoice into a proposed intent
@@ -451,7 +451,7 @@ stories:
   est: 1.0
   deps: [INT-04, MND-01]
   trace: [A5.proposes, A2.Intent, L1]
-  ms: M2
+  ms: S5
 - id: AGT-02
   epic: AGT
   title: Flag, never guess
@@ -466,7 +466,7 @@ stories:
   est: 0.5
   deps: [AGT-01]
   trace: [A5.proposes, L1]
-  ms: M2
+  ms: S5
 - id: AGT-03
   epic: AGT
   title: The agent can only propose
@@ -481,7 +481,7 @@ stories:
   est: 0.25
   deps: [AGT-01]
   trace: [A5.tools, A2b.no_agent_retry, B6.ai]
-  ms: M2
+  ms: S5
 - id: AGT-04
   epic: AGT
   title: Prompt-injection isolation
@@ -497,7 +497,7 @@ stories:
   est: 0.5
   deps: [AGT-01]
   trace: [A5.injection, L2, B6.ai]
-  ms: M2
+  ms: S5
 - id: AGT-05
   epic: AGT
   title: Record every agent call for replay
@@ -511,7 +511,7 @@ stories:
   est: 0.25
   deps: [AGT-01]
   trace: [A2.Prove, A5.citations]
-  ms: M2
+  ms: S5
 - id: AGT-06
   epic: AGT
   title: Model configuration and cost guard
@@ -526,7 +526,7 @@ stories:
   est: 0.25
   deps: [AGT-01]
   trace: [B4.infra, B6.dependence, D.abuse]
-  ms: M2
+  ms: S5
 
 # ---------------- EXE Exactly-once execution ----------------
 - id: EXE-01
@@ -543,7 +543,7 @@ stories:
   est: 0.75
   deps: [FND-03]
   trace: [A2b.states, A2.Execute]
-  ms: M3
+  ms: S2
 - id: EXE-02
   epic: EXE
   title: Attempts and exactly-once guarantees
@@ -559,7 +559,7 @@ stories:
   est: 0.75
   deps: [EXE-01]
   trace: [A2.Execute, A6.retry_rule, A2b.rule, L3]
-  ms: M3
+  ms: S2
 - id: EXE-03
   epic: EXE
   title: Pre-send checks under the lock
@@ -574,7 +574,7 @@ stories:
   est: 0.5
   deps: [EXE-02, POL-02]
   trace: [A2.Execute, A2b.custody]
-  ms: M3
+  ms: S2
 - id: EXE-04
   epic: EXE
   title: Nonce manager
@@ -589,7 +589,7 @@ stories:
   est: 0.5
   deps: [EXE-02, RAL-02]
   trace: [A2.Execute, A2b.custody]
-  ms: M3
+  ms: S2
 - id: EXE-05
   epic: EXE
   title: A timeout becomes UNKNOWN
@@ -604,7 +604,7 @@ stories:
   est: 0.25
   deps: [EXE-02]
   trace: [A2b.unknown, A2b.states, L4]
-  ms: M3
+  ms: S4
 - id: EXE-06
   epic: EXE
   title: UNKNOWN resolver
@@ -620,7 +620,7 @@ stories:
   est: 1.0
   deps: [EXE-05, FND-06, EXC-01]
   trace: [A2b.unknown, B7.unknown]
-  ms: M3
+  ms: S4
 - id: EXE-07
   epic: EXE
   title: Deterministic retry policy
@@ -635,7 +635,7 @@ stories:
   est: 0.5
   deps: [EXE-02]
   trace: [A2b.no_agent_retry, A6.retry_rule, A2b.rule]
-  ms: M3
+  ms: S4
 - id: EXE-08
   epic: EXE
   title: Kill switch
@@ -651,7 +651,7 @@ stories:
   est: 0.5
   deps: [EXE-03, FND-04]
   trace: [B3.kill_switch, A2.Execute, L4]
-  ms: M3
+  ms: S4
 - id: EXE-09
   epic: EXE
   title: Shadow, Assist and Auto modes
@@ -666,7 +666,7 @@ stories:
   est: 0.5
   deps: [EXE-03, FND-04]
   trace: [A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates]
-  ms: M4
+  ms: S6
 - id: EXE-10
   epic: EXE
   title: Sev 1 invariant monitor
@@ -680,7 +680,7 @@ stories:
   est: 0.5
   deps: [EXE-08, LED-05]
   trace: [B3.incident, B7.safety]
-  ms: M12
+  ms: L
 
 # ---------------- RAL Rails, routing and faults ----------------
 - id: RAL-01
@@ -697,7 +697,7 @@ stories:
   est: 0.5
   deps: [FND-03]
   trace: [A2.Connect, B4.rails, B6.dependence]
-  ms: M3
+  ms: S2
 - id: RAL-02
   epic: RAL
   title: Base Sepolia USDC adapter
@@ -712,7 +712,7 @@ stories:
   est: 0.75
   deps: [RAL-01, FND-09]
   trace: [A2.Connect, A2b.custody, A7.prototype]
-  ms: M3
+  ms: S2
 - id: RAL-03
   epic: RAL
   title: Ethereum Sepolia USDC adapter
@@ -726,7 +726,7 @@ stories:
   est: 0.25
   deps: [RAL-02]
   trace: [A2.Connect]
-  ms: M3
+  ms: S4
 - id: RAL-04
   epic: RAL
   title: Simulated instant bank rail
@@ -741,7 +741,7 @@ stories:
   est: 0.75
   deps: [RAL-01]
   trace: [A2.Connect, A7.prototype]
-  ms: M3
+  ms: S4
 - id: RAL-05
   epic: RAL
   title: Fault-injection proxy
@@ -756,7 +756,7 @@ stories:
   est: 0.75
   deps: [RAL-02, RAL-04]
   trace: [L3, L4, A2b.unknown]
-  ms: M3
+  ms: S4
 - id: RAL-06
   epic: RAL
   title: Routing engine
@@ -771,7 +771,7 @@ stories:
   est: 0.5
   deps: [RAL-01, POL-02]
   trace: [A2.Route, A3.orchestrate, A1.cost]
-  ms: M3
+  ms: S4
 - id: RAL-07
   epic: RAL
   title: Failover on technical failure only
@@ -787,7 +787,7 @@ stories:
   est: 0.5
   deps: [RAL-06, EXE-07]
   trace: [A2.Route, A6.block_final, L5, A1.cost]
-  ms: M3
+  ms: S4
 - id: RAL-08
   epic: RAL
   title: Rail health and circuit breaker
@@ -801,7 +801,7 @@ stories:
   est: 0.5
   deps: [RAL-06]
   trace: [A2.Connect, B3.adapters]
-  ms: M12
+  ms: L
 - id: RAL-09
   epic: RAL
   title: Rail connection flow (mock)
@@ -815,7 +815,7 @@ stories:
   est: 0.75
   deps: [RAL-01]
   trace: [A2.Connect, B3.onboarding, B5.security]
-  ms: M12
+  ms: L
 - id: RAL-10
   epic: RAL
   title: Daily adapter contract tests
@@ -828,7 +828,7 @@ stories:
   est: 0.25
   deps: [RAL-03, RAL-04]
   trace: [B3.adapters]
-  ms: M12
+  ms: L
 - id: RAL-11
   epic: RAL
   title: Simulated chain rail for the sandbox
@@ -842,7 +842,7 @@ stories:
   est: 0.5
   deps: [RAL-01]
   trace: [D.sandbox]
-  ms: M9
+  ms: P2
 
 # ---------------- EXC Exceptions ----------------
 - id: EXC-01
@@ -859,7 +859,7 @@ stories:
   est: 0.5
   deps: [POL-02, FND-05]
   trace: [A2.Exceptions, B3.exceptions]
-  ms: M3
+  ms: S3
 - id: EXC-02
   epic: EXC
   title: Raw facts first
@@ -873,7 +873,7 @@ stories:
   est: 0.5
   deps: [EXC-01, INT-04]
   trace: [A2b.raw_facts, L6]
-  ms: M4
+  ms: S3
 - id: EXC-03
   epic: EXC
   title: Investigation agent with cited evidence
@@ -889,7 +889,7 @@ stories:
   est: 1.0
   deps: [EXC-01, AGT-05]
   trace: [A5.citations, A5.tools, A2.Exceptions, A1.reviews]
-  ms: M4
+  ms: S6
 - id: EXC-04
   epic: EXC
   title: Approve or reject, with policy re-run
@@ -904,7 +904,7 @@ stories:
   est: 0.5
   deps: [EXC-01, EXE-03]
   trace: [A2.Exceptions, A6.block_final, L6]
-  ms: M4
+  ms: S3
 - id: EXC-05
   epic: EXC
   title: Double-approval safety
@@ -918,7 +918,7 @@ stories:
   est: 0.25
   deps: [EXC-04]
   trace: [L3, A6.retry_rule]
-  ms: M4
+  ms: S3
 - id: EXC-06
   epic: EXC
   title: Deadline sweeper - a timeout never becomes an approval
@@ -932,7 +932,7 @@ stories:
   est: 0.5
   deps: [EXC-01, EXC-07, FND-06]
   trace: [A2b.timeout_hold, A6.timeout, B3.exceptions, L6, B7.exceptions]
-  ms: M4
+  ms: S6
 - id: EXC-07
   epic: EXC
   title: Mock outbox
@@ -946,7 +946,7 @@ stories:
   est: 0.25
   deps: [FND-03]
   trace: [B3.exceptions]
-  ms: M4
+  ms: S3
 - id: EXC-08
   epic: EXC
   title: Exceptions by API
@@ -960,7 +960,7 @@ stories:
   est: 0.25
   deps: [EXC-04]
   trace: [A2.Exceptions, D.standards]
-  ms: M8
+  ms: P1
 - id: EXC-09
   epic: EXC
   title: Agent-versus-human agreement sample
@@ -973,7 +973,7 @@ stories:
   est: 0.25
   deps: [EXC-03]
   trace: [B3.agent_eval, B7.quality]
-  ms: M12
+  ms: L
 
 # ---------------- LED Ledger, deposits, reconciliation ----------------
 - id: LED-01
@@ -990,7 +990,7 @@ stories:
   est: 0.75
   deps: [FND-03]
   trace: [A2.Reconcile, A1.evidence]
-  ms: M5
+  ms: S7
 - id: LED-02
   epic: LED
   title: Payout postings
@@ -1004,7 +1004,7 @@ stories:
   est: 0.5
   deps: [LED-01, EXE-02]
   trace: [A2.Reconcile]
-  ms: M5
+  ms: S7
 - id: LED-03
   epic: LED
   title: Deposit intents
@@ -1018,7 +1018,7 @@ stories:
   est: 0.5
   deps: [LED-01]
   trace: [A1.deposits, A2.Reconcile]
-  ms: M5
+  ms: S7
 - id: LED-04
   epic: LED
   title: Deposit watchers
@@ -1032,7 +1032,7 @@ stories:
   est: 0.5
   deps: [LED-03, FND-06, RAL-02]
   trace: [A1.deposits]
-  ms: M5
+  ms: S7
 - id: LED-05
   epic: LED
   title: Deposit decision and credit-once
@@ -1048,7 +1048,7 @@ stories:
   est: 0.75
   deps: [LED-04, POL-03, EXC-01]
   trace: [A1.deposits, A2.Reconcile, L7]
-  ms: M5
+  ms: S7
 - id: LED-06
   epic: LED
   title: Reconciliation run with proposed fixes
@@ -1065,7 +1065,7 @@ stories:
   est: 0.75
   deps: [LED-02, LED-05, LED-07, EXC-01]
   trace: [A2.Reconcile, L7, B7.recon]
-  ms: M5
+  ms: S7
 - id: LED-07
   epic: LED
   title: Bank statement import
@@ -1078,7 +1078,7 @@ stories:
   est: 0.25
   deps: [RAL-04]
   trace: [A2.Reconcile]
-  ms: M5
+  ms: S7
 - id: LED-08
   epic: LED
   title: Usage metering
@@ -1091,7 +1091,7 @@ stories:
   est: 0.25
   deps: [LED-01]
   trace: [A4.fee, B3.billing, D.usage]
-  ms: M9
+  ms: P2
 
 # ---------------- AUD Audit ----------------
 - id: AUD-01
@@ -1108,7 +1108,7 @@ stories:
   est: 0.75
   deps: [FND-03]
   trace: [A2.Prove, B5.security, A1.evidence]
-  ms: M1
+  ms: S1
 - id: AUD-02
   epic: AUD
   title: Replay any payment
@@ -1123,7 +1123,7 @@ stories:
   est: 0.75
   deps: [AUD-01, AGT-05, POL-02]
   trace: [A2.Prove, L8, B3.incident]
-  ms: M5
+  ms: S7
 - id: AUD-03
   epic: AUD
   title: Evidence export
@@ -1136,7 +1136,7 @@ stories:
   est: 0.5
   deps: [AUD-02]
   trace: [A2.Prove, A1.evidence]
-  ms: M12
+  ms: L
 
 # ---------------- CON Console ----------------
 - id: CON-01
@@ -1153,7 +1153,7 @@ stories:
   est: 0.5
   deps: [FND-04]
   trace: [L8, BR.category, D.honesty]
-  ms: M4
+  ms: S3
 - id: CON-02
   epic: CON
   title: Overview screen
@@ -1167,7 +1167,7 @@ stories:
   est: 0.5
   deps: [CON-01]
   trace: [B7.automation, B7.exceptions, B7.unknown]
-  ms: M4
+  ms: S6
 - id: CON-03
   epic: CON
   title: Payments list and detail
@@ -1180,7 +1180,7 @@ stories:
   est: 0.75
   deps: [CON-01, AUD-01]
   trace: [A2.Prove, A2.Decide]
-  ms: M4
+  ms: S3
 - id: CON-04
   epic: CON
   title: Exceptions queue screen
@@ -1193,7 +1193,7 @@ stories:
   est: 0.5
   deps: [CON-01, EXC-04]
   trace: [A2.Exceptions, A2b.raw_facts]
-  ms: M4
+  ms: S3
 - id: CON-05
   epic: CON
   title: Invoice drop and agent proposal screen
@@ -1207,7 +1207,7 @@ stories:
   est: 0.5
   deps: [CON-01, AGT-02, MND-02]
   trace: [MVP.flow, A5.proposes]
-  ms: M4
+  ms: S5
 - id: CON-06
   epic: CON
   title: Policy and mandates screens
@@ -1221,7 +1221,7 @@ stories:
   est: 0.5
   deps: [POL-07, MND-03]
   trace: [B3.rule_changes, A2.Mandate]
-  ms: M4
+  ms: S6
 - id: CON-07
   epic: CON
   title: Reconciliation screen
@@ -1234,7 +1234,7 @@ stories:
   est: 0.25
   deps: [LED-06]
   trace: [A2.Reconcile, L7]
-  ms: M5
+  ms: S7
 - id: CON-08
   epic: CON
   title: Rails screen
@@ -1247,7 +1247,7 @@ stories:
   est: 0.25
   deps: [CON-01, RAL-06]
   trace: [A2.Connect]
-  ms: M4
+  ms: S4
 - id: CON-09
   epic: CON
   title: Demo scenario runner
@@ -1261,7 +1261,7 @@ stories:
   est: 0.75
   deps: [CON-05, LED-06, EVL-01]
   trace: [MVP.flow, MVP.scenarios]
-  ms: M7
+  ms: S9
 - id: CON-10
   epic: CON
   title: Settings screen
@@ -1274,7 +1274,7 @@ stories:
   est: 0.25
   deps: [EXE-09]
   trace: [B5.failsafe, A3.gates]
-  ms: M12
+  ms: L
 
 # ---------------- EVL Evaluation ----------------
 - id: EVL-01
@@ -1290,7 +1290,7 @@ stories:
   est: 0.5
   deps: [FND-09, POL-02]
   trace: [A5.gate, B3.agent_eval]
-  ms: M6
+  ms: S8
 - id: EVL-02
   epic: EVL
   title: Attack suite (100+ scenarios)
@@ -1304,7 +1304,7 @@ stories:
   est: 1.0
   deps: [EVL-01, AGT-04, EXC-04, RAL-07]
   trace: [L2, A5.gate, A5.injection, B7.safety]
-  ms: M6
+  ms: S8
 - id: EVL-03
   epic: EVL
   title: Fault suite (30+ cases)
@@ -1318,7 +1318,7 @@ stories:
   est: 1.0
   deps: [EVL-01, RAL-05, EXE-06]
   trace: [L3, L4, L5, B7.safety]
-  ms: M6
+  ms: S8
 - id: EVL-04
   epic: EVL
   title: Interpretation set
@@ -1331,7 +1331,7 @@ stories:
   est: 0.5
   deps: [EVL-01, AGT-02]
   trace: [L1, A5.proposes]
-  ms: M6
+  ms: S8
 - id: EVL-05
   epic: EVL
   title: Agreement set (synthetic)
@@ -1344,7 +1344,7 @@ stories:
   est: 0.5
   deps: [EVL-01, EXC-03]
   trace: [B7.quality, A1.reviews]
-  ms: M6
+  ms: S8
 - id: EVL-06
   epic: EVL
   title: Results report
@@ -1358,7 +1358,7 @@ stories:
   est: 0.5
   deps: [EVL-02, EVL-03, EVL-04]
   trace: [MVP.flow, D.site, D.honesty, B7.automation]
-  ms: M6
+  ms: S8
 - id: EVL-07
   epic: EVL
   title: Release gate in CI
@@ -1372,7 +1372,7 @@ stories:
   est: 0.5
   deps: [EVL-02, EVL-03]
   trace: [A5.gate, B3.agent_eval, B6.ai]
-  ms: M6
+  ms: S8
 - id: EVL-08
   epic: EVL
   title: Latency benchmark
@@ -1381,11 +1381,11 @@ stories:
   so: we can state the resilience target honestly
   ac:
     - "Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report"
-  pri: Should
+  pri: Must  # promoted from Should (D-13)
   est: 0.25
   deps: [EVL-01]
   trace: [B5.resilience, B7.reliability]
-  ms: M6
+  ms: S8
 
 # ---------------- DEM Demo data ----------------
 - id: DEM-01
@@ -1401,7 +1401,7 @@ stories:
   est: 0.25
   deps: [INT-04, POL-01, MND-01]
   trace: [B1.independence, B6.former_employer, MVP.flow]
-  ms: M7
+  ms: S9
 - id: DEM-02
   epic: DEM
   title: Canonical invoice and variants
@@ -1414,7 +1414,7 @@ stories:
   est: 0.25
   deps: []
   trace: [L1, MVP.flow]
-  ms: M2
+  ms: S5
 - id: DEM-03
   epic: DEM
   title: 20-payment batch with deposits
@@ -1427,7 +1427,7 @@ stories:
   est: 0.25
   deps: [LED-06]
   trace: [MVP.flow, L7]
-  ms: M7
+  ms: S9
 - id: DEM-04
   epic: DEM
   title: Wallet funding runbook and check
@@ -1440,7 +1440,7 @@ stories:
   est: 0.25
   deps: [RAL-03]
   trace: [A7.prototype]
-  ms: M7
+  ms: S9
 - id: DEM-05
   epic: DEM
   title: Demo script
@@ -1453,7 +1453,7 @@ stories:
   est: 0.25
   deps: [CON-09]
   trace: [MVP.flow, B3.lead_shadow]
-  ms: M7
+  ms: S9
 - id: DEM-06
   epic: DEM
   title: Scenario packs per platform type
@@ -1466,7 +1466,7 @@ stories:
   est: 0.5
   deps: [DEM-01]
   trace: [MVP.scenarios]
-  ms: M12
+  ms: L
 
 # ---------------- SHD Shadow mode ----------------
 - id: SHD-01
@@ -1481,7 +1481,7 @@ stories:
   est: 0.75
   deps: [POL-08]
   trace: [MVP.shadow_csv, A3.shadow, A6.shadow_first, A7.beta, B3.lead_shadow]
-  ms: M12
+  ms: L
 - id: SHD-02
   epic: SHD
   title: Shadow report
@@ -1494,7 +1494,7 @@ stories:
   est: 0.75
   deps: [SHD-01, RAL-06]
   trace: [A3.shadow, B3.lead_shadow, A4.plans]
-  ms: M12
+  ms: L
 - id: SHD-03
   epic: SHD
   title: Mode-gate report and sign-off
@@ -1507,7 +1507,7 @@ stories:
   est: 0.5
   deps: [SHD-02, EXE-09]
   trace: [A3.gates, B3.mode_gates]
-  ms: M12
+  ms: L
 - id: SHD-04
   epic: SHD
   title: Anonymise on import
@@ -1520,7 +1520,7 @@ stories:
   est: 0.25
   deps: [SHD-01]
   trace: [B1.contracts, A5.data]
-  ms: M12
+  ms: L
 
 # ---------------- OPS Operational controls ----------------
 - id: OPS-01
@@ -1535,7 +1535,7 @@ stories:
   est: 0.5
   deps: [EXE-10, AUD-02]
   trace: [B3.incident]
-  ms: M12
+  ms: L
 - id: OPS-02
   epic: OPS
   title: Independence check in CI
@@ -1549,7 +1549,7 @@ stories:
   done: [0]
   deps: [FND-01]
   trace: [B1.independence, B6.former_employer]
-  ms: M0
+  ms: S0
 - id: OPS-03
   epic: OPS
   title: Backup and restore drill
@@ -1562,7 +1562,7 @@ stories:
   est: 0.25
   deps: [FND-07]
   trace: [B5.resilience]
-  ms: M12
+  ms: L
 - id: OPS-04
   epic: OPS
   title: Security pack draft
@@ -1575,7 +1575,7 @@ stories:
   est: 0.25
   deps: [EVL-07]
   trace: [B5.assurance, B5.security]
-  ms: M12
+  ms: L
 
 # ---------------- API Public sandbox API ----------------
 - id: API-01
@@ -1592,7 +1592,7 @@ stories:
   est: 0.75
   deps: [FND-03]
   trace: [D.keys, D.standards, B5.security]
-  ms: M8
+  ms: P1
 - id: API-02
   epic: API
   title: Error model
@@ -1605,7 +1605,7 @@ stories:
   est: 0.25
   deps: [FND-08]
   trace: [D.standards]
-  ms: M8
+  ms: P1
 - id: API-03
   epic: API
   title: Dated API versions
@@ -1618,7 +1618,7 @@ stories:
   est: 0.25
   deps: [API-01]
   trace: [D.standards]
-  ms: M8
+  ms: P1
 - id: API-04
   epic: API
   title: Rate limits
@@ -1631,7 +1631,7 @@ stories:
   est: 0.25
   deps: [API-01]
   trace: [D.standards, D.abuse]
-  ms: M8
+  ms: P1
 - id: API-05
   epic: API
   title: OpenAPI 3.1 file
@@ -1645,7 +1645,7 @@ stories:
   est: 1.5
   deps: [API-02, EXC-08, LED-03]
   trace: [D.docs, D.sdks, D.standards]
-  ms: M8
+  ms: P1
 - id: API-06
   epic: API
   title: Request logs
@@ -1658,7 +1658,7 @@ stories:
   est: 0.5
   deps: [API-01]
   trace: [D.logs]
-  ms: M8
+  ms: P1
 - id: API-07
   epic: API
   title: Events list
@@ -1671,7 +1671,7 @@ stories:
   est: 0.25
   deps: [WHK-01]
   trace: [D.webhooks, D.standards]
-  ms: M8
+  ms: P1
 
 # ---------------- WHK Webhooks ----------------
 - id: WHK-01
@@ -1687,7 +1687,7 @@ stories:
   est: 0.5
   deps: [API-01]
   trace: [D.webhooks]
-  ms: M8
+  ms: P1
 - id: WHK-02
   epic: WHK
   title: Signed webhooks
@@ -1700,7 +1700,7 @@ stories:
   est: 0.25
   deps: [WHK-01]
   trace: [D.webhooks]
-  ms: M8
+  ms: P1
 - id: WHK-03
   epic: WHK
   title: Delivery, retries and log
@@ -1713,7 +1713,7 @@ stories:
   est: 0.5
   deps: [WHK-02, FND-06]
   trace: [D.webhooks]
-  ms: M8
+  ms: P1
 
 # ---------------- DSH Developer dashboard ----------------
 - id: DSH-01
@@ -1729,7 +1729,7 @@ stories:
   est: 0.5
   deps: [API-01]
   trace: [D.sales_led, B3.onboarding]
-  ms: M9
+  ms: P2
 - id: DSH-02
   epic: DSH
   title: Accept invite and verify email
@@ -1743,7 +1743,7 @@ stories:
   est: 0.5
   deps: [DSH-01]
   trace: [D.sales_led]
-  ms: M9
+  ms: P2
 - id: DSH-03
   epic: DSH
   title: Organisation expiry and extension
@@ -1756,7 +1756,7 @@ stories:
   est: 0.25
   deps: [DSH-01]
   trace: [D.sales_led, D.abuse]
-  ms: M9
+  ms: P2
 - id: DSH-04
   epic: DSH
   title: Keys page
@@ -1769,7 +1769,7 @@ stories:
   est: 0.5
   deps: [DSH-02]
   trace: [D.keys]
-  ms: M9
+  ms: P2
 - id: DSH-05
   epic: DSH
   title: Request logs page
@@ -1782,7 +1782,7 @@ stories:
   est: 0.25
   deps: [API-06, DSH-02]
   trace: [D.logs]
-  ms: M9
+  ms: P2
 - id: DSH-06
   epic: DSH
   title: Webhooks page
@@ -1795,7 +1795,7 @@ stories:
   est: 0.25
   deps: [WHK-03, DSH-02]
   trace: [D.webhooks]
-  ms: M9
+  ms: P2
 - id: DSH-07
   epic: DSH
   title: Sandbox controls page
@@ -1808,7 +1808,7 @@ stories:
   est: 0.25
   deps: [SBX-01, SBX-04, DSH-02]
   trace: [D.sandbox]
-  ms: M9
+  ms: P2
 - id: DSH-08
   epic: DSH
   title: Usage page
@@ -1821,7 +1821,7 @@ stories:
   est: 0.25
   deps: [LED-08, SBX-02]
   trace: [D.usage]
-  ms: M9
+  ms: P2
 - id: DSH-09
   epic: DSH
   title: Console per organisation
@@ -1834,7 +1834,7 @@ stories:
   est: 0.5
   deps: [CON-04, DSH-02]
   trace: [D.console]
-  ms: M9
+  ms: P2
 - id: DSH-10
   epic: DSH
   title: Access requests inbox
@@ -1847,7 +1847,7 @@ stories:
   est: 0.25
   deps: [DSH-01]
   trace: [D.sales_led, D.ops_pages]
-  ms: M9
+  ms: P2
 
 # ---------------- SBX Sandbox ----------------
 - id: SBX-01
@@ -1863,7 +1863,7 @@ stories:
   est: 0.5
   deps: [RAL-11, RAL-05]
   trace: [D.sandbox]
-  ms: M9
+  ms: P2
 - id: SBX-02
   epic: SBX
   title: Quotas and abuse limits
@@ -1876,7 +1876,7 @@ stories:
   est: 0.25
   deps: [API-04]
   trace: [D.abuse]
-  ms: M9
+  ms: P2
 - id: SBX-03
   epic: SBX
   title: Real test-network mode
@@ -1889,7 +1889,7 @@ stories:
   est: 0.5
   deps: [RAL-03, SBX-02]
   trace: [D.sandbox]
-  ms: M9
+  ms: P2
 - id: SBX-04
   epic: SBX
   title: Sandbox reset
@@ -1897,12 +1897,12 @@ stories:
   want: to reset my organisation's test data
   so: I can start clean
   ac:
-    - "Deletes intents, cases, ledger and logs for the organisation; keeps keys, webhooks and settings; audited"
+    - "Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08)"
   pri: Must
   est: 0.25
   deps: [API-01]
   trace: [D.sandbox]
-  ms: M9
+  ms: P2
 
 # ---------------- DOC Docs ----------------
 - id: DOC-01
@@ -1917,7 +1917,7 @@ stories:
   est: 0.5
   deps: [API-05]
   trace: [D.docs]
-  ms: M10
+  ms: P3
 - id: DOC-02
   epic: DOC
   title: Concept pages
@@ -1930,7 +1930,7 @@ stories:
   est: 1.0
   deps: [DOC-01]
   trace: [D.docs, BR.category]
-  ms: M10
+  ms: P3
 - id: DOC-03
   epic: DOC
   title: Guides
@@ -1943,7 +1943,7 @@ stories:
   est: 1.0
   deps: [DOC-01]
   trace: [D.docs]
-  ms: M10
+  ms: P3
 - id: DOC-04
   epic: DOC
   title: Tested samples in 8 languages
@@ -1957,7 +1957,7 @@ stories:
   est: 1.25
   deps: [DOC-03, WHK-02]
   trace: [D.samples]
-  ms: M10
+  ms: P3
 - id: DOC-05
   epic: DOC
   title: Try it with a sandbox key
@@ -1971,7 +1971,7 @@ stories:
   est: 0.25
   deps: [DOC-01]
   trace: [D.docs, D.sales_led]
-  ms: M10
+  ms: P3
 - id: DOC-06
   epic: DOC
   title: Changelog and versioning page
@@ -1984,7 +1984,7 @@ stories:
   est: 0.25
   deps: [DOC-01]
   trace: [D.docs, D.standards]
-  ms: M10
+  ms: P3
 
 # ---------------- SDK SDKs ----------------
 - id: SDK-01
@@ -2000,7 +2000,7 @@ stories:
   est: 1.0
   deps: [API-05, WHK-02]
   trace: [D.sdks]
-  ms: M10
+  ms: P3
 - id: SDK-02
   epic: SDK
   title: TypeScript SDK
@@ -2013,7 +2013,7 @@ stories:
   est: 1.0
   deps: [API-05, WHK-02]
   trace: [D.sdks]
-  ms: M10
+  ms: P3
 - id: SDK-03
   epic: SDK
   title: Postman collection and OpenAPI download
@@ -2026,7 +2026,7 @@ stories:
   est: 0.25
   deps: [API-05]
   trace: [D.sdks]
-  ms: M10
+  ms: P3
 
 # ---------------- WEB Marketing site ----------------
 - id: WEB-01
@@ -2043,7 +2043,7 @@ stories:
   est: 1.5
   deps: []
   trace: [D.site, D.honesty, BR.category, A4.plans]
-  ms: M11
+  ms: P4
 - id: WEB-02
   epic: WEB
   title: Product, Security and Design partners pages
@@ -2057,7 +2057,7 @@ stories:
   est: 0.75
   deps: [WEB-01]
   trace: [D.site, D.honesty, B3.lead_shadow, B5.hosting]
-  ms: M11
+  ms: P4
 - id: WEB-03
   epic: WEB
   title: Measured results section
@@ -2070,7 +2070,7 @@ stories:
   est: 0.25
   deps: [EVL-06, WEB-01]
   trace: [D.site, D.honesty]
-  ms: M11
+  ms: P4
 - id: WEB-04
   epic: WEB
   title: Developer code tabs
@@ -2083,7 +2083,7 @@ stories:
   est: 0.25
   deps: [DOC-04, WEB-01]
   trace: [D.site, D.samples]
-  ms: M11
+  ms: P4
 - id: WEB-05
   epic: WEB
   title: Legal pages and analytics
@@ -2096,7 +2096,7 @@ stories:
   est: 0.25
   deps: [WEB-01]
   trace: [D.ops_pages, B1.contracts]
-  ms: M11
+  ms: P4
 - id: WEB-06
   epic: WEB
   title: Booking and access form
@@ -2109,7 +2109,7 @@ stories:
   est: 0.25
   deps: [DSH-10, WEB-01]
   trace: [D.ops_pages, D.sales_led]
-  ms: M11
+  ms: P4
 - id: WEB-07
   epic: WEB
   title: Status page
@@ -2122,7 +2122,7 @@ stories:
   est: 0.25
   deps: [FND-07]
   trace: [D.ops_pages, B7.reliability]
-  ms: M11
+  ms: P4
 - id: WEB-08
   epic: WEB
   title: SEO basics
@@ -2135,4 +2135,4 @@ stories:
   est: 0.25
   deps: [WEB-01]
   trace: [BR.category, D.site]
-  ms: M11
+  ms: P4

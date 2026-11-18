@@ -40,5 +40,5 @@ fields:
   recon_breaks.status: [LED-06]                        # PROPOSED values (D-P04)
   audit_events.hash: [AUD-01]                          # hash chain, append-only
   api_keys.prefix: [API-01]                            # sk_test_ only
-  webhook_endpoints.secret_hash: [WHK-01]              # to become encrypted storage (C-19)
+  webhook_endpoints.secret_hash: [WHK-01]              # becomes encrypted storage in P1 (D-12)
   jobs.dedupe_key: [FND-06]                            # unique per organisation and kind

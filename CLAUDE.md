@@ -113,7 +113,7 @@ make dev          # api :8000 + worker + banksim :8100 + faultproxy :8200
 make test         # unit, property, integration, concurrency, local chain (needs make db)
 make test-fast    # unit + property only, no database
 make lint typecheck
-make eval         # detent eval run --suite all (fails until M6)
+make eval         # detent eval run --suite all (fails until slice S8)
 make denylist     # OPS-02 check; needs DENYLIST in the environment
 make backlog      # python tools/build_backlog.py
 make spec         # python tools/build_spec.py: Spec Kit inventory, traceability, tasks + coverage checks

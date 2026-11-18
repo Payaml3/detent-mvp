@@ -14,7 +14,7 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | LED Ledger, deposits and reconciliation | Operations | prototype | One ledger across rails; deposits credited once; mismatches become exceptions with proposed fixes | 8 | 7 | 0 | 1 | 4.25 |
 | AUD Audit and replay | Operations | prototype | Every step is recorded append-only and any payment can be replayed and exported | 3 | 2 | 1 | 0 | 2 |
 | CON Back-office console | All three (console) | prototype | The screens where the 10-minute demo happens | 10 | 9 | 1 | 0 | 4.75 |
-| EVL Evaluation harness | All three (proof) | prototype | Measured proof: attacks, faults, interpretation and agreement, gated in CI and published as a results report | 8 | 6 | 2 | 0 | 4.75 |
+| EVL Evaluation harness | All three (proof) | prototype | Measured proof: attacks, faults, interpretation and agreement, gated in CI and published as a results report | 8 | 7 | 1 | 0 | 4.75 |
 | DEM Demo data and scenarios | All three (demo) | prototype | Fictional, repeatable demo data and a one-click scenario runner | 6 | 5 | 1 | 0 | 1.75 |
 | SHD Shadow mode | Decision (shadow mode) | prototype | Run decisions on a prospect's exported data and produce the free shadow report | 4 | 0 | 3 | 1 | 2.25 |
 | OPS Operational controls | Operations | prototype | The operating-model processes that need software: incidents, independence check, recovery | 4 | 1 | 1 | 2 | 1.25 |
@@ -31,24 +31,26 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | | Stories | Days |
 |---|---|---|
 | All stories | 146 | 71.75 |
-| Must only | 118 | 61.25 |
-| Must, prototype track | 84 | 43 |
+| Must only | 119 | 61.5 |
+| Must, prototype track | 85 | 43.25 |
 | Must, portal track | 34 | 18.25 |
 
 ## By milestone
 
 | Milestone | Stories | Must days | All days |
 |---|---|---|---|
-| M0 Foundation | 9 | 3.25 | 3.5 |
-| M1 Decide | 12 | 6.25 | 6.25 |
-| M2 Agent and mandates | 9 | 3.75 | 4 |
-| M3 Exactly-once execution and rails | 18 | 10 | 10 |
-| M4 Exceptions and console | 15 | 7.75 | 7.75 |
-| M5 Ledger, deposits, reconciliation, replay | 9 | 5 | 5 |
-| M6 Evaluation and release gate | 8 | 4 | 4.75 |
-| M7 Demo-ready prototype | 6 | 2.25 | 2.25 |
-| M8 Public sandbox API and webhooks | 11 | 5 | 5.25 |
-| M9 Dashboard and sandbox | 16 | 4.75 | 5.75 |
-| M10 Docs and SDKs | 9 | 6 | 6.5 |
-| M11 Website launch | 8 | 3.25 | 3.75 |
-| M12 Should and could haves after launch | 16 | 0 | 7 |
+| S0 Foundation (done) | 9 | 3.25 | 3.5 |
+| S1 A platform payout is decided through the API | 11 | 5.75 | 5.75 |
+| S2 An EXECUTE decision is sent exactly once | 6 | 3.75 | 3.75 |
+| S3 Escalate, review raw facts, approve with a policy re-run | 10 | 4.75 | 4.75 |
+| S4 Never paid twice | 10 | 5.25 | 5.25 |
+| S5 An AI agent proposes the $18,500 invoice inside a mandate | 11 | 4.5 | 4.75 |
+| S6 Operations around escalations | 6 | 3.75 | 3.75 |
+| S7 One ledger, deposits credited once, reconciliation, replay | 9 | 5 | 5 |
+| S8 Proof and release gate | 8 | 4.25 | 4.75 |
+| S9 Demo-ready prototype in the EU | 6 | 2.25 | 2.25 |
+| P1 Public sandbox API and webhooks | 11 | 5 | 5.25 |
+| P2 Dashboard and sandbox | 16 | 4.75 | 5.75 |
+| P3 Docs and SDKs | 9 | 6 | 6.5 |
+| P4 Website launch | 8 | 3.25 | 3.75 |
+| L After launch (Should and Could) | 16 | 0 | 7 |

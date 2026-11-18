@@ -19,7 +19,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [x] `.env.example` lists every setting; a secret scanner runs as a pre-commit hook and in CI
 - [x] The README explains setup in under 10 commands
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** none · **Traces to:** A7.prototype, B5.security
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S0 Foundation (done) · **Depends on:** none · **Traces to:** A7.prototype, B5.security
 
 ### FND-02 · Settings and test-network guard
 
@@ -31,7 +31,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [x] Given an API key prefix `sk_live_`, when any request uses it, then it is rejected with 403 `live_mode_unavailable`
 - [x] Settings load via pydantic-settings; no setting is read from os.environ elsewhere
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** A6.no_custody, L8
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** A6.no_custody, L8
 
 ### FND-03 · Baseline schema and ID conventions
 
@@ -44,7 +44,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [x] Every table carries `org_id`; every query in the repository layer filters by it
 - [x] Partial unique indexes from the domain model exist (one in-flight attempt, one confirmed attempt per payment)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** A2b.states, A2.Intent
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** A2b.states, A2.Intent
 
 ### FND-04 · Demo login and acting-user switcher
 
@@ -56,7 +56,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [x] Every write records the acting user ID and role in the audit log
 - [x] Role checks run on the server; hiding a button is never the only control
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-03 · **Traces to:** B3.rule_changes, B3.kill_switch, A2.Exceptions
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-03 · **Traces to:** B3.rule_changes, B3.kill_switch, A2.Exceptions
 
 ### FND-05 · Controllable clock
 
@@ -68,7 +68,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [x] In demo mode the console can advance the clock by 15 min, 1 h or 1 day; outside demo mode the control is absent
 - [x] Tests use a frozen clock
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** B3.exceptions, MVP.flow
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** B3.exceptions, MVP.flow
 
 ### FND-06 · Background worker and job loop
 
@@ -80,7 +80,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [x] Killing the worker mid-job and restarting it never duplicates a side effect (tested)
 - [x] Job runs, failures and durations are logged with the payment ID where relevant
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-03 · **Traces to:** B5.resilience
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-03 · **Traces to:** B5.resilience
 
 ### FND-07 · Deploy to an EU region
 
@@ -92,7 +92,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [ ] `/healthz` checks the database and both chain RPCs and reports each
 - [ ] spec/10-security-and-deploy.md records the regions; the console footer states them
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M7 Demo-ready prototype · **Depends on:** FND-06 · **Traces to:** B5.hosting, B4.infra, A5.data
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** FND-06 · **Traces to:** B5.hosting, B4.infra, A5.data
 
 ### FND-08 · Structured logs and request IDs
 
@@ -104,7 +104,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [x] Log lines include `payment_id` when one is in context
 - [ ] Keys, secrets, full wallet private data and invoice bodies are never logged (tested with a log capture)
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** B5.security, B3.incident
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** B5.security, B3.incident
 
 ### FND-09 · Local EVM with a mock USDC for tests
 
@@ -116,7 +116,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 - [ ] The EVM adapter runs its contract tests against the local chain in CI
 - [x] Public testnets are used only in nightly runs and the live demo
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** L3, A5.gate
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** L3, A5.gate
 
 ## INT · Payment intents
 
@@ -133,7 +133,7 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 - [ ] Invalid input returns 422 with the standard error body and no intent is created
 - [ ] `source` is `platform` or `agent`; `agent` requires a `mandate_id`
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** FND-03 · **Traces to:** A2.Intent, A2b.states
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Intent, A2b.states
 
 ### INT-02 · Idempotent creates
 
@@ -145,7 +145,7 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 - [ ] Given the same key and a different body, then I get 409 `idempotency_conflict`
 - [ ] Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** INT-01 · **Traces to:** A2.Execute, A6.retry_rule, D.standards, L3
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** INT-01 · **Traces to:** A2.Execute, A6.retry_rule, D.standards, L3
 
 ### INT-03 · Read and list intents
 
@@ -157,7 +157,7 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 - [ ] GET /v1/payment_intents supports cursor pagination and filters by status, rail and created range
 - [ ] Another organisation's ID returns 404, never 403
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M1 Decide · **Depends on:** INT-01 · **Traces to:** A2.Prove, D.standards
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** INT-01 · **Traces to:** A2.Prove, D.standards
 
 ### INT-04 · Counterparty registry with wallet history
 
@@ -169,7 +169,7 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 - [ ] Each counterparty exposes payment count and median amount, computed from confirmed payments
 - [ ] Counterparties are seeded from fixtures and editable in the console
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** FND-03 · **Traces to:** A2.Policy, A2b.unusual, A2b.raw_facts
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Policy, A2b.unusual, A2b.raw_facts
 
 ### INT-05 · Cancel an intent before it is sent
 
@@ -180,7 +180,7 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 - [ ] Cancel is allowed from ESCALATED, HELD or READY only; from SUBMITTED or UNKNOWN it returns 409
 - [ ] CANCELLED is terminal and audited with the actor and reason
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** EXE-01 · **Traces to:** A2.Intent
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-01 · **Traces to:** A2.Intent
 
 ## POL · Policy and decisions
 
@@ -196,7 +196,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] A loaded version is immutable and identified by version number and content hash
 - [ ] Every decision stores the version and hash it used
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** FND-03 · **Traces to:** A2.Policy, A6.client_rules, B3.rule_changes
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Policy, A6.client_rules, B3.rule_changes
 
 ### POL-02 · Decision engine and precedence
 
@@ -209,7 +209,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] Same inputs and rule version always give the same decision (property-based test)
 - [ ] Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** POL-01, INT-01 · **Traces to:** A2.Decide, A6.block_final, A1.reviews
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-01, INT-01 · **Traces to:** A2.Decide, A6.block_final, A1.reviews
 
 ### POL-03 · Compliance checks (KYB, allowlist, screening, Travel Rule, network)
 
@@ -224,7 +224,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] Network or currency not allowed for the platform -> BLOCK
 - [ ] Screening sits behind a `Screening` interface so a real vendor can replace the mock
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M1 Decide · **Depends on:** POL-02, INT-04 · **Traces to:** A2.Policy, B4.risk_data
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02, INT-04 · **Traces to:** A2.Policy, B4.risk_data
 
 ### POL-04 · Limits and daily caps
 
@@ -236,7 +236,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] Daily caps per platform and per counterparty count confirmed plus in-flight amounts
 - [ ] Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** POL-02 · **Traces to:** A2.Policy, A2b.unusual
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02 · **Traces to:** A2.Policy, A2b.unusual
 
 ### POL-05 · Unusual activity as checkable rules
 
@@ -249,7 +249,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM`
 - [ ] Each hit stores the raw fact (address, timestamps, median, ratio) as evidence
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** POL-02, INT-04 · **Traces to:** A2b.unusual, A2b.raw_facts
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** POL-02, INT-04 · **Traces to:** A2b.unusual, A2b.raw_facts
 
 ### POL-06 · A block is final
 
@@ -259,9 +259,9 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 - [ ] BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it
 - [ ] Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked`
-- [ ] A new intent to the same payee for the same amount within 24 h of a block is escalated with a link to the blocked one
+- [ ] A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** POL-02, EXE-01 · **Traces to:** A6.block_final, A2b.rule, L5
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** POL-02, EXE-01 · **Traces to:** A6.block_final, A2b.rule, L5
 
 ### POL-07 · Versioned rule changes with two approvers
 
@@ -274,7 +274,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability
 - [ ] All versions are kept and readable; decisions link to the version used
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M4 Exceptions and console · **Depends on:** POL-01, FND-04 · **Traces to:** B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S6 Operations around escalations · **Depends on:** POL-01, FND-04 · **Traces to:** B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding
 
 ### POL-08 · Decision-only API
 
@@ -285,7 +285,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] Returns the same decision object as intent creation, with `executed: false`
 - [ ] Decisions are stored and audited but never create attempts
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M1 Decide · **Depends on:** POL-02 · **Traces to:** A2.Decide, A3.shadow
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02 · **Traces to:** A2.Decide, A3.shadow
 
 ### POL-09 · Fail closed
 
@@ -296,7 +296,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [ ] If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`)
 - [ ] No code path turns an error into EXECUTE (fault-injection test on each dependency)
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M1 Decide · **Depends on:** POL-02 · **Traces to:** A6.fail_closed, B5.failsafe
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02 · **Traces to:** A6.fail_closed, B5.failsafe
 
 ## AGT · Mandates and instruction agent
 
@@ -312,7 +312,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Invalid signature, unknown agent or expired mandate are detectable without calling the model
 - [ ] The format keeps fields that map to AP2-style mandates later
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M2 Agent and mandates · **Depends on:** FND-03 · **Traces to:** A2.Mandate
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** FND-03 · **Traces to:** A2.Mandate
 
 ### MND-02 · Mandate check in the policy
 
@@ -324,7 +324,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Cumulative usage updates atomically (concurrency test)
 - [ ] The check re-runs at execution time
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M2 Agent and mandates · **Depends on:** MND-01, POL-02 · **Traces to:** A2.Mandate, A5.proposes, D.sandbox
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** MND-01, POL-02 · **Traces to:** A2.Mandate, A5.proposes, D.sandbox
 
 ### MND-03 · Revoke a mandate
 
@@ -335,7 +335,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Revocation by console or API takes effect for every intent not yet SUBMITTED
 - [ ] An approved intent whose mandate is revoked before sending is BLOCKED `MANDATE_REVOKED` at the pre-send re-check
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** MND-02, EXE-03 · **Traces to:** A2.Mandate
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** MND-02, EXE-03 · **Traces to:** A2.Mandate
 
 ### AGT-01 · Instruction agent turns an invoice into a proposed intent
 
@@ -348,7 +348,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Invalid output is retried once, then the proposal is marked `needs_human`
 - [ ] The canonical $18,500 USDC invoice yields the expected intent on 10 of 10 runs (EVL-04)
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M2 Agent and mandates · **Depends on:** INT-04, MND-01 · **Traces to:** A5.proposes, A2.Intent, L1
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** INT-04, MND-01 · **Traces to:** A5.proposes, A2.Intent, L1
 
 ### AGT-02 · Flag, never guess
 
@@ -360,7 +360,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Any flag sets `requires_clarification`; such a proposal can't be submitted until a human resolves each flag
 - [ ] Tests on the interpretation set confirm no flagged field is ever populated from outside the document
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M2 Agent and mandates · **Depends on:** AGT-01 · **Traces to:** A5.proposes, L1
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A5.proposes, L1
 
 ### AGT-03 · The agent can only propose
 
@@ -372,7 +372,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] An import-boundary test fails if `detent.agents` imports `detent.execution`, `detent.exceptions.approve` or `detent.rails`
 - [ ] An attempt by the agent to call any other write endpoint is rejected by scope and logged
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M2 Agent and mandates · **Depends on:** AGT-01 · **Traces to:** A5.tools, A2b.no_agent_retry, B6.ai
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A5.tools, A2b.no_agent_retry, B6.ai
 
 ### AGT-04 · Prompt-injection isolation
 
@@ -385,7 +385,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Instruction-like content in a document is reported as a `possible_injection` flag and never followed
 - [ ] All injection scenarios in the attack suite pass (EVL-02)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M2 Agent and mandates · **Depends on:** AGT-01 · **Traces to:** A5.injection, L2, B6.ai
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A5.injection, L2, B6.ai
 
 ### AGT-05 · Record every agent call for replay
 
@@ -396,7 +396,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Agent calls are rows linked to the intent or case, with token counts and latency
 - [ ] Replay reads stored outputs and never calls the model again
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M2 Agent and mandates · **Depends on:** AGT-01 · **Traces to:** A2.Prove, A5.citations
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A2.Prove, A5.citations
 
 ### AGT-06 · Model configuration and cost guard
 
@@ -408,7 +408,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [ ] Model calls go through one `LLMClient` interface so a second provider can be added
 - [ ] Over budget, agent features return `needs_human`; nothing falls back to executing
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M2 Agent and mandates · **Depends on:** AGT-01 · **Traces to:** B4.infra, B6.dependence, D.abuse
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** B4.infra, B6.dependence, D.abuse
 
 ## EXE · Exactly-once execution
 
@@ -424,7 +424,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] Illegal transitions raise, change nothing and write an audit event
 - [ ] Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** FND-03 · **Traces to:** A2b.states, A2.Execute
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** FND-03 · **Traces to:** A2b.states, A2.Execute
 
 ### EXE-02 · Attempts and exactly-once guarantees
 
@@ -437,7 +437,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] A new attempt is created only when the previous one is definitively FAILED
 - [ ] Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** EXE-01 · **Traces to:** A2.Execute, A6.retry_rule, A2b.rule, L3
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** EXE-01 · **Traces to:** A2.Execute, A6.retry_rule, A2b.rule, L3
 
 ### EXE-03 · Pre-send checks under the lock
 
@@ -449,7 +449,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] If the decision is older than the configured age or the rule version changed, policy re-runs first
 - [ ] Any failed check moves the payment to HELD with the reason; nothing is sent
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** EXE-02, POL-02 · **Traces to:** A2.Execute, A2b.custody
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** EXE-02, POL-02 · **Traces to:** A2.Execute, A2b.custody
 
 ### EXE-04 · Nonce manager
 
@@ -461,7 +461,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] On startup the manager reconciles with `eth_getTransactionCount(pending)` and refuses to send if they disagree
 - [ ] Concurrent sends from one wallet get consecutive nonces (concurrency test)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** EXE-02, RAL-02 · **Traces to:** A2.Execute, A2b.custody
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** EXE-02, RAL-02 · **Traces to:** A2.Execute, A2b.custody
 
 ### EXE-05 · A timeout becomes UNKNOWN
 
@@ -473,7 +473,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] While UNKNOWN, no new attempt can be created (database and code)
 - [ ] Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** EXE-02 · **Traces to:** A2b.unknown, A2b.states, L4
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-02 · **Traces to:** A2b.unknown, A2b.states, L4
 
 ### EXE-06 · UNKNOWN resolver
 
@@ -486,7 +486,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer
 - [ ] Median and p95 time to resolve are recorded for the results report
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** EXE-05, FND-06, EXC-01 · **Traces to:** A2b.unknown, B7.unknown
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-05, FND-06, EXC-01 · **Traces to:** A2b.unknown, B7.unknown
 
 ### EXE-07 · Deterministic retry policy
 
@@ -498,7 +498,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] Only `TECHNICAL_RETRYABLE` failures retry; `REJECTED_BY_RAIL` and any BLOCK never do
 - [ ] Every retry keeps the payment ID and is audited with the rule that allowed it
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** EXE-02 · **Traces to:** A2b.no_agent_retry, A6.retry_rule, A2b.rule
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-02 · **Traces to:** A2b.no_agent_retry, A6.retry_rule, A2b.rule
 
 ### EXE-08 · Kill switch
 
@@ -511,7 +511,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] Release requires the client's payments lead, even if on-call engaged it
 - [ ] A red banner shows on every console page while engaged; every change is audited
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** EXE-03, FND-04 · **Traces to:** B3.kill_switch, A2.Execute, L4
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-03, FND-04 · **Traces to:** B3.kill_switch, A2.Execute, L4
 
 ### EXE-09 · Shadow, Assist and Auto modes
 
@@ -523,7 +523,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] Changing mode needs the payments lead and the compliance lead; each change is audited
 - [ ] Orchestrate is shown as routing being enabled when 2 or more rails are connected
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** EXE-03, FND-04 · **Traces to:** A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** EXE-03, FND-04 · **Traces to:** A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates
 
 ### EXE-10 · Sev 1 invariant monitor
 
@@ -534,7 +534,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 - [ ] Every minute and after each confirmation: two confirmed transfers for one payment ID, a confirmed attempt without an EXECUTE or approved decision, or two credits for one inbound transfer
 - [ ] A hit opens a Sev 1 incident, engages the kill switch (configurable, on by default), posts to the mock outbox and shows a red banner
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** EXE-08, LED-05 · **Traces to:** B3.incident, B7.safety
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-08, LED-05 · **Traces to:** B3.incident, B7.safety
 
 ## RAL · Rails, routing and faults
 
@@ -550,7 +550,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Errors normalise to TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL or TIMEOUT
 - [ ] A shared contract-test suite runs against every adapter
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** FND-03 · **Traces to:** A2.Connect, B4.rails, B6.dependence
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** FND-03 · **Traces to:** A2.Connect, B4.rails, B6.dependence
 
 ### RAL-02 · Base Sepolia USDC adapter
 
@@ -562,7 +562,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Confirmation threshold configurable; explorer link stored on the attempt
 - [ ] Contract tests pass on the local chain and nightly on Base Sepolia
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** RAL-01, FND-09 · **Traces to:** A2.Connect, A2b.custody, A7.prototype
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** RAL-01, FND-09 · **Traces to:** A2.Connect, A2b.custody, A7.prototype
 
 ### RAL-03 · Ethereum Sepolia USDC adapter
 
@@ -573,7 +573,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold
 - [ ] Contract tests pass
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** RAL-02 · **Traces to:** A2.Connect
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-02 · **Traces to:** A2.Connect
 
 ### RAL-04 · Simulated instant bank rail
 
@@ -585,7 +585,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Status endpoint and asynchronous settlement callback; daily statement endpoint (used by LED-07)
 - [ ] Deterministic test values: amounts ending .13 time out then settle; .42 fail technically
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** RAL-01 · **Traces to:** A2.Connect, A7.prototype
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-01 · **Traces to:** A2.Connect, A7.prototype
 
 ### RAL-05 · Fault-injection proxy
 
@@ -597,7 +597,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Fault chosen per attempt by scenario config in tests and sandbox; disabled in demo mode unless a scenario requests it
 - [ ] Each injected fault is logged with the attempt ID
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** RAL-02, RAL-04 · **Traces to:** L3, L4, A2b.unknown
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-02, RAL-04 · **Traces to:** L3, L4, A2b.unknown
 
 ### RAL-06 · Routing engine
 
@@ -609,7 +609,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Eligibility first (currency, network constraint from intent or mandate, limits, cut-off, health, liquidity), then a weighted score from config
 - [ ] The decision stores each candidate's score and the reason for the winner
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** RAL-01, POL-02 · **Traces to:** A2.Route, A3.orchestrate, A1.cost
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-01, POL-02 · **Traces to:** A2.Route, A3.orchestrate, A1.cost
 
 ### RAL-07 · Failover on technical failure only
 
@@ -622,7 +622,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Network switches need `allow_network_switch` on the intent or mandate, or a human approval
 - [ ] The new attempt keeps the payment ID
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** RAL-06, EXE-07 · **Traces to:** A2.Route, A6.block_final, L5, A1.cost
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-06, EXE-07 · **Traces to:** A2.Route, A6.block_final, L5, A1.cost
 
 ### RAL-08 · Rail health and circuit breaker
 
@@ -633,7 +633,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Rolling success rate and p95 latency per rail; balance and pre-funded limit usage
 - [ ] Circuit opens after the configured failure count and closes after a successful probe
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** RAL-06 · **Traces to:** A2.Connect, B3.adapters
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** RAL-06 · **Traces to:** A2.Connect, B3.adapters
 
 ### RAL-09 · Rail connection flow (mock)
 
@@ -644,7 +644,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Mock OAuth-style consent screen and a scoped-key form; credentials encrypted at rest and never shown again
 - [ ] Scopes listed; disconnect removes credentials and takes the rail out of routing
 
-**Priority:** Should · **Estimate:** 0.75 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** RAL-01 · **Traces to:** A2.Connect, B3.onboarding, B5.security
+**Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** RAL-01 · **Traces to:** A2.Connect, B3.onboarding, B5.security
 
 ### RAL-10 · Daily adapter contract tests
 
@@ -654,7 +654,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 - [ ] Scheduled GitHub Actions job; failure opens an issue with the failing adapter and test
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** RAL-03, RAL-04 · **Traces to:** B3.adapters
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** RAL-03, RAL-04 · **Traces to:** B3.adapters
 
 ### RAL-11 · Simulated chain rail for the sandbox
 
@@ -665,7 +665,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 - [ ] Implements the adapter contract with instant settlement and the same test values
 - [ ] Sandbox organisations use it by default; real testnet is opt-in (SBX-03)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** RAL-01 · **Traces to:** D.sandbox
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** RAL-01 · **Traces to:** D.sandbox
 
 ## EXC · Exceptions and investigation
 
@@ -681,7 +681,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions)
 - [ ] Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M3 Exactly-once execution and rails · **Depends on:** POL-02, FND-05 · **Traces to:** A2.Exceptions, B3.exceptions
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** POL-02, FND-05 · **Traces to:** A2.Exceptions, B3.exceptions
 
 ### EXC-02 · Raw facts first
 
@@ -692,7 +692,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] Top of the case: payee as registered, full checksummed wallet address, first seen and last changed times, amount against the counterparty's median, each rule hit with its parameters, and the mandate scope
 - [ ] The agent's evidence and recommendation sit below, collapsed by default
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** EXC-01, INT-04 · **Traces to:** A2b.raw_facts, L6
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** EXC-01, INT-04 · **Traces to:** A2b.raw_facts, L6
 
 ### EXC-03 · Investigation agent with cited evidence
 
@@ -705,7 +705,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] Recommendation is approve, reject or needs-information with a confidence; the agent cannot change any state
 - [ ] Runs in the worker; the case is usable before the agent finishes
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M4 Exceptions and console · **Depends on:** EXC-01, AGT-05 · **Traces to:** A5.citations, A5.tools, A2.Exceptions, A1.reviews
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S6 Operations around escalations · **Depends on:** EXC-01, AGT-05 · **Traces to:** A5.citations, A5.tools, A2.Exceptions, A1.reviews
 
 ### EXC-04 · Approve or reject, with policy re-run
 
@@ -717,7 +717,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] Reject -> REJECTED (terminal); a reason is required for both
 - [ ] The approver can't be the user who initiated the intent
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** EXC-01, EXE-03 · **Traces to:** A2.Exceptions, A6.block_final, L6
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** EXC-01, EXE-03 · **Traces to:** A2.Exceptions, A6.block_final, L6
 
 ### EXC-05 · Double-approval safety
 
@@ -728,7 +728,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] Row lock plus version check; the second approval gets 409 `already_resolved`
 - [ ] Fault suite includes parallel approvals from console and API
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M4 Exceptions and console · **Depends on:** EXC-04 · **Traces to:** L3, A6.retry_rule
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** EXC-04 · **Traces to:** L3, A6.retry_rule
 
 ### EXC-06 · Deadline sweeper - a timeout never becomes an approval
 
@@ -739,7 +739,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline
 - [ ] The count of payments approved by timeout is always 0 and is reported
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** EXC-01, EXC-07, FND-06 · **Traces to:** A2b.timeout_hold, A6.timeout, B3.exceptions, L6, B7.exceptions
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** EXC-01, EXC-07, FND-06 · **Traces to:** A2b.timeout_hold, A6.timeout, B3.exceptions, L6, B7.exceptions
 
 ### EXC-07 · Mock outbox
 
@@ -750,7 +750,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] Counterparty updates, owner assignments and incident notices are stored with recipient, template and body
 - [ ] Nothing in the prototype sends real email
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M4 Exceptions and console · **Depends on:** FND-03 · **Traces to:** B3.exceptions
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** FND-03 · **Traces to:** B3.exceptions
 
 ### EXC-08 · Exceptions by API
 
@@ -761,7 +761,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 - [ ] GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve`
 - [ ] Same rules as the console: re-run, separation of duties, 409 on double approval
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** EXC-04 · **Traces to:** A2.Exceptions, D.standards
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** EXC-04 · **Traces to:** A2.Exceptions, D.standards
 
 ### EXC-09 · Agent-versus-human agreement sample
 
@@ -771,7 +771,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 - [ ] Per period: cases, agreement rate, disagreements listed with both rationales
 
-**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** EXC-03 · **Traces to:** B3.agent_eval, B7.quality
+**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXC-03 · **Traces to:** B3.agent_eval, B7.quality
 
 ## LED · Ledger, deposits and reconciliation
 
@@ -787,7 +787,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 - [ ] Entries are append-only; corrections are new entries
 - [ ] Every posting references a payment, deposit or adjustment ID
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** FND-03 · **Traces to:** A2.Reconcile, A1.evidence
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** FND-03 · **Traces to:** A2.Reconcile, A1.evidence
 
 ### LED-02 · Payout postings
 
@@ -798,7 +798,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 - [ ] SUBMITTED reserves; CONFIRMED settles and posts actual fees; final FAILED reverses the reservation; UNKNOWN keeps the reservation
 - [ ] Ledger and payment status agree after every fault-suite case
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** LED-01, EXE-02 · **Traces to:** A2.Reconcile
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-01, EXE-02 · **Traces to:** A2.Reconcile
 
 ### LED-03 · Deposit intents
 
@@ -809,7 +809,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 - [ ] POST /v1/deposit_intents returns deposit instructions: a per-account test address, or a bank reference for the simulated rail
 - [ ] Idempotent like payment intents
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** LED-01 · **Traces to:** A1.deposits, A2.Reconcile
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-01 · **Traces to:** A1.deposits, A2.Reconcile
 
 ### LED-04 · Deposit watchers
 
@@ -820,7 +820,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 - [ ] Reads ERC-20 Transfer logs to watched addresses, and bank-rail inbound credits
 - [ ] Unique on (rail, transaction hash, log index); restarting the watcher never duplicates
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** LED-03, FND-06, RAL-02 · **Traces to:** A1.deposits
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-03, FND-06, RAL-02 · **Traces to:** A1.deposits
 
 ### LED-05 · Deposit decision and credit-once
 
@@ -833,7 +833,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 - [ ] Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer
 - [ ] Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** LED-04, POL-03, EXC-01 · **Traces to:** A1.deposits, A2.Reconcile, L7
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-04, POL-03, EXC-01 · **Traces to:** A1.deposits, A2.Reconcile, L7
 
 ### LED-06 · Reconciliation run with proposed fixes
 
@@ -847,7 +847,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 - [ ] On a generated set of 500 synthetic deposits and payouts with 3 designed breaks, automatic matching is 99% or more and each break gets a proposed fix
 - [ ] The demo batch (20 payouts, 8 deposits) shows exactly one designed break, dep-07
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** LED-02, LED-05, LED-07, EXC-01 · **Traces to:** A2.Reconcile, L7, B7.recon
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-02, LED-05, LED-07, EXC-01 · **Traces to:** A2.Reconcile, L7, B7.recon
 
 ### LED-07 · Bank statement import
 
@@ -857,7 +857,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 - [ ] Pulls the statement endpoint (JSON or CSV), idempotent per statement date
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** RAL-04 · **Traces to:** A2.Reconcile
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** RAL-04 · **Traces to:** A2.Reconcile
 
 ### LED-08 · Usage metering
 
@@ -867,7 +867,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 - [ ] Monthly counts of payments decided, agent investigations and API calls per organisation
 
-**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** LED-01 · **Traces to:** A4.fee, B3.billing, D.usage
+**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** LED-01 · **Traces to:** A4.fee, B3.billing, D.usage
 
 ## AUD · Audit and replay
 
@@ -883,7 +883,7 @@ _Every step is recorded append-only and any payment can be replayed and exported
 - [ ] A database trigger rejects UPDATE and DELETE on audit rows
 - [ ] Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested)
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M1 Decide · **Depends on:** FND-03 · **Traces to:** A2.Prove, B5.security, A1.evidence
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Prove, B5.security, A1.evidence
 
 ### AUD-02 · Replay any payment
 
@@ -895,7 +895,7 @@ _Every step is recorded append-only and any payment can be replayed and exported
 - [ ] Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert
 - [ ] Every payment in the demo data replays successfully (test)
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** AUD-01, AGT-05, POL-02 · **Traces to:** A2.Prove, L8, B3.incident
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** AUD-01, AGT-05, POL-02 · **Traces to:** A2.Prove, L8, B3.incident
 
 ### AUD-03 · Evidence export
 
@@ -905,7 +905,7 @@ _Every step is recorded append-only and any payment can be replayed and exported
 
 - [ ] JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** AUD-02 · **Traces to:** A2.Prove, A1.evidence
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** AUD-02 · **Traces to:** A2.Prove, A1.evidence
 
 ## CON · Back-office console
 
@@ -921,7 +921,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 - [ ] A banner on every page: 'Prototype · test networks · simulated bank rail'
 - [ ] Wording uses 'agentic payment controls' and names the three layers (decision, orchestration, operations); never 'payments company' or 'payment provider'
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** FND-04 · **Traces to:** L8, BR.category, D.honesty
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** FND-04 · **Traces to:** L8, BR.category, D.honesty
 
 ### CON-02 · Overview screen
 
@@ -932,7 +932,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 - [ ] Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events
 - [ ] Refreshes by htmx polling
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** CON-01 · **Traces to:** B7.automation, B7.exceptions, B7.unknown
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** CON-01 · **Traces to:** B7.automation, B7.exceptions, B7.unknown
 
 ### CON-03 · Payments list and detail
 
@@ -942,7 +942,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 - [ ] Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M4 Exceptions and console · **Depends on:** CON-01, AUD-01 · **Traces to:** A2.Prove, A2.Decide
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** CON-01, AUD-01 · **Traces to:** A2.Prove, A2.Decide
 
 ### CON-04 · Exceptions queue screen
 
@@ -952,7 +952,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 - [ ] Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** CON-01, EXC-04 · **Traces to:** A2.Exceptions, A2b.raw_facts
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run · **Depends on:** CON-01, EXC-04 · **Traces to:** A2.Exceptions, A2b.raw_facts
 
 ### CON-05 · Invoice drop and agent proposal screen
 
@@ -963,7 +963,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 - [ ] Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force
 - [ ] 'Submit as agent' calls the public API with the agent's key and shows the decision
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** CON-01, AGT-02, MND-02 · **Traces to:** MVP.flow, A5.proposes
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** CON-01, AGT-02, MND-02 · **Traces to:** MVP.flow, A5.proposes
 
 ### CON-06 · Policy and mandates screens
 
@@ -974,7 +974,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 - [ ] Active version, history and diff; propose and approve per POL-07
 - [ ] Mandates list with scope, usage against limits, expiry and revoke
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M4 Exceptions and console · **Depends on:** POL-07, MND-03 · **Traces to:** B3.rule_changes, A2.Mandate
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** POL-07, MND-03 · **Traces to:** B3.rule_changes, A2.Mandate
 
 ### CON-07 · Reconciliation screen
 
@@ -984,7 +984,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 - [ ] Run history, match rate, breaks with proposed fix and approve button
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M5 Ledger, deposits, reconciliation, replay · **Depends on:** LED-06 · **Traces to:** A2.Reconcile, L7
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-06 · **Traces to:** A2.Reconcile, L7
 
 ### CON-08 · Rails screen
 
@@ -994,7 +994,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 - [ ] Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M4 Exceptions and console · **Depends on:** CON-01, RAL-06 · **Traces to:** A2.Connect
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice · **Depends on:** CON-01, RAL-06 · **Traces to:** A2.Connect
 
 ### CON-09 · Demo scenario runner
 
@@ -1005,7 +1005,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 - [ ] Scenarios: the $18,500 invoice; forced timeout to UNKNOWN then CONFIRMED with no resend; 20-payment batch with deposits and one designed break; an attack sample; reset demo data
 - [ ] Each scenario is scripted, idempotent and uses the controllable clock
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M7 Demo-ready prototype · **Depends on:** CON-05, LED-06, EVL-01 · **Traces to:** MVP.flow, MVP.scenarios
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** CON-05, LED-06, EVL-01 · **Traces to:** MVP.flow, MVP.scenarios
 
 ### CON-10 · Settings screen
 
@@ -1015,7 +1015,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 - [ ] Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** EXE-09 · **Traces to:** B5.failsafe, A3.gates
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-09 · **Traces to:** B5.failsafe, A3.gates
 
 ## EVL · Evaluation harness
 
@@ -1030,7 +1030,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [ ] Each scenario runs in isolation with a fixed seed; output is results.json with date, commit, model IDs and per-scenario results
 - [ ] Scenarios are data files under eval/scenarios/, not code
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** FND-09, POL-02 · **Traces to:** A5.gate, B3.agent_eval
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** FND-09, POL-02 · **Traces to:** A5.gate, B3.agent_eval
 
 ### EVL-02 · Attack suite (100+ scenarios)
 
@@ -1041,7 +1041,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [ ] Categories from spec/09-evaluation-and-tests.md: injection in invoice body, notes, payee name, reference and PDF metadata; mandate violations; split payments; wallet change race; resubmission after block; self-approval; approval after deadline; idempotency-key reuse; tampered rule version; cross-organisation access; wrong-scope keys; re-route after block
 - [ ] Pass means no SUBMITTED or CONFIRMED attempt without authorisation; the suite reports per category
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** EVL-01, AGT-04, EXC-04, RAL-07 · **Traces to:** L2, A5.gate, A5.injection, B7.safety
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, AGT-04, EXC-04, RAL-07 · **Traces to:** L2, A5.gate, A5.injection, B7.safety
 
 ### EVL-03 · Fault suite (30+ cases)
 
@@ -1052,7 +1052,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [ ] Matrix of faults (timeout after and before send, reset, 5xx, delayed and hidden receipt, duplicated response, worker crash mid-send, concurrent retries, double approvals, failover, kill switch mid-batch) across the rails
 - [ ] Pass: 0 duplicates, every retry and switch keeps the payment ID, no timeout ever becomes FAILED
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** EVL-01, RAL-05, EXE-06 · **Traces to:** L3, L4, L5, B7.safety
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, RAL-05, EXE-06 · **Traces to:** L3, L4, L5, B7.safety
 
 ### EVL-04 · Interpretation set
 
@@ -1062,7 +1062,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 
 - [ ] Metrics: field accuracy, flag recall on ambiguous cases, invented-value count (must be 0), and canonical 10/10
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** EVL-01, AGT-02 · **Traces to:** L1, A5.proposes
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, AGT-02 · **Traces to:** L1, A5.proposes
 
 ### EVL-05 · Agreement set (synthetic)
 
@@ -1072,7 +1072,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 
 - [ ] Agreement of final decision and of agent recommendation with labels, reported separately; clearly marked synthetic
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** EVL-01, EXC-03 · **Traces to:** B7.quality, A1.reviews
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, EXC-03 · **Traces to:** B7.quality, A1.reviews
 
 ### EVL-06 · Results report
 
@@ -1083,7 +1083,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [ ] HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]'
 - [ ] results.json is published for the website's Measured results section
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** EVL-02, EVL-03, EVL-04 · **Traces to:** MVP.flow, D.site, D.honesty, B7.automation
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-02, EVL-03, EVL-04 · **Traces to:** MVP.flow, D.site, D.honesty, B7.automation
 
 ### EVL-07 · Release gate in CI
 
@@ -1094,7 +1094,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [ ] Runs on main and on release tags against the local chain and simulators; nightly against public testnets
 - [ ] Any unauthorised execution or duplicate fails the build, whatever other scores say
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** EVL-02, EVL-03 · **Traces to:** A5.gate, B3.agent_eval, B6.ai
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-02, EVL-03 · **Traces to:** A5.gate, B3.agent_eval, B6.ai
 
 ### EVL-08 · Latency benchmark
 
@@ -1104,7 +1104,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 
 - [ ] Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M6 Evaluation and release gate · **Depends on:** EVL-01 · **Traces to:** B5.resilience, B7.reliability
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01 · **Traces to:** B5.resilience, B7.reliability
 
 ## DEM · Demo data and scenarios
 
@@ -1119,7 +1119,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 - [ ] Names are invented and labelled fictional; no real client, partner or former-employer names
 - [ ] Seed is idempotent and resettable
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M7 Demo-ready prototype · **Depends on:** INT-04, POL-01, MND-01 · **Traces to:** B1.independence, B6.former_employer, MVP.flow
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** INT-04, POL-01, MND-01 · **Traces to:** B1.independence, B6.former_employer, MVP.flow
 
 ### DEM-02 · Canonical invoice and variants
 
@@ -1129,7 +1129,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 - [ ] fixtures/invoices/ contains the canonical invoice plus missing-network, two-wallet, changed-wallet and injection variants with expected outputs
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M2 Agent and mandates · **Depends on:** none · **Traces to:** L1, MVP.flow
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** none · **Traces to:** L1, MVP.flow
 
 ### DEM-03 · 20-payment batch with deposits
 
@@ -1139,7 +1139,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 - [ ] Covers all three rails, at least one escalation, one block and exactly one reconciliation break
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M7 Demo-ready prototype · **Depends on:** LED-06 · **Traces to:** MVP.flow, L7
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** LED-06 · **Traces to:** MVP.flow, L7
 
 ### DEM-04 · Wallet funding runbook and check
 
@@ -1149,7 +1149,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 - [ ] `detent demo check` prints USDC and gas balances per wallet and chain with faucet instructions
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M7 Demo-ready prototype · **Depends on:** RAL-03 · **Traces to:** A7.prototype
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** RAL-03 · **Traces to:** A7.prototype
 
 ### DEM-05 · Demo script
 
@@ -1159,7 +1159,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 - [ ] spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M7 Demo-ready prototype · **Depends on:** CON-09 · **Traces to:** MVP.flow, B3.lead_shadow
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** CON-09 · **Traces to:** MVP.flow, B3.lead_shadow
 
 ### DEM-06 · Scenario packs per platform type
 
@@ -1169,7 +1169,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 - [ ] Each pack: platform, counterparties, rules and a short batch; selectable on reset
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** DEM-01 · **Traces to:** MVP.scenarios
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** DEM-01 · **Traces to:** MVP.scenarios
 
 ## SHD · Shadow mode
 
@@ -1183,7 +1183,7 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 - [ ] Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed
 
-**Priority:** Should · **Estimate:** 0.75 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** POL-08 · **Traces to:** MVP.shadow_csv, A3.shadow, A6.shadow_first, A7.beta, B3.lead_shadow
+**Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** POL-08 · **Traces to:** MVP.shadow_csv, A3.shadow, A6.shadow_first, A7.beta, B3.lead_shadow
 
 ### SHD-02 · Shadow report
 
@@ -1193,7 +1193,7 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 - [ ] Sections: decision mix, agreement, unsafe approvals (approved by Detent but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF
 
-**Priority:** Should · **Estimate:** 0.75 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** SHD-01, RAL-06 · **Traces to:** A3.shadow, B3.lead_shadow, A4.plans
+**Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** SHD-01, RAL-06 · **Traces to:** A3.shadow, B3.lead_shadow, A4.plans
 
 ### SHD-03 · Mode-gate report and sign-off
 
@@ -1203,7 +1203,7 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 - [ ] Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change
 
-**Priority:** Could · **Estimate:** 0.5 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** SHD-02, EXE-09 · **Traces to:** A3.gates, B3.mode_gates
+**Priority:** Could · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** SHD-02, EXE-09 · **Traces to:** A3.gates, B3.mode_gates
 
 ### SHD-04 · Anonymise on import
 
@@ -1213,7 +1213,7 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 - [ ] Raw names and account identifiers never stored; hashes are consistent within one import
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** SHD-01 · **Traces to:** B1.contracts, A5.data
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** SHD-01 · **Traces to:** B1.contracts, A5.data
 
 ## OPS · Operational controls
 
@@ -1227,7 +1227,7 @@ _The operating-model processes that need software: incidents, independence check
 
 - [ ] Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** EXE-10, AUD-02 · **Traces to:** B3.incident
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-10, AUD-02 · **Traces to:** B3.incident
 
 ### OPS-02 · Independence check in CI
 
@@ -1237,7 +1237,7 @@ _The operating-model processes that need software: incidents, independence check
 
 - [x] The denylist lives in a CI secret, never in the repo; the check scans code, fixtures and docs
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M0 Foundation · **Depends on:** FND-01 · **Traces to:** B1.independence, B6.former_employer
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** B1.independence, B6.former_employer
 
 ### OPS-03 · Backup and restore drill
 
@@ -1247,7 +1247,7 @@ _The operating-model processes that need software: incidents, independence check
 
 - [ ] Runbook in spec/10; one drill done and timed; audit hash chain verified after restore
 
-**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** FND-07 · **Traces to:** B5.resilience
+**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** FND-07 · **Traces to:** B5.resilience
 
 ### OPS-04 · Security pack draft
 
@@ -1257,7 +1257,7 @@ _The operating-model processes that need software: incidents, independence check
 
 - [ ] docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap
 
-**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** M12 Should and could haves after launch · **Depends on:** EVL-07 · **Traces to:** B5.assurance, B5.security
+**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EVL-07 · **Traces to:** B5.assurance, B5.security
 
 ## API · Public sandbox API
 
@@ -1273,7 +1273,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 - [ ] Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable`
 - [ ] Every data access filters by the key's organisation (cross-organisation tests in EVL-02)
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** FND-03 · **Traces to:** D.keys, D.standards, B5.security
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** FND-03 · **Traces to:** D.keys, D.standards, B5.security
 
 ### API-02 · Error model
 
@@ -1283,7 +1283,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 - [ ] Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** FND-08 · **Traces to:** D.standards
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** FND-08 · **Traces to:** D.standards
 
 ### API-03 · Dated API versions
 
@@ -1293,7 +1293,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 - [ ] `Detent-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.standards
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.standards
 
 ### API-04 · Rate limits
 
@@ -1303,7 +1303,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 - [ ] `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After`
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.standards, D.abuse
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.standards, D.abuse
 
 ### API-05 · OpenAPI 3.1 file
 
@@ -1314,7 +1314,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 - [ ] Generated from FastAPI, then completed with descriptions, examples and error responses
 - [ ] Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift
 
-**Priority:** Must · **Estimate:** 1.5 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** API-02, EXC-08, LED-03 · **Traces to:** D.docs, D.sdks, D.standards
+**Priority:** Must · **Estimate:** 1.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-02, EXC-08, LED-03 · **Traces to:** D.docs, D.sdks, D.standards
 
 ### API-06 · Request logs
 
@@ -1324,7 +1324,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 - [ ] Stored per organisation for 30 days; bodies redacted; filterable in the dashboard
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.logs
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.logs
 
 ### API-07 · Events list
 
@@ -1334,7 +1334,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 - [ ] Same event objects as webhooks; filter by type and payment ID
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** WHK-01 · **Traces to:** D.webhooks, D.standards
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** WHK-01 · **Traces to:** D.webhooks, D.standards
 
 ## WHK · Webhooks
 
@@ -1349,7 +1349,7 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 - [ ] Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break)
 - [ ] Signing secret shown once; events carry `id` and a per-payment `sequence`
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.webhooks
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.webhooks
 
 ### WHK-02 · Signed webhooks
 
@@ -1359,7 +1359,7 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 
 - [ ] `Detent-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** WHK-01 · **Traces to:** D.webhooks
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** WHK-01 · **Traces to:** D.webhooks
 
 ### WHK-03 · Delivery, retries and log
 
@@ -1369,7 +1369,7 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 
 - [ ] Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event'
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M8 Public sandbox API and webhooks · **Depends on:** WHK-02, FND-06 · **Traces to:** D.webhooks
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** WHK-02, FND-06 · **Traces to:** D.webhooks
 
 ## DSH · Developer dashboard
 
@@ -1384,7 +1384,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 - [ ] Admin screen: organisation name, expiry (default 60 days), invite emails; invite links are single-use and expire in 7 days
 - [ ] No public sign-up route exists
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** API-01 · **Traces to:** D.sales_led, B3.onboarding
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-01 · **Traces to:** D.sales_led, B3.onboarding
 
 ### DSH-02 · Accept invite and verify email
 
@@ -1395,7 +1395,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 - [ ] Email verification link; password hashed with argon2; first login shows the keys page
 - [ ] Emails go through a transactional email provider in production and the outbox in development
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led
 
 ### DSH-03 · Organisation expiry and extension
 
@@ -1405,7 +1405,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.abuse
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.abuse
 
 ### DSH-04 · Keys page
 
@@ -1415,7 +1415,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** DSH-02 · **Traces to:** D.keys
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-02 · **Traces to:** D.keys
 
 ### DSH-05 · Request logs page
 
@@ -1425,7 +1425,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] Filters by status, path, idempotency key and payment ID; detail view with redacted bodies
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** API-06, DSH-02 · **Traces to:** D.logs
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-06, DSH-02 · **Traces to:** D.logs
 
 ### DSH-06 · Webhooks page
 
@@ -1435,7 +1435,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] All WHK features available in the UI
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** WHK-03, DSH-02 · **Traces to:** D.webhooks
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** WHK-03, DSH-02 · **Traces to:** D.webhooks
 
 ### DSH-07 · Sandbox controls page
 
@@ -1445,7 +1445,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] Reset; force timeout to UNKNOWN, rail failure and flagged address; explorer links for real-testnet payments
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** SBX-01, SBX-04, DSH-02 · **Traces to:** D.sandbox
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** SBX-01, SBX-04, DSH-02 · **Traces to:** D.sandbox
 
 ### DSH-08 · Usage page
 
@@ -1455,7 +1455,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] Calls, payments decided and agent investigations against daily quotas
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** LED-08, SBX-02 · **Traces to:** D.usage
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** LED-08, SBX-02 · **Traces to:** D.usage
 
 ### DSH-09 · Console per organisation
 
@@ -1465,7 +1465,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] Console screens reused with the organisation scope; demo-only controls (clock, scenario runner) hidden
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** CON-04, DSH-02 · **Traces to:** D.console
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** CON-04, DSH-02 · **Traces to:** D.console
 
 ### DSH-10 · Access requests inbox
 
@@ -1475,7 +1475,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 - [ ] Form fields: name, work email, company, role, use case; stored; admin list with status; email to the sales inbox
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.ops_pages
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.ops_pages
 
 ## SBX · Sandbox
 
@@ -1490,7 +1490,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 - [ ] Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK
 - [ ] Documented in the docs and covered by tests
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** RAL-11, RAL-05 · **Traces to:** D.sandbox
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** RAL-11, RAL-05 · **Traces to:** D.sandbox
 
 ### SBX-02 · Quotas and abuse limits
 
@@ -1500,7 +1500,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 
 - [ ] Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** API-04 · **Traces to:** D.abuse
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-04 · **Traces to:** D.abuse
 
 ### SBX-03 · Real test-network mode
 
@@ -1510,7 +1510,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 
 - [ ] Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** RAL-03, SBX-02 · **Traces to:** D.sandbox
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** RAL-03, SBX-02 · **Traces to:** D.sandbox
 
 ### SBX-04 · Sandbox reset
 
@@ -1518,9 +1518,9 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 
 **Acceptance criteria**
 
-- [ ] Deletes intents, cases, ledger and logs for the organisation; keeps keys, webhooks and settings; audited
+- [ ] Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08)
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M9 Dashboard and sandbox · **Depends on:** API-01 · **Traces to:** D.sandbox
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-01 · **Traces to:** D.sandbox
 
 ## DOC · Docs portal
 
@@ -1534,7 +1534,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 - [ ] Mintlify (Starter) from the repo's docs/ folder; reference generated from openapi.yaml; custom domain placeholder
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** M10 Docs and SDKs · **Depends on:** API-05 · **Traces to:** D.docs
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05 · **Traces to:** D.docs
 
 ### DOC-02 · Concept pages
 
@@ -1544,7 +1544,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 - [ ] Payment intents and the payment ID; decisions; payment states; policies and versions; mandates; exceptions and deadlines; deposits and reconciliation; routing and failover; audit and replay
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M10 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, BR.category
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, BR.category
 
 ### DOC-03 · Guides
 
@@ -1554,7 +1554,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 - [ ] Let an AI agent pay a supplier invoice ($18,500 USDC); credit deposits safely; handle UNKNOWN payments; approve escalations by API; use the kill switch; move from shadow to auto
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M10 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs
 
 ### DOC-04 · Tested samples in 8 languages
 
@@ -1565,7 +1565,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 - [ ] Guide and webhook-verification samples live as files under docs/snippets/<lang>/ and run in CI against a sandbox started in the pipeline
 - [ ] Reference request samples are generated from the OpenAPI file
 
-**Priority:** Must · **Estimate:** 1.25 d · **Milestone:** M10 Docs and SDKs · **Depends on:** DOC-03, WHK-02 · **Traces to:** D.samples
+**Priority:** Must · **Estimate:** 1.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-03, WHK-02 · **Traces to:** D.samples
 
 ### DOC-05 · Try it with a sandbox key
 
@@ -1576,7 +1576,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 - [ ] Works with a pasted sandbox key; visitors without a key see examples and a 'Request sandbox access' button
 - [ ] Only the sandbox base URL is configurable
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M10 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, D.sales_led
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, D.sales_led
 
 ### DOC-06 · Changelog and versioning page
 
@@ -1586,7 +1586,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 - [ ] One entry per release with the API version; linked from the reference
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M10 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, D.standards
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, D.standards
 
 ## SDK · SDKs
 
@@ -1601,7 +1601,7 @@ _Typed Python and TypeScript clients with automatic idempotency and webhook help
 - [ ] Generated from openapi.yaml then polished: typed models, automatic idempotency keys on creates, safe retries, webhook verify helper
 - [ ] Tests run against the CI sandbox; package builds and installs from the repo
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M10 Docs and SDKs · **Depends on:** API-05, WHK-02 · **Traces to:** D.sdks
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05, WHK-02 · **Traces to:** D.sdks
 
 ### SDK-02 · TypeScript SDK
 
@@ -1611,7 +1611,7 @@ _Typed Python and TypeScript clients with automatic idempotency and webhook help
 
 - [ ] Same features as SDK-01; ESM and CJS builds; tests in CI
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** M10 Docs and SDKs · **Depends on:** API-05, WHK-02 · **Traces to:** D.sdks
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05, WHK-02 · **Traces to:** D.sdks
 
 ### SDK-03 · Postman collection and OpenAPI download
 
@@ -1621,7 +1621,7 @@ _Typed Python and TypeScript clients with automatic idempotency and webhook help
 
 - [ ] Generated in CI from openapi.yaml and linked from the docs
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M10 Docs and SDKs · **Depends on:** API-05 · **Traces to:** D.sdks
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05 · **Traces to:** D.sdks
 
 ## WEB · Marketing site
 
@@ -1637,7 +1637,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 - [ ] Category wording 'agentic payment controls', with the three layers shown as one section; never 'payments company' or 'payment provider'
 - [ ] Passes the honesty checklist: no logos, testimonials, customer counts, certification badges or licence claims
 
-**Priority:** Must · **Estimate:** 1.5 d · **Milestone:** M11 Website launch · **Depends on:** none · **Traces to:** D.site, D.honesty, BR.category, A4.plans
+**Priority:** Must · **Estimate:** 1.5 d · **Milestone:** P4 Website launch · **Depends on:** none · **Traces to:** D.site, D.honesty, BR.category, A4.plans
 
 ### WEB-02 · Product, Security and Design partners pages
 
@@ -1648,7 +1648,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 - [ ] Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned')
 - [ ] Design partners page explains the free shadow report and data handling
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** M11 Website launch · **Depends on:** WEB-01 · **Traces to:** D.site, D.honesty, B3.lead_shadow, B5.hosting
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** D.site, D.honesty, B3.lead_shadow, B5.hosting
 
 ### WEB-03 · Measured results section
 
@@ -1658,7 +1658,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 - [ ] Reads results.json at build time; every figure labelled 'test-network evaluation, [date]'
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M11 Website launch · **Depends on:** EVL-06, WEB-01 · **Traces to:** D.site, D.honesty
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** EVL-06, WEB-01 · **Traces to:** D.site, D.honesty
 
 ### WEB-04 · Developer code tabs
 
@@ -1668,7 +1668,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 - [ ] Uses the same tested snippets as DOC-04
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M11 Website launch · **Depends on:** DOC-04, WEB-01 · **Traces to:** D.site, D.samples
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** DOC-04, WEB-01 · **Traces to:** D.site, D.samples
 
 ### WEB-05 · Legal pages and analytics
 
@@ -1678,7 +1678,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 - [ ] Templates marked 'draft for legal review'; analytics without cookie banners where possible
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M11 Website launch · **Depends on:** WEB-01 · **Traces to:** D.ops_pages, B1.contracts
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** D.ops_pages, B1.contracts
 
 ### WEB-06 · Booking and access form
 
@@ -1688,7 +1688,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 - [ ] Booking link to the founder's appointment page; access form posts to DSH-10
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** M11 Website launch · **Depends on:** DSH-10, WEB-01 · **Traces to:** D.ops_pages, D.sales_led
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** DSH-10, WEB-01 · **Traces to:** D.ops_pages, D.sales_led
 
 ### WEB-07 · Status page
 
@@ -1698,7 +1698,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 - [ ] Fed by health checks; shows sandbox API, dashboard and docs
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M11 Website launch · **Depends on:** FND-07 · **Traces to:** D.ops_pages, B7.reliability
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** FND-07 · **Traces to:** D.ops_pages, B7.reliability
 
 ### WEB-08 · SEO basics
 
@@ -1708,4 +1708,4 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 - [ ] Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** M11 Website launch · **Depends on:** WEB-01 · **Traces to:** BR.category, D.site
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** BR.category, D.site

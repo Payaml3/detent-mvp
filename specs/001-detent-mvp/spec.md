@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 83 requirements confirmed; 19 proposed and 1 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 87 requirements confirmed; 16 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -33,7 +33,7 @@ only as extracts (`backlog/model-items.yaml`, `spec/`). See [decisions.md](decis
 ## User Scenarios & Testing *(mandatory)*
 
 Journeys are ordered by priority. Each one maps to one end-to-end slice in [plan.md](plan.md#milestones) (proposed
-order, C-17) and can be demonstrated on its own.
+order, D-11) and can be demonstrated on its own.
 
 ### User Story 1 - A platform payout is decided under the client's rules (Priority: P1)
 
@@ -321,12 +321,12 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-026**: Unusual activity is checkable rules: new wallet, changed details, first payment, above k times the counterparty median (only with enough confirmed history); each hit stores the raw facts.
 - **FR-027**: Above-norm compares only with confirmed payments in the same currency; otherwise it is reported as not evaluated. *(proposed: G-13)*
 - **FR-028**: A block is final: approve, retry, reroute or resubmit of a blocked payment returns 409 payment_blocked and the database rejects any status change away from BLOCKED or REJECTED.
-- **FR-029**: A new intent to the same counterparty or destination address within 24 hours of a block escalates RESUBMISSION_AFTER_BLOCK with a link to the blocked payment, whatever the amount. *(proposed: C-05)*
+- **FR-029**: A new intent to the same counterparty or destination address within 24 hours of a block escalates RESUBMISSION_AFTER_BLOCK with a link to the blocked payment, whatever the amount.
 - **FR-030**: Rule changes are drafts with a structured diff; activation needs a second, different user; a loosening change needs the compliance lead; the attestation, approvers and times are recorded; in-flight decisions keep their version.
 - **FR-031**: The compliance lead is one of the two approvers on every activation; the loosening detector uses the union of the spec/04 and POL-07 lists. *(proposed: C-06, C-08)*
 - **FR-032**: A decision-only endpoint evaluates an intent without creating or executing anything.
 - **FR-033**: Any failure in a decision path (database, screening, policy load, model) gives ESCALATE SYSTEM_UNAVAILABLE handled by the organisation's fail-safe; no error ever becomes EXECUTE.
-- **FR-034**: With fail-safe 'hold', a payment whose decision failed moves RECEIVED to HELD; with 'manual_queue' it moves to ESCALATED. *(proposed: C-03)*
+- **FR-034**: With fail-safe 'hold', a payment whose decision failed moves RECEIVED to HELD; with 'manual_queue' it moves to ESCALATED.
 - **FR-035**: A re-run after approval executes only if every remaining escalation reason was approved with unchanged evidence; a new reason opens a new case; a BLOCK always blocks; the pre-send re-check applies the same rule.
 
 **Mandates**
@@ -432,7 +432,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 
 - **FR-103**: Webhook endpoints subscribe to the listed event types; deliveries are signed (HMAC-SHA256 with timestamp, 300 s tolerance), at least once, with sequence per payment, retries and a delivery log.
 - **FR-104**: Webhook retries back off at 1 min, 5 min, 30 min, 2 h, 6 h and 24 h, then the delivery is marked failed. *(proposed: G-20)*
-- **FR-113**: Webhook signing secrets are shown once and stored encrypted (not hashed), because every delivery is signed with the plaintext secret. *(proposed: C-19)*
+- **FR-113**: Webhook signing secrets are shown once and stored encrypted (not hashed), because every delivery is signed with the plaintext secret.
 
 **Dashboard**
 
@@ -441,7 +441,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 **Sandbox**
 
 - **FR-106**: Sandbox test values trigger every path; quotas and abuse limits apply; expired organisations get 403 organisation_expired; (Should) opt-in real testnet mode from a capped faucet wallet.
-- **FR-107**: Sandbox reset clears an organisation's test data without deleting audit or ledger rows (method to be decided: proposed new data generation). *(open: C-04)*
+- **FR-107**: Sandbox reset starts a new data generation: earlier intents, cases, ledger and logs are hidden from the API and dashboard but never deleted; keys, webhooks and settings are kept.
 - **FR-108**: A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days (pending legal review). *(proposed: G-18, G-19)*
 
 **Docs**

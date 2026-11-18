@@ -16,13 +16,10 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 BL = ROOT / "backlog"
-MS_ORDER = [f"M{i}" for i in range(13)]
-MS_NAMES = {
-    "M0": "Foundation", "M1": "Decide", "M2": "Agent and mandates", "M3": "Exactly-once execution and rails",
-    "M4": "Exceptions and console", "M5": "Ledger, deposits, reconciliation, replay", "M6": "Evaluation and release gate",
-    "M7": "Demo-ready prototype", "M8": "Public sandbox API and webhooks", "M9": "Dashboard and sandbox",
-    "M10": "Docs and SDKs", "M11": "Website launch", "M12": "Should and could haves after launch",
-}
+# Milestones are the end-to-end slices in specs/001-detent-mvp/slices.yaml (founder decision D-11, 18 Nov 2026).
+_SLICES = yaml.safe_load((ROOT / "specs" / "001-detent-mvp" / "slices.yaml").read_text())["slices"]
+MS_ORDER = [s["id"] for s in _SLICES]
+MS_NAMES = {s["id"]: s["name"] for s in _SLICES}
 
 
 def main() -> int:

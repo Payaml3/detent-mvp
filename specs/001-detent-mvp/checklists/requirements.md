@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No [NEEDS CLARIFICATION] markers remain. Open founder decisions are tracked by ID in decisions.md (C-04, C-13, G-19) instead of inline markers.
+- [x] No [NEEDS CLARIFICATION] markers remain. Open founder decisions are tracked by ID in decisions.md (C-13, G-19) instead of inline markers.
 - [x] Requirements are testable and unambiguous: each FR maps to stories whose criteria have a done or planned test (traceability.md)
 - [x] Success criteria are measurable (SC-001 to SC-011 carry counts, rates or times)
 - [x] Success criteria are technology-agnostic
@@ -27,8 +27,9 @@
 - [x] All functional requirements have clear acceptance criteria (via stories; `tools/build_spec.py` fails otherwise)
 - [x] User scenarios cover primary flows (W-01 to W-12)
 - [x] Feature meets measurable outcomes defined in Success Criteria (SC ↔ L1 to L8 and B7)
-- [ ] Every requirement is confirmed. **19 proposed requirements and 1 open requirement wait for the founder** (decisions.md). Planning can proceed; each slice must not start implementing a proposed rule until it is approved.
+- [ ] Every requirement is confirmed. **16 proposed requirements wait for the founder; none is open** (decisions.md). Planning can proceed; each slice must not start implementing a proposed rule until it is approved.
 
 ## Notes
 
 - Validation run 1 (2026-11-18): all items pass except founder confirmation, which by design cannot be closed by the agent.
+- Validation run 2 (2026-11-18, after D-07 to D-13): same result; 16 proposed requirements remain.

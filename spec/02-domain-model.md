@@ -18,6 +18,7 @@ stateDiagram-v2
   RECEIVED --> ESCALATED: decision ESCALATE
   RECEIVED --> READY: decision EXECUTE (auto or assist)
   RECEIVED --> SHADOWED: shadow mode
+  RECEIVED --> HELD: decision failed + fail_safe hold (D-09)
   ESCALATED --> READY: approved + policy re-run EXECUTE
   ESCALATED --> BLOCKED: policy re-run BLOCK
   ESCALATED --> REJECTED: reviewer rejects
@@ -131,7 +132,7 @@ Audit and ledger tables get `BEFORE UPDATE OR DELETE` triggers that raise an err
 | `audit_heads` | org_id, seq, hash | Head of each chain; appending locks it, so `seq` has no gaps |
 | `demo_clock` | org_id, offset_seconds | Demo-mode clock offset (FND-05) |
 | `outbox` | id, org_id, channel (email_mock, webhook), recipient, template, body, created_at, sent_at | |
-| `webhook_endpoints`, `webhook_events`, `webhook_deliveries` | Signing secret hashed and shown once; deliveries log status | |
+| `webhook_endpoints`, `webhook_events`, `webhook_deliveries` | Signing secret shown once and stored **encrypted** with `CREDENTIALS_ENCRYPTION_KEY`, not hashed, because every delivery is signed with the plaintext (D-12); deliveries log status | |
 | `request_logs` | org_id, key_id, method, path, status, latency_ms, idempotency_key, payment_id, request_id, at | 30 days |
 | `jobs` | id, kind, run_at, payload, attempts, locked_by, locked_until, done_at | Worker queue |
 | `incidents` | id, org_id, severity, trigger, opened_at, notified_at, root_cause | |

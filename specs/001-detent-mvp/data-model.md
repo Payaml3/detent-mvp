@@ -67,7 +67,7 @@ proposed decision in [decisions.md](decisions.md).
 
 | Entity | Key fields | Notes |
 |---|---|---|
-| **webhook_endpoints**, **webhook_events**, **webhook_deliveries** | url, event_types[], secret_hash; type, sequence, payload; attempt, status_code, error | Secret shown once; must be stored encrypted, not hashed **(P, C-19)**; retry schedule **(P, G-20)** |
+| **webhook_endpoints**, **webhook_events**, **webhook_deliveries** | url, event_types[], secret_hash; type, sequence, payload; attempt, status_code, error | Secret shown once; stored encrypted, not hashed (D-12); retry schedule **(P, G-20)** |
 | **request_logs** | key_id, method, path, status, latency_ms, idempotency_key, payment_id, request_id, at | 30 days; bodies redacted |
 | **invites**, **leads** | email, token_hash, expires_at, used_at; email, company, message | Invite single use, 7 days; leads in operator organisation `org_detent` **(P, D-P05)** |
 | **demo_clock** | org_id, offset_seconds | Demo mode only |
@@ -83,7 +83,7 @@ stateDiagram-v2
   RECEIVED --> ESCALATED: ESCALATE
   RECEIVED --> READY: EXECUTE
   RECEIVED --> SHADOWED: shadow mode
-  RECEIVED --> HELD: SYSTEM_UNAVAILABLE + fail_safe hold (PROPOSED, C-03)
+  RECEIVED --> HELD: SYSTEM_UNAVAILABLE + fail_safe hold (D-09)
   ESCALATED --> READY: approved + re-run EXECUTE (D-01)
   ESCALATED --> BLOCKED: re-run BLOCK
   ESCALATED --> REJECTED: reviewer rejects
@@ -107,7 +107,7 @@ stateDiagram-v2
 ```
 
 Terminal: CONFIRMED, BLOCKED, REJECTED, CANCELLED, FAILED_FINAL, SHADOWED (trigger-enforced, M0). The table is code:
-`detent/domain/states.py` `ALLOWED`; the C-03 edge is **not** in the code until approved.
+`detent/domain/states.py` `ALLOWED`, including the RECEIVED → HELD edge (D-09, tested).
 
 ### Attempt (confirmed, spec/02)
 
@@ -170,7 +170,7 @@ rolls back the run's effects.
 | S1 | Counterparty and destination seed from fixtures | INT-04 |
 | S2 | `nonce_allocations` | R-07 |
 | S3 | `exception_cases.version` (or row lock plus status check) | EXC-05 double approval |
-| S4 | `cancel_replacements`; RECEIVED → HELD if C-03 is approved | spec/02, C-03 |
+| S4 | `cancel_replacements` | spec/02 |
 | S6 | `counterparties.contact_email` if G-02 is approved; two-person mode change table | G-02, EXE-09 |
-| P1 | `webhook_endpoints.secret_encrypted` replaces `secret_hash` (C-19); `api_keys.user_id` if G-08 is approved; `users.role` adds `auditor` if C-14 is approved | G-08, C-14 |
-| P2 | Sandbox data generation column if C-04 is decided that way | C-04 |
+| P1 | `webhook_endpoints.secret_encrypted` replaces `secret_hash` (D-12); `api_keys.user_id` if G-08 is approved; `users.role` adds `auditor` if C-14 is approved | G-08, C-14 |
+| P2 | `organisations.data_generation` and a `generation` column on intents, cases, ledger and logs; queries filter the current one | D-08 |

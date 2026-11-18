@@ -274,7 +274,7 @@ paths:
       tags: [Sandbox]
       operationId: resetSandbox
       x-scope: admin
-      summary: Reset the organisation's test data; keeps keys, webhooks and settings (SBX-04; method OPEN, C-04)
+      summary: Reset the organisation's test data by starting a new data generation; nothing is deleted; keeps keys, webhooks and settings (SBX-04, D-08)
       responses:
         "200": {description: Reset, content: {application/json: {schema: {type: object, properties: {reset_at: {type: string, format: date-time}}}}}}
   /sandbox/scenarios:

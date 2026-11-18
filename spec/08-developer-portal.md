@@ -28,7 +28,7 @@ Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and d
 - **Request logs:** method, path, status, latency, idempotency key, payment ID and request ID. Bodies are redacted. Kept for 30 days.
 - **Webhooks:** endpoints, event types, a secret shown once, "send test event", and a delivery log with resend.
 - **Sandbox controls:**
-  - reset test data
+  - reset test data (a new data generation; earlier data is hidden, never deleted: D-08)
   - force a scenario for the next payment
   - toggle real testnet mode (Should)
 - **Usage:** calls, payments decided and agent investigations against daily quotas.

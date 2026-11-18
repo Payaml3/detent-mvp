@@ -66,7 +66,7 @@ owners:
 | unusual.changed_details | ESCALATE | CHANGED_DETAILS | old and new address, last_changed_at, changed_by |
 | unusual.first_payment | ESCALATE | FIRST_PAYMENT | payment count = 0 |
 | unusual.above_norm | ESCALATE | ABOVE_NORM | amount, median, ratio (only with at least `above_norm_min_history` confirmed payments) |
-| resubmission_after_block | ESCALATE | RESUBMISSION_AFTER_BLOCK | blocked payment ID |
+| resubmission_after_block | ESCALATE | RESUBMISSION_AFTER_BLOCK | blocked payment ID. Matches the same counterparty or the same destination address within the window, whatever the amount (D-10) |
 | system | ESCALATE | SYSTEM_UNAVAILABLE | dependency and error class |
 
 **Deposit checks** (LED-05) reuse the same engine with a deposit profile:

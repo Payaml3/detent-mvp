@@ -28,7 +28,7 @@ Detent-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")
 ```
 
 - Receivers reject a delivery whose `t` is more than 300 s from their clock.
-- The signing secret is shown once when the endpoint is created. It is stored **encrypted** (PROPOSED, C-19), not
+- The signing secret is shown once when the endpoint is created. It is stored **encrypted** (D-12), not
   hashed: Detent needs the plaintext to compute each signature.
 - `send test event` (spec/08) delivers a signed sample event; marking it `"test": true` is PROPOSED (G-20).
 

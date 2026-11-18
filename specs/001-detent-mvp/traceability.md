@@ -333,9 +333,9 @@ Sources: [Invariant 4](../../CLAUDE.md#non-negotiable-invariants); [POL-06 crite
 |---|---|---|---|---|---|
 | [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 0 | BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
 | [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 1 | Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked` | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
-| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same payee for the same amount within 24 h of a block is escalated with a link to the blocked one | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
+| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10) | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
 
-## FR-029 · Policy (proposed)
+## FR-029 · Policy (confirmed)
 
 A new intent to the same counterparty or destination address within 24 hours of a block escalates RESUBMISSION_AFTER_BLOCK with a link to the blocked payment, whatever the amount.
 
@@ -345,7 +345,7 @@ Sources: [POL-06 criteria](../../backlog/user-stories.md#pol-06); [spec/09 §att
 |---|---|---|---|---|---|
 | [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 0 | BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
 | [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 1 | Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked` | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
-| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same payee for the same amount within 24 h of a block is escalated with a link to the blocked one | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
+| [POL-06](../../backlog/user-stories.md#pol-06) | S3 | 2 | A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10) | planned | unit: `apps/api/tests/unit/test_pol_06.py` |
 
 ## FR-030 · Policy (confirmed)
 
@@ -395,7 +395,7 @@ Sources: [Invariant 9](../../CLAUDE.md#non-negotiable-invariants); [spec/01 §fa
 | [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 0 | If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`) | planned | unit: `apps/api/tests/unit/test_pol_09.py` |
 | [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 1 | No code path turns an error into EXECUTE (fault-injection test on each dependency) | planned | fault: `apps/api/tests/integration/test_pol_09.py` |
 
-## FR-034 · Policy (proposed)
+## FR-034 · Policy (confirmed)
 
 With fail-safe 'hold', a payment whose decision failed moves RECEIVED to HELD; with 'manual_queue' it moves to ESCALATED.
 
@@ -1208,7 +1208,7 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks)
 |---|---|---|---|---|---|
 | [WHK-03](../../backlog/user-stories.md#whk-03) | P1 | 0 | Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event' | planned | integration: `apps/api/tests/integration/test_whk_03.py` |
 
-## FR-113 · Webhooks (proposed)
+## FR-113 · Webhooks (confirmed)
 
 Webhook signing secrets are shown once and stored encrypted (not hashed), because every delivery is signed with the plaintext secret.
 
@@ -1254,15 +1254,15 @@ Sources: [spec/08 §sandbox-sbx](../../spec/08-developer-portal.md#sandbox-sbx);
 | [SBX-02](../../backlog/user-stories.md#sbx-02) | P2 | 0 | Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap | planned | integration: `apps/api/tests/integration/test_sbx_02.py` |
 | [SBX-03](../../backlog/user-stories.md#sbx-03) | P2 | 0 | Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned | planned | integration: `apps/api/tests/integration/test_sbx_03.py` |
 
-## FR-107 · Sandbox (open)
+## FR-107 · Sandbox (confirmed)
 
-Sandbox reset clears an organisation's test data without deleting audit or ledger rows (method to be decided: proposed new data generation).
+Sandbox reset starts a new data generation: earlier intents, cases, ledger and logs are hidden from the API and dashboard but never deleted; keys, webhooks and settings are kept.
 
 Sources: [SBX-04 criteria](../../backlog/user-stories.md#sbx-04); [Invariant 12](../../CLAUDE.md#non-negotiable-invariants)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [SBX-04](../../backlog/user-stories.md#sbx-04) | P2 | 0 | Deletes intents, cases, ledger and logs for the organisation; keeps keys, webhooks and settings; audited | planned | integration: `apps/api/tests/integration/test_sbx_04.py` |
+| [SBX-04](../../backlog/user-stories.md#sbx-04) | P2 | 0 | Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08) | planned | integration: `apps/api/tests/integration/test_sbx_04.py` |
 
 ## FR-108 · Sandbox (proposed)
 
@@ -1274,7 +1274,7 @@ Sources: [spec/08 §sandbox-sbx](../../spec/08-developer-portal.md#sandbox-sbx)
 |---|---|---|---|---|---|
 | [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 0 | Admin screen: organisation name, expiry (default 60 days), invite emails; invite links are single-use and expire in 7 days | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
 | [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 1 | No public sign-up route exists | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
-| [SBX-04](../../backlog/user-stories.md#sbx-04) | P2 | 0 | Deletes intents, cases, ledger and logs for the organisation; keeps keys, webhooks and settings; audited | planned | integration: `apps/api/tests/integration/test_sbx_04.py` |
+| [SBX-04](../../backlog/user-stories.md#sbx-04) | P2 | 0 | Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08) | planned | integration: `apps/api/tests/integration/test_sbx_04.py` |
 
 ## FR-109 · Docs (confirmed)
 
