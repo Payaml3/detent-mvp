@@ -32,7 +32,8 @@ PERMISSIONS: dict[str, frozenset[Role]] = {
     "mandate.issue": frozenset({R.PAYMENTS_LEAD}),
     "mandate.revoke": frozenset({R.PAYMENTS_LEAD}),
     "recon.approve_fix": frozenset({R.PAYMENTS_LEAD}),
-    "org.change_mode": frozenset({R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
+    # EXE-09: a mode change is never a single-person action; see mode_change_approved().
+    "org.change_mode.propose": frozenset({R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
     "demo.clock.advance": frozenset(Role),
 }
 
@@ -43,3 +44,10 @@ def allowed(action: str, role: Role) -> bool:
         # Fail closed: an action missing from the table is allowed for nobody.
         return False
     return role in roles
+
+
+def mode_change_approved(*, proposer: tuple[str, Role], approver: tuple[str, Role]) -> bool:
+    """EXE-09: a mode change needs the payments lead and the compliance lead, as two different people."""
+    (proposer_id, proposer_role), (approver_id, approver_role) = proposer, approver
+    both_leads = {proposer_role, approver_role} == {R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}
+    return proposer_id != approver_id and both_leads
