@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block main %}
+<h1>Overview</h1>
+<p class="muted">Decisions, cases, rails and reconciliation appear here as milestones M1 to M5 land.</p>
+<dl class="facts">
+  <dt>Organisation</dt><dd class="mono">{{ user.org_id }}</dd>
+  <dt>Acting user</dt><dd>{{ user.display_name }} <span class="mono">{{ user.id }}</span></dd>
+  <dt>Role</dt><dd>{{ user.role.value }}</dd>
+</dl>
+{% endblock %}

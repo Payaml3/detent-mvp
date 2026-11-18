@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Act as{% endblock %}
+{% block main %}
+<section class="card narrow">
+  <h1>Act as</h1>
+  <p>Every action you take is recorded in the audit log under this user and role.</p>
+  <form method="post" action="/console/act-as" class="users">
+    {% for u in users %}
+    <button name="user_id" value="{{ u.id }}" class="user {{ 'current' if user and user.id == u.id }}">
+      <strong>{{ u.display_name }}</strong><span class="role">{{ u.role.value }}</span><span class="mono">{{ u.id }}</span>
+    </button>
+    {% endfor %}
+  </form>
+</section>
+{% endblock %}

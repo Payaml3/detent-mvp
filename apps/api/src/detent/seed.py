@@ -1,0 +1,88 @@
+"""Seed the fictional demo organisation and console users from fixtures (FND-04).
+
+Idempotent: running it twice changes nothing. Counterparties, destinations, rails, policy and the
+mandate are seeded by the stories that use them (INT-04, POL-01, MND-01, RAL-01).
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+import yaml
+from sqlalchemy import Connection, text
+
+from detent.audit.log import Actor, append
+from detent.db.engine import transaction
+from detent.runtime import Runtime
+from detent.settings import REPO_ROOT
+
+FIXTURE = REPO_ROOT / "fixtures" / "counterparties.yaml"
+OPERATOR_ORG = "org_detent"  # owns website access requests (leads)
+
+
+def ensure_org(conn: Connection, rt: Runtime, org_id: str, name: str, **kw: Any) -> bool:
+    created = conn.execute(
+        text(
+            "INSERT INTO organisations (id, name, mode, fail_safe, kind, created_at) "
+            "VALUES (:id, :name, :mode, :fail_safe, :kind, :now) ON CONFLICT (id) DO NOTHING RETURNING id"
+        ),
+        {
+            "id": org_id,
+            "name": name,
+            "mode": kw.get("mode", "shadow"),
+            "fail_safe": kw.get("fail_safe", "manual_queue"),
+            "kind": kw.get("kind", "demo"),
+            "now": rt.clock.now(),
+        },
+    ).scalar_one_or_none()
+    conn.execute(
+        text("INSERT INTO kill_switch (org_id, engaged) VALUES (:o, false) ON CONFLICT (org_id) DO NOTHING"),
+        {"o": org_id},
+    )
+    conn.execute(
+        text(
+            "INSERT INTO demo_clock (org_id, offset_seconds) VALUES (:o, 0) ON CONFLICT (org_id) DO NOTHING"
+        ),
+        {"o": org_id},
+    )
+    return created is not None
+
+
+def seed_demo(rt: Runtime, fixture: Path = FIXTURE) -> dict[str, int]:
+    data = yaml.safe_load(fixture.read_text())
+    plat = data["platform"]
+    org_id = plat["org_id"]
+    users_added = 0
+    with transaction(rt.engine) as conn:
+        orgs_added = int(
+            ensure_org(conn, rt, org_id, plat["name"], mode=plat["mode"], fail_safe=plat["fail_safe"])
+        )
+        orgs_added += int(ensure_org(conn, rt, OPERATOR_ORG, "Detent operator (internal)", kind="demo"))
+        for u in data["users"]:
+            added = conn.execute(
+                text(
+                    "INSERT INTO users (id, org_id, email, display_name, role, created_at) "
+                    "VALUES (:id, :org_id, :email, :name, :role, :now) "
+                    "ON CONFLICT (id) DO NOTHING RETURNING id"
+                ),
+                {
+                    "id": u["id"],
+                    "org_id": org_id,
+                    "email": f"{u['id']}@demo.invalid",
+                    "name": u["name"],
+                    "role": u["role"],
+                    "now": rt.clock.now(),
+                },
+            ).scalar_one_or_none()
+            users_added += int(added is not None)
+        if orgs_added or users_added:
+            append(
+                conn,
+                rt.clock,
+                org_id=org_id,
+                actor=Actor.system("seed"),
+                kind="seed.demo_applied",
+                payload={"orgs_added": orgs_added, "users_added": users_added},
+            )
+    return {"orgs_added": orgs_added, "users_added": users_added}

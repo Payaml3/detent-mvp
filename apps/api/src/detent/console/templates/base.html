@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Console{% endblock %} · {{ brand }} payment controls</title>
+  <link rel="stylesheet" href="/static/console.css">
+</head>
+<body>
+  <div class="banner" role="note">Prototype · test networks · simulated bank rail</div>
+  {% if kill_switch_engaged %}
+  <div class="kill-bar" role="alert">Kill switch engaged: all sending is stopped and pending payments are held.</div>
+  {% endif %}
+  <header class="top">
+    <a class="brand" href="/console/">{{ brand }} <span>payment controls</span></a>
+    <div class="status">
+      <span class="ks {{ 'on' if kill_switch_engaged else 'off' }}">Kill switch: {{ 'engaged' if kill_switch_engaged else 'off' }}</span>
+      {% if demo_mode %}
+      <form class="clock" method="post" action="/console/clock/advance">
+        <span class="mono" title="Demo clock">{{ now.strftime('%Y-%m-%d %H:%M') }} UTC</span>
+        {% for s in demo_steps %}<button name="step" value="{{ s }}" {{ 'disabled' if not user }}>+{{ s }}</button>{% endfor %}
+      </form>
+      {% endif %}
+      {% if user %}
+      <a class="who" href="/console/act-as">Acting as <strong>{{ user.display_name }}</strong> <span class="role">{{ user.role.value }}</span></a>
+      <form method="post" action="/console/logout"><button class="link">Log out</button></form>
+      {% endif %}
+    </div>
+  </header>
+  <main>{% block main %}{% endblock %}</main>
+  <footer>Fictional demo data. {{ brand }} is a working name. Agentic payment controls: decision, orchestration and operations.</footer>
+</body>
+</html>
