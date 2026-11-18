@@ -29,7 +29,8 @@ class Status(StrEnum):
 S = Status
 
 ALLOWED: dict[Status, frozenset[Status]] = {
-    S.RECEIVED: frozenset({S.BLOCKED, S.ESCALATED, S.READY, S.SHADOWED}),
+    # RECEIVED -> HELD: the decision itself failed and fail_safe is 'hold' (C-03, D-09).
+    S.RECEIVED: frozenset({S.BLOCKED, S.ESCALATED, S.READY, S.SHADOWED, S.HELD}),
     # ESCALATED -> ESCALATED: a re-run found a new reason, so a new case opens.
     S.ESCALATED: frozenset({S.READY, S.BLOCKED, S.REJECTED, S.ESCALATED, S.CANCELLED}),
     S.READY: frozenset({S.SUBMITTED, S.HELD, S.BLOCKED, S.CANCELLED}),

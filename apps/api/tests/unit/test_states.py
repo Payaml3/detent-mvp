@@ -55,3 +55,10 @@ def test_timeout_path_goes_through_unknown() -> None:
         check_attempt_transition(A.CONFIRMED, A.FAILED)
     with pytest.raises(InvalidTransition):
         check_attempt_transition(A.FAILED, A.CREATED)
+
+
+def test_failed_decision_can_be_held() -> None:
+    # C-03 (D-09): with fail_safe 'hold', a payment whose decision failed goes RECEIVED -> HELD.
+    check_transition(S.RECEIVED, S.HELD)
+    # Holding never skips the checks: HELD only leaves via a re-run, escalation, block or cancel.
+    assert ALLOWED[S.HELD] == {S.READY, S.ESCALATED, S.BLOCKED, S.CANCELLED}

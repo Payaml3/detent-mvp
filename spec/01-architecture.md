@@ -119,7 +119,7 @@ In the prototype, `rails/evm.py` signs with test keys from settings. Keep signin
 
 ## Fail-safe
 
-Each platform setting `fail_safe` is either `hold` or `manual_queue`. Any dependency failure in a decision path (database, screening, policy load, model) yields ESCALATE with `SYSTEM_UNAVAILABLE` and follows that setting. No path executes unchecked.
+Each platform setting `fail_safe` is either `hold` or `manual_queue`. Any dependency failure in a decision path (database, screening, policy load, model) yields ESCALATE with `SYSTEM_UNAVAILABLE` and follows that setting. With `hold`, the payment moves RECEIVED → HELD; with `manual_queue`, RECEIVED → ESCALATED (D-09). No path executes unchecked.
 
 ## Performance targets (Estimate)
 
