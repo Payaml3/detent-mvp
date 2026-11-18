@@ -84,6 +84,10 @@ on attempt UNKNOWN:
         if receipt and receipt.status == 0 -> FAILED(TECHNICAL_FINAL)
         if no receipt and get_transaction_count(from, 'latest') > nonce
            and the tx at that nonce is a different hash -> FAILED(TECHNICAL_FINAL)   # nonce consumed by another tx
+        if no receipt and the node does not know tx_hash (eth_getTransactionByHash is null)
+           and get_transaction_count(from, 'pending') <= nonce
+           -> re-broadcast attempt.raw_tx (the SAME signed transaction, same nonce and hash)
+              # covers timeout_before_forward: the tx never left, so we send it now, never a new one
         else keep UNKNOWN
   Bank: status by idempotency key: SETTLED -> CONFIRMED; FAILED -> FAILED(class); NOT_FOUND after rail's
         stated acceptance window -> FAILED(TECHNICAL_FINAL); else keep UNKNOWN
@@ -99,7 +103,7 @@ on attempt UNKNOWN:
 | Fault | Effect | Expected Detent behaviour |
 |---|---|---|
 | `timeout_after_forward` | Forwards the request; drops the response | Attempt UNKNOWN; resolver finds CONFIRMED; no second send |
-| `timeout_before_forward` | Never forwards; times out | Attempt UNKNOWN; resolver finds nothing; nonce not consumed; definitive FAILED only after nonce or rail evidence; then retry with the same payment ID |
+| `timeout_before_forward` | Never forwards; times out | Attempt UNKNOWN; resolver finds nothing and the nonce unused, so it re-broadcasts the same signed transaction (same hash); the chain then decides CONFIRMED or FAILED. Bank: the resolver re-sends with the same idempotency key, which the rail deduplicates. No new transaction is ever signed while UNKNOWN |
 | `reset_after_forward` | Connection reset after forwarding | Same as `timeout_after_forward` |
 | `http_503_before_accept` | 503 without forwarding | TECHNICAL_RETRYABLE; retry |
 | `delayed_receipt:N` | Hides the receipt for N polls | UNKNOWN until revealed; no resend |

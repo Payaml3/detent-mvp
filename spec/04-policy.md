@@ -75,6 +75,34 @@ owners:
 - sender screening (BLOCK on a hit)
 - amount tolerance against the deposit intent (ESCALATE)
 
+## Re-runs after approval (EXC-04, EXE-03)
+
+A re-run evaluates every check again with the active rule version. Without a rule for what the approval already covered, the reasons that caused the escalation (for example FIRST_PAYMENT and ABOVE_AUTO_LIMIT) would still hold and the payment would escalate forever. So:
+
+- The approval records the escalation reasons the approver saw, as `approved_reasons` on the next decision.
+- The re-run gives **EXECUTE** only if every remaining ESCALATE reason is in `approved_reasons` and the evidence behind it is unchanged (same amount, destination and counterparty facts).
+- **A new reason**, or changed evidence behind an approved one (for example, the destination changed after approval), escalates again and opens a new case.
+- **Any BLOCK still blocks.** An approval never covers a BLOCK.
+- The pre-send re-check in the execution layer applies the same rule with the same `approved_reasons`.
+
+## Travel-rule data (travel_rule check)
+
+The travel-rule fields are typed data, never agent free text:
+
+- **Originator:** the platform's own registered name and account, from organisation settings.
+- **Beneficiary:** the counterparty's registered name and the destination's address or account, from the counterparty registry.
+- A platform-sourced intent can supply `travel_rule` itself; the supplied values must match the registry, or the check escalates `TRAVEL_RULE_MISSING`.
+
+An agent-proposed intent never supplies travel-rule data. Only registry data is used, so the $18,500 demo intent passes this check.
+
+## User payouts (payouts to the platform's own end users)
+
+A payout with `user_account_ref` instead of `counterparty_id` uses a **user payout profile**:
+
+- **Skipped:** kyb_status, allowlist, unusual.first_payment and unusual.above_norm. These checks are about business counterparties.
+- **Kept:** screening of the destination, allowed_networks, limits, daily caps (platform scope), unusual.new_wallet and unusual.changed_details on the user's destination, and resubmission_after_block.
+- **Platform's job:** the end user's own KYC stays with the platform, which is accountable for it. The policy only reads the platform's typed `user_verified` flag, and it escalates if the flag is false.
+
 ## Counters and concurrency
 
 Daily caps and mandate totals use one row per (org, scope, day) in `counters`, updated with `UPDATE ... RETURNING` inside the decision transaction. Concurrent decisions serialise on that row. The amount counted is confirmed plus in-flight (READY, SUBMITTED or UNKNOWN). It is released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED.
