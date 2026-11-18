@@ -8,15 +8,61 @@ EXE-01 (slice S2) builds attempts on top of this function.
 
 from __future__ import annotations
 
-from sqlalchemy import Connection, text
+from sqlalchemy import Connection, Engine, text
 
 from detent.audit.log import Actor, append
 from detent.clock import Clock
-from detent.domain.states import Status, check_transition
+from detent.domain.states import InvalidTransition, Status, check_transition
 
 
 class PaymentNotFound(LookupError):
     pass
+
+
+def apply_transition(
+    engine: Engine,
+    clock: Clock,
+    *,
+    org_id: str,
+    payment_id: str,
+    to: Status,
+    actor: Actor,
+    reason: str | None = None,
+) -> Status:
+    """``transition()`` in its own transaction. A refused move changes nothing, is audited, and raises."""
+    try:
+        with engine.begin() as conn:
+            return transition(
+                conn, clock, org_id=org_id, payment_id=payment_id, to=to, actor=actor, reason=reason
+            )
+    except InvalidTransition as exc:
+        record_refusal(
+            engine, clock, org_id=org_id, payment_id=payment_id, exc=exc, actor=actor, reason=reason
+        )
+        raise
+
+
+def record_refusal(
+    engine: Engine,
+    clock: Clock,
+    *,
+    org_id: str,
+    payment_id: str,
+    exc: InvalidTransition,
+    actor: Actor,
+    reason: str | None,
+) -> None:
+    """The refused change was rolled back; its record is written in a transaction of its own."""
+    with engine.begin() as conn:
+        append(
+            conn,
+            clock,
+            org_id=org_id,
+            actor=actor,
+            kind="payment.transition_refused",
+            subject_id=payment_id,
+            payload={"from": exc.old.value, "to": exc.new.value, "reason": reason},
+        )
 
 
 def transition(

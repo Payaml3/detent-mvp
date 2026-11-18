@@ -1,0 +1,227 @@
+"""ERC-20 USDC rail on an EVM test network (RAL-02): local anvil, Base Sepolia or Ethereum Sepolia.
+
+Sending is two steps so the nonce and the signed bytes are stored before anything leaves (EXE-04):
+``prepare`` estimates gas, checks it, and signs; ``submit`` broadcasts the stored raw transaction.
+Re-broadcasting the same raw transaction is the same transaction, never a second payment.
+
+The adapter refuses any chain outside the test networks (invariant 14).
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+import requests
+
+from detent.domain.money import Currency, Money
+from detent.domain.states import FailureClass
+from detent.rails.base import (
+    AttemptView,
+    Eligibility,
+    Health,
+    IntentView,
+    Prepared,
+    Quote,
+    RailError,
+    StatusResult,
+    SubmitResult,
+)
+from detent.rails.signer import Signer
+from detent.settings import TESTNET_CHAIN_IDS, TestNetworkGuardError
+
+ERC20_ABI: list[dict[str, Any]] = [
+    {"type": "function", "name": "transfer", "stateMutability": "nonpayable",
+     "inputs": [{"name": "to", "type": "address"}, {"name": "amount", "type": "uint256"}],
+     "outputs": [{"name": "", "type": "bool"}]},
+    {"type": "function", "name": "balanceOf", "stateMutability": "view",
+     "inputs": [{"name": "who", "type": "address"}], "outputs": [{"name": "", "type": "uint256"}]},
+]  # fmt: skip
+
+GAS_HEADROOM_PERCENT = 20  # sign with 20% more gas than estimated
+_NOT_REACHED = (
+    "Connection refused",
+    "NewConnectionError",
+    "Failed to establish",
+    "Name or service not known",
+)
+
+
+def classify(exc: BaseException) -> FailureClass:
+    """Spec/06 rule of thumb: only an error that proves the request never reached the node is retryable."""
+    if isinstance(exc, RailError):
+        return exc.failure_class
+    if isinstance(exc, requests.exceptions.ConnectTimeout):
+        return FailureClass.TECHNICAL_RETRYABLE
+    if isinstance(exc, requests.exceptions.ConnectionError) and any(s in str(exc) for s in _NOT_REACHED):
+        return FailureClass.TECHNICAL_RETRYABLE
+    return FailureClass.TIMEOUT
+
+
+class EvmAdapter:
+    def __init__(
+        self,
+        *,
+        rail_id: str,
+        rpc_url: str,
+        expected_chain_id: int,
+        token_address: str,
+        signer: Signer,
+        confirmations: int,
+        explorer_tx_url: str | None = None,
+        timeout_seconds: float = 10.0,
+        check_chain: bool = True,
+        expected_seconds: int = 2,
+    ) -> None:
+        from web3 import Web3
+
+        if expected_chain_id not in TESTNET_CHAIN_IDS:
+            raise TestNetworkGuardError(f"rail {rail_id}: chain {expected_chain_id} is not a test network")
+        self.rail_id = rail_id
+        self.chain_id = expected_chain_id
+        self.confirmations = confirmations
+        self.explorer_tx_url = explorer_tx_url
+        self.expected_seconds = expected_seconds
+        self._signer = signer
+        self._w3 = Web3(
+            Web3.HTTPProvider(
+                rpc_url, request_kwargs={"timeout": timeout_seconds}, exception_retry_configuration=None
+            )
+        )
+        self._token = self._w3.eth.contract(address=Web3.to_checksum_address(token_address), abi=ERC20_ABI)
+        if check_chain:
+            actual = int(self._w3.eth.chain_id)
+            if actual != expected_chain_id:
+                raise TestNetworkGuardError(
+                    f"rail {rail_id}: RPC reports chain {actual}, expected {expected_chain_id}"
+                )
+
+    # ------------------------------------------------------------------------------ helpers
+    @property
+    def from_address(self) -> str:
+        return self._signer.address
+
+    def _usdc(self, minor: int) -> Money:
+        return Money(minor, Currency.USDC)
+
+    def _transfer_call(self, to: str, amount: Money) -> Any:
+        from web3 import Web3
+
+        if amount.currency is not Currency.USDC:
+            raise RailError(FailureClass.TECHNICAL_FINAL, f"{self.rail_id} carries USDC only")
+        return self._token.functions.transfer(Web3.to_checksum_address(to), amount.amount_minor)
+
+    def explorer_url(self, tx_hash: str) -> str | None:
+        return self.explorer_tx_url.format(tx=tx_hash) if self.explorer_tx_url else None
+
+    def pending_nonce(self) -> int:
+        return int(self._w3.eth.get_transaction_count(self.from_address, "pending"))
+
+    def _gas(self, call: Any) -> tuple[int, int]:
+        gas = int(call.estimate_gas({"from": self.from_address}))
+        gas = gas * (100 + GAS_HEADROOM_PERCENT) // 100
+        price = int(self._w3.eth.gas_price)
+        return gas, price
+
+    # ------------------------------------------------------------------------------ contract
+    def eligible(self, intent: IntentView) -> Eligibility:  # noqa: PLR0911 - one return per reason
+        if intent.amount.currency is not Currency.USDC:
+            return Eligibility(False, "CURRENCY_NOT_SUPPORTED")
+        if intent.network != self.rail_id:
+            return Eligibility(False, "NETWORK_MISMATCH")
+        if not intent.destination_address:
+            return Eligibility(False, "NO_DESTINATION_ADDRESS")
+        try:
+            token = int(self._token.functions.balanceOf(self.from_address).call())
+            if token < intent.amount.amount_minor:
+                return Eligibility(False, "INSUFFICIENT_BALANCE")
+            gas, price = self._gas(self._transfer_call(intent.destination_address, intent.amount))
+            if int(self._w3.eth.get_balance(self.from_address)) < gas * price:
+                return Eligibility(False, "INSUFFICIENT_GAS")
+        except Exception as exc:  # cannot tell: not eligible now (the caller holds the payment)
+            return Eligibility(False, f"RAIL_UNAVAILABLE:{type(exc).__name__}")
+        return Eligibility(True)
+
+    def quote(self, intent: IntentView) -> Quote:
+        gas, price = self._gas(
+            self._transfer_call(intent.destination_address or self.from_address, intent.amount)
+        )
+        return Quote(fee_minor=gas * price, fee_currency="wei", expected_seconds=self.expected_seconds)
+
+    def prepare(self, attempt: AttemptView, nonce: int) -> Prepared:
+        if not attempt.destination_address:
+            raise RailError(FailureClass.TECHNICAL_FINAL, "no destination address")
+        try:
+            call = self._transfer_call(attempt.destination_address, attempt.amount)
+            gas, price = self._gas(call)
+            tx = call.build_transaction(
+                {
+                    "from": self.from_address,
+                    "nonce": nonce,
+                    "gas": gas,
+                    "gasPrice": price,
+                    "chainId": self.chain_id,
+                }
+            )
+        except RailError:
+            raise
+        except Exception as exc:  # nothing has been broadcast yet: known not executed
+            raise RailError(
+                FailureClass.TECHNICAL_RETRYABLE, f"prepare failed: {type(exc).__name__}"
+            ) from exc
+        raw, h = self._signer.sign(tx)
+        return Prepared(nonce=nonce, raw_tx=raw, tx_hash=h, from_address=self.from_address)
+
+    def submit(self, attempt: AttemptView) -> SubmitResult:
+        if not attempt.raw_tx or not attempt.tx_hash:
+            raise RailError(FailureClass.TECHNICAL_FINAL, "attempt has no signed transaction")
+        try:
+            self._w3.eth.send_raw_transaction(attempt.raw_tx)
+        except requests.exceptions.RequestException as exc:
+            raise RailError(classify(exc), f"broadcast: {type(exc).__name__}") from exc
+        except Exception as exc:
+            # The node answered with an RPC error. If it already knows this exact transaction, it is sent.
+            if self._knows(attempt.tx_hash):
+                return SubmitResult(attempt.tx_hash)
+            raise RailError(
+                FailureClass.TECHNICAL_RETRYABLE,
+                f"broadcast rejected: {type(exc).__name__}: {str(exc)[:200]}",
+            ) from exc
+        return SubmitResult(attempt.tx_hash)
+
+    def _knows(self, tx_hash: str) -> bool:
+        try:
+            self._w3.eth.get_transaction(tx_hash)
+            return True
+        except Exception:
+            return False
+
+    def status(self, attempt: AttemptView) -> StatusResult:
+        if not attempt.tx_hash:
+            return StatusResult("NOT_FOUND")
+        try:
+            rcpt = self._w3.eth.get_transaction_receipt(attempt.tx_hash)
+        except Exception as exc:
+            if type(exc).__name__ == "TransactionNotFound":
+                return StatusResult("PENDING") if self._knows(attempt.tx_hash) else StatusResult("NOT_FOUND")
+            raise RailError(classify(exc), f"status: {type(exc).__name__}") from exc
+        head = int(self._w3.eth.block_number)
+        confs = head - int(rcpt["blockNumber"]) + 1
+        ev = {
+            "tx_hash": attempt.tx_hash,
+            "block": int(rcpt["blockNumber"]),
+            "confirmations": confs,
+            "receipt_status": int(rcpt["status"]),
+        }
+        if int(rcpt["status"]) == 0:
+            return StatusResult("FAILED", FailureClass.TECHNICAL_FINAL, confs, ev)
+        if confs >= self.confirmations:
+            return StatusResult("CONFIRMED", None, confs, ev)
+        return StatusResult("PENDING", None, confs, ev)
+
+    def health(self) -> Health:
+        try:
+            bal = int(self._token.functions.balanceOf(self.from_address).call())
+            native = int(self._w3.eth.get_balance(self.from_address))
+        except Exception as exc:
+            return Health(False, None, {"error": type(exc).__name__})
+        return Health(True, self._usdc(bal), {"native_wei": str(native), "from": self.from_address})

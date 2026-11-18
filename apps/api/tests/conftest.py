@@ -14,6 +14,7 @@ import shutil
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import pytest
 from alembic import command
@@ -178,3 +179,20 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     """In CI (REQUIRE_CHAIN=1) the local-chain tests must run; a missing anvil is an error, not a skip."""
     if os.environ.get("REQUIRE_CHAIN") == "1" and not have_foundry():
         raise pytest.UsageError("REQUIRE_CHAIN=1 but anvil is not installed")
+
+
+@pytest.fixture(scope="module")
+def chain() -> Iterator[Any]:
+    """A local anvil chain with MockUSDC, one per test module (S2 onwards)."""
+    import socket
+
+    from detent import devchain
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = int(s.getsockname()[1])
+    proc = devchain.start_anvil(port)
+    try:
+        yield devchain.deploy(f"http://127.0.0.1:{port}")
+    finally:
+        proc.terminate()

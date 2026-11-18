@@ -554,6 +554,7 @@ stories:
   deps: [FND-03]
   trace: [A2b.states, A2.Execute]
   ms: S2
+  done: [0, 1, 2]
 - id: EXE-02
   epic: EXE
   title: Attempts and exactly-once guarantees
@@ -570,6 +571,7 @@ stories:
   deps: [EXE-01]
   trace: [A2.Execute, A6.retry_rule, A2b.rule, L3]
   ms: S2
+  done: [0, 1, 2, 3]
 - id: EXE-03
   epic: EXE
   title: Pre-send checks under the lock
@@ -585,6 +587,7 @@ stories:
   deps: [EXE-02, POL-02]
   trace: [A2.Execute, A2b.custody]
   ms: S2
+  done: [1, 2]
 - id: EXE-04
   epic: EXE
   title: Nonce manager
@@ -600,6 +603,7 @@ stories:
   deps: [EXE-02, RAL-02]
   trace: [A2.Execute, A2b.custody]
   ms: S2
+  done: [0, 1, 2]
 - id: EXE-05
   epic: EXE
   title: A timeout becomes UNKNOWN
@@ -708,6 +712,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Connect, B4.rails, B6.dependence]
   ms: S2
+  done: [0, 1, 2]
 - id: RAL-02
   epic: RAL
   title: Base Sepolia USDC adapter
@@ -723,6 +728,7 @@ stories:
   deps: [RAL-01, FND-09]
   trace: [A2.Connect, A2b.custody, A7.prototype]
   ms: S2
+  done: [0, 1]
 - id: RAL-03
   epic: RAL
   title: Ethereum Sepolia USDC adapter

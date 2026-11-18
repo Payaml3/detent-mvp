@@ -23,7 +23,8 @@ slices:
   stories: [INT-01, INT-02, INT-03, INT-04, POL-01, POL-02, POL-03, POL-04, POL-08, POL-09, AUD-01]
 
 - id: S2
-  name: "An EXECUTE decision is sent exactly once"
+  name: "An EXECUTE decision is sent exactly once (done)"
+  status: done
   goal: "Orchestration's core: the state machine, attempts, pre-send checks under the lock, nonces and the first chain adapter."
   exit: >-
     On anvil: an EXECUTE payout sends one MockUSDC transfer and reaches CONFIRMED under its pay_ ID; a BLOCKED one

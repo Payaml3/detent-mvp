@@ -420,11 +420,11 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction
-- [ ] Illegal transitions raise, change nothing and write an audit event
-- [ ] Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md
+- [x] All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction
+- [x] Illegal transitions raise, change nothing and write an audit event
+- [x] Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** FND-03 · **Traces to:** A2b.states, A2.Execute
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once (done) · **Depends on:** FND-03 · **Traces to:** A2b.states, A2.Execute
 
 ### EXE-02 · Attempts and exactly-once guarantees
 
@@ -432,12 +432,12 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] At most one attempt per payment is SUBMITTED or UNKNOWN at a time (partial unique index)
-- [ ] At most one attempt per payment is CONFIRMED (partial unique index)
-- [ ] A new attempt is created only when the previous one is definitively FAILED
-- [ ] Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md
+- [x] At most one attempt per payment is SUBMITTED or UNKNOWN at a time (partial unique index)
+- [x] At most one attempt per payment is CONFIRMED (partial unique index)
+- [x] A new attempt is created only when the previous one is definitively FAILED
+- [x] Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** EXE-01 · **Traces to:** A2.Execute, A6.retry_rule, A2b.rule, L3
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once (done) · **Depends on:** EXE-01 · **Traces to:** A2.Execute, A6.retry_rule, A2b.rule, L3
 
 ### EXE-03 · Pre-send checks under the lock
 
@@ -446,10 +446,10 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 **Acceptance criteria**
 
 - [ ] Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid
-- [ ] If the decision is older than the configured age or the rule version changed, policy re-runs first
-- [ ] Any failed check moves the payment to HELD with the reason; nothing is sent
+- [x] If the decision is older than the configured age or the rule version changed, policy re-runs first
+- [x] Any failed check moves the payment to HELD with the reason; nothing is sent
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** EXE-02, POL-02 · **Traces to:** A2.Execute, A2b.custody
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once (done) · **Depends on:** EXE-02, POL-02 · **Traces to:** A2.Execute, A2b.custody
 
 ### EXE-04 · Nonce manager
 
@@ -457,11 +457,11 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] The nonce is written on the attempt before the transaction is broadcast
-- [ ] On startup the manager reconciles with `eth_getTransactionCount(pending)` and refuses to send if they disagree
-- [ ] Concurrent sends from one wallet get consecutive nonces (concurrency test)
+- [x] The nonce is written on the attempt before the transaction is broadcast
+- [x] On startup the manager reconciles with `eth_getTransactionCount(pending)` and refuses to send if they disagree
+- [x] Concurrent sends from one wallet get consecutive nonces (concurrency test)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** EXE-02, RAL-02 · **Traces to:** A2.Execute, A2b.custody
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once (done) · **Depends on:** EXE-02, RAL-02 · **Traces to:** A2.Execute, A2b.custody
 
 ### EXE-05 · A timeout becomes UNKNOWN
 
@@ -546,11 +546,11 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Interface: `eligible`, `quote`, `submit`, `status`, `health`, as in spec/06-rails-and-faults.md
-- [ ] Errors normalise to TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL or TIMEOUT
-- [ ] A shared contract-test suite runs against every adapter
+- [x] Interface: `eligible`, `quote`, `submit`, `status`, `health`, as in spec/06-rails-and-faults.md
+- [x] Errors normalise to TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL or TIMEOUT
+- [x] A shared contract-test suite runs against every adapter
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** FND-03 · **Traces to:** A2.Connect, B4.rails, B6.dependence
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S2 An EXECUTE decision is sent exactly once (done) · **Depends on:** FND-03 · **Traces to:** A2.Connect, B4.rails, B6.dependence
 
 ### RAL-02 · Base Sepolia USDC adapter
 
@@ -558,11 +558,11 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] ERC-20 transfer via web3.py signed with a test key from settings; gas estimated and checked
-- [ ] Confirmation threshold configurable; explorer link stored on the attempt
+- [x] ERC-20 transfer via web3.py signed with a test key from settings; gas estimated and checked
+- [x] Confirmation threshold configurable; explorer link stored on the attempt
 - [ ] Contract tests pass on the local chain and nightly on Base Sepolia
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once · **Depends on:** RAL-01, FND-09 · **Traces to:** A2.Connect, A2b.custody, A7.prototype
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S2 An EXECUTE decision is sent exactly once (done) · **Depends on:** RAL-01, FND-09 · **Traces to:** A2.Connect, A2b.custody, A7.prototype
 
 ### RAL-03 · Ethereum Sepolia USDC adapter
 

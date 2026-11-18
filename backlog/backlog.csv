@@ -103,17 +103,17 @@ AGT-06,AGT Mandates and instruction agent,Model configuration and cost guard,"As
 - Over budget, agent features return `needs_human`; nothing falls back to executing",Should,0.25,"S5 An AI agent proposes the $18,500 invoice inside a mandate",AGT-01,"B4.infra, B6.dependence, D.abuse"
 EXE-01,EXE Exactly-once execution,Payment state machine,"As a builder, I want one transition function with an allowed-transitions table, called under a row lock, so that no code can put a payment into an impossible state.","- All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction
 - Illegal transitions raise, change nothing and write an audit event
-- Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md",Must,0.75,S2 An EXECUTE decision is sent exactly once,FND-03,"A2b.states, A2.Execute"
+- Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md",Must,0.75,S2 An EXECUTE decision is sent exactly once (done),FND-03,"A2b.states, A2.Execute"
 EXE-02,EXE Exactly-once execution,Attempts and exactly-once guarantees,"As a payments lead, I want each send recorded as an attempt under the same payment ID, with database guarantees against a second payment, so that no retry or failover can ever pay twice.","- At most one attempt per payment is SUBMITTED or UNKNOWN at a time (partial unique index)
 - At most one attempt per payment is CONFIRMED (partial unique index)
 - A new attempt is created only when the previous one is definitively FAILED
-- Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md",Must,0.75,S2 An EXECUTE decision is sent exactly once,EXE-01,"A2.Execute, A6.retry_rule, A2b.rule, L3"
+- Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md",Must,0.75,S2 An EXECUTE decision is sent exactly once (done),EXE-01,"A2.Execute, A6.retry_rule, A2b.rule, L3"
 EXE-03,EXE Exactly-once execution,Pre-send checks under the lock,"As a payments lead, I want the state lock, balance check, pre-funded wallet limit, kill switch and a fresh policy check right before every send, so that nothing is sent on stale or unsafe conditions.","- Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid
 - If the decision is older than the configured age or the rule version changed, policy re-runs first
-- Any failed check moves the payment to HELD with the reason; nothing is sent",Must,0.5,S2 An EXECUTE decision is sent exactly once,"EXE-02, POL-02","A2.Execute, A2b.custody"
+- Any failed check moves the payment to HELD with the reason; nothing is sent",Must,0.5,S2 An EXECUTE decision is sent exactly once (done),"EXE-02, POL-02","A2.Execute, A2b.custody"
 EXE-04,EXE Exactly-once execution,Nonce manager,"As a builder, I want nonces allocated per chain and wallet under a database lock and stored before broadcast, so that two different transactions never share a nonce.","- The nonce is written on the attempt before the transaction is broadcast
 - On startup the manager reconciles with `eth_getTransactionCount(pending)` and refuses to send if they disagree
-- Concurrent sends from one wallet get consecutive nonces (concurrency test)",Must,0.5,S2 An EXECUTE decision is sent exactly once,"EXE-02, RAL-02","A2.Execute, A2b.custody"
+- Concurrent sends from one wallet get consecutive nonces (concurrency test)",Must,0.5,S2 An EXECUTE decision is sent exactly once (done),"EXE-02, RAL-02","A2.Execute, A2b.custody"
 EXE-05,EXE Exactly-once execution,A timeout becomes UNKNOWN,"As a payments lead, I want a send whose outcome is unclear marked UNKNOWN, never FAILED, so that a stuck transaction that later confirms is never paid a second time.","- A timeout, dropped connection or 5xx after the request may have reached the rail -> attempt and payment UNKNOWN
 - While UNKNOWN, no new attempt can be created (database and code)
 - Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED",Must,0.25,S4 Never paid twice,EXE-02,"A2b.unknown, A2b.states, L4"
@@ -135,10 +135,10 @@ EXE-10,EXE Exactly-once execution,Sev 1 invariant monitor,"As a on-call engineer
 - A hit opens a Sev 1 incident, engages the kill switch (configurable, on by default), posts to the mock outbox and shows a red banner",Should,0.5,L After launch (Should and Could),"EXE-08, LED-05","B3.incident, B7.safety"
 RAL-01,"RAL Rails, routing and faults",Rail adapter contract,"As a builder, I want one adapter interface with normalised statuses and an error taxonomy, so that adding a rail never touches decision or execution logic.","- Interface: `eligible`, `quote`, `submit`, `status`, `health`, as in spec/06-rails-and-faults.md
 - Errors normalise to TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL or TIMEOUT
-- A shared contract-test suite runs against every adapter",Must,0.5,S2 An EXECUTE decision is sent exactly once,FND-03,"A2.Connect, B4.rails, B6.dependence"
+- A shared contract-test suite runs against every adapter",Must,0.5,S2 An EXECUTE decision is sent exactly once (done),FND-03,"A2.Connect, B4.rails, B6.dependence"
 RAL-02,"RAL Rails, routing and faults",Base Sepolia USDC adapter,"As a demo viewer, I want real test USDC transfers on Base Sepolia with explorer links, so that the demo moves real (test) value on a real network.","- ERC-20 transfer via web3.py signed with a test key from settings; gas estimated and checked
 - Confirmation threshold configurable; explorer link stored on the attempt
-- Contract tests pass on the local chain and nightly on Base Sepolia",Must,0.75,S2 An EXECUTE decision is sent exactly once,"RAL-01, FND-09","A2.Connect, A2b.custody, A7.prototype"
+- Contract tests pass on the local chain and nightly on Base Sepolia",Must,0.75,S2 An EXECUTE decision is sent exactly once (done),"RAL-01, FND-09","A2.Connect, A2b.custody, A7.prototype"
 RAL-03,"RAL Rails, routing and faults",Ethereum Sepolia USDC adapter,"As a demo viewer, I want the same transfers on Ethereum Sepolia, so that routing has a real second network to choose.","- Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold
 - Contract tests pass",Must,0.25,S4 Never paid twice,RAL-02,A2.Connect
 RAL-04,"RAL Rails, routing and faults",Simulated instant bank rail,"As a demo viewer, I want a mock instant bank rail with its own fees, limits, cut-off times and failure rate, so that routing and reconciliation span stablecoin and fiat.","- A separate FastAPI sub-app with GBP and EUR, per-payment and daily limits, cut-off times, a configurable failure rate and idempotency by key

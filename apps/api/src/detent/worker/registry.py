@@ -4,11 +4,15 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from sqlalchemy import Connection
+from sqlalchemy import Connection, Engine
 
 from detent.clock import Clock
 from detent.worker.queue import Job
+
+if TYPE_CHECKING:
+    from detent.settings import Settings
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,6 +21,9 @@ class JobContext:
     clock: Clock
     job: Job
     worker_id: str
+    # For handlers that need transactions of their own (sending stores the signed transaction first).
+    engine: Engine | None = None
+    settings: Settings | None = None
 
 
 Handler = Callable[[JobContext], None]

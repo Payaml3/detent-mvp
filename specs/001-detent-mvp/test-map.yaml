@@ -120,3 +120,29 @@ AUD-01:
 API-01:
   0: ["integration/test_intents_api.py::test_requests_need_a_valid_key", "integration/test_intents_api.py::test_wrong_scope_is_403"]
   1: ["integration/test_intents_api.py::test_wrong_scope_is_403", "integration/test_api.py::test_live_keys_are_always_rejected"]
+EXE-01:
+  0: ["integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited", "chain/test_send_once.py::test_parallel_send_triggers_produce_one_transaction"]
+  1: ["integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited", "integration/test_transition.py::test_terminal_states_never_change"]
+  2: ["integration/test_transition.py::test_random_requests_never_leave_the_table", "property/test_state_machine_property.py::test_random_events_never_leave_the_table"]
+EXE-02:
+  0: ["integration/test_attempts.py::test_one_attempt_in_flight", "integration/test_schema.py::test_one_inflight_attempt_per_payment"]
+  1: ["integration/test_attempts.py::test_no_attempt_after_confirmation", "integration/test_schema.py::test_one_confirmed_attempt_per_payment"]
+  2: ["integration/test_attempts.py::test_new_attempt_only_after_definitive_failure", "integration/test_attempts.py::test_timeout_never_marks_an_attempt_failed"]
+  3: ["integration/test_attempts.py::test_rail_idempotency_keys_follow_spec_06"]
+EXE-03:
+  1: ["chain/test_send_once.py::test_stale_decision_reruns_policy_first", "chain/test_send_once.py::test_new_rule_version_reruns_policy_before_sending",
+      "chain/test_send_once.py::test_fresh_decision_is_not_rerun"]
+  2: ["chain/test_send_once.py::test_kill_switch_holds_before_sending", "chain/test_send_once.py::test_insufficient_balance_holds_before_sending",
+      "chain/test_send_once.py::test_prefunded_daily_limit_holds"]
+EXE-04:
+  0: ["chain/test_send_once.py::test_nonce_and_signed_tx_are_stored_before_broadcast"]
+  1: ["chain/test_send_once.py::test_nonce_disagreement_refuses_to_send", "chain/test_worker_send.py::test_worker_startup_reconciles_nonces"]
+  2: ["chain/test_send_once.py::test_concurrent_sends_from_one_wallet_get_consecutive_nonces"]
+RAL-01:
+  0: ["chain/test_rail_contract.py::test_eligible_quote_health", "chain/test_rail_contract.py::test_prepare_submit_status"]
+  1: ["chain/test_rail_contract.py::test_unreachable_rpc_is_retryable", "chain/test_rail_contract.py::test_no_answer_after_sending_is_timeout_not_failure"]
+  2: ["chain/test_rail_contract.py::test_eligible_quote_health"]
+RAL-02:
+  0: ["chain/test_rail_contract.py::test_prepare_submit_status", "chain/test_rail_contract.py::test_adapter_refuses_a_non_test_chain",
+      "chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms"]
+  1: ["chain/test_rail_contract.py::test_explorer_link", "chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms"]

@@ -405,9 +405,9 @@ Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment
 |---|---|---|---|---|---|
 | [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 0 | If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`) | done | `integration/test_fail_closed.py::test_screening_down`<br>`integration/test_fail_closed.py::test_each_data_read_failing_fails_closed`<br>`integration/test_fail_closed.py::test_policy_crash_fails_closed` |
 | [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 1 | No code path turns an error into EXECUTE (fault-injection test on each dependency) | done | `integration/test_fail_closed.py::test_each_data_read_failing_fails_closed`<br>`unit/test_policy_engine.py::test_a_crashing_check_fails_closed`<br>`property/test_policy_property.py::test_precedence` |
-| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 0 | All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction | planned | integration: `apps/api/tests/integration/test_exe_01.py` |
-| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 1 | Illegal transitions raise, change nothing and write an audit event | planned | manual: `manual check, recorded in the PR description` |
-| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 2 | Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md | planned | property: `apps/api/tests/property/test_exe_01.py` |
+| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 0 | All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction | done | `integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited`<br>`chain/test_send_once.py::test_parallel_send_triggers_produce_one_transaction` |
+| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 1 | Illegal transitions raise, change nothing and write an audit event | done | `integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited`<br>`integration/test_transition.py::test_terminal_states_never_change` |
+| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 2 | Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md | done | `integration/test_transition.py::test_random_requests_never_leave_the_table`<br>`property/test_state_machine_property.py::test_random_events_never_leave_the_table` |
 
 ## FR-035 · Policy (confirmed)
 
@@ -421,8 +421,8 @@ Sources: [spec/04 §re-runs-after-approval-exc-04-exe-03](../../spec/04-policy.m
 | [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
 | [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | planned | integration: `apps/api/tests/integration/test_exc_04.py` |
 | [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 0 | Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid | planned | integration: `apps/api/tests/integration/test_exe_03.py` |
-| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 1 | If the decision is older than the configured age or the rule version changed, policy re-runs first | planned | integration: `apps/api/tests/integration/test_exe_03.py` |
-| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 2 | Any failed check moves the payment to HELD with the reason; nothing is sent | planned | integration: `apps/api/tests/integration/test_exe_03.py` |
+| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 1 | If the decision is older than the configured age or the rule version changed, policy re-runs first | done | `chain/test_send_once.py::test_stale_decision_reruns_policy_first`<br>`chain/test_send_once.py::test_new_rule_version_reruns_policy_before_sending`<br>`chain/test_send_once.py::test_fresh_decision_is_not_rerun` |
+| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 2 | Any failed check moves the payment to HELD with the reason; nothing is sent | done | `chain/test_send_once.py::test_kill_switch_holds_before_sending`<br>`chain/test_send_once.py::test_insufficient_balance_holds_before_sending`<br>`chain/test_send_once.py::test_prefunded_daily_limit_holds` |
 
 ## FR-040 · Mandates (confirmed)
 
@@ -541,9 +541,9 @@ Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 0 | All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction | planned | integration: `apps/api/tests/integration/test_exe_01.py` |
-| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 1 | Illegal transitions raise, change nothing and write an audit event | planned | manual: `manual check, recorded in the PR description` |
-| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 2 | Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md | planned | property: `apps/api/tests/property/test_exe_01.py` |
+| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 0 | All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction | done | `integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited`<br>`chain/test_send_once.py::test_parallel_send_triggers_produce_one_transaction` |
+| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 1 | Illegal transitions raise, change nothing and write an audit event | done | `integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited`<br>`integration/test_transition.py::test_terminal_states_never_change` |
+| [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 2 | Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md | done | `integration/test_transition.py::test_random_requests_never_leave_the_table`<br>`property/test_state_machine_property.py::test_random_events_never_leave_the_table` |
 
 ## FR-051 · Execution (confirmed)
 
@@ -553,10 +553,10 @@ Sources: [Invariant 2](../../CLAUDE.md#non-negotiable-invariants); [spec/02 §ex
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 0 | At most one attempt per payment is SUBMITTED or UNKNOWN at a time (partial unique index) | planned | integration: `apps/api/tests/integration/test_exe_02.py` |
-| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 1 | At most one attempt per payment is CONFIRMED (partial unique index) | planned | integration: `apps/api/tests/integration/test_exe_02.py` |
-| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 2 | A new attempt is created only when the previous one is definitively FAILED | planned | integration: `apps/api/tests/integration/test_exe_02.py` |
-| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 3 | Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md | planned | integration: `apps/api/tests/integration/test_exe_02.py` |
+| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 0 | At most one attempt per payment is SUBMITTED or UNKNOWN at a time (partial unique index) | done | `integration/test_attempts.py::test_one_attempt_in_flight`<br>`integration/test_schema.py::test_one_inflight_attempt_per_payment` |
+| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 1 | At most one attempt per payment is CONFIRMED (partial unique index) | done | `integration/test_attempts.py::test_no_attempt_after_confirmation`<br>`integration/test_schema.py::test_one_confirmed_attempt_per_payment` |
+| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 2 | A new attempt is created only when the previous one is definitively FAILED | done | `integration/test_attempts.py::test_new_attempt_only_after_definitive_failure`<br>`integration/test_attempts.py::test_timeout_never_marks_an_attempt_failed` |
+| [EXE-02](../../backlog/user-stories.md#exe-02) | S2 | 3 | Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md | done | `integration/test_attempts.py::test_rail_idempotency_keys_follow_spec_06` |
 
 ## FR-052 · Execution (confirmed)
 
@@ -567,8 +567,8 @@ Sources: [EXE-03 criteria](../../backlog/user-stories.md#exe-03); [spec/01 §the
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 0 | Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid | planned | integration: `apps/api/tests/integration/test_exe_03.py` |
-| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 1 | If the decision is older than the configured age or the rule version changed, policy re-runs first | planned | integration: `apps/api/tests/integration/test_exe_03.py` |
-| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 2 | Any failed check moves the payment to HELD with the reason; nothing is sent | planned | integration: `apps/api/tests/integration/test_exe_03.py` |
+| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 1 | If the decision is older than the configured age or the rule version changed, policy re-runs first | done | `chain/test_send_once.py::test_stale_decision_reruns_policy_first`<br>`chain/test_send_once.py::test_new_rule_version_reruns_policy_before_sending`<br>`chain/test_send_once.py::test_fresh_decision_is_not_rerun` |
+| [EXE-03](../../backlog/user-stories.md#exe-03) | S2 | 2 | Any failed check moves the payment to HELD with the reason; nothing is sent | done | `chain/test_send_once.py::test_kill_switch_holds_before_sending`<br>`chain/test_send_once.py::test_insufficient_balance_holds_before_sending`<br>`chain/test_send_once.py::test_prefunded_daily_limit_holds` |
 
 ## FR-053 · Execution (confirmed)
 
@@ -578,9 +578,9 @@ Sources: [spec/06 §idempotency-keys-passed-to-rails](../../spec/06-rails-and-fa
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-04](../../backlog/user-stories.md#exe-04) | S2 | 0 | The nonce is written on the attempt before the transaction is broadcast | planned | integration: `apps/api/tests/integration/test_exe_04.py` |
-| [EXE-04](../../backlog/user-stories.md#exe-04) | S2 | 1 | On startup the manager reconciles with `eth_getTransactionCount(pending)` and refuses to send if they disagree | planned | integration: `apps/api/tests/integration/test_exe_04.py` |
-| [EXE-04](../../backlog/user-stories.md#exe-04) | S2 | 2 | Concurrent sends from one wallet get consecutive nonces (concurrency test) | planned | concurrency: `apps/api/tests/concurrency/test_exe_04.py` |
+| [EXE-04](../../backlog/user-stories.md#exe-04) | S2 | 0 | The nonce is written on the attempt before the transaction is broadcast | done | `chain/test_send_once.py::test_nonce_and_signed_tx_are_stored_before_broadcast` |
+| [EXE-04](../../backlog/user-stories.md#exe-04) | S2 | 1 | On startup the manager reconciles with `eth_getTransactionCount(pending)` and refuses to send if they disagree | done | `chain/test_send_once.py::test_nonce_disagreement_refuses_to_send`<br>`chain/test_worker_send.py::test_worker_startup_reconciles_nonces` |
+| [EXE-04](../../backlog/user-stories.md#exe-04) | S2 | 2 | Concurrent sends from one wallet get consecutive nonces (concurrency test) | done | `chain/test_send_once.py::test_concurrent_sends_from_one_wallet_get_consecutive_nonces` |
 
 ## FR-054 · Execution (confirmed)
 
@@ -688,9 +688,9 @@ Sources: [spec/06 §adapter-contract-ral-01](../../spec/06-rails-and-faults.md#a
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-01](../../backlog/user-stories.md#ral-01) | S2 | 0 | Interface: `eligible`, `quote`, `submit`, `status`, `health`, as in spec/06-rails-and-faults.md | planned | contract: `apps/api/tests/integration/test_ral_01.py` |
-| [RAL-01](../../backlog/user-stories.md#ral-01) | S2 | 1 | Errors normalise to TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL or TIMEOUT | planned | fault: `apps/api/tests/integration/test_ral_01.py` |
-| [RAL-01](../../backlog/user-stories.md#ral-01) | S2 | 2 | A shared contract-test suite runs against every adapter | planned | contract: `apps/api/tests/integration/test_ral_01.py` |
+| [RAL-01](../../backlog/user-stories.md#ral-01) | S2 | 0 | Interface: `eligible`, `quote`, `submit`, `status`, `health`, as in spec/06-rails-and-faults.md | done | `chain/test_rail_contract.py::test_eligible_quote_health`<br>`chain/test_rail_contract.py::test_prepare_submit_status` |
+| [RAL-01](../../backlog/user-stories.md#ral-01) | S2 | 1 | Errors normalise to TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL or TIMEOUT | done | `chain/test_rail_contract.py::test_unreachable_rpc_is_retryable`<br>`chain/test_rail_contract.py::test_no_answer_after_sending_is_timeout_not_failure` |
+| [RAL-01](../../backlog/user-stories.md#ral-01) | S2 | 2 | A shared contract-test suite runs against every adapter | done | `chain/test_rail_contract.py::test_eligible_quote_health` |
 
 ## FR-063 · Rails (confirmed)
 
@@ -700,8 +700,8 @@ Sources: [spec/06 §rails-in-the-mvp](../../spec/06-rails-and-faults.md#rails-in
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 0 | ERC-20 transfer via web3.py signed with a test key from settings; gas estimated and checked | planned | contract: `apps/api/tests/integration/test_ral_02.py` |
-| [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 1 | Confirmation threshold configurable; explorer link stored on the attempt | planned | contract: `apps/api/tests/integration/test_ral_02.py` |
+| [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 0 | ERC-20 transfer via web3.py signed with a test key from settings; gas estimated and checked | done | `chain/test_rail_contract.py::test_prepare_submit_status`<br>`chain/test_rail_contract.py::test_adapter_refuses_a_non_test_chain`<br>`chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms` |
+| [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 1 | Confirmation threshold configurable; explorer link stored on the attempt | done | `chain/test_rail_contract.py::test_explorer_link`<br>`chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms` |
 | [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 2 | Contract tests pass on the local chain and nightly on Base Sepolia | planned | contract: `apps/api/tests/integration/test_ral_02.py` |
 | [RAL-03](../../backlog/user-stories.md#ral-03) | S4 | 0 | Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold | planned | contract: `apps/api/tests/integration/test_ral_03.py` |
 | [RAL-03](../../backlog/user-stories.md#ral-03) | S4 | 1 | Contract tests pass | planned | contract: `apps/api/tests/integration/test_ral_03.py` |

@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     local_evm_rpc_url: str | None = None
     test_wallet_private_key_base: SecretStr | None = None
     test_wallet_private_key_eth: SecretStr | None = None
+    test_wallet_private_key_local: SecretStr | None = None  # local anvil only (S2)
     usdc_address_base_sepolia: str = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
     usdc_address_eth_sepolia: str = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
 

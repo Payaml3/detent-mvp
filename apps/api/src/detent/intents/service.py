@@ -24,7 +24,7 @@ from detent.clock import Clock
 from detent.db.engine import transaction
 from detent.domain.ids import Prefix, new_id
 from detent.domain.money import Currency, Money, MoneyError
-from detent.domain.states import Status
+from detent.domain.states import IN_FLIGHT, Status
 from detent.intents.registry import counterparty_stats
 from detent.intents.transition import transition
 from detent.policy.engine import CheckResult, Evaluation, evaluate
@@ -38,6 +38,9 @@ from detent.policy.facts import (
 )
 from detent.policy.screening import Screening
 from detent.policy.store import ActivePolicy, active_policy
+from detent.worker.queue import enqueue
+
+SEND_JOB = "payment.send"
 
 log = logging.getLogger("detent.intents")
 
@@ -191,8 +194,8 @@ def load_destination(
     else:
         r = conn.execute(
             text(
-                f"SELECT {cols} FROM destinations WHERE org_id=:o AND counterparty_id=:c AND network=:n "  # noqa: S608
-                "AND lower(address)=lower(:a) ORDER BY first_seen_at LIMIT 1"
+                f"SELECT {cols} FROM destinations WHERE org_id=:o AND counterparty_id=:c "  # noqa: S608
+                "AND network=:n AND lower(address)=lower(:a) ORDER BY first_seen_at LIMIT 1"
             ),
             {"o": org_id, "c": cpt, "n": dest.network, "a": dest.address},
         ).one_or_none()
@@ -267,6 +270,19 @@ def add_to_counters(conn: Connection, org_id: str, cpt: str, amount: Money, day:
         )
 
 
+def release_counters(conn: Connection, org_id: str, cpt: str, amount: Money, day: str) -> None:
+    """Spec/04: an amount stops counting when its payment is BLOCKED, REJECTED, CANCELLED or FAILED_FINAL."""
+    for scope in _scopes(cpt, amount.currency):
+        conn.execute(
+            text(
+                "UPDATE counters SET amount_minor = greatest(amount_minor - :a, 0), count = greatest(count "
+                "- 1, 0) "
+                "WHERE org_id=:o AND scope=:s AND period=:p"
+            ),
+            {"a": amount.amount_minor, "o": org_id, "s": scope, "p": day},
+        )
+
+
 def find_recent_block(
     conn: Connection, org_id: str, cpt: str, address: str | None, since: datetime
 ) -> str | None:
@@ -285,12 +301,12 @@ def find_recent_block(
 
 
 def load_travel_rule(
-    org: OrgRow, cp: CounterpartyFacts, dest: DestinationFacts, req: IntentRequest
+    org: OrgRow, cp: CounterpartyFacts, dest: DestinationFacts, supplied: dict[str, Any] | None, source: str
 ) -> TravelRuleFacts:
     return TravelRuleFacts(
         originator={"name": org.registered_name, "account": org.registered_account},
         beneficiary={"name": cp.name, "account": dest.address or dest.account_masked},
-        supplied=req.travel_rule if req.source == "platform" else None,
+        supplied=supplied if source == "platform" else None,
     )
 
 
@@ -615,6 +631,17 @@ def _record(
             "checks": checks,
         },
     )
+    if status is Status.READY and not awaiting:
+        # Orchestration picks it up: the worker sends it (EXE-03 onwards). One job per payment.
+        enqueue(
+            conn,
+            clock,
+            org_id=c.org_id,
+            kind=SEND_JOB,
+            payment_id=pid,
+            dedupe_key=pid,
+            payload={"payment_id": pid},
+        )
     transition(
         conn,
         clock,
@@ -638,6 +665,148 @@ def _record(
     return code, body
 
 
+def build_facts(
+    conn: Connection,
+    clock: Clock,
+    org_id: str,
+    org: OrgRow,
+    rules: Any,
+    *,
+    source: str,
+    amount: Money,
+    network: str,
+    cp: CounterpartyFacts,
+    dest: DestinationFacts,
+    supplied_travel_rule: dict[str, Any] | None,
+    screening: Screening,
+    already_counted: Money | None,
+) -> Facts:
+    """Gather the typed facts for one evaluation. ``already_counted`` is this payment's own amount when a
+    re-run happens while it is in flight, so it is not counted against the cap twice."""
+    now = clock.now()
+    day = now.date().isoformat()  # UTC calendar day (G-14)
+    counters = _try("counters", read_counters, conn, org_id, cp.id, amount.currency, day)
+    if isinstance(counters, tuple):
+        used_p, used_c = counters
+        if already_counted is not None:
+            used_p, used_c = used_p - already_counted, used_c - already_counted
+    else:
+        used_p = used_c = counters
+    recent_block = None
+    if rules.checks.resubmission_after_block is not None:
+        since = now - timedelta(hours=rules.checks.resubmission_after_block.window_hours)
+        recent_block = find_recent_block(conn, org_id, cp.id, dest.address, since)
+    mandate: MandateFacts | Unavailable | None = None
+    if source == "agent":
+        # Mandate signatures and scope are verified by MND-02 (slice S5). Until then: fail closed.
+        mandate = Unavailable("mandate_verifier", "not_built")
+    return Facts(
+        now=now,
+        source=source,  # type: ignore[arg-type]
+        amount=amount,
+        network=network,
+        counterparty=cp,
+        destination=dest,
+        screening=_try("screening", lambda: screening.check(address=dest.address, name=cp.name)),
+        travel_rule=load_travel_rule(org, cp, dest, supplied_travel_rule, source),
+        used_today_platform=used_p,
+        used_today_counterparty=used_c,
+        recent_block_id=recent_block,
+        mandate=mandate,
+    )
+
+
+def load_destination_by_id(conn: Connection, org_id: str, destination_id: str) -> DestinationFacts:
+    r = conn.execute(
+        text(
+            "SELECT id, address, account_masked, first_seen_at, last_changed_at, last_changed_by, verified "
+            "FROM destinations WHERE org_id=:o AND id=:d"
+        ),
+        {"o": org_id, "d": destination_id},
+    ).one()
+    return DestinationFacts(
+        r.id, True, r.address, r.account_masked, r.first_seen_at, r.last_changed_at, r.last_changed_by
+    )
+
+
+def reevaluate(
+    conn: Connection, clock: Clock, *, org_id: str, payment_id: str, screening: Screening, reason: str
+) -> tuple[Evaluation, ActivePolicy]:
+    """Re-run every check with the active rule version on an existing payment (EXE-03; spec/04 Re-runs).
+
+    Records a new decision and its audit event in the caller's transaction. Any error is the caller's
+    to handle as a hold (fail closed)."""
+    p = conn.execute(
+        text(
+            "SELECT source, counterparty_id, destination_id, amount_minor, currency, network_constraint, "
+            "travel_rule, status FROM payment_intents WHERE org_id=:o AND id=:p"
+        ),
+        {"o": org_id, "p": payment_id},
+    ).one()
+    org = load_org(conn, org_id)
+    policy = active_policy(conn, org_id)
+    amount = Money(int(p.amount_minor), Currency(p.currency))
+    cp = load_counterparty(conn, org_id, p.counterparty_id)
+    dest = load_destination_by_id(conn, org_id, p.destination_id)
+    in_flight = p.status in {s.value for s in IN_FLIGHT}
+    facts = build_facts(
+        conn,
+        clock,
+        org_id,
+        org,
+        policy.rules,
+        source=p.source,
+        amount=amount,
+        network=p.network_constraint,
+        cp=cp,
+        dest=dest,
+        supplied_travel_rule=p.travel_rule,
+        screening=screening,
+        already_counted=amount if in_flight else None,
+    )
+    result = evaluate(facts, policy.rules)
+    now = clock.now()
+    dec_id = new_id(Prefix.DEC, now)
+    checks = [ch.to_json() for ch in result.checks]
+    conn.execute(
+        text(
+            "INSERT INTO decisions (id, org_id, payment_id, outcome, policy_version_id, policy_hash, "
+            "inputs_snapshot, checks, decided_at, actor) VALUES (:id, :o, :p, :out, :pv, :ph, "
+            "CAST(:snap AS jsonb), CAST(:checks AS jsonb), :t, 'system:policy')"
+        ),
+        {
+            "id": dec_id,
+            "o": org_id,
+            "p": payment_id,
+            "out": result.outcome,
+            "pv": policy.id,
+            "ph": policy.rules.content_hash,
+            "snap": json.dumps(
+                {"facts": _jsonable(facts), "rule_version": policy.version, "rerun_reason": reason}
+            ),
+            "checks": json.dumps(checks),
+            "t": now,
+        },
+    )
+    append(
+        conn,
+        clock,
+        org_id=org_id,
+        actor=Actor.system("policy"),
+        kind="decision.made",
+        subject_id=payment_id,
+        payload={
+            "decision_id": dec_id,
+            "outcome": result.outcome,
+            "policy_version": policy.version,
+            "policy_hash": policy.rules.content_hash,
+            "checks": checks,
+            "rerun_reason": reason,
+        },
+    )
+    return result, policy
+
+
 def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tuple[int, dict[str, Any]]:
     replay = _claim_idempotency(conn, clock, c)
     if replay:
@@ -652,30 +821,20 @@ def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tu
     now = clock.now()
     amount = c.req.amount.money()
     day = now.date().isoformat()  # UTC calendar day (G-14)
-
-    counters = _try("counters", read_counters, conn, c.org_id, cpt, amount.currency, day)
-    used_p, used_c = counters if isinstance(counters, tuple) else (counters, counters)
-    recent_block = None
-    if rules.checks.resubmission_after_block is not None:
-        since = now - timedelta(hours=rules.checks.resubmission_after_block.window_hours)
-        recent_block = find_recent_block(conn, c.org_id, cpt, dest.address, since)
-    mandate: MandateFacts | Unavailable | None = None
-    if c.req.source == "agent":
-        # Mandate signatures and scope are verified by MND-02 (slice S5). Until then: fail closed.
-        mandate = Unavailable("mandate_verifier", "not_built")
-    facts = Facts(
-        now=now,
+    facts = build_facts(
+        conn,
+        clock,
+        c.org_id,
+        org,
+        rules,
         source=c.req.source,
         amount=amount,
         network=c.req.destination.network,
-        counterparty=cp,
-        destination=dest,
-        screening=_try("screening", lambda: screening.check(address=dest.address, name=cp.name)),
-        travel_rule=load_travel_rule(org, cp, dest, c.req),
-        used_today_platform=used_p,
-        used_today_counterparty=used_c,
-        recent_block_id=recent_block,
-        mandate=mandate,
+        cp=cp,
+        dest=dest,
+        supplied_travel_rule=c.req.travel_rule,
+        screening=screening,
+        already_counted=None,
     )
     result: Evaluation = evaluate(facts, rules)
     status = _status_for(

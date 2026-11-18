@@ -14,6 +14,8 @@ class RailAdapter(Protocol):
     def health(self) -> Health: ...                                    # success_rate, p95_latency, balance
 ```
 
+**EVM extension (S2):** rails that deduplicate by nonce also implement `pending_nonce()`, `prepare(attempt, nonce) -> Prepared` (estimate and check gas, sign) and `explorer_url(tx_hash)`. The execution layer assigns the nonce under the wallet's row lock, stores the nonce and the signed raw transaction on the attempt, commits, and only then calls `submit`, which broadcasts the stored bytes. Signing sits behind a `Signer` interface (`rails/signer.py`).
+
 **Normalised failure classes:**
 
 | Class | Meaning | Execution layer response |

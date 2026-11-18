@@ -28,6 +28,7 @@ class Worker:
         self.worker_id = worker_id or rt.settings.worker_id or default_worker_id()
         self.lease = timedelta(seconds=rt.settings.worker_lease_seconds)
         self.stop = threading.Event()
+        importlib.import_module("detent.execution.jobs")  # payment.send, payment.confirm
         for mod in rt.settings.worker_extra_handler_modules:
             importlib.import_module(mod)
 
@@ -44,7 +45,11 @@ class Worker:
                 if fn is None:
                     raise LookupError(f"no handler registered for job kind {job.kind!r}")
                 with self.rt.engine.begin() as conn:
-                    fn(registry.JobContext(conn, self.rt.clock, job, self.worker_id))
+                    fn(
+                        registry.JobContext(
+                            conn, self.rt.clock, job, self.worker_id, self.rt.engine, self.rt.settings
+                        )
+                    )
                     queue.mark_done(conn, self.rt.clock, job, self.worker_id)
             except queue.LeaseLost:
                 log.warning("job lease lost; effects rolled back", extra=fields)
@@ -58,8 +63,15 @@ class Worker:
                 log.info("job done", extra={**fields, "duration_ms": _ms(started)})
         return True
 
+    def startup(self) -> None:
+        """EXE-04: before sending anything, check every used wallet's nonce against the chain."""
+        from detent.execution.jobs import reconcile_all
+
+        reconcile_all(self.rt.engine, self.rt.clock, self.rt.settings)
+
     def run(self) -> None:
         log.info("worker started", extra={"worker_id": self.worker_id, "handlers": registry.kinds()})
+        self.startup()
         while not self.stop.is_set():
             try:
                 busy = self.run_one()

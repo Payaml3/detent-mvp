@@ -17,6 +17,7 @@ from detent.db.engine import transaction
 from detent.intents.registry import seed_registry
 from detent.policy.schema import load_ruleset
 from detent.policy.store import install_ruleset
+from detent.rails.registry import seed_rails
 from detent.runtime import Runtime
 from detent.settings import REPO_ROOT
 
@@ -88,6 +89,7 @@ def seed_demo(rt: Runtime, fixture: Path = FIXTURE) -> dict[str, int]:
             {"n": plat["name"], "a": plat.get("registered_account"), "o": org_id},
         )
         seed_registry(conn, rt.clock, org_id, fixture)
+        seed_rails(conn, org_id, rt.settings)
         has_policy = conn.execute(
             text("SELECT 1 FROM policy_versions WHERE org_id=:o AND status='active'"), {"o": org_id}
         ).first()
