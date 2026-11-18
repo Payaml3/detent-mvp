@@ -36,7 +36,7 @@ dev = [
 [tool.ruff]
 line-length = 110
 target-version = "py312"
-extend-exclude = ["chain/lib", "chain/out", "chain/cache", "tools/build_backlog.py", "*.md"]  # supplied script; specs are prose
+extend-exclude = ["chain/lib", "chain/out", "chain/cache", "tools/build_backlog.py", "*.md", ".specify", ".claude"]  # supplied or vendored; specs are prose
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "DTZ", "TID", "RUF", "PL", "SIM", "PT"]
@@ -61,7 +61,7 @@ ignore = [
 "apps/api/src/detent/clock.py" = ["TID251"]
 "apps/api/tests/**" = ["S", "PLR", "PLW1510", "TID251", "DTZ", "PT012", "PT018", "E501"]
 "apps/api/migrations/**" = ["E501"]
-"tools/**" = ["S", "PLR", "T20", "TID251", "DTZ"]
+"tools/**" = ["S", "PLR", "T20", "TID251", "DTZ", "E501"]  # generators hold long Markdown templates
 "apps/banksim/**" = ["TID251"]
 "apps/faultproxy/**" = ["TID251"]
 
