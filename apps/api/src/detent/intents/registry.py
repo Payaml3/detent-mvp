@@ -18,11 +18,12 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from sqlalchemy import Connection, text
+
 from detent.audit.log import Actor, append
 from detent.clock import Clock
 from detent.domain.money import Currency, Money
 from detent.settings import REPO_ROOT
-from sqlalchemy import Connection, text
 
 FIXTURE = REPO_ROOT / "fixtures" / "counterparties.yaml"
 

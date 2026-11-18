@@ -8,10 +8,11 @@ EXE-01 (slice S2) builds attempts on top of this function.
 
 from __future__ import annotations
 
+from sqlalchemy import Connection, text
+
 from detent.audit.log import Actor, append
 from detent.clock import Clock
 from detent.domain.states import Status, check_transition
-from sqlalchemy import Connection, text
 
 
 class PaymentNotFound(LookupError):

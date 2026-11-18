@@ -16,6 +16,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Literal
 
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator, model_validator
+from sqlalchemy import Connection, Engine, text
+
 from detent.audit.log import Actor, append
 from detent.clock import Clock
 from detent.db.engine import transaction
@@ -35,8 +38,6 @@ from detent.policy.facts import (
 )
 from detent.policy.screening import Screening
 from detent.policy.store import ActivePolicy, active_policy
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator, model_validator
-from sqlalchemy import Connection, Engine, text
 
 log = logging.getLogger("detent.intents")
 
