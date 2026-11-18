@@ -40,7 +40,7 @@ stories:
     - "The README explains setup in under 10 commands"
   pri: Must
   est: 0.5
-  done: [1, 2, 3]
+  done: [0, 1, 2, 3]
   deps: []
   trace: [A7.prototype, B5.security]
   ms: M0

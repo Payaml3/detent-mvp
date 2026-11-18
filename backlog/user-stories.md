@@ -14,7 +14,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 **Acceptance criteria**
 
-- [ ] `make test`, `make lint` (ruff) and `make typecheck` (mypy, strict on `detent/domain`) pass locally and in GitHub Actions on every push
+- [x] `make test`, `make lint` (ruff) and `make typecheck` (mypy, strict on `detent/domain`) pass locally and in GitHub Actions on every push
 - [x] CI starts a Postgres 16 service and runs Alembic migrations before tests
 - [x] `.env.example` lists every setting; a secret scanner runs as a pre-commit hook and in CI
 - [x] The README explains setup in under 10 commands
