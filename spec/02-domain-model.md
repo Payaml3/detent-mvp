@@ -4,10 +4,10 @@
 
 ## Conventions
 
-- **IDs:** prefixed UUIDv7 strings: `org_`, `usr_`, `key_`, `cpt_` (counterparty), `dst_` (destination), `mnd_`, `pol_`, `pay_`, `dec_`, `att_`, `exc_`, `dep_`, `inb_` (inbound transfer), `jrn_`, `rec_`, `brk_`, `agc_` (agent call), `evt_`, `inc_`.
-- **Money:** `amount_minor BIGINT` plus `currency CHAR(4)` (`USDC` has 6 decimals; `GBP` and `EUR` have 2). There is a `Money` value type in `domain/money.py`. Arithmetic across currencies is an error.
+- **IDs:** prefixed UUIDv7 strings, encoded as 26 Crockford base32 characters so they sort by time (`pay_01JD...`). Seeded fixture rows use readable IDs with the same prefix (`cpt_bluefin`, `org_demo`); the database checks the prefix only. Prefixes: `org_`, `usr_`, `key_`, `cpt_` (counterparty), `dst_` (destination), `mnd_`, `pol_`, `pay_`, `dec_`, `att_`, `exc_`, `dep_`, `inb_` (inbound transfer), `jrn_`, `rec_`, `brk_`, `agc_` (agent call), `evt_`, `inc_`.
+- **Money:** `amount_minor BIGINT` plus `currency VARCHAR(8)` with a CHECK on the known codes (`CHAR(4)` would pad `GBP` to `GBP `) (`USDC` has 6 decimals; `GBP` and `EUR` have 2). There is a `Money` value type in `domain/money.py`. Arithmetic across currencies is an error.
 - **Time:** `timestamptz` in UTC, always from `Clock`.
-- **Tenancy:** every table has `org_id NOT NULL`. Repositories require it.
+- **Tenancy:** every table has `org_id NOT NULL`, including child tables such as `attempts`, `decisions` and `postings`. Children reference their parent with a composite `(org_id, id)` foreign key, so a row can never point at another organisation's row. Repositories require `org_id`, and the engine refuses a SELECT, UPDATE or DELETE on a `detent` table that doesn't mention `org_id` unless the call marks itself cross-organisation (the worker's job claim).
 
 ## Payment state machine
 
@@ -71,6 +71,9 @@ Each attempt stores the following fields:
 - `submitted_at`
 - `resolved_at`
 - `evidence` (jsonb: receipt or rail response)
+- `raw_tx` (EVM: the signed raw transaction, stored before broadcast so the resolver can re-broadcast the same transaction)
+
+The database also enforces: a CONFIRMED or FAILED attempt never changes again; UNKNOWN to FAILED needs `evidence`; and a FAILED attempt can never carry `failure_class = TIMEOUT`.
 
 ## Exactly-once constraints (database)
 
@@ -109,13 +112,14 @@ Audit and ledger tables get `BEFORE UPDATE OR DELETE` triggers that raise an err
 | `mandates` | id, org_id, agent_id, payload jsonb, signature, valid_from, expires_at, revoked_at | Format in spec/05 |
 | `mandate_usage` | mandate_id, total_minor, count | Updated atomically |
 | `policy_versions` | id, org_id, version, content_hash, yaml, status (draft, active, superseded), proposed_by, approved_by, loosening bool, attestation | Immutable after activation |
-| `payment_intents` | id, org_id, kind (payout), source (platform, agent), mandate_id, counterparty_id, destination_id, amount_minor, currency, network_constraint, allow_network_switch, reference, notes, travel_rule jsonb, status, idempotency_key, request_hash, awaiting_send_click | The payment ID for life |
-| `decisions` | id, payment_id, outcome, policy_version_id, policy_hash, inputs_snapshot jsonb, checks jsonb[], route jsonb, decided_at, actor | One per evaluation; re-runs add rows |
+| `payment_intents` | id, org_id, kind (payout), source (platform, agent), mandate_id, counterparty_id or user_account_ref (exactly one), destination_id, amount_minor, currency, network_constraint, allow_network_switch, reference, notes, travel_rule jsonb, status, idempotency_key, request_hash, awaiting_send_click | The payment ID for life |
+| `decisions` | id, payment_id, outcome, policy_version_id, policy_hash, inputs_snapshot jsonb, checks jsonb[], route jsonb, approved_reasons text[], decided_at, actor | One per evaluation; re-runs add rows. `approved_reasons` lists the escalation reasons a human approved before this re-run (spec/04) |
 | `exception_cases` | id, payment_id or deposit_id, type, tier, owner_id, backup_owner_id, deadline_at, status (OPEN, HELD_OVERDUE, RESOLVED), resolution, resolved_by | |
 | `case_events` | case_id, kind, actor, payload | Assignment, overdue, comment |
 | `attempts` | see above | |
 | `rails` | id, org_id, kind (evm, banksim, simchain), network, currency, enabled, weights, prefunded_daily_limit_minor | |
 | `kill_switch` | org_id, engaged bool, engaged_by, engaged_at, released_by, released_at | One row per org |
+| `counters` | org_id, scope (`platform:USDC`, `counterparty:cpt_x:USDC`, `mandate:mnd_x`), period (`YYYY-MM-DD`, or `all` for mandate totals), currency, amount_minor, count | Daily caps and mandate totals (spec/04); updated with `UPDATE ... RETURNING` in the decision transaction |
 | `deposit_intents` | id, org_id, account_ref, currency, network, expected_amount_minor, deposit_address or reference, status | |
 | `inbound_transfers` | id, rail_id, tx_hash, log_index, from_address, to_address, amount_minor, token, confirmations, seen_at | |
 | `credits` | id, inbound_transfer_id, deposit_intent_id, account_ref, amount_minor, journal_id | |
@@ -123,13 +127,15 @@ Audit and ledger tables get `BEFORE UPDATE OR DELETE` triggers that raise an err
 | `journal_entries`, `postings` | Balanced double entry; postings reference payment, deposit or adjustment IDs | Append-only |
 | `recon_runs`, `recon_breaks` | Run stats; each break has a proposed fix, status and approver | |
 | `agent_calls` | id, kind, subject_id, model, prompt_version, input_hash, raw_output, parsed jsonb, tokens, latency_ms | Used by replay |
-| `audit_events` | id, org_id, seq, at, actor, kind, subject_id, payload jsonb, prev_hash, hash | Append-only, hash-chained per org |
+| `audit_events` | id, org_id, seq, at, actor, actor_role, kind, subject_id, payload jsonb, prev_hash, hash | Append-only (UPDATE, DELETE and TRUNCATE raise), hash-chained per org. Payloads are JSON-native with no floats |
+| `audit_heads` | org_id, seq, hash | Head of each chain; appending locks it, so `seq` has no gaps |
+| `demo_clock` | org_id, offset_seconds | Demo-mode clock offset (FND-05) |
 | `outbox` | id, org_id, channel (email_mock, webhook), recipient, template, body, created_at, sent_at | |
 | `webhook_endpoints`, `webhook_events`, `webhook_deliveries` | Signing secret hashed and shown once; deliveries log status | |
 | `request_logs` | org_id, key_id, method, path, status, latency_ms, idempotency_key, payment_id, request_id, at | 30 days |
 | `jobs` | id, kind, run_at, payload, attempts, locked_by, locked_until, done_at | Worker queue |
 | `incidents` | id, org_id, severity, trigger, opened_at, notified_at, root_cause | |
-| `invites`, `leads` | Dashboard onboarding and website access requests | |
+| `invites`, `leads` | Dashboard onboarding and website access requests | Leads belong to the operator organisation `org_detent` |
 | `idempotency_records` | org_id, key, request_hash, response jsonb | For all create endpoints |
 
 ## Ledger accounts and postings
