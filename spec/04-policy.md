@@ -24,7 +24,7 @@ checks:
   kyb_status: {block_on: [failed, unknown], escalate_on: [pending]}
   allowlist: {escalate_if_not_listed: true}
   screening: {provider: mock, block_on_hit: true}
-  travel_rule: {threshold: {amount: "1000.00", currency: USDC}, required: [originator.name, originator.account, beneficiary.name, beneficiary.account]}
+  travel_rule: {threshold: {USDC: "1000.00", GBP: "1000.00", EUR: "1000.00"}, required: [originator.name, originator.account, beneficiary.name, beneficiary.account]}
   allowed_networks: {USDC: [base-sepolia, eth-sepolia], GBP: [banksim-fps], EUR: [banksim-sepa-inst]}
   limits:
     auto_limit: {USDC: "10000.00", GBP: "5000.00", EUR: "5000.00"}     # above -> ESCALATE
@@ -86,6 +86,8 @@ A re-run evaluates every check again with the active rule version. Without a rul
 - The pre-send re-check in the execution layer applies the same rule with the same `approved_reasons`.
 
 ## Travel-rule data (travel_rule check)
+
+The threshold is per currency (D-25); a payment above the threshold for its own currency needs every required field.
 
 The travel-rule fields are typed data, never agent free text:
 

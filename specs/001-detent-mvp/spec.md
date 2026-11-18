@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 87 requirements confirmed; 16 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 90 requirements confirmed; 13 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -315,11 +315,11 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-020**: Rules are a versioned YAML rule set, validated against a schema; each version is immutable once active and decisions record the version and its hash.
 - **FR-021**: The decision is deterministic: same inputs and rule version give the same outcome; BLOCK beats ESCALATE beats EXECUTE; every check runs and reports its result, reason and evidence; an invalid mandate short-circuits to BLOCK.
 - **FR-022**: Compliance checks: KYB (block failed or unknown, escalate pending), allowlist, screening of address and name, travel-rule fields above the threshold taken from registry and organisation data, and allowed networks per currency.
-- **FR-023**: Screening matches addresses case-insensitively and names after case-folding and whitespace collapsing; no fuzzy matching in the MVP. *(proposed: G-07)*
+- **FR-023**: Screening matches addresses case-insensitively and names after case-folding and whitespace collapsing; no fuzzy matching in the MVP.
 - **FR-024**: Above the auto limit escalates; above the hard maximum blocks; daily caps per platform and per counterparty count confirmed plus in-flight amounts and update atomically under concurrency.
 - **FR-025**: Daily caps use the UTC calendar day; mandate totals cover the mandate's whole validity window; reserved amounts are released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED. *(proposed: G-14, G-12)*
 - **FR-026**: Unusual activity is checkable rules: new wallet, changed details, first payment, above k times the counterparty median (only with enough confirmed history); each hit stores the raw facts.
-- **FR-027**: Above-norm compares only with confirmed payments in the same currency; otherwise it is reported as not evaluated. *(proposed: G-13)*
+- **FR-027**: Above-norm compares only with confirmed payments in the same currency; otherwise it is reported as not evaluated.
 - **FR-028**: A block is final: approve, retry, reroute or resubmit of a blocked payment returns 409 payment_blocked and the database rejects any status change away from BLOCKED or REJECTED.
 - **FR-029**: A new intent to the same counterparty or destination address within 24 hours of a block escalates RESUBMISSION_AFTER_BLOCK with a link to the blocked payment, whatever the amount.
 - **FR-030**: Rule changes are drafts with a structured diff; activation needs a second, different user; a loosening change needs the compliance lead; the attestation, approvers and times are recorded; in-flight decisions keep their version.
@@ -425,7 +425,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 **API**
 
 - **FR-100**: The public API uses scoped, hashed test keys, a standard error envelope, dated versions pinned per organisation, and per-key rate limits with standard headers.
-- **FR-101**: Every API key is issued to a named user, who is the actor in the audit log for that key's writes. *(proposed: G-08)*
+- **FR-101**: Every API key is issued to a named user, who is the actor in the audit log for that key's writes.
 - **FR-102**: An OpenAPI 3.1 file matches the code; request logs (30 days, bodies redacted) and an events list are available.
 
 **Webhooks**

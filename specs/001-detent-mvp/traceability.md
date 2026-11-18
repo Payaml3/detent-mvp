@@ -124,10 +124,10 @@ Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | planned | integration: `apps/api/tests/integration/test_int_01.py` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | done | `integration/test_intents_api.py::test_harbor_executes`<br>`integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 1 | The payment ID is assigned once and never changes through retries, failovers or approvals | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | planned | integration: `apps/api/tests/integration/test_int_01.py` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_idempotency_key_is_required` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist` |
 
 ## FR-011 · Intents (confirmed)
 
@@ -137,9 +137,9 @@ Sources: [spec/03 §standards](../../spec/03-api.md#standards); [spec/02 §exact
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [INT-02](../../backlog/user-stories.md#int-02) | S1 | 0 | Given the same key and the same body, when I repeat the call, then I get the original response and no new intent | planned | integration: `apps/api/tests/integration/test_int_02.py` |
-| [INT-02](../../backlog/user-stories.md#int-02) | S1 | 1 | Given the same key and a different body, then I get 409 `idempotency_conflict` | planned | integration: `apps/api/tests/integration/test_int_02.py` |
-| [INT-02](../../backlog/user-stories.md#int-02) | S1 | 2 | Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test) | planned | concurrency: `apps/api/tests/concurrency/test_int_02.py` |
+| [INT-02](../../backlog/user-stories.md#int-02) | S1 | 0 | Given the same key and the same body, when I repeat the call, then I get the original response and no new intent | done | `integration/test_intents_api.py::test_same_key_same_body_returns_the_original` |
+| [INT-02](../../backlog/user-stories.md#int-02) | S1 | 1 | Given the same key and a different body, then I get 409 `idempotency_conflict` | done | `integration/test_intents_api.py::test_same_key_different_body_conflicts` |
+| [INT-02](../../backlog/user-stories.md#int-02) | S1 | 2 | Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test) | done | `integration/test_intents_api.py::test_keys_are_scoped_per_organisation`<br>`concurrency/test_decision_races.py::test_parallel_requests_with_one_key_create_one_intent` |
 
 ## FR-012 · Intents (confirmed)
 
@@ -149,9 +149,9 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [INT-03](../../backlog/user-stories.md#int-03) | S1 | 0 | GET /v1/payment_intents/{id} includes decisions, checks, attempts, ledger postings and events | planned | integration: `apps/api/tests/integration/test_int_03.py` |
-| [INT-03](../../backlog/user-stories.md#int-03) | S1 | 1 | GET /v1/payment_intents supports cursor pagination and filters by status, rail and created range | planned | integration: `apps/api/tests/integration/test_int_03.py` |
-| [INT-03](../../backlog/user-stories.md#int-03) | S1 | 2 | Another organisation's ID returns 404, never 403 | planned | integration: `apps/api/tests/integration/test_int_03.py` |
+| [INT-03](../../backlog/user-stories.md#int-03) | S1 | 0 | GET /v1/payment_intents/{id} includes decisions, checks, attempts, ledger postings and events | done | `integration/test_intents_api.py::test_get_intent_with_timeline` |
+| [INT-03](../../backlog/user-stories.md#int-03) | S1 | 1 | GET /v1/payment_intents supports cursor pagination and filters by status, rail and created range | done | `integration/test_intents_api.py::test_list_paginates_and_filters` |
+| [INT-03](../../backlog/user-stories.md#int-03) | S1 | 2 | Another organisation's ID returns 404, never 403 | done | `integration/test_intents_api.py::test_other_organisations_payment_is_404` |
 
 ## FR-013 · Intents (confirmed)
 
@@ -161,9 +161,9 @@ Sources: [INT-04 criteria](../../backlog/user-stories.md#int-04); [spec/04 §che
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 0 | Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event | planned | integration: `apps/api/tests/integration/test_int_04.py` |
-| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 1 | Each counterparty exposes payment count and median amount, computed from confirmed payments | planned | integration: `apps/api/tests/integration/test_int_04.py` |
-| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 2 | Counterparties are seeded from fixtures and editable in the console | planned | integration: `apps/api/tests/integration/test_int_04.py` |
+| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 0 | Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event | done | `integration/test_registry.py::test_editing_a_destination_updates_last_changed_and_audits`<br>`integration/test_registry.py::test_fixture_counterparties_are_seeded` |
+| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 1 | Each counterparty exposes payment count and median amount, computed from confirmed payments | done | `integration/test_registry.py::test_stats_are_computed_from_confirmed_payments` |
+| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 2 | Counterparties are seeded from fixtures and editable in the console | done | `integration/test_registry.py::test_fixture_counterparties_are_seeded`<br>`integration/test_registry.py::test_destination_editable_in_console_by_payments_lead_only` |
 
 ## FR-014 · Intents (proposed)
 
@@ -173,13 +173,13 @@ Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | planned | integration: `apps/api/tests/integration/test_int_01.py` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | done | `integration/test_intents_api.py::test_harbor_executes`<br>`integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 1 | The payment ID is assigned once and never changes through retries, failovers or approvals | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 0 | Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event | planned | integration: `apps/api/tests/integration/test_int_04.py` |
-| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 1 | Each counterparty exposes payment count and median amount, computed from confirmed payments | planned | integration: `apps/api/tests/integration/test_int_04.py` |
-| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 2 | Counterparties are seeded from fixtures and editable in the console | planned | integration: `apps/api/tests/integration/test_int_04.py` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_idempotency_key_is_required` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist` |
+| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 0 | Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event | done | `integration/test_registry.py::test_editing_a_destination_updates_last_changed_and_audits`<br>`integration/test_registry.py::test_fixture_counterparties_are_seeded` |
+| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 1 | Each counterparty exposes payment count and median amount, computed from confirmed payments | done | `integration/test_registry.py::test_stats_are_computed_from_confirmed_payments` |
+| [INT-04](../../backlog/user-stories.md#int-04) | S1 | 2 | Counterparties are seeded from fixtures and editable in the console | done | `integration/test_registry.py::test_fixture_counterparties_are_seeded`<br>`integration/test_registry.py::test_destination_editable_in_console_by_payments_lead_only` |
 | [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 0 | Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
 | [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 1 | No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
 | [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
@@ -204,16 +204,16 @@ Sources: [spec/04 §user-payouts-payouts-to-the-platforms-own-end-users](../../s
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | planned | integration: `apps/api/tests/integration/test_int_01.py` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | done | `integration/test_intents_api.py::test_harbor_executes`<br>`integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 1 | The payment ID is assigned once and never changes through retries, failovers or approvals | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | planned | integration: `apps/api/tests/integration/test_int_01.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 0 | KYB not verified -> BLOCK; KYB pending -> ESCALATE | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 1 | Payee not on allowlist -> ESCALATE (first payment) | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 2 | Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09 | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 3 | Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 4 | Network or currency not allowed for the platform -> BLOCK | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 5 | Screening sits behind a `Screening` interface so a real vendor can replace the mock | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_idempotency_key_is_required` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 0 | KYB not verified -> BLOCK; KYB pending -> ESCALATE | done | `unit/test_policy_engine.py::test_kyb` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 1 | Payee not on allowlist -> ESCALATE (first payment) | done | `unit/test_policy_engine.py::test_not_allowlisted_escalates`<br>`integration/test_intents_api.py::test_nova_escalates` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 2 | Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09 | done | `unit/test_policy_engine.py::test_screening_hit_blocks_with_the_matched_entry`<br>`unit/test_policy_engine.py::test_screening_unavailable_fails_closed`<br>`integration/test_intents_api.py::test_flagged_payee_is_blocked` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 3 | Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE | done | `unit/test_policy_engine.py::test_travel_rule_missing_fields_escalate_above_threshold`<br>`unit/test_policy_engine.py::test_travel_rule_below_threshold_passes`<br>`unit/test_policy_engine.py::test_travel_rule_supplied_values_must_match_the_registry`<br>`unit/test_policy_engine.py::test_travel_rule_threshold_is_per_currency` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 4 | Network or currency not allowed for the platform -> BLOCK | done | `unit/test_policy_engine.py::test_network_not_allowed_blocks` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 5 | Screening sits behind a `Screening` interface so a real vendor can replace the mock | done | `integration/test_fail_closed.py::test_screening_down` |
 
 ## FR-020 · Policy (confirmed)
 
@@ -223,9 +223,9 @@ Sources: [spec/04 §rule-set-format](../../spec/04-policy.md#rule-set-format); [
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-01](../../backlog/user-stories.md#pol-01) | S1 | 0 | Rule sets follow spec/04-policy.md and are validated against a schema on load; an invalid file is rejected with line-level errors | planned | unit: `apps/api/tests/unit/test_pol_01.py` |
-| [POL-01](../../backlog/user-stories.md#pol-01) | S1 | 1 | A loaded version is immutable and identified by version number and content hash | planned | unit: `apps/api/tests/unit/test_pol_01.py` |
-| [POL-01](../../backlog/user-stories.md#pol-01) | S1 | 2 | Every decision stores the version and hash it used | planned | unit: `apps/api/tests/unit/test_pol_01.py` |
+| [POL-01](../../backlog/user-stories.md#pol-01) | S1 | 0 | Rule sets follow spec/04-policy.md and are validated against a schema on load; an invalid file is rejected with line-level errors | done | `unit/test_policy_schema.py::test_fixture_rule_set_loads`<br>`unit/test_policy_schema.py::test_invalid_value_reports_its_line`<br>`unit/test_policy_schema.py::test_unknown_key_is_rejected_with_its_line`<br>`unit/test_policy_schema.py::test_yaml_syntax_error_reports_line` |
+| [POL-01](../../backlog/user-stories.md#pol-01) | S1 | 1 | A loaded version is immutable and identified by version number and content hash | done | `unit/test_policy_schema.py::test_hash_identifies_the_exact_text`<br>`unit/test_policy_schema.py::test_loaded_rule_set_is_immutable` |
+| [POL-01](../../backlog/user-stories.md#pol-01) | S1 | 2 | Every decision stores the version and hash it used | done | `integration/test_intents_api.py::test_every_step_is_audited_and_the_chain_verifies` |
 
 ## FR-021 · Policy (confirmed)
 
@@ -235,9 +235,9 @@ Sources: [spec/04 §principles](../../spec/04-policy.md#principles)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-02](../../backlog/user-stories.md#pol-02) | S1 | 0 | Each check returns PASS, ESCALATE or BLOCK with a reason code, parameters and evidence references | planned | unit: `apps/api/tests/unit/test_pol_02.py` |
-| [POL-02](../../backlog/user-stories.md#pol-02) | S1 | 1 | Final decision: BLOCK if any check blocks; else ESCALATE if any escalates; else EXECUTE | planned | unit: `apps/api/tests/unit/test_pol_02.py` |
-| [POL-02](../../backlog/user-stories.md#pol-02) | S1 | 2 | Same inputs and rule version always give the same decision (property-based test) | planned | property: `apps/api/tests/property/test_pol_02.py` |
+| [POL-02](../../backlog/user-stories.md#pol-02) | S1 | 0 | Each check returns PASS, ESCALATE or BLOCK with a reason code, parameters and evidence references | done | `unit/test_policy_engine.py::test_routine_payout_executes_with_a_result_per_check`<br>`unit/test_policy_engine.py::test_screening_hit_blocks_with_the_matched_entry` |
+| [POL-02](../../backlog/user-stories.md#pol-02) | S1 | 1 | Final decision: BLOCK if any check blocks; else ESCALATE if any escalates; else EXECUTE | done | `unit/test_policy_engine.py::test_precedence_block_beats_escalate`<br>`unit/test_policy_engine.py::test_every_check_runs_even_after_a_block`<br>`property/test_policy_property.py::test_precedence` |
+| [POL-02](../../backlog/user-stories.md#pol-02) | S1 | 2 | Same inputs and rule version always give the same decision (property-based test) | done | `property/test_policy_property.py::test_same_inputs_same_decision` |
 | [POL-02](../../backlog/user-stories.md#pol-02) | S1 | 3 | Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08) | planned | unit: `apps/api/tests/unit/test_pol_02.py` |
 
 ## FR-022 · Policy (confirmed)
@@ -248,14 +248,14 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks); [spec/04 §travel-r
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 0 | KYB not verified -> BLOCK; KYB pending -> ESCALATE | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 1 | Payee not on allowlist -> ESCALATE (first payment) | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 2 | Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09 | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 3 | Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 4 | Network or currency not allowed for the platform -> BLOCK | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 5 | Screening sits behind a `Screening` interface so a real vendor can replace the mock | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 0 | KYB not verified -> BLOCK; KYB pending -> ESCALATE | done | `unit/test_policy_engine.py::test_kyb` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 1 | Payee not on allowlist -> ESCALATE (first payment) | done | `unit/test_policy_engine.py::test_not_allowlisted_escalates`<br>`integration/test_intents_api.py::test_nova_escalates` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 2 | Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09 | done | `unit/test_policy_engine.py::test_screening_hit_blocks_with_the_matched_entry`<br>`unit/test_policy_engine.py::test_screening_unavailable_fails_closed`<br>`integration/test_intents_api.py::test_flagged_payee_is_blocked` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 3 | Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE | done | `unit/test_policy_engine.py::test_travel_rule_missing_fields_escalate_above_threshold`<br>`unit/test_policy_engine.py::test_travel_rule_below_threshold_passes`<br>`unit/test_policy_engine.py::test_travel_rule_supplied_values_must_match_the_registry`<br>`unit/test_policy_engine.py::test_travel_rule_threshold_is_per_currency` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 4 | Network or currency not allowed for the platform -> BLOCK | done | `unit/test_policy_engine.py::test_network_not_allowed_blocks` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 5 | Screening sits behind a `Screening` interface so a real vendor can replace the mock | done | `integration/test_fail_closed.py::test_screening_down` |
 
-## FR-023 · Policy (proposed)
+## FR-023 · Policy (confirmed)
 
 Screening matches addresses case-insensitively and names after case-folding and whitespace collapsing; no fuzzy matching in the MVP.
 
@@ -263,12 +263,12 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks); [fixtures/screening
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 0 | KYB not verified -> BLOCK; KYB pending -> ESCALATE | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 1 | Payee not on allowlist -> ESCALATE (first payment) | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 2 | Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09 | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 3 | Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 4 | Network or currency not allowed for the platform -> BLOCK | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
-| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 5 | Screening sits behind a `Screening` interface so a real vendor can replace the mock | planned | unit: `apps/api/tests/unit/test_pol_03.py` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 0 | KYB not verified -> BLOCK; KYB pending -> ESCALATE | done | `unit/test_policy_engine.py::test_kyb` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 1 | Payee not on allowlist -> ESCALATE (first payment) | done | `unit/test_policy_engine.py::test_not_allowlisted_escalates`<br>`integration/test_intents_api.py::test_nova_escalates` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 2 | Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09 | done | `unit/test_policy_engine.py::test_screening_hit_blocks_with_the_matched_entry`<br>`unit/test_policy_engine.py::test_screening_unavailable_fails_closed`<br>`integration/test_intents_api.py::test_flagged_payee_is_blocked` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 3 | Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE | done | `unit/test_policy_engine.py::test_travel_rule_missing_fields_escalate_above_threshold`<br>`unit/test_policy_engine.py::test_travel_rule_below_threshold_passes`<br>`unit/test_policy_engine.py::test_travel_rule_supplied_values_must_match_the_registry`<br>`unit/test_policy_engine.py::test_travel_rule_threshold_is_per_currency` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 4 | Network or currency not allowed for the platform -> BLOCK | done | `unit/test_policy_engine.py::test_network_not_allowed_blocks` |
+| [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 5 | Screening sits behind a `Screening` interface so a real vendor can replace the mock | done | `integration/test_fail_closed.py::test_screening_down` |
 
 ## FR-024 · Policy (confirmed)
 
@@ -278,9 +278,9 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks); [spec/04 §counters
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 0 | Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK | planned | unit: `apps/api/tests/unit/test_pol_04.py` |
-| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 1 | Daily caps per platform and per counterparty count confirmed plus in-flight amounts | planned | unit: `apps/api/tests/unit/test_pol_04.py` |
-| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 2 | Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test) | planned | concurrency: `apps/api/tests/concurrency/test_pol_04.py` |
+| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 0 | Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK | done | `unit/test_policy_engine.py::test_limits` |
+| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 1 | Daily caps per platform and per counterparty count confirmed plus in-flight amounts | done | `unit/test_policy_engine.py::test_daily_caps_count_what_is_already_used`<br>`unit/test_policy_engine.py::test_daily_cap_exactly_reached_passes`<br>`integration/test_intents_api.py::test_decision_only_executes_nothing` |
+| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 2 | Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test) | done | `concurrency/test_decision_races.py::test_parallel_intents_at_the_daily_cap_never_all_execute` |
 
 ## FR-025 · Policy (proposed)
 
@@ -290,9 +290,9 @@ Sources: [spec/04 §counters-and-concurrency](../../spec/04-policy.md#counters-a
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 0 | Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK | planned | unit: `apps/api/tests/unit/test_pol_04.py` |
-| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 1 | Daily caps per platform and per counterparty count confirmed plus in-flight amounts | planned | unit: `apps/api/tests/unit/test_pol_04.py` |
-| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 2 | Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test) | planned | concurrency: `apps/api/tests/concurrency/test_pol_04.py` |
+| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 0 | Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK | done | `unit/test_policy_engine.py::test_limits` |
+| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 1 | Daily caps per platform and per counterparty count confirmed plus in-flight amounts | done | `unit/test_policy_engine.py::test_daily_caps_count_what_is_already_used`<br>`unit/test_policy_engine.py::test_daily_cap_exactly_reached_passes`<br>`integration/test_intents_api.py::test_decision_only_executes_nothing` |
+| [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 2 | Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test) | done | `concurrency/test_decision_races.py::test_parallel_intents_at_the_daily_cap_never_all_execute` |
 | [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 0 | Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason | planned | unit: `apps/api/tests/unit/test_mnd_02.py` |
 | [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 1 | Cumulative usage updates atomically (concurrency test) | planned | concurrency: `apps/api/tests/concurrency/test_mnd_02.py` |
 | [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 2 | The check re-runs at execution time | planned | unit: `apps/api/tests/unit/test_mnd_02.py` |
@@ -310,7 +310,7 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks); [POL-05 criteria](.
 | [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
 | [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | planned | unit: `apps/api/tests/unit/test_pol_05.py` |
 
-## FR-027 · Policy (proposed)
+## FR-027 · Policy (confirmed)
 
 Above-norm compares only with confirmed payments in the same currency; otherwise it is reported as not evaluated.
 
@@ -381,8 +381,8 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-08](../../backlog/user-stories.md#pol-08) | S1 | 0 | Returns the same decision object as intent creation, with `executed: false` | planned | unit: `apps/api/tests/unit/test_pol_08.py` |
-| [POL-08](../../backlog/user-stories.md#pol-08) | S1 | 1 | Decisions are stored and audited but never create attempts | planned | unit: `apps/api/tests/unit/test_pol_08.py` |
+| [POL-08](../../backlog/user-stories.md#pol-08) | S1 | 0 | Returns the same decision object as intent creation, with `executed: false` | done | `integration/test_intents_api.py::test_decision_only_executes_nothing`<br>`integration/test_intents_api.py::test_shadow_mode_shadows_executes` |
+| [POL-08](../../backlog/user-stories.md#pol-08) | S1 | 1 | Decisions are stored and audited but never create attempts | done | `integration/test_intents_api.py::test_decision_only_executes_nothing` |
 
 ## FR-033 · Policy (confirmed)
 
@@ -392,8 +392,8 @@ Sources: [Invariant 9](../../CLAUDE.md#non-negotiable-invariants); [spec/01 §fa
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 0 | If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`) | planned | unit: `apps/api/tests/unit/test_pol_09.py` |
-| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 1 | No code path turns an error into EXECUTE (fault-injection test on each dependency) | planned | fault: `apps/api/tests/integration/test_pol_09.py` |
+| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 0 | If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`) | done | `integration/test_fail_closed.py::test_screening_down`<br>`integration/test_fail_closed.py::test_each_data_read_failing_fails_closed`<br>`integration/test_fail_closed.py::test_policy_crash_fails_closed` |
+| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 1 | No code path turns an error into EXECUTE (fault-injection test on each dependency) | done | `integration/test_fail_closed.py::test_each_data_read_failing_fails_closed`<br>`unit/test_policy_engine.py::test_a_crashing_check_fails_closed`<br>`property/test_policy_property.py::test_precedence` |
 
 ## FR-034 · Policy (confirmed)
 
@@ -403,8 +403,8 @@ Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 0 | If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`) | planned | unit: `apps/api/tests/unit/test_pol_09.py` |
-| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 1 | No code path turns an error into EXECUTE (fault-injection test on each dependency) | planned | fault: `apps/api/tests/integration/test_pol_09.py` |
+| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 0 | If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`) | done | `integration/test_fail_closed.py::test_screening_down`<br>`integration/test_fail_closed.py::test_each_data_read_failing_fails_closed`<br>`integration/test_fail_closed.py::test_policy_crash_fails_closed` |
+| [POL-09](../../backlog/user-stories.md#pol-09) | S1 | 1 | No code path turns an error into EXECUTE (fault-injection test on each dependency) | done | `integration/test_fail_closed.py::test_each_data_read_failing_fails_closed`<br>`unit/test_policy_engine.py::test_a_crashing_check_fails_closed`<br>`property/test_policy_property.py::test_precedence` |
 | [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 0 | All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction | planned | integration: `apps/api/tests/integration/test_exe_01.py` |
 | [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 1 | Illegal transitions raise, change nothing and write an audit event | planned | manual: `manual check, recorded in the PR description` |
 | [EXE-01](../../backlog/user-stories.md#exe-01) | S2 | 2 | Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md | planned | property: `apps/api/tests/property/test_exe_01.py` |
@@ -979,8 +979,8 @@ Sources: [Invariant 12](../../CLAUDE.md#non-negotiable-invariants); [spec/02 §e
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [AUD-01](../../backlog/user-stories.md#aud-01) | S1 | 0 | Events written in the same transaction as the change they describe: intent, agent output, decision with rule version and checks, case events, approvals, transitions, rail requests and responses, postings, kill switch, policy changes | planned | integration: `apps/api/tests/integration/test_aud_01.py` |
-| [AUD-01](../../backlog/user-stories.md#aud-01) | S1 | 1 | A database trigger rejects UPDATE and DELETE on audit rows | planned | integration: `apps/api/tests/integration/test_aud_01.py` |
-| [AUD-01](../../backlog/user-stories.md#aud-01) | S1 | 2 | Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested) | planned | integration: `apps/api/tests/integration/test_aud_01.py` |
+| [AUD-01](../../backlog/user-stories.md#aud-01) | S1 | 1 | A database trigger rejects UPDATE and DELETE on audit rows | done | `integration/test_audit_cli.py::test_trigger_rejects_update_and_delete`<br>`integration/test_audit.py::test_tampering_is_detected` |
+| [AUD-01](../../backlog/user-stories.md#aud-01) | S1 | 2 | Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested) | done | `integration/test_audit_cli.py::test_verify_command`<br>`integration/test_audit.py::test_chain_appends_and_verifies` |
 
 ## FR-086 · Audit (confirmed)
 
@@ -1153,14 +1153,14 @@ Sources: [spec/03 §standards](../../spec/03-api.md#standards); [spec/03 §error
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [API-01](../../backlog/user-stories.md#api-01) | P1 | 0 | `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin | planned | contract: `apps/api/tests/integration/test_api_01.py` |
-| [API-01](../../backlog/user-stories.md#api-01) | P1 | 1 | Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable` | planned | contract: `apps/api/tests/integration/test_api_01.py` |
+| [API-01](../../backlog/user-stories.md#api-01) | P1 | 0 | `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin | done | `integration/test_intents_api.py::test_requests_need_a_valid_key`<br>`integration/test_intents_api.py::test_wrong_scope_is_403` |
+| [API-01](../../backlog/user-stories.md#api-01) | P1 | 1 | Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable` | done | `integration/test_intents_api.py::test_wrong_scope_is_403`<br>`integration/test_api.py::test_live_keys_are_always_rejected` |
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 2 | Every data access filters by the key's organisation (cross-organisation tests in EVL-02) | planned | contract: `apps/api/tests/integration/test_api_01.py` |
 | [API-02](../../backlog/user-stories.md#api-02) | P1 | 0 | Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs | planned | contract: `apps/api/tests/integration/test_api_02.py` |
 | [API-03](../../backlog/user-stories.md#api-03) | P1 | 0 | `Detent-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400 | planned | contract: `apps/api/tests/integration/test_api_03.py` |
 | [API-04](../../backlog/user-stories.md#api-04) | P1 | 0 | `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After` | planned | contract: `apps/api/tests/integration/test_api_04.py` |
 
-## FR-101 · API (proposed)
+## FR-101 · API (confirmed)
 
 Every API key is issued to a named user, who is the actor in the audit log for that key's writes.
 
@@ -1168,8 +1168,8 @@ Sources: [spec/03 §standards](../../spec/03-api.md#standards)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [API-01](../../backlog/user-stories.md#api-01) | P1 | 0 | `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin | planned | contract: `apps/api/tests/integration/test_api_01.py` |
-| [API-01](../../backlog/user-stories.md#api-01) | P1 | 1 | Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable` | planned | contract: `apps/api/tests/integration/test_api_01.py` |
+| [API-01](../../backlog/user-stories.md#api-01) | P1 | 0 | `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin | done | `integration/test_intents_api.py::test_requests_need_a_valid_key`<br>`integration/test_intents_api.py::test_wrong_scope_is_403` |
+| [API-01](../../backlog/user-stories.md#api-01) | P1 | 1 | Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable` | done | `integration/test_intents_api.py::test_wrong_scope_is_403`<br>`integration/test_api.py::test_live_keys_are_always_rejected` |
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 2 | Every data access filters by the key's organisation (cross-organisation tests in EVL-02) | planned | contract: `apps/api/tests/integration/test_api_01.py` |
 
 ## FR-102 · API (confirmed)
@@ -1338,3 +1338,4 @@ Sources: [spec/product-definition.md §rules-for-wording](../../spec/product-def
 | [WEB-01](../../backlog/user-stories.md#web-01) | P4 | 1 | Category wording 'agentic payment controls', with the three layers shown as one section; never 'payments company' or 'payment provider' | done | `ci:apps/site/tests/site.test.mjs home: category wording and both calls to action`<br>`ci:apps/site/tests/site.test.mjs honesty: no banned claims or phrases on any page` |
 | [WEB-01](../../backlog/user-stories.md#web-01) | P4 | 2 | Passes the honesty checklist: no logos, testimonials, customer counts, certification badges or licence claims | done | `ci:apps/site/tests/site.test.mjs honesty: no banned claims or phrases on any page`<br>`ci:apps/site/tests/site.test.mjs honesty: certifications appear only as roadmap items` |
 | [OPS-02](../../backlog/user-stories.md#ops-02) | S0 | 0 | The denylist lives in a CI secret, never in the repo; the check scans code, fixtures and docs | done | `unit/test_denylist.py::test_term_in_code_docs_or_fixtures_fails`<br>`unit/test_denylist.py::test_missing_denylist_fails_closed`<br>`ci:.github/workflows/ci.yml 'independence check' job (fails until INDEPENDENCE_DENYLIST is set)` |
+

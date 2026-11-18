@@ -9,7 +9,7 @@ checks:
   allowlist: {escalate_if_not_listed: true}
   screening: {provider: mock, list: fixtures/screening-list.yaml, block_on_hit: true}
   travel_rule:
-    threshold: {amount: "1000.00", currency: USDC}
+    threshold: {USDC: "1000.00", GBP: "1000.00", EUR: "1000.00"}   # per currency (D-25)
     required: [originator.name, originator.account, beneficiary.name, beneficiary.account]
   allowed_networks:
     USDC: [base-sepolia, eth-sepolia, local-evm, simchain]

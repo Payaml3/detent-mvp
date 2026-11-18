@@ -128,12 +128,12 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 
 **Acceptance criteria**
 
-- [ ] POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status
+- [x] POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status
 - [ ] The payment ID is assigned once and never changes through retries, failovers or approvals
-- [ ] Invalid input returns 422 with the standard error body and no intent is created
-- [ ] `source` is `platform` or `agent`; `agent` requires a `mandate_id`
+- [x] Invalid input returns 422 with the standard error body and no intent is created
+- [x] `source` is `platform` or `agent`; `agent` requires a `mandate_id`
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Intent, A2b.states
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** FND-03 · **Traces to:** A2.Intent, A2b.states
 
 ### INT-02 · Idempotent creates
 
@@ -141,11 +141,11 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 
 **Acceptance criteria**
 
-- [ ] Given the same key and the same body, when I repeat the call, then I get the original response and no new intent
-- [ ] Given the same key and a different body, then I get 409 `idempotency_conflict`
-- [ ] Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test)
+- [x] Given the same key and the same body, when I repeat the call, then I get the original response and no new intent
+- [x] Given the same key and a different body, then I get 409 `idempotency_conflict`
+- [x] Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** INT-01 · **Traces to:** A2.Execute, A6.retry_rule, D.standards, L3
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** INT-01 · **Traces to:** A2.Execute, A6.retry_rule, D.standards, L3
 
 ### INT-03 · Read and list intents
 
@@ -153,11 +153,11 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 
 **Acceptance criteria**
 
-- [ ] GET /v1/payment_intents/{id} includes decisions, checks, attempts, ledger postings and events
-- [ ] GET /v1/payment_intents supports cursor pagination and filters by status, rail and created range
-- [ ] Another organisation's ID returns 404, never 403
+- [x] GET /v1/payment_intents/{id} includes decisions, checks, attempts, ledger postings and events
+- [x] GET /v1/payment_intents supports cursor pagination and filters by status, rail and created range
+- [x] Another organisation's ID returns 404, never 403
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** INT-01 · **Traces to:** A2.Prove, D.standards
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** INT-01 · **Traces to:** A2.Prove, D.standards
 
 ### INT-04 · Counterparty registry with wallet history
 
@@ -165,11 +165,11 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 
 **Acceptance criteria**
 
-- [ ] Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event
-- [ ] Each counterparty exposes payment count and median amount, computed from confirmed payments
-- [ ] Counterparties are seeded from fixtures and editable in the console
+- [x] Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event
+- [x] Each counterparty exposes payment count and median amount, computed from confirmed payments
+- [x] Counterparties are seeded from fixtures and editable in the console
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Policy, A2b.unusual, A2b.raw_facts
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** FND-03 · **Traces to:** A2.Policy, A2b.unusual, A2b.raw_facts
 
 ### INT-05 · Cancel an intent before it is sent
 
@@ -192,11 +192,11 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] Rule sets follow spec/04-policy.md and are validated against a schema on load; an invalid file is rejected with line-level errors
-- [ ] A loaded version is immutable and identified by version number and content hash
-- [ ] Every decision stores the version and hash it used
+- [x] Rule sets follow spec/04-policy.md and are validated against a schema on load; an invalid file is rejected with line-level errors
+- [x] A loaded version is immutable and identified by version number and content hash
+- [x] Every decision stores the version and hash it used
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Policy, A6.client_rules, B3.rule_changes
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** FND-03 · **Traces to:** A2.Policy, A6.client_rules, B3.rule_changes
 
 ### POL-02 · Decision engine and precedence
 
@@ -204,12 +204,12 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] Each check returns PASS, ESCALATE or BLOCK with a reason code, parameters and evidence references
-- [ ] Final decision: BLOCK if any check blocks; else ESCALATE if any escalates; else EXECUTE
-- [ ] Same inputs and rule version always give the same decision (property-based test)
+- [x] Each check returns PASS, ESCALATE or BLOCK with a reason code, parameters and evidence references
+- [x] Final decision: BLOCK if any check blocks; else ESCALATE if any escalates; else EXECUTE
+- [x] Same inputs and rule version always give the same decision (property-based test)
 - [ ] Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-01, INT-01 · **Traces to:** A2.Decide, A6.block_final, A1.reviews
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** POL-01, INT-01 · **Traces to:** A2.Decide, A6.block_final, A1.reviews
 
 ### POL-03 · Compliance checks (KYB, allowlist, screening, Travel Rule, network)
 
@@ -217,14 +217,14 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] KYB not verified -> BLOCK; KYB pending -> ESCALATE
-- [ ] Payee not on allowlist -> ESCALATE (first payment)
-- [ ] Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09
-- [ ] Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE
-- [ ] Network or currency not allowed for the platform -> BLOCK
-- [ ] Screening sits behind a `Screening` interface so a real vendor can replace the mock
+- [x] KYB not verified -> BLOCK; KYB pending -> ESCALATE
+- [x] Payee not on allowlist -> ESCALATE (first payment)
+- [x] Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09
+- [x] Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE
+- [x] Network or currency not allowed for the platform -> BLOCK
+- [x] Screening sits behind a `Screening` interface so a real vendor can replace the mock
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02, INT-04 · **Traces to:** A2.Policy, B4.risk_data
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** POL-02, INT-04 · **Traces to:** A2.Policy, B4.risk_data
 
 ### POL-04 · Limits and daily caps
 
@@ -232,11 +232,11 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK
-- [ ] Daily caps per platform and per counterparty count confirmed plus in-flight amounts
-- [ ] Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test)
+- [x] Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK
+- [x] Daily caps per platform and per counterparty count confirmed plus in-flight amounts
+- [x] Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02 · **Traces to:** A2.Policy, A2b.unusual
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** POL-02 · **Traces to:** A2.Policy, A2b.unusual
 
 ### POL-05 · Unusual activity as checkable rules
 
@@ -282,10 +282,10 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] Returns the same decision object as intent creation, with `executed: false`
-- [ ] Decisions are stored and audited but never create attempts
+- [x] Returns the same decision object as intent creation, with `executed: false`
+- [x] Decisions are stored and audited but never create attempts
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02 · **Traces to:** A2.Decide, A3.shadow
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** POL-02 · **Traces to:** A2.Decide, A3.shadow
 
 ### POL-09 · Fail closed
 
@@ -293,10 +293,10 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`)
-- [ ] No code path turns an error into EXECUTE (fault-injection test on each dependency)
+- [x] If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`)
+- [x] No code path turns an error into EXECUTE (fault-injection test on each dependency)
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** POL-02 · **Traces to:** A6.fail_closed, B5.failsafe
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** POL-02 · **Traces to:** A6.fail_closed, B5.failsafe
 
 ## AGT · Mandates and instruction agent
 
@@ -880,10 +880,10 @@ _Every step is recorded append-only and any payment can be replayed and exported
 **Acceptance criteria**
 
 - [ ] Events written in the same transaction as the change they describe: intent, agent output, decision with rule version and checks, case events, approvals, transitions, rail requests and responses, postings, kill switch, policy changes
-- [ ] A database trigger rejects UPDATE and DELETE on audit rows
-- [ ] Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested)
+- [x] A database trigger rejects UPDATE and DELETE on audit rows
+- [x] Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested)
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S1 A platform payout is decided through the API · **Depends on:** FND-03 · **Traces to:** A2.Prove, B5.security, A1.evidence
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** FND-03 · **Traces to:** A2.Prove, B5.security, A1.evidence
 
 ### AUD-02 · Replay any payment
 
@@ -1269,8 +1269,8 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin
-- [ ] Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable`
+- [x] `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin
+- [x] Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable`
 - [ ] Every data access filters by the key's organisation (cross-organisation tests in EVL-02)
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** FND-03 · **Traces to:** D.keys, D.standards, B5.security

@@ -35,6 +35,8 @@ PERMISSIONS: dict[str, frozenset[Role]] = {
     # EXE-09: a mode change is never a single-person action; see mode_change_approved().
     "org.change_mode.propose": frozenset({R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
     "demo.clock.advance": frozenset(Role),
+    # INT-04: editing payout details. Payments lead only (G-23, Proposed: the narrowest safe choice).
+    "counterparty.edit": frozenset({R.PAYMENTS_LEAD}),
 }
 
 

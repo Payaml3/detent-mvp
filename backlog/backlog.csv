@@ -31,34 +31,34 @@ FND-09,FND Foundation,Local EVM with a mock USDC for tests,"As a builder, I want
 INT-01,INT Payment intents,Create a payout intent,"As a platform integrator, I want to POST a payout intent with amount, currency, payee, optional network, reference and notes, so that every payment starts with one ID and gets a decision before any money moves.","- POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status
 - The payment ID is assigned once and never changes through retries, failovers or approvals
 - Invalid input returns 422 with the standard error body and no intent is created
-- `source` is `platform` or `agent`; `agent` requires a `mandate_id`",Must,0.5,S1 A platform payout is decided through the API,FND-03,"A2.Intent, A2b.states"
+- `source` is `platform` or `agent`; `agent` requires a `mandate_id`",Must,0.5,S1 A platform payout is decided through the API (done),FND-03,"A2.Intent, A2b.states"
 INT-02,INT Payment intents,Idempotent creates,"As a platform integrator, I want an `Idempotency-Key` on every create call, so that a network retry on my side can never create a second payment.","- Given the same key and the same body, when I repeat the call, then I get the original response and no new intent
 - Given the same key and a different body, then I get 409 `idempotency_conflict`
-- Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test)",Must,0.5,S1 A platform payout is decided through the API,INT-01,"A2.Execute, A6.retry_rule, D.standards, L3"
+- Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test)",Must,0.5,S1 A platform payout is decided through the API (done),INT-01,"A2.Execute, A6.retry_rule, D.standards, L3"
 INT-03,INT Payment intents,Read and list intents,"As a platform integrator, I want to fetch an intent with its full timeline and to list intents with filters, so that I can show status to my users and debug my integration.","- GET /v1/payment_intents/{id} includes decisions, checks, attempts, ledger postings and events
 - GET /v1/payment_intents supports cursor pagination and filters by status, rail and created range
-- Another organisation's ID returns 404, never 403",Must,0.25,S1 A platform payout is decided through the API,INT-01,"A2.Prove, D.standards"
+- Another organisation's ID returns 404, never 403",Must,0.25,S1 A platform payout is decided through the API (done),INT-01,"A2.Prove, D.standards"
 INT-04,INT Payment intents,Counterparty registry with wallet history,"As a payments lead, I want counterparties with KYB status, wallets or bank accounts, first-seen and last-changed times and payment history, so that the policy can check ""new wallet"", ""changed details"", ""first payment"" and ""above norm"" from facts.","- Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event
 - Each counterparty exposes payment count and median amount, computed from confirmed payments
-- Counterparties are seeded from fixtures and editable in the console",Must,0.5,S1 A platform payout is decided through the API,FND-03,"A2.Policy, A2b.unusual, A2b.raw_facts"
+- Counterparties are seeded from fixtures and editable in the console",Must,0.5,S1 A platform payout is decided through the API (done),FND-03,"A2.Policy, A2b.unusual, A2b.raw_facts"
 INT-05,INT Payment intents,Cancel an intent before it is sent,"As a payments lead, I want to cancel an escalated, held or ready intent, so that a payment we no longer want never goes out.","- Cancel is allowed from ESCALATED, HELD or READY only; from SUBMITTED or UNKNOWN it returns 409
 - CANCELLED is terminal and audited with the actor and reason",Should,0.25,L After launch (Should and Could),EXE-01,A2.Intent
 POL-01,POL Policy and decisions,Rule-set format and loader,"As a compliance lead, I want our rules as a versioned YAML rule set with named checks and parameters, so that the rules are ours, readable and exactly enforced.","- Rule sets follow spec/04-policy.md and are validated against a schema on load; an invalid file is rejected with line-level errors
 - A loaded version is immutable and identified by version number and content hash
-- Every decision stores the version and hash it used",Must,0.5,S1 A platform payout is decided through the API,FND-03,"A2.Policy, A6.client_rules, B3.rule_changes"
+- Every decision stores the version and hash it used",Must,0.5,S1 A platform payout is decided through the API (done),FND-03,"A2.Policy, A6.client_rules, B3.rule_changes"
 POL-02,POL Policy and decisions,Decision engine and precedence,"As a payments lead, I want every intent evaluated against all checks with execute, escalate or block and a reason per check, so that I can see exactly why each payment was decided.","- Each check returns PASS, ESCALATE or BLOCK with a reason code, parameters and evidence references
 - Final decision: BLOCK if any check blocks; else ESCALATE if any escalates; else EXECUTE
 - Same inputs and rule version always give the same decision (property-based test)
-- Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08)",Must,0.5,S1 A platform payout is decided through the API,"POL-01, INT-01","A2.Decide, A6.block_final, A1.reviews"
+- Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08)",Must,0.5,S1 A platform payout is decided through the API (done),"POL-01, INT-01","A2.Decide, A6.block_final, A1.reviews"
 POL-03,POL Policy and decisions,"Compliance checks (KYB, allowlist, screening, Travel Rule, network)","As a compliance lead, I want KYB, allowlist, screening, Travel Rule and allowed-network checks, so that no payment reaches a payee we haven't cleared.","- KYB not verified -> BLOCK; KYB pending -> ESCALATE
 - Payee not on allowlist -> ESCALATE (first payment)
 - Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09
 - Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE
 - Network or currency not allowed for the platform -> BLOCK
-- Screening sits behind a `Screening` interface so a real vendor can replace the mock",Must,1.0,S1 A platform payout is decided through the API,"POL-02, INT-04","A2.Policy, B4.risk_data"
+- Screening sits behind a `Screening` interface so a real vendor can replace the mock",Must,1.0,S1 A platform payout is decided through the API (done),"POL-02, INT-04","A2.Policy, B4.risk_data"
 POL-04,POL Policy and decisions,Limits and daily caps,"As a compliance lead, I want an auto-approval limit, a hard maximum and daily caps on routine payments, so that large or accumulated payments always reach a human, and splitting a payment can't get around a cap.","- Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK
 - Daily caps per platform and per counterparty count confirmed plus in-flight amounts
-- Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test)",Must,0.5,S1 A platform payout is decided through the API,POL-02,"A2.Policy, A2b.unusual"
+- Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test)",Must,0.5,S1 A platform payout is decided through the API (done),POL-02,"A2.Policy, A2b.unusual"
 POL-05,POL Policy and decisions,Unusual activity as checkable rules,"As a compliance lead, I want new wallet, changed details, first payment and amount above the counterparty's norm as explicit rules, so that ""unusual"" is something the system can check and a reviewer can verify.","- Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS`
 - No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT`
 - Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM`
@@ -71,9 +71,9 @@ POL-07,POL Policy and decisions,Versioned rule changes with two approvers,"As a 
 - On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability
 - All versions are kept and readable; decisions link to the version used",Must,0.75,S6 Operations around escalations,"POL-01, FND-04","B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding"
 POL-08,POL Policy and decisions,Decision-only API,"As a platform integrator, I want POST /v1/decisions to get a decision without Detent executing anything, so that I can use Detent before my own payout process, and shadow mode can reuse the same engine.","- Returns the same decision object as intent creation, with `executed: false`
-- Decisions are stored and audited but never create attempts",Must,0.5,S1 A platform payout is decided through the API,POL-02,"A2.Decide, A3.shadow"
+- Decisions are stored and audited but never create attempts",Must,0.5,S1 A platform payout is decided through the API (done),POL-02,"A2.Decide, A3.shadow"
 POL-09,POL Policy and decisions,Fail closed,"As a compliance lead, I want any internal error during a decision to hold the payment or send it to manual review, so that nothing is ever executed unchecked.","- If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`)
-- No code path turns an error into EXECUTE (fault-injection test on each dependency)",Must,0.25,S1 A platform payout is decided through the API,POL-02,"A6.fail_closed, B5.failsafe"
+- No code path turns an error into EXECUTE (fault-injection test on each dependency)",Must,0.25,S1 A platform payout is decided through the API (done),POL-02,"A6.fail_closed, B5.failsafe"
 MND-01,AGT Mandates and instruction agent,Signed mandate for an AI agent,"As a payments lead, I want to issue a mandate that limits what an agent may propose (payees, per-payment and total amounts, networks, currencies and expiry), so that an agent can only ask for payments inside a scope we signed.","- Mandates are JSON with an HMAC-SHA256 signature by the platform's mandate key (format in spec/05-agents.md)
 - Invalid signature, unknown agent or expired mandate are detectable without calling the model
 - The format keeps fields that map to AP2-style mandates later",Must,0.5,"S5 An AI agent proposes the $18,500 invoice inside a mandate",FND-03,A2.Mandate
@@ -204,7 +204,7 @@ LED-07,"LED Ledger, deposits and reconciliation",Bank statement import,"As a bui
 LED-08,"LED Ledger, deposits and reconciliation",Usage metering,"As a founder, I want payments decided per organisation per month counted from decisions and the ledger, so that per-payment pricing can be billed later, and sandbox usage shown now.","- Monthly counts of payments decided, agent investigations and API calls per organisation",Could,0.25,P2 Dashboard and sandbox,LED-01,"A4.fee, B3.billing, D.usage"
 AUD-01,AUD Audit and replay,"Append-only, hash-chained audit log","As a auditor, I want every step recorded in an append-only log I can verify, so that the record can't be quietly changed.","- Events written in the same transaction as the change they describe: intent, agent output, decision with rule version and checks, case events, approvals, transitions, rail requests and responses, postings, kill switch, policy changes
 - A database trigger rejects UPDATE and DELETE on audit rows
-- Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested)",Must,0.75,S1 A platform payout is decided through the API,FND-03,"A2.Prove, B5.security, A1.evidence"
+- Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested)",Must,0.75,S1 A platform payout is decided through the API (done),FND-03,"A2.Prove, B5.security, A1.evidence"
 AUD-02,AUD Audit and replay,Replay any payment,"As a auditor, I want to replay a payment step by step from its stored inputs, rule version and agent outputs, so that I can confirm the decision would be made the same way again.","- Console button and GET /v1/payment_intents/{id}/replay
 - Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert
 - Every payment in the demo data replays successfully (test)",Must,0.75,"S7 One ledger, deposits credited once, reconciliation, replay","AUD-01, AGT-05, POL-02","A2.Prove, L8, B3.incident"

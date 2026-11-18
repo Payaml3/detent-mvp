@@ -40,7 +40,7 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | Milestone | Stories | Must days | All days |
 |---|---|---|---|
 | S0 Foundation (done) | 9 | 3.25 | 3.5 |
-| S1 A platform payout is decided through the API | 11 | 5.75 | 5.75 |
+| S1 A platform payout is decided through the API (done) | 11 | 5.75 | 5.75 |
 | S2 An EXECUTE decision is sent exactly once | 6 | 3.75 | 3.75 |
 | S3 Escalate, review raw facts, approve with a policy re-run | 10 | 4.75 | 4.75 |
 | S4 Never paid twice | 10 | 5.25 | 5.25 |

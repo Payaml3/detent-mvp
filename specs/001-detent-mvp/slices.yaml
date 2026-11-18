@@ -12,7 +12,8 @@ slices:
   stories: [FND-01, FND-02, FND-03, FND-04, FND-05, FND-06, FND-08, FND-09, OPS-02]
 
 - id: S1
-  name: "A platform payout is decided through the API"
+  name: "A platform payout is decided through the API (done)"
+  status: done
   goal: "API request to audited decision: the decision layer end to end, with every check and its evidence."
   exit: >-
     POST /v1/payment_intents returns the correct EXECUTE, ESCALATE or BLOCK with a reason for every check across the

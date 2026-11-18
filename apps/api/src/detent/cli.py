@@ -3,7 +3,9 @@
 detent check-config      validate settings, including the test-network guard
 detent api [--port N]    run the API and console
 detent worker            run the job worker
-detent seed              seed the fictional demo organisation and users
+detent seed              seed the fictional demo organisation, users, counterparties and rule set
+detent audit verify      verify an organisation's hash-chained audit log (AUD-01)
+detent keys create       issue an sk_test_ API key to a named user (G-08)
 detent eval run ...      evaluation suites (built in M6)
 """
 
@@ -94,6 +96,46 @@ def cmd_seed(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_audit_verify(args: argparse.Namespace) -> int:
+    settings = _load_settings()
+    from detent.audit.log import verify_chain
+    from detent.runtime import build_runtime
+
+    rt = build_runtime(settings)
+    org = args.org or settings.demo_org_id
+    with rt.engine.connect() as conn:
+        st = verify_chain(conn, org)
+    if st.ok:
+        print(f"audit chain OK: {org}: {st.events} events")
+        return 0
+    where = f"seq {st.first_bad_seq}" if st.first_bad_seq is not None else "chain head"
+    print(f"audit chain BROKEN: {org}: {where}: {st.problem}")
+    return 1
+
+
+def cmd_keys_create(args: argparse.Namespace) -> int:
+    settings = _load_settings()
+    if settings.api_key_pepper is None:
+        print("detent: API_KEY_PEPPER is not set", file=sys.stderr)
+        return 2
+    from detent.api.auth import issue_key
+    from detent.db.engine import transaction
+    from detent.runtime import build_runtime
+
+    rt = build_runtime(settings)
+    with transaction(rt.engine) as conn:
+        key = issue_key(
+            conn,
+            rt.clock,
+            args.org or settings.demo_org_id,
+            args.user,
+            args.scopes.split(","),
+            settings.api_key_pepper.get_secret_value(),
+        )
+    print(key)  # shown once; only its hash is stored
+    return 0
+
+
 def cmd_eval(_: argparse.Namespace) -> int:
     print(
         "detent eval: not built yet (EVL-01, milestone M6). Failing so CI can't pass by accident.",
@@ -112,6 +154,14 @@ def main(argv: list[str] | None = None) -> int:
     a.set_defaults(fn=cmd_api)
     sub.add_parser("worker").set_defaults(fn=cmd_worker)
     sub.add_parser("seed").set_defaults(fn=cmd_seed)
+    au = sub.add_parser("audit").add_subparsers(dest="audit_cmd", required=True).add_parser("verify")
+    au.add_argument("--org", default=None)
+    au.set_defaults(fn=cmd_audit_verify)
+    k = sub.add_parser("keys").add_subparsers(dest="keys_cmd", required=True).add_parser("create")
+    k.add_argument("--org", default=None)
+    k.add_argument("--user", required=True)
+    k.add_argument("--scopes", default="read,intents:create")
+    k.set_defaults(fn=cmd_keys_create)
     e = sub.add_parser("eval")
     e.add_argument("action", nargs="?", default="run")
     e.add_argument("--suite", default="all")

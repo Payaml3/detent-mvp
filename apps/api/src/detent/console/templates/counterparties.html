@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Counterparties{% endblock %}
+{% block main %}
+<h1>Counterparties</h1>
+<p class="lead">Payees and their payout details. The policy reads these facts: KYB status, the allowlist, when a destination was first seen and last changed, and the history of confirmed payments. All names are fictional.</p>
+{% for cp in counterparties %}
+<section class="card">
+  <h2>{{ cp.name }} <span class="mono">{{ cp.id }}</span></h2>
+  <p>KYB: <strong>{{ cp.kyb_status }}</strong> · Allowlisted: <strong>{{ 'yes' if cp.allowlisted else 'no' }}</strong> · Jurisdiction: {{ cp.jurisdiction or 'not set' }} · Confirmed payments: {{ cp.payment_count }} · Median: {{ median(cp) }}</p>
+  <table>
+    <thead><tr><th>Destination</th><th>Network</th><th>Details</th><th>First seen</th><th>Last changed</th><th>Changed by</th>{% if can_edit %}<th>Edit</th>{% endif %}</tr></thead>
+    <tbody>
+    {% for d in destinations.get(cp.id, []) %}
+      <tr>
+        <td class="mono">{{ d.id }}{% if not d.verified %} (unverified){% endif %}</td>
+        <td>{{ d.network }}</td>
+        <td class="mono">{{ d.address or d.account_masked or '' }}</td>
+        <td>{{ d.first_seen_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ d.last_changed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ d.last_changed_by or '' }}</td>
+        {% if can_edit %}
+        <td>
+          <form method="post" action="/console/destinations/{{ d.id }}">
+            {% if d.kind == 'evm_wallet' %}
+            <input name="address" value="{{ d.address }}" aria-label="New address for {{ d.id }}" size="44" required pattern="0x[0-9a-fA-F]{40}">
+            {% else %}
+            <input name="account_masked" value="{{ d.account_masked or '' }}" aria-label="New masked account for {{ d.id }}" required>
+            {% endif %}
+            <button>Save</button>
+          </form>
+        </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+<p class="note">Changing payout details is recorded in the audit log, and the next payment to the destination escalates as CHANGED_DETAILS.</p>
+{% endblock %}

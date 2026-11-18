@@ -26,6 +26,7 @@ from detent.console.auth import (
 from detent.db.engine import transaction
 from detent.db.repo import OrgScoped
 from detent.db.tables import kill_switch
+from detent.intents.registry import update_destination
 from detent.runtime import Runtime
 
 log = logging.getLogger("detent.console")
@@ -159,3 +160,78 @@ def advance_clock(
         )
     rt.clock.invalidate()
     return RedirectResponse(request.headers.get("referer") or "/console/", status_code=303)
+
+
+# ---------------------------------------------------------------------------------- INT-04 registry
+@router.get("/counterparties", response_class=HTMLResponse)
+def counterparties(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    with rt.engine.connect() as conn:
+        cps = conn.execute(
+            text(
+                "SELECT id, name, kyb_status, allowlisted, jurisdiction, payment_count, median_amount_minor, "
+                "median_currency FROM counterparties WHERE org_id=:o ORDER BY name"
+            ),
+            {"o": user.org_id},
+        ).all()
+        dests = conn.execute(
+            text(
+                "SELECT id, counterparty_id, kind, network, address, account_masked, verified, "
+                "first_seen_at, "
+                "last_changed_at, last_changed_by FROM destinations WHERE org_id=:o ORDER BY first_seen_at"
+            ),
+            {"o": user.org_id},
+        ).all()
+    by_cp: dict[str, list[Any]] = {}
+    for d in dests:
+        by_cp.setdefault(d.counterparty_id, []).append(d)
+    from detent.domain.money import Currency, Money
+    from detent.domain.roles import allowed
+
+    def median(cp: Any) -> str:
+        if cp.median_amount_minor is None:
+            return "none yet"
+        return str(Money(int(cp.median_amount_minor), Currency(cp.median_currency)))
+
+    return page(
+        request,
+        rt,
+        "counterparties.html",
+        user,
+        counterparties=cps,
+        destinations=by_cp,
+        median=median,
+        can_edit=allowed("counterparty.edit", user.role),
+    )
+
+
+@router.post("/destinations/{destination_id}")
+def edit_destination(
+    request: Request,
+    destination_id: str,
+    address: str | None = Form(None),
+    account_masked: str | None = Form(None),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("counterparty.edit")),  # noqa: B008
+) -> RedirectResponse:
+    import re
+
+    if address is not None and not re.fullmatch(r"0x[0-9a-fA-F]{40}", address.strip()):
+        raise HTTPException(status_code=400, detail="address must be a 0x-prefixed 40-hex-digit address")
+    try:
+        with transaction(rt.engine) as conn:
+            update_destination(
+                conn,
+                rt.clock,
+                user.org_id,
+                destination_id,
+                actor=Actor(user.id, user.role.value),
+                address=address.strip() if address else None,
+                account_masked=account_masked.strip() if account_masked else None,
+            )
+    except LookupError as exc:
+        raise HTTPException(status_code=404) from exc
+    return RedirectResponse("/console/counterparties", status_code=303)

@@ -65,3 +65,58 @@ WEB-06:
   0: ["ci:apps/site/tests/site.test.mjs placeholders are reported, never silently shipped (booking link and access form are placeholders until DSH-10 and the founder's booking URL)"]
 WEB-08:
   0: ["ci:apps/site/tests/site.test.mjs SEO: titles pair the name with 'payment controls'; sitemap, robots, OG image, schema.org"]
+INT-01:
+  0: ["integration/test_intents_api.py::test_harbor_executes", "integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit"]
+  2: ["integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing", "integration/test_intents_api.py::test_idempotency_key_is_required"]
+  3: ["integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing", "integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused",
+      "integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist"]
+INT-02:
+  0: ["integration/test_intents_api.py::test_same_key_same_body_returns_the_original"]
+  1: ["integration/test_intents_api.py::test_same_key_different_body_conflicts"]
+  2: ["integration/test_intents_api.py::test_keys_are_scoped_per_organisation", "concurrency/test_decision_races.py::test_parallel_requests_with_one_key_create_one_intent"]
+INT-03:
+  0: ["integration/test_intents_api.py::test_get_intent_with_timeline"]
+  1: ["integration/test_intents_api.py::test_list_paginates_and_filters"]
+  2: ["integration/test_intents_api.py::test_other_organisations_payment_is_404"]
+INT-04:
+  0: ["integration/test_registry.py::test_editing_a_destination_updates_last_changed_and_audits", "integration/test_registry.py::test_fixture_counterparties_are_seeded"]
+  1: ["integration/test_registry.py::test_stats_are_computed_from_confirmed_payments"]
+  2: ["integration/test_registry.py::test_fixture_counterparties_are_seeded", "integration/test_registry.py::test_destination_editable_in_console_by_payments_lead_only"]
+POL-01:
+  0: ["unit/test_policy_schema.py::test_fixture_rule_set_loads", "unit/test_policy_schema.py::test_invalid_value_reports_its_line",
+      "unit/test_policy_schema.py::test_unknown_key_is_rejected_with_its_line", "unit/test_policy_schema.py::test_yaml_syntax_error_reports_line"]
+  1: ["unit/test_policy_schema.py::test_hash_identifies_the_exact_text", "unit/test_policy_schema.py::test_loaded_rule_set_is_immutable"]
+  2: ["integration/test_intents_api.py::test_every_step_is_audited_and_the_chain_verifies"]
+POL-02:
+  0: ["unit/test_policy_engine.py::test_routine_payout_executes_with_a_result_per_check", "unit/test_policy_engine.py::test_screening_hit_blocks_with_the_matched_entry"]
+  1: ["unit/test_policy_engine.py::test_precedence_block_beats_escalate", "unit/test_policy_engine.py::test_every_check_runs_even_after_a_block",
+      "property/test_policy_property.py::test_precedence"]
+  2: ["property/test_policy_property.py::test_same_inputs_same_decision"]
+POL-03:
+  0: ["unit/test_policy_engine.py::test_kyb"]
+  1: ["unit/test_policy_engine.py::test_not_allowlisted_escalates", "integration/test_intents_api.py::test_nova_escalates"]
+  2: ["unit/test_policy_engine.py::test_screening_hit_blocks_with_the_matched_entry", "unit/test_policy_engine.py::test_screening_unavailable_fails_closed",
+      "integration/test_intents_api.py::test_flagged_payee_is_blocked"]
+  3: ["unit/test_policy_engine.py::test_travel_rule_missing_fields_escalate_above_threshold", "unit/test_policy_engine.py::test_travel_rule_below_threshold_passes",
+      "unit/test_policy_engine.py::test_travel_rule_supplied_values_must_match_the_registry", "unit/test_policy_engine.py::test_travel_rule_threshold_is_per_currency"]
+  4: ["unit/test_policy_engine.py::test_network_not_allowed_blocks"]
+  5: ["integration/test_fail_closed.py::test_screening_down"]
+POL-04:
+  0: ["unit/test_policy_engine.py::test_limits"]
+  1: ["unit/test_policy_engine.py::test_daily_caps_count_what_is_already_used", "unit/test_policy_engine.py::test_daily_cap_exactly_reached_passes",
+      "integration/test_intents_api.py::test_decision_only_executes_nothing"]
+  2: ["concurrency/test_decision_races.py::test_parallel_intents_at_the_daily_cap_never_all_execute"]
+POL-08:
+  0: ["integration/test_intents_api.py::test_decision_only_executes_nothing", "integration/test_intents_api.py::test_shadow_mode_shadows_executes"]
+  1: ["integration/test_intents_api.py::test_decision_only_executes_nothing"]
+POL-09:
+  0: ["integration/test_fail_closed.py::test_screening_down", "integration/test_fail_closed.py::test_each_data_read_failing_fails_closed",
+      "integration/test_fail_closed.py::test_policy_crash_fails_closed"]
+  1: ["integration/test_fail_closed.py::test_each_data_read_failing_fails_closed", "unit/test_policy_engine.py::test_a_crashing_check_fails_closed",
+      "property/test_policy_property.py::test_precedence"]
+AUD-01:
+  1: ["integration/test_audit_cli.py::test_trigger_rejects_update_and_delete", "integration/test_audit.py::test_tampering_is_detected"]
+  2: ["integration/test_audit_cli.py::test_verify_command", "integration/test_audit.py::test_chain_appends_and_verifies"]
+API-01:
+  0: ["integration/test_intents_api.py::test_requests_need_a_valid_key", "integration/test_intents_api.py::test_wrong_scope_is_403"]
+  1: ["integration/test_intents_api.py::test_wrong_scope_is_403", "integration/test_api.py::test_live_keys_are_always_rejected"]

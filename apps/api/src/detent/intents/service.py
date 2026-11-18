@@ -1,0 +1,755 @@
+"""Create a payout intent and decide it synchronously (INT-01, INT-02, POL-02 to POL-04, POL-08, POL-09).
+
+One transaction (spec/01 "Synchronous decision"): idempotency record, intent row (RECEIVED), facts,
+policy, counters, decision row, ``transition()``, audit events, stored response. If anything in that
+transaction fails, it rolls back and a fresh transaction records the intent with ESCALATE
+``SYSTEM_UNAVAILABLE``, routed by the organisation's fail-safe setting. No path turns an error into
+EXECUTE (invariant 9).
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import logging
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Literal
+
+from detent.audit.log import Actor, append
+from detent.clock import Clock
+from detent.db.engine import transaction
+from detent.domain.ids import Prefix, new_id
+from detent.domain.money import Currency, Money, MoneyError
+from detent.domain.states import Status
+from detent.intents.registry import counterparty_stats
+from detent.intents.transition import transition
+from detent.policy.engine import CheckResult, Evaluation, evaluate
+from detent.policy.facts import (
+    CounterpartyFacts,
+    DestinationFacts,
+    Facts,
+    MandateFacts,
+    TravelRuleFacts,
+    Unavailable,
+)
+from detent.policy.screening import Screening
+from detent.policy.store import ActivePolicy, active_policy
+from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator, model_validator
+from sqlalchemy import Connection, Engine, text
+
+log = logging.getLogger("detent.intents")
+
+
+# ------------------------------------------------------------------------------------------ request
+class AmountIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    amount: StrictStr
+    currency: Currency
+
+    @model_validator(mode="after")
+    def _exact(self) -> AmountIn:
+        try:
+            m = Money.parse(self.amount, self.currency)
+        except MoneyError as exc:
+            raise ValueError(str(exc)) from exc
+        if m.amount_minor <= 0:
+            raise ValueError("amount must be greater than zero")
+        return self
+
+    def money(self) -> Money:
+        return Money.parse(self.amount, self.currency)
+
+
+class DestinationIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["evm_wallet", "bank_account"]
+    network: str = Field(min_length=1, max_length=64)
+    address: str | None = Field(default=None, pattern=r"^0x[0-9a-fA-F]{40}$")
+    destination_id: str | None = Field(default=None, pattern=r"^dst_")
+
+    @model_validator(mode="after")
+    def _identified(self) -> DestinationIn:
+        if self.destination_id is None and not (self.kind == "evm_wallet" and self.address):
+            raise ValueError("give destination_id, or an address for an evm_wallet")
+        return self
+
+
+class IntentRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["payout"] = "payout"
+    source: Literal["platform", "agent"]
+    mandate_id: str | None = Field(default=None, pattern=r"^mnd_")
+    counterparty_id: str | None = Field(default=None, pattern=r"^cpt_")
+    user_account_ref: str | None = None
+    destination: DestinationIn
+    amount: AmountIn
+    allow_network_switch: bool = False
+    reference: str | None = Field(default=None, max_length=140)
+    notes: str | None = Field(default=None, max_length=1000)  # untrusted text: never read by the policy
+    travel_rule: dict[str, Any] | None = None
+
+    @field_validator("travel_rule")
+    @classmethod
+    def _tr_shape(cls, v: dict[str, Any] | None) -> dict[str, Any] | None:
+        if v is not None and not set(v) <= {"originator", "beneficiary"}:
+            raise ValueError("travel_rule has only originator and beneficiary")
+        return v
+
+    @model_validator(mode="after")
+    def _rules(self) -> IntentRequest:
+        if self.source == "agent" and not self.mandate_id:
+            raise ValueError("an agent intent needs a mandate_id")
+        if (self.counterparty_id is None) == (self.user_account_ref is None):
+            raise ValueError("give exactly one of counterparty_id or user_account_ref")
+        return self
+
+
+class RequestProblem(Exception):
+    """A 422 found after parsing (for example an unknown counterparty). Nothing is created."""
+
+    def __init__(self, code: str, message: str, param: str | None = None, status: int = 422) -> None:
+        super().__init__(message)
+        self.code, self.message, self.param, self.status = code, message, param, status
+
+
+class IdempotencyConflict(Exception):
+    pass
+
+
+# ------------------------------------------------------------------------------------------ data reads
+# Module-level functions so a fault-injection test can replace each one (POL-09).
+@dataclass(frozen=True, slots=True)
+class OrgRow:
+    mode: str
+    fail_safe: str
+    registered_name: str | None
+    registered_account: str | None
+
+
+def load_org(conn: Connection, org_id: str) -> OrgRow:
+    r = conn.execute(
+        text(
+            "SELECT mode, fail_safe, registered_name, registered_account FROM organisations WHERE org_id=:o"
+        ),
+        {"o": org_id},
+    ).one()
+    return OrgRow(r.mode, r.fail_safe, r.registered_name, r.registered_account)
+
+
+def counterparty_exists(conn: Connection, org_id: str, cpt: str) -> bool:
+    return (
+        conn.execute(
+            text("SELECT 1 FROM counterparties WHERE org_id=:o AND id=:c"), {"o": org_id, "c": cpt}
+        ).first()
+        is not None
+    )
+
+
+def mandate_exists(conn: Connection, org_id: str, mnd: str) -> bool:
+    return (
+        conn.execute(
+            text("SELECT 1 FROM mandates WHERE org_id=:o AND id=:m"), {"o": org_id, "m": mnd}
+        ).first()
+        is not None
+    )
+
+
+def load_counterparty(conn: Connection, org_id: str, cpt: str) -> CounterpartyFacts:
+    r = conn.execute(
+        text("SELECT id, name, kyb_status, allowlisted FROM counterparties WHERE org_id=:o AND id=:c"),
+        {"o": org_id, "c": cpt},
+    ).one()
+    st = counterparty_stats(conn, org_id, cpt)
+    return CounterpartyFacts(r.id, r.name, r.kyb_status, r.allowlisted, st.payment_count, st.median)
+
+
+def load_destination(
+    conn: Connection, clock: Clock, org_id: str, cpt: str, dest: DestinationIn
+) -> DestinationFacts:
+    cols = "id, network, address, account_masked, first_seen_at, last_changed_at, last_changed_by"
+    if dest.destination_id:
+        r = conn.execute(
+            text(f"SELECT {cols}, counterparty_id, kind FROM destinations WHERE org_id=:o AND id=:d"),  # noqa: S608 - cols is a constant
+            {"o": org_id, "d": dest.destination_id},
+        ).one_or_none()
+        if r is None or r.counterparty_id != cpt:
+            raise RequestProblem(
+                "validation_error",
+                "destination_id is not a destination of this counterparty",
+                "destination.destination_id",
+            )
+        if (
+            r.network != dest.network
+            or r.kind != dest.kind
+            or (dest.address and (r.address or "").lower() != dest.address.lower())
+        ):
+            raise RequestProblem(
+                "validation_error", "destination does not match the registered destination", "destination"
+            )
+    else:
+        r = conn.execute(
+            text(
+                f"SELECT {cols} FROM destinations WHERE org_id=:o AND counterparty_id=:c AND network=:n "  # noqa: S608
+                "AND lower(address)=lower(:a) ORDER BY first_seen_at LIMIT 1"
+            ),
+            {"o": org_id, "c": cpt, "n": dest.network, "a": dest.address},
+        ).one_or_none()
+        if r is None:
+            # G-01 (D-23): never trust an unregistered address silently. Record it as a new destination
+            # first seen now, so NEW_WALLET escalates.
+            now = clock.now()
+            dst_id = new_id(Prefix.DST, now)
+            conn.execute(
+                text(
+                    "INSERT INTO destinations (id, org_id, counterparty_id, kind, network, address, "
+                    "verified, "
+                    "first_seen_at, last_changed_at) VALUES (:id, :o, :c, 'evm_wallet', :n, :a, false, :t, "
+                    ":t)"
+                ),
+                {"id": dst_id, "o": org_id, "c": cpt, "n": dest.network, "a": dest.address, "t": now},
+            )
+            append(
+                conn,
+                clock,
+                org_id=org_id,
+                actor=Actor.system("intents"),
+                kind="destination.registered",
+                subject_id=dst_id,
+                payload={
+                    "counterparty_id": cpt,
+                    "network": dest.network,
+                    "address": dest.address,
+                    "verified": False,
+                },
+            )
+            return DestinationFacts(dst_id, False, dest.address, None, now, now, None)
+    return DestinationFacts(
+        r.id, True, r.address, r.account_masked, r.first_seen_at, r.last_changed_at, r.last_changed_by
+    )
+
+
+def _scopes(cpt: str, currency: Currency) -> list[str]:
+    # Fixed order: platform row first, then counterparty, so concurrent decisions never deadlock.
+    return [f"platform:{currency.value}", f"counterparty:{cpt}:{currency.value}"]
+
+
+def read_counters(
+    conn: Connection, org_id: str, cpt: str, currency: Currency, day: str
+) -> tuple[Money, Money]:
+    """Lock and read today's cap counters (confirmed plus in-flight). Concurrent decisions queue here."""
+    used = []
+    for scope in _scopes(cpt, currency):
+        conn.execute(
+            text(
+                "INSERT INTO counters (org_id, scope, period, currency) VALUES (:o, :s, :p, :c) "
+                "ON CONFLICT (org_id, scope, period) DO NOTHING"
+            ),
+            {"o": org_id, "s": scope, "p": day, "c": currency.value},
+        )
+        v = conn.execute(
+            text("SELECT amount_minor FROM counters WHERE org_id=:o AND scope=:s AND period=:p FOR UPDATE"),
+            {"o": org_id, "s": scope, "p": day},
+        ).scalar_one()
+        used.append(Money(int(v), currency))
+    return used[0], used[1]
+
+
+def add_to_counters(conn: Connection, org_id: str, cpt: str, amount: Money, day: str) -> None:
+    for scope in _scopes(cpt, amount.currency):
+        conn.execute(
+            text(
+                "UPDATE counters SET amount_minor = amount_minor + :a, count = count + 1 "
+                "WHERE org_id=:o AND scope=:s AND period=:p"
+            ),
+            {"a": amount.amount_minor, "o": org_id, "s": scope, "p": day},
+        )
+
+
+def find_recent_block(
+    conn: Connection, org_id: str, cpt: str, address: str | None, since: datetime
+) -> str | None:
+    """D-10: a block on the same counterparty or the same destination address, whatever the amount."""
+    return conn.execute(
+        text(
+            "SELECT p.id FROM payment_intents p LEFT JOIN destinations d "
+            "ON d.org_id = p.org_id AND d.id = p.destination_id "
+            "WHERE p.org_id=:o AND p.status='BLOCKED' AND p.updated_at >= :since "
+            "AND (p.counterparty_id=:c OR (CAST(:a AS text) IS NOT NULL AND lower(d.address)=lower(CAST(:a "
+            "AS text)))) "
+            "ORDER BY p.updated_at DESC LIMIT 1"
+        ),
+        {"o": org_id, "since": since, "c": cpt, "a": address},
+    ).scalar_one_or_none()
+
+
+def load_travel_rule(
+    org: OrgRow, cp: CounterpartyFacts, dest: DestinationFacts, req: IntentRequest
+) -> TravelRuleFacts:
+    return TravelRuleFacts(
+        originator={"name": org.registered_name, "account": org.registered_account},
+        beneficiary={"name": cp.name, "account": dest.address or dest.account_masked},
+        supplied=req.travel_rule if req.source == "platform" else None,
+    )
+
+
+def _try(dependency: str, fn: Any, *a: Any) -> Any:
+    try:
+        return fn(*a)
+    except Exception as exc:  # fail closed: the check that needs it returns SYSTEM_UNAVAILABLE
+        log.warning(
+            "dependency failed during decision", extra={"dependency": dependency, "error": type(exc).__name__}
+        )
+        return Unavailable(dependency, type(exc).__name__)
+
+
+# ------------------------------------------------------------------------------------------ views
+def _iso(t: datetime) -> str:
+    return t.isoformat().replace("+00:00", "Z")
+
+
+def decision_json(row: Any) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "outcome": row.outcome,
+        "policy_version": row.policy_version,
+        "policy_hash": row.policy_hash,
+        "checks": row.checks,
+        "approved_reasons": list(row.approved_reasons),
+        "route": row.route,
+        "decided_at": _iso(row.decided_at),
+    }
+
+
+_DEC_SQL = (
+    "SELECT d.id, d.outcome, d.policy_hash, d.checks, d.approved_reasons, d.route, d.decided_at, "
+    "v.version AS policy_version FROM decisions d JOIN policy_versions v "
+    "ON v.org_id = d.org_id AND v.id = d.policy_version_id WHERE d.org_id=:o AND d.payment_id=:p "
+    "ORDER BY d.decided_at, d.id"
+)
+
+
+def payment_view(
+    conn: Connection, org_id: str, payment_id: str, *, detail: bool = False
+) -> dict[str, Any] | None:
+    p = conn.execute(
+        text(
+            "SELECT p.*, d.kind AS d_kind, d.network AS d_network, d.address AS d_address "
+            "FROM payment_intents p LEFT JOIN destinations d ON d.org_id = p.org_id AND d.id = "
+            "p.destination_id "
+            "WHERE p.org_id=:o AND p.id=:p"
+        ),
+        {"o": org_id, "p": payment_id},
+    ).one_or_none()
+    if p is None:
+        return None
+    decisions = [decision_json(r) for r in conn.execute(text(_DEC_SQL), {"o": org_id, "p": payment_id}).all()]
+    out: dict[str, Any] = {
+        "id": p.id,
+        "status": p.status,
+        "source": p.source,
+        "amount": Money(int(p.amount_minor), Currency(p.currency)).to_api(),
+        "counterparty_id": p.counterparty_id,
+        "user_account_ref": p.user_account_ref,
+        "destination": {
+            "destination_id": p.destination_id,
+            "kind": p.d_kind,
+            "network": p.d_network or p.network_constraint,
+            "address": p.d_address,
+        },
+        "reference": p.reference,
+        "decision": decisions[-1] if decisions else None,
+        "exception": None,  # exception cases arrive with EXC-01 (slice S3)
+        "awaiting_send_click": p.awaiting_send_click,
+        "created_at": _iso(p.created_at),
+    }
+    if detail:
+        events = conn.execute(
+            text(
+                "SELECT id, seq, at, actor, actor_role, kind, payload FROM audit_events "
+                "WHERE org_id=:o AND subject_id=:p ORDER BY seq"
+            ),
+            {"o": org_id, "p": payment_id},
+        ).all()
+        attempts = conn.execute(
+            text(
+                "SELECT id, attempt_no, rail_id, status, failure_class, nonce, tx_hash, submitted_at, "
+                "resolved_at "
+                "FROM attempts WHERE org_id=:o AND payment_id=:p ORDER BY attempt_no"
+            ),
+            {"o": org_id, "p": payment_id},
+        ).all()
+        postings = conn.execute(
+            text(
+                "SELECT ps.account_id, ps.direction, ps.amount_minor, ps.currency, ps.journal_id FROM "
+                "postings ps "
+                "JOIN journal_entries j ON j.org_id = ps.org_id AND j.id = ps.journal_id "
+                "WHERE ps.org_id=:o AND j.payment_id=:p ORDER BY ps.id"
+            ),
+            {"o": org_id, "p": payment_id},
+        ).all()
+        out.update(
+            decisions=decisions,
+            attempts=[
+                {
+                    "id": a.id,
+                    "attempt_no": a.attempt_no,
+                    "rail": a.rail_id,
+                    "status": a.status,
+                    "failure_class": a.failure_class,
+                    "nonce": a.nonce,
+                    "tx_hash": a.tx_hash,
+                    "submitted_at": _iso(a.submitted_at) if a.submitted_at else None,
+                    "resolved_at": _iso(a.resolved_at) if a.resolved_at else None,
+                }
+                for a in attempts
+            ],
+            postings=[
+                {
+                    "account": x.account_id,
+                    "direction": x.direction,
+                    "journal_id": x.journal_id,
+                    "amount": Money(int(x.amount_minor), Currency(x.currency)).to_api(),
+                }
+                for x in postings
+            ],
+            events=[
+                {
+                    "id": e.id,
+                    "seq": e.seq,
+                    "at": _iso(e.at),
+                    "actor": e.actor,
+                    "actor_role": e.actor_role,
+                    "kind": e.kind,
+                    "payload": e.payload,
+                }
+                for e in events
+            ],
+        )
+    return out
+
+
+# ------------------------------------------------------------------------------------------ the flow
+def request_hash(endpoint: str, req: IntentRequest) -> str:
+    body = json.dumps(
+        {"endpoint": endpoint, "body": req.model_dump(mode="json")}, sort_keys=True, separators=(",", ":")
+    )
+    return hashlib.sha256(body.encode()).hexdigest()
+
+
+def _jsonable(v: Any) -> Any:
+    if isinstance(v, Money):
+        return v.to_api()
+    if isinstance(v, datetime):
+        return _iso(v)
+    if hasattr(v, "__dataclass_fields__"):
+        return {k: _jsonable(getattr(v, k)) for k in v.__dataclass_fields__}
+    if isinstance(v, dict):
+        return {str(k): _jsonable(x) for k, x in v.items()}
+    if isinstance(v, list | tuple):
+        return [_jsonable(x) for x in v]
+    return v
+
+
+def _status_for(
+    outcome: str, *, decision_only: bool, mode: str, fail_safe: str, system_unavailable: bool
+) -> Status:
+    if outcome == "BLOCK":
+        return Status.BLOCKED
+    if decision_only or mode == "shadow":
+        return Status.SHADOWED  # decided beside the platform; never executes (D-24)
+    if outcome == "EXECUTE":
+        return Status.READY
+    if system_unavailable and fail_safe == "hold":
+        return Status.HELD  # D-09
+    return Status.ESCALATED
+
+
+@dataclass
+class _Ctx:
+    org_id: str
+    actor: Actor
+    key: str
+    req: IntentRequest
+    decision_only: bool
+    endpoint: str
+    rhash: str
+
+
+def _claim_idempotency(conn: Connection, clock: Clock, c: _Ctx) -> tuple[int, dict[str, Any]] | None:
+    """Keys are per organisation. A parallel duplicate waits on the unique index, then replays."""
+    inserted = conn.execute(
+        text(
+            "INSERT INTO idempotency_records (org_id, key, request_hash, response, created_at) "
+            "VALUES (:o, :k, :h, '{}'::jsonb, :t) ON CONFLICT (org_id, key) DO NOTHING RETURNING key"
+        ),
+        {"o": c.org_id, "k": c.key, "h": c.rhash, "t": clock.now()},
+    ).scalar_one_or_none()
+    if inserted is not None:
+        return None
+    rec = conn.execute(
+        text("SELECT request_hash, response FROM idempotency_records WHERE org_id=:o AND key=:k"),
+        {"o": c.org_id, "k": c.key},
+    ).one()
+    if rec.request_hash != c.rhash:
+        raise IdempotencyConflict(c.key)
+    return int(rec.response["status_code"]), rec.response["body"]
+
+
+def _validate_refs(conn: Connection, c: _Ctx) -> str:
+    req = c.req
+    if req.user_account_ref is not None:
+        raise RequestProblem(
+            "user_payouts_unavailable",
+            "Payouts to end users are not available yet (D-26). Use counterparty_id.",
+            "user_account_ref",
+        )
+    assert req.counterparty_id is not None
+    if not counterparty_exists(conn, c.org_id, req.counterparty_id):
+        raise RequestProblem("validation_error", "unknown counterparty", "counterparty_id")
+    if req.source == "agent" and req.mandate_id and not mandate_exists(conn, c.org_id, req.mandate_id):
+        raise RequestProblem("mandate_invalid", "unknown mandate", "mandate_id")
+    return req.counterparty_id
+
+
+def _insert_intent(conn: Connection, clock: Clock, c: _Ctx, cpt: str, dest_id: str | None) -> str:
+    now = clock.now()
+    pid = new_id(Prefix.PAY, now)
+    amount = c.req.amount.money()
+    conn.execute(
+        text(
+            "INSERT INTO payment_intents (id, org_id, source, mandate_id, counterparty_id, destination_id, "
+            "amount_minor, currency, network_constraint, allow_network_switch, reference, notes, "
+            "travel_rule, "
+            "status, idempotency_key, request_hash, initiated_by, created_at, updated_at) VALUES (:id, :o, "
+            ":src, "
+            ":m, :c, :d, :a, :cur, :net, :sw, :ref, :notes, CAST(:tr AS jsonb), 'RECEIVED', :k, :h, :by, "
+            ":t, :t)"
+        ),
+        {
+            "id": pid,
+            "o": c.org_id,
+            "src": c.req.source,
+            "m": c.req.mandate_id,
+            "c": cpt,
+            "d": dest_id,
+            "a": amount.amount_minor,
+            "cur": amount.currency.value,
+            "net": c.req.destination.network,
+            "sw": c.req.allow_network_switch,
+            "ref": c.req.reference,
+            "notes": c.req.notes,
+            "tr": json.dumps(c.req.travel_rule) if c.req.travel_rule is not None else None,
+            "k": c.key,
+            "h": c.rhash,
+            "by": c.actor.id,
+            "t": now,
+        },
+    )
+    append(
+        conn,
+        clock,
+        org_id=c.org_id,
+        actor=c.actor,
+        kind="payment.received",
+        subject_id=pid,
+        payload={
+            "amount": amount.to_api(),
+            "source": c.req.source,
+            "counterparty_id": cpt,
+            "destination_id": dest_id,
+            "network": c.req.destination.network,
+            "decision_only": c.decision_only,
+            "idempotency_key": c.key,
+        },
+    )
+    return pid
+
+
+def _record(
+    conn: Connection,
+    clock: Clock,
+    c: _Ctx,
+    pid: str,
+    policy: ActivePolicy,
+    outcome: str,
+    checks: list[dict[str, Any]],
+    snapshot: dict[str, Any],
+    status: Status,
+    awaiting: bool,
+) -> tuple[int, dict[str, Any]]:
+    now = clock.now()
+    dec_id = new_id(Prefix.DEC, now)
+    conn.execute(
+        text(
+            "INSERT INTO decisions (id, org_id, payment_id, outcome, policy_version_id, policy_hash, "
+            "inputs_snapshot, checks, decided_at, actor) VALUES (:id, :o, :p, :out, :pv, :ph, "
+            "CAST(:snap AS jsonb), CAST(:checks AS jsonb), :t, :a)"
+        ),
+        {
+            "id": dec_id,
+            "o": c.org_id,
+            "p": pid,
+            "out": outcome,
+            "pv": policy.id,
+            "ph": policy.rules.content_hash,
+            "snap": json.dumps(snapshot),
+            "checks": json.dumps(checks),
+            "t": now,
+            "a": "system:policy",
+        },
+    )
+    append(
+        conn,
+        clock,
+        org_id=c.org_id,
+        actor=Actor.system("policy"),
+        kind="decision.made",
+        subject_id=pid,
+        payload={
+            "decision_id": dec_id,
+            "outcome": outcome,
+            "policy_version": policy.version,
+            "policy_hash": policy.rules.content_hash,
+            "checks": checks,
+        },
+    )
+    transition(
+        conn,
+        clock,
+        org_id=c.org_id,
+        payment_id=pid,
+        to=status,
+        actor=Actor.system("policy"),
+        reason=f"decision {outcome}",
+        awaiting_send_click=awaiting,
+    )
+    view = payment_view(conn, c.org_id, pid)
+    assert view is not None
+    if c.decision_only:
+        code, body = 200, {**view["decision"], "payment_id": pid, "executed": False}
+    else:
+        code, body = 201, view
+    conn.execute(
+        text("UPDATE idempotency_records SET response=CAST(:r AS jsonb) WHERE org_id=:o AND key=:k"),
+        {"r": json.dumps({"status_code": code, "body": body}), "o": c.org_id, "k": c.key},
+    )
+    return code, body
+
+
+def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tuple[int, dict[str, Any]]:
+    replay = _claim_idempotency(conn, clock, c)
+    if replay:
+        return replay
+    cpt = _validate_refs(conn, c)
+    org = load_org(conn, c.org_id)
+    policy = active_policy(conn, c.org_id)
+    rules = policy.rules
+    dest = load_destination(conn, clock, c.org_id, cpt, c.req.destination)
+    pid = _insert_intent(conn, clock, c, cpt, dest.id)
+    cp = load_counterparty(conn, c.org_id, cpt)
+    now = clock.now()
+    amount = c.req.amount.money()
+    day = now.date().isoformat()  # UTC calendar day (G-14)
+
+    counters = _try("counters", read_counters, conn, c.org_id, cpt, amount.currency, day)
+    used_p, used_c = counters if isinstance(counters, tuple) else (counters, counters)
+    recent_block = None
+    if rules.checks.resubmission_after_block is not None:
+        since = now - timedelta(hours=rules.checks.resubmission_after_block.window_hours)
+        recent_block = find_recent_block(conn, c.org_id, cpt, dest.address, since)
+    mandate: MandateFacts | Unavailable | None = None
+    if c.req.source == "agent":
+        # Mandate signatures and scope are verified by MND-02 (slice S5). Until then: fail closed.
+        mandate = Unavailable("mandate_verifier", "not_built")
+    facts = Facts(
+        now=now,
+        source=c.req.source,
+        amount=amount,
+        network=c.req.destination.network,
+        counterparty=cp,
+        destination=dest,
+        screening=_try("screening", lambda: screening.check(address=dest.address, name=cp.name)),
+        travel_rule=load_travel_rule(org, cp, dest, c.req),
+        used_today_platform=used_p,
+        used_today_counterparty=used_c,
+        recent_block_id=recent_block,
+        mandate=mandate,
+    )
+    result: Evaluation = evaluate(facts, rules)
+    status = _status_for(
+        result.outcome,
+        decision_only=c.decision_only,
+        mode=org.mode,
+        fail_safe=org.fail_safe,
+        system_unavailable=result.system_unavailable,
+    )
+    if status is Status.READY:
+        add_to_counters(conn, c.org_id, cpt, amount, day)  # in-flight from now (spec/04 Counters)
+    return _record(
+        conn,
+        clock,
+        c,
+        pid,
+        policy,
+        result.outcome,
+        [ch.to_json() for ch in result.checks],
+        {"facts": _jsonable(facts), "rule_version": policy.version},
+        status,
+        status is Status.READY and org.mode == "assist",
+    )
+
+
+def _decide_failed(conn: Connection, clock: Clock, c: _Ctx, error: str) -> tuple[int, dict[str, Any]]:
+    """Fresh transaction after a failure: record the intent as ESCALATE SYSTEM_UNAVAILABLE."""
+    replay = _claim_idempotency(conn, clock, c)
+    if replay:
+        return replay
+    cpt = _validate_refs(conn, c)
+    org = load_org(conn, c.org_id)
+    policy = active_policy(conn, c.org_id)
+    pid = _insert_intent(conn, clock, c, cpt, None)
+    check = CheckResult(
+        "system", "ESCALATE", "SYSTEM_UNAVAILABLE", {"dependency": "decision", "error": error}
+    )
+    status = (
+        Status.HELD
+        if org.fail_safe == "hold" and not c.decision_only
+        else (Status.SHADOWED if c.decision_only or org.mode == "shadow" else Status.ESCALATED)
+    )
+    return _record(
+        conn, clock, c, pid, policy, "ESCALATE", [check.to_json()], {"error": error}, status, False
+    )
+
+
+def submit_intent(
+    engine: Engine,
+    clock: Clock,
+    *,
+    org_id: str,
+    actor_id: str,
+    idempotency_key: str,
+    request: IntentRequest,
+    decision_only: bool,
+    screening: Screening,
+    actor_role: str | None = None,
+) -> tuple[int, dict[str, Any]]:
+    endpoint = "decisions" if decision_only else "payment_intents"
+    c = _Ctx(
+        org_id,
+        Actor(actor_id, actor_role),
+        idempotency_key,
+        request,
+        decision_only,
+        endpoint,
+        request_hash(endpoint, request),
+    )
+    try:
+        with transaction(engine) as conn:
+            return _decide(conn, clock, c, screening)
+    except (RequestProblem, IdempotencyConflict):
+        raise
+    except Exception as exc:
+        log.exception("decision failed; recording it fail-closed", extra={"error": type(exc).__name__})
+        with transaction(engine) as conn:
+            return _decide_failed(conn, clock, c, type(exc).__name__)

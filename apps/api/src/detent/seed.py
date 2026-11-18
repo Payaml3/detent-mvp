@@ -1,7 +1,7 @@
 """Seed the fictional demo organisation and console users from fixtures (FND-04).
 
-Idempotent: running it twice changes nothing. Counterparties, destinations, rails, policy and the
-mandate are seeded by the stories that use them (INT-04, POL-01, MND-01, RAL-01).
+Idempotent: running it twice changes nothing. Counterparties, destinations and the rule set are
+seeded for slice S1 (INT-04, POL-01); rails and the mandate arrive with RAL-01 and MND-01.
 """
 
 from __future__ import annotations
@@ -14,10 +14,14 @@ from sqlalchemy import Connection, text
 
 from detent.audit.log import Actor, append
 from detent.db.engine import transaction
+from detent.intents.registry import seed_registry
+from detent.policy.schema import load_ruleset
+from detent.policy.store import install_ruleset
 from detent.runtime import Runtime
 from detent.settings import REPO_ROOT
 
 FIXTURE = REPO_ROOT / "fixtures" / "counterparties.yaml"
+POLICY = REPO_ROOT / "fixtures" / "policy" / "default-policy.yaml"
 OPERATOR_ORG = "org_detent"  # owns website access requests (leads)
 
 
@@ -76,6 +80,21 @@ def seed_demo(rt: Runtime, fixture: Path = FIXTURE) -> dict[str, int]:
                 },
             ).scalar_one_or_none()
             users_added += int(added is not None)
+        conn.execute(
+            text(
+                "UPDATE organisations SET registered_name = coalesce(registered_name, :n), "
+                "registered_account = coalesce(registered_account, :a) WHERE org_id = :o"
+            ),
+            {"n": plat["name"], "a": plat.get("registered_account"), "o": org_id},
+        )
+        seed_registry(conn, rt.clock, org_id, fixture)
+        has_policy = conn.execute(
+            text("SELECT 1 FROM policy_versions WHERE org_id=:o AND status='active'"), {"o": org_id}
+        ).first()
+        if has_policy is None:
+            install_ruleset(
+                conn, rt.clock, org_id, load_ruleset(POLICY.read_text()), proposed_by="system:seed"
+            )
         if orgs_added or users_added:
             append(
                 conn,

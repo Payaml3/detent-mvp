@@ -1,6 +1,7 @@
 # All names are invented and fictional. Wallet addresses are placeholders filled by the seed
 # script with generated test wallets ({{...}}).
-platform: {org_id: org_demo, name: "Demo Platform Ltd (fictional)", mode: auto, fail_safe: manual_queue}
+platform: {org_id: org_demo, name: "Demo Platform Ltd (fictional)", mode: auto, fail_safe: manual_queue,
+           registered_account: "GB00 DEMO 0000 0000 0000 00 (fictional)"}   # travel-rule originator (D-03)
 users:
   - {id: usr_pl, name: "Priya (payments lead)", role: payments_lead}
   - {id: usr_cl, name: "Marco (compliance lead)", role: compliance_lead}

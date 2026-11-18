@@ -99,7 +99,7 @@ paths:
     post:
       tags: [Decision]
       operationId: createDecision
-      summary: Decision only; nothing is created or executed (POL-08)
+      summary: Decision only; nothing is executed. The decision is stored and audited against a SHADOWED (or BLOCKED) intent (POL-08, D-24)
       x-scope: intents:create
       requestBody:
         required: true

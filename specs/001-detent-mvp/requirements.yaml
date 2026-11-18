@@ -74,7 +74,7 @@ requirements:
 - {id: FR-022, area: Policy, layer: decision, status: confirmed, decision: [D-03], stories: [POL-03],
    src: ["spec/04#checks", "spec/04#travel-rule-data-travel_rule-check"],
    text: "Compliance checks: KYB (block failed or unknown, escalate pending), allowlist, screening of address and name, travel-rule fields above the threshold taken from registry and organisation data, and allowed networks per currency."}
-- {id: FR-023, area: Policy, layer: decision, status: proposed, decision: [G-07], stories: [POL-03],
+- {id: FR-023, area: Policy, layer: decision, status: confirmed, decision: [G-07, D-23], stories: [POL-03],
    src: ["spec/04#checks", "fixture:fixtures/screening-list.yaml"],
    text: "Screening matches addresses case-insensitively and names after case-folding and whitespace collapsing; no fuzzy matching in the MVP."}
 - {id: FR-024, area: Policy, layer: decision, status: confirmed, decision: [D-05], stories: [POL-04],
@@ -86,7 +86,7 @@ requirements:
 - {id: FR-026, area: Policy, layer: decision, status: confirmed, stories: [POL-05],
    src: ["spec/04#checks", "story:POL-05"],
    text: "Unusual activity is checkable rules: new wallet, changed details, first payment, above k times the counterparty median (only with enough confirmed history); each hit stores the raw facts."}
-- {id: FR-027, area: Policy, layer: decision, status: proposed, decision: [G-13], stories: [POL-05],
+- {id: FR-027, area: Policy, layer: decision, status: confirmed, decision: [G-13, D-23], stories: [POL-05],
    src: ["spec/04#checks"],
    text: "Above-norm compares only with confirmed payments in the same currency; otherwise it is reported as not evaluated."}
 - {id: FR-028, area: Policy, layer: decision, status: confirmed, stories: [POL-06],
@@ -298,7 +298,7 @@ requirements:
 - {id: FR-100, area: API, layer: portal, status: confirmed, stories: [API-01, API-02, API-03, API-04],
    src: ["spec/03#standards", "spec/03#error-codes-starter-catalogue"],
    text: "The public API uses scoped, hashed test keys, a standard error envelope, dated versions pinned per organisation, and per-key rate limits with standard headers."}
-- {id: FR-101, area: API, layer: portal, status: proposed, decision: [G-08], stories: [API-01],
+- {id: FR-101, area: API, layer: portal, status: confirmed, decision: [G-08, D-23], stories: [API-01],
    src: ["spec/03#standards"],
    text: "Every API key is issued to a named user, who is the actor in the audit log for that key's writes."}
 - {id: FR-102, area: API, layer: portal, status: confirmed, stories: [API-05, API-06, API-07],

@@ -190,6 +190,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Intent, A2b.states]
   ms: S1
+  done: [0, 2, 3]
 - id: INT-02
   epic: INT
   title: Idempotent creates
@@ -205,6 +206,7 @@ stories:
   deps: [INT-01]
   trace: [A2.Execute, A6.retry_rule, D.standards, L3]
   ms: S1
+  done: [0, 1, 2]
 - id: INT-03
   epic: INT
   title: Read and list intents
@@ -220,6 +222,7 @@ stories:
   deps: [INT-01]
   trace: [A2.Prove, D.standards]
   ms: S1
+  done: [0, 1, 2]
 - id: INT-04
   epic: INT
   title: Counterparty registry with wallet history
@@ -235,6 +238,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Policy, A2b.unusual, A2b.raw_facts]
   ms: S1
+  done: [0, 1, 2]
 - id: INT-05
   epic: INT
   title: Cancel an intent before it is sent
@@ -266,6 +270,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Policy, A6.client_rules, B3.rule_changes]
   ms: S1
+  done: [0, 1, 2]
 - id: POL-02
   epic: POL
   title: Decision engine and precedence
@@ -282,6 +287,7 @@ stories:
   deps: [POL-01, INT-01]
   trace: [A2.Decide, A6.block_final, A1.reviews]
   ms: S1
+  done: [0, 1, 2]
 - id: POL-03
   epic: POL
   title: Compliance checks (KYB, allowlist, screening, Travel Rule, network)
@@ -300,6 +306,7 @@ stories:
   deps: [POL-02, INT-04]
   trace: [A2.Policy, B4.risk_data]
   ms: S1
+  done: [0, 1, 2, 3, 4, 5]
 - id: POL-04
   epic: POL
   title: Limits and daily caps
@@ -315,6 +322,7 @@ stories:
   deps: [POL-02]
   trace: [A2.Policy, A2b.unusual]
   ms: S1
+  done: [0, 1, 2]
 - id: POL-05
   epic: POL
   title: Unusual activity as checkable rules
@@ -376,6 +384,7 @@ stories:
   deps: [POL-02]
   trace: [A2.Decide, A3.shadow]
   ms: S1
+  done: [0, 1]
 - id: POL-09
   epic: POL
   title: Fail closed
@@ -390,6 +399,7 @@ stories:
   deps: [POL-02]
   trace: [A6.fail_closed, B5.failsafe]
   ms: S1
+  done: [0, 1]
 
 # ---------------- AGT Mandates and instruction agent ----------------
 - id: MND-01
@@ -1109,6 +1119,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Prove, B5.security, A1.evidence]
   ms: S1
+  done: [1, 2]
 - id: AUD-02
   epic: AUD
   title: Replay any payment
@@ -1593,6 +1604,7 @@ stories:
   deps: [FND-03]
   trace: [D.keys, D.standards, B5.security]
   ms: P1
+  done: [0, 1]
 - id: API-02
   epic: API
   title: Error model

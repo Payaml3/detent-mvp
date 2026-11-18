@@ -10,16 +10,23 @@ import logging
 from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import Engine, text
 from starlette.middleware.sessions import SessionMiddleware
 
 from detent import logging as dlog
+from detent.api import v1
+from detent.api.auth import AuthError
+from detent.api.errors import error_response
 from detent.api.middleware import request_context
 from detent.clock import Clock
 from detent.console import routes as console_routes
 from detent.console.auth import ActingUserRequired, LoginRequired
+from detent.intents.service import IdempotencyConflict, RequestProblem
+from detent.logging import request_id_var
+from detent.policy.screening import MockScreening
 from detent.runtime import build_runtime
 from detent.settings import Settings, get_settings
 
@@ -64,6 +71,51 @@ def create_app(
 
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
     app.include_router(console_routes.router)
+    app.include_router(v1.router)
+    app.state.screening = MockScreening.from_fixture()
+
+    def _err(status: int, type_: str, code: str, message: str, param: str | None = None) -> Response:
+        return error_response(status, type_, code, message, request_id=request_id_var.get(), param=param)  # type: ignore[arg-type]
+
+    @app.exception_handler(AuthError)
+    def _auth(request: Request, exc: AuthError) -> Response:
+        return _err(exc.status, exc.type, exc.code, exc.message)
+
+    @app.exception_handler(RequestValidationError)
+    def _invalid(request: Request, exc: RequestValidationError) -> Response:
+        errs = exc.errors()
+        first = errs[0] if errs else {"loc": (), "msg": "invalid request"}
+        loc = [str(p) for p in first.get("loc", ()) if p not in ("body",)]
+        msg = "; ".join(
+            f"{'.'.join(str(p) for p in e.get('loc', ()) if p != 'body')}: {e.get('msg')}" for e in errs
+        )
+        return _err(
+            422, "invalid_request", "validation_error", msg or "invalid request", ".".join(loc) or None
+        )
+
+    @app.exception_handler(RequestProblem)
+    def _problem(request: Request, exc: RequestProblem) -> Response:
+        return _err(exc.status, "invalid_request", exc.code, exc.message, exc.param)
+
+    @app.exception_handler(IdempotencyConflict)
+    def _conflict(request: Request, exc: IdempotencyConflict) -> Response:
+        return _err(
+            409,
+            "conflict",
+            "idempotency_conflict",
+            "This Idempotency-Key was already used with a different request body.",
+            "Idempotency-Key",
+        )
+
+    @app.exception_handler(v1.MissingIdempotencyKey)
+    def _no_key(request: Request, exc: v1.MissingIdempotencyKey) -> Response:
+        return _err(
+            422,
+            "invalid_request",
+            "validation_error",
+            "The Idempotency-Key header is required.",
+            "Idempotency-Key",
+        )
 
     @app.exception_handler(LoginRequired)
     def _login(request: Request, exc: LoginRequired) -> Response:
