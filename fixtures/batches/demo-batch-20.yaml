@@ -1,0 +1,33 @@
+# DEM-03: 20 payouts plus deposits across three rails. Amounts are test values; names fictional.
+# Expected: 1 BLOCK (never re-routed), 1 failover under the same payment ID (.42), 2 escalations,
+# deposits credited once, reconciliation >= 99% with exactly one designed break (dep-07).
+payouts:
+  - {ref: p01, counterparty: cpt_harbor, amount: "2400.00", currency: EUR, expect: EXECUTE}
+  - {ref: p02, counterparty: cpt_harbor, amount: "1980.00", currency: EUR, expect: EXECUTE}
+  - {ref: p03, counterparty: cpt_quill, amount: "820.00", currency: GBP, expect: ESCALATE, reason: CHANGED_DETAILS}
+  - {ref: p04, counterparty: cpt_harbor, amount: "2650.00", currency: EUR, expect: EXECUTE}
+  - {ref: p05, counterparty: cpt_flagged, amount: "500.00", currency: USDC, expect: BLOCK, reason: SCREENING_HIT}
+  - {ref: p06, counterparty: cpt_nova, amount: "300.00", currency: USDC, expect: ESCALATE, reason: [KYB_PENDING, NOT_ALLOWLISTED, NEW_WALLET, FIRST_PAYMENT]}
+  - {ref: p07, user_payout: acct_u1001, amount: "120.00", currency: USDC, network: base-sepolia, expect: EXECUTE}
+  - {ref: p08, user_payout: acct_u1002, amount: "75.42", currency: USDC, allow_network_switch: true, expect: EXECUTE, note: "fails on first rail, fails over under same ID"}
+  - {ref: p09, user_payout: acct_u1003, amount: "60.00", currency: GBP, expect: EXECUTE}
+  - {ref: p10, counterparty: cpt_harbor, amount: "2210.00", currency: EUR, expect: EXECUTE}
+  - {ref: p11, user_payout: acct_u1001, amount: "40.00", currency: USDC, expect: EXECUTE}
+  - {ref: p12, user_payout: acct_u1002, amount: "95.00", currency: USDC, expect: EXECUTE}
+  - {ref: p13, user_payout: acct_u1003, amount: "25.00", currency: GBP, expect: EXECUTE}
+  - {ref: p14, counterparty: cpt_harbor, amount: "2390.00", currency: EUR, expect: EXECUTE}
+  - {ref: p15, user_payout: acct_u1001, amount: "210.00", currency: USDC, expect: EXECUTE}
+  - {ref: p16, user_payout: acct_u1002, amount: "33.00", currency: USDC, expect: EXECUTE}
+  - {ref: p17, user_payout: acct_u1003, amount: "48.00", currency: GBP, expect: EXECUTE}
+  - {ref: p18, counterparty: cpt_harbor, amount: "2500.00", currency: EUR, expect: EXECUTE}
+  - {ref: p19, user_payout: acct_u1001, amount: "18.00", currency: USDC, expect: EXECUTE}
+  - {ref: p20, user_payout: acct_u1002, amount: "52.00", currency: USDC, expect: EXECUTE}
+deposits:
+  - {ref: dep-01, account: acct_u1001, amount: "500.00", currency: USDC, network: base-sepolia, expect: CREDITED}
+  - {ref: dep-02, account: acct_u1002, amount: "250.00", currency: USDC, network: eth-sepolia, expect: CREDITED}
+  - {ref: dep-03, account: acct_u1003, amount: "300.00", currency: GBP, rail: banksim-fps, expect: CREDITED}
+  - {ref: dep-04, account: acct_u1001, amount: "120.00", currency: USDC, network: base-sepolia, expect: CREDITED}
+  - {ref: dep-05, account: acct_u1002, amount: "80.00", currency: USDC, network: base-sepolia, expect: CREDITED}
+  - {ref: dep-06, account: acct_u1003, amount: "150.00", currency: GBP, rail: banksim-fps, expect: CREDITED}
+  - {ref: dep-07, account: acct_u1001, amount: "200.00", currency: USDC, network: eth-sepolia, sent_to: base-sepolia-address-of-acct_u1002, expect: RECON_BREAK, proposed_fix: "match_to deposit intent of acct_u1001 after confirmation, or return_to_sender"}
+  - {ref: dep-08, account: acct_u1002, amount: "60.00", currency: USDC, network: base-sepolia, duplicate_notification: true, expect: CREDITED_ONCE}

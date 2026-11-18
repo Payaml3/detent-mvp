@@ -1,0 +1,47 @@
+# Demo rule set v1 for "Demo Platform Ltd (fictional)". Format: spec/04-policy.md
+version: 1
+platform: demo-platform
+fail_safe: manual_queue
+attestation: "Approved by the compliance lead. The platform owns these rules and keeps its AML accountability."
+checks:
+  mandate_scope: {enabled: true}
+  kyb_status: {block_on: [failed, unknown], escalate_on: [pending]}
+  allowlist: {escalate_if_not_listed: true}
+  screening: {provider: mock, list: fixtures/screening-list.yaml, block_on_hit: true}
+  travel_rule:
+    threshold: {amount: "1000.00", currency: USDC}
+    required: [originator.name, originator.account, beneficiary.name, beneficiary.account]
+  allowed_networks:
+    USDC: [base-sepolia, eth-sepolia, local-evm, simchain]
+    GBP: [banksim-fps]
+    EUR: [banksim-sepa-inst]
+  limits:
+    auto_limit: {USDC: "10000.00", GBP: "5000.00", EUR: "5000.00"}
+    hard_max:   {USDC: "100000.00", GBP: "50000.00", EUR: "50000.00"}
+  daily_caps:
+    platform: {USDC: "50000.00", GBP: "25000.00", EUR: "25000.00"}
+    per_counterparty: {USDC: "20000.00", GBP: "10000.00", EUR: "10000.00"}
+  unusual:
+    new_wallet_days: 7
+    changed_details_days: 14
+    first_payment: escalate
+    above_norm_multiplier: 3.0
+    above_norm_min_history: 3   # fewer confirmed payments -> not evaluated (FIRST_PAYMENT covers zero)
+  resubmission_after_block: {window_hours: 24, action: escalate}
+deadlines:
+  payout_above_auto_limit: PT2H
+  payout_other: PT4H
+  deposit_exception: P1BD
+  unknown_stuck: PT30M
+owners:
+  - {match: {type: payout}, owner_role: reviewer, backup_role: backup_owner}
+  - {match: {type: deposit}, owner_role: reviewer, backup_role: payments_lead}
+  - {match: {type: reconciliation}, owner_role: payments_lead, backup_role: reviewer}
+  - {match: {type: unknown_stuck}, owner_role: payments_lead, backup_role: oncall}
+retry:
+  max_attempts: 3
+  retryable: [TECHNICAL_RETRYABLE]
+  backoff_seconds: [5, 30, 120]
+execution:
+  max_decision_age_seconds: 300
+  unknown_stuck_after: PT15M

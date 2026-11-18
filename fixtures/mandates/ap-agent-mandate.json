@@ -1,0 +1,17 @@
+{
+  "mandate_id": "mnd_demo_ap_agent",
+  "version": 1,
+  "principal": {"org_id": "org_demo", "name": "Demo Platform Ltd (fictional)"},
+  "agent": {"agent_id": "agt_ap_invoices", "description": "Accounts-payable agent that reads supplier invoices"},
+  "scope": {
+    "payees": ["cpt_bluefin", "cpt_harbor"],
+    "max_per_payment": {"amount": "20000.00", "currency": "USDC"},
+    "max_total": {"amount": "50000.00", "currency": "USDC"},
+    "networks": ["base-sepolia", "eth-sepolia", "local-evm", "simchain"],
+    "currencies": ["USDC"],
+    "purpose": "supplier invoices"
+  },
+  "valid_from": "{{NOW_MINUS_1D}}",
+  "expires_at": "{{NOW_PLUS_30D}}",
+  "signature": {"alg": "HS256", "key_id": "mk_demo_1", "value": "{{SIGNED_AT_SEED}}"}
+}

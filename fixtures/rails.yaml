@@ -1,0 +1,9 @@
+# Rail configuration for demo and tests. Fees and speeds are simulated or estimated.
+routing_weights: {cost: 0.4, speed: 0.2, success: 0.3, liquidity: 0.1}
+rails:
+  - {id: base-sepolia, kind: evm, chain_id: 84532, currency: USDC, confirmations: 3, est_fee_minor: 2000, est_seconds: 10, prefunded_daily_limit: "40000.00", signer: env:TEST_WALLET_PRIVATE_KEY_BASE}
+  - {id: eth-sepolia, kind: evm, chain_id: 11155111, currency: USDC, confirmations: 2, est_fee_minor: 150000, est_seconds: 40, prefunded_daily_limit: "40000.00", signer: env:TEST_WALLET_PRIVATE_KEY_ETH}
+  - {id: banksim-fps, kind: banksim, scheme: fps, currency: GBP, fee: {flat_minor: 20, bps: 0}, per_payment_limit: "25000.00", daily_limit: "100000.00", failure_rate: 0.0, est_seconds: 5}
+  - {id: banksim-sepa-inst, kind: banksim, scheme: sepa_inst, currency: EUR, fee: {flat_minor: 25, bps: 5}, per_payment_limit: "25000.00", daily_limit: "100000.00", failure_rate: 0.0, est_seconds: 8}
+  - {id: simchain, kind: simchain, currency: USDC, est_fee_minor: 0, est_seconds: 1, sandbox_only: true}
+  - {id: local-evm, kind: evm, chain_id: 31337, currency: USDC, confirmations: 1, est_fee_minor: 0, est_seconds: 1, test_only: true}

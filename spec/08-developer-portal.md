@@ -1,0 +1,115 @@
+# 08 · Developer portal: dashboard, sandbox, docs, SDKs and website
+
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** how developers and buyers reach all three layers (dashboard, sandbox, docs, SDKs, website).
+
+Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and docs are public. **Sandbox keys are not self-serve.** A developer gets keys only after contacting sales by email or booking a demo; the admin then creates the organisation and sends an invite.
+
+## Surfaces (domains are placeholders until the name is final)
+
+| Surface | Host | Built with |
+|---|---|---|
+| Marketing site | `<domain>` | Astro static site (`apps/site`) |
+| Docs | `docs.<domain>` | Mintlify Starter from `docs/` |
+| Dashboard and console | `dashboard.<domain>` | The `api` app (Jinja and htmx) |
+| Sandbox API | `sandbox.api.<domain>` | The `api` app |
+| Status | `status.<domain>` | A hosted status page fed by `/healthz` (WEB-07) |
+
+## Dashboard (DSH)
+
+- **Sales-led access:**
+  - There is no public sign-up route.
+  - The admin creates an organisation (name, expiry 60 days by default) and invites emails.
+  - An invite link is single-use and lasts 7 days.
+  - The developer verifies their email and sets a password (argon2), then lands on the Keys page.
+- **Keys:**
+  - `sk_test_` keys only.
+  - Create, roll (with an overlap window) and revoke.
+  - Shown once; scopes; last used.
+- **Request logs:** method, path, status, latency, idempotency key, payment ID and request ID. Bodies are redacted. Kept for 30 days.
+- **Webhooks:** endpoints, event types, a secret shown once, "send test event", and a delivery log with resend.
+- **Sandbox controls:**
+  - reset test data
+  - force a scenario for the next payment
+  - toggle real testnet mode (Should)
+- **Usage:** calls, payments decided and agent investigations against daily quotas.
+- **Console:** the back-office screens scoped to the organisation. Demo-only controls are hidden.
+- **Admin (Detent only):** organisations, invites, expiry extension, and the access-requests inbox (DSH-10).
+
+## Sandbox (SBX)
+
+- Simulated rails by default (`simchain`, `banksim-*`). Real Base Sepolia or Ethereum Sepolia is opt-in, from a shared, rate-limited faucet wallet with a daily outflow cap.
+- Test values: see spec/06.
+- **Quotas (defaults, Estimate):**
+  - 60 requests per minute per key
+  - 500 payments a day per organisation
+  - 50 agent investigations a day per organisation
+- Expired organisations get 403 `organisation_expired`, and their dashboard becomes read-only.
+
+## Docs (DOC)
+
+| Section | Pages |
+|---|---|
+| Get started | Overview · Quickstart (first payment intent in 5 minutes) · Sandbox and test values · Authentication |
+| Concepts | Payment intents and the payment ID · Decisions · Payment states · Policies and rule versions · Mandates for AI agents · Exceptions and deadlines · Deposits and reconciliation · Routing and failover · Audit and replay |
+| Guides | Let an AI agent pay a supplier invoice ($18,500 USDC) · Credit deposits safely · Handle UNKNOWN payments · Approve escalations by API · Use the kill switch · Move from shadow to auto mode |
+| API reference | Generated from `openapi.yaml`, with "try it" against the sandbox only |
+| Webhooks | Event types · Signature verification (8 languages) · Retries and ordering |
+| Errors and limits | Error codes · Idempotency · Rate limits · Versioning |
+| SDKs and tools | Python · TypeScript · Postman · OpenAPI download |
+| Changelog | Dated entries |
+
+**Samples:** cURL, Python, TypeScript, Go, Java, C#, PHP and Ruby.
+
+- Snippets live in `docs/snippets/<lang>/` as runnable files.
+- CI starts the API and sandbox, then runs each snippet in a language container and checks the output (DOC-04).
+- Reference request samples are generated from the OpenAPI file.
+
+## SDKs (SDK)
+
+Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `openapi.yaml` and then polished:
+
+- typed models
+- automatic `Idempotency-Key` on creates (UUIDv4 unless provided)
+- retries only on 429, 503 and connection errors that happen before a response, reusing the same idempotency key
+- `verify_webhook(secret, header, body, tolerance=300)`
+
+## Website (WEB)
+
+**Home page sections, in order:**
+
+1. **Hero:** "Every payout decided, sent once and reconciled, across any rail." Category line: "Agentic payment controls: decide, orchestrate and operate every deposit and payout, under your rules." The primary CTA is Book a demo; the secondary CTA is Request sandbox access.
+2. **The problem:** manual review queues, deposits credited wrong, retries that become double payments, irreversible rails.
+3. **How it works:** agent proposes, intent, policy, then execute, escalate or block, then the exceptions queue and audit.
+4. **The three layers:** Decision (Intent, Decide, Policy, Mandate), Orchestration (Route, Execute, Connect), Operations (Exceptions, Reconcile, Prove), with AI agents working in all three.
+5. **Built for irreversible payments:** "A failure can retry. A rejection can't. No retry ever becomes a second payment.", with the payment states shown.
+6. **Measured results:** from `results.json`, each figure labelled "test-network evaluation, [date]".
+7. **Developer section:** an 8-language code tab creating a payment intent, with a link to the docs.
+8. **Security and architecture:** non-custodial; audit and replay; kill switch; EU hosting; roadmap items labelled as roadmap.
+9. **Use cases:** payout platforms, crypto service providers, brokers and prop firms, marketplaces.
+10. **Pricing:** Pilot, Growth and Scale, or "Talk to us" (an open founder decision).
+11. **Footer:** docs, status, privacy, terms, contact.
+
+**Sub-pages:** Product, Security, and Design partners (the free shadow report offer).
+
+**Honesty checklist (WEB-01 acceptance):**
+- Uses "agentic payment controls" (or "payment controls") and never "payments company" or "payment provider".
+- No logos, testimonials, customer counts or volume figures.
+- No certification badges and no "licensed" or "regulated" claims.
+- Results are dated and labelled.
+- The dashboard and API show a "Sandbox, pre-launch" label.
+- Prior-company figures appear only as the founder's experience on an About section.
+
+**SEO (WEB-08):**
+- Titles pair the name with the category ("Detent agentic payment controls" or "Detent payment controls").
+- Topic pages and docs target the searches buyers make: "stablecoin payout controls", "payout exception handling", "payment reconciliation across rails" and "APP fraud reimbursement".
+- Add sitemap.xml, Open Graph images, and schema.org `Organization` and `SoftwareApplication` markup.
+
+## Needed from the founder before M8 to M11
+
+- the name and domain
+- a transactional email provider
+- an always-on hosting tier for the sandbox
+- a Mintlify account
+- the booking page link
+- the sales inbox address
+- legal text review (privacy, sandbox terms, cookies)

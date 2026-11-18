@@ -1,0 +1,17 @@
+# Example fault scenario (EVL-03).
+id: flt-001
+rail: local-evm
+fault: timeout_after_forward
+description: Broadcast reaches the chain but the response is dropped.
+setup: {seed: demo}
+steps:
+  - create_intent: {counterparty: cpt_bluefin, amount: "120.00", currency: USDC, approve_if_escalated: usr_rv}
+  - set_fault_next_submit: timeout_after_forward
+  - run_worker_until_idle: {max_seconds: 120}
+assert:
+  payment_status: CONFIRMED
+  attempts_count: 1
+  attempt_statuses_seen: [SUBMITTED, UNKNOWN, CONFIRMED]
+  chain_transfers_for_payment: 1
+  never_status: FAILED
+  ledger_balanced: true

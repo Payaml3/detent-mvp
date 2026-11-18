@@ -1,0 +1,139 @@
+# Every item in the product model, operating model, MVP scope and developer portal spec.
+# status: mvp = built in this MVP | partly = MVP builds the software part, the rest is later or manual
+#         later = a later roadmap phase | non-software = a business, legal or hiring task, no code
+# Stories reference these codes in their `trace` field. tools/build_backlog.py checks coverage.
+
+- {code: A1.reviews,      source: "Product model A1", item: "Outcome: fewer manual reviews", status: mvp}
+- {code: A1.deposits,     source: "Product model A1", item: "Outcome: deposits credited once, to the right account", status: mvp}
+- {code: A1.cost,         source: "Product model A1", item: "Outcome: lower cost and failure rate per payout", status: mvp}
+- {code: A1.evidence,     source: "Product model A1", item: "Outcome: evidence an auditor accepts", status: mvp}
+
+- {code: A2.Intent,       source: "Product model A2", item: "Intent module: payment intent with one payment ID for life; agents can only propose", status: mvp}
+- {code: A2.Decide,       source: "Product model A2", item: "Decide module: decision API, execute / escalate / block with a reason per check", status: mvp}
+- {code: A2.Policy,       source: "Product model A2", item: "Policy module: versioned client-approved rules (KYB, allowlist, limits, KYT, Travel Rule, unusual rules, daily caps)", status: mvp}
+- {code: A2.Execute,      source: "Product model A2", item: "Execute module: idempotency, state lock, nonce, balance check, pre-funded limits, kill switch", status: mvp}
+- {code: A2.Exceptions,   source: "Product model A2", item: "Exceptions module: owner, deadline, held on timeout, raw facts first, approval re-runs policy", status: mvp}
+- {code: A2.Reconcile,    source: "Product model A2", item: "Reconcile module: one ledger, deposit intents, matching, exceptions with proposed fixes", status: mvp}
+- {code: A2.Prove,        source: "Product model A2", item: "Prove module: audit log, replay, evidence export", status: mvp}
+- {code: A2.Connect,      source: "Product model A2", item: "Connect module: rail adapters, connection flow, status normalisation", status: mvp}
+- {code: A2.Route,        source: "Product model A2", item: "Route module: best-rail choice and failover on technical errors only", status: mvp}
+- {code: A2.Mandate,      source: "Product model A2", item: "Mandate module: agent-proposed intents stay inside a signed scope", status: mvp}
+
+- {code: A2b.rule,        source: "Product model A2b", item: "A failure can retry; a rejection can't; no retry can become a second payment", status: mvp}
+- {code: A2b.states,      source: "Product model A2b", item: "Payment states SUBMITTED, UNKNOWN, CONFIRMED, FAILED then RETRY, BLOCKED", status: mvp}
+- {code: A2b.unknown,     source: "Product model A2b", item: "UNKNOWN: nothing is resent until the original's outcome is known", status: mvp}
+- {code: A2b.no_agent_retry, source: "Product model A2b", item: "The agent never decides to retry", status: mvp}
+- {code: A2b.timeout_hold, source: "Product model A2b", item: "Timeouts never become approvals", status: mvp}
+- {code: A2b.raw_facts,   source: "Product model A2b", item: "Approvers see raw facts before the agent's summary", status: mvp}
+- {code: A2b.unusual,     source: "Case study v2", item: "Unusual defined as checkable rules: new wallet, changed details, first payment, above norm; daily caps", status: mvp}
+- {code: A2b.custody,     source: "Product model A2b", item: "Custody boundary: signing and nonces at the client's custody provider in production; testnet keys in prototype", status: partly}
+
+- {code: A3.shadow,       source: "Product model A3", item: "Mode 1 Shadow: decisions on exported data, no execution", status: partly}
+- {code: A3.assist,       source: "Product model A3", item: "Mode 2 Assist: live recommendations, staff click every decision", status: mvp}
+- {code: A3.auto,         source: "Product model A3", item: "Mode 3 Auto: executes within approved rules, only escalations reach humans", status: mvp}
+- {code: A3.orchestrate,  source: "Product model A3", item: "Mode 4 Orchestrate: routing across 2+ rails", status: mvp}
+- {code: A3.gates,        source: "Product model A3", item: "Signed gate between modes (agreement %, zero unsafe approvals)", status: partly}
+
+- {code: A4.fee,          source: "Product model A4", item: "Software fee per payment, not a share of money moved (usage metering)", status: partly}
+- {code: A4.plans,        source: "Product model A4", item: "Plans: free shadow report, Pilot, Growth, Scale, routing add-on", status: partly}
+
+- {code: A5.proposes,     source: "Product model A5", item: "The LLM proposes; the policy layer decides; uncertain fields flagged, never guessed", status: mvp}
+- {code: A5.tools,        source: "Product model A5", item: "Agent tools are read-only; nothing that moves money", status: mvp}
+- {code: A5.injection,    source: "Product model A5", item: "Free text is data, never instructions; tested by attack suite", status: mvp}
+- {code: A5.citations,    source: "Product model A5", item: "Every agent claim cites evidence or isn't shown", status: mvp}
+- {code: A5.gate,         source: "Product model A5", item: "Regression gate: 100+ attack scenarios before every release", status: mvp}
+- {code: A5.data,         source: "Product model A5", item: "Client data not used to train models; UK/EU processing", status: partly}
+
+- {code: A6.no_custody,   source: "Product model A6", item: "Never hold funds or keys", status: partly}
+- {code: A6.client_rules, source: "Product model A6", item: "The client owns the rules; we enforce them exactly", status: mvp}
+- {code: A6.block_final,  source: "Product model A6", item: "A block is final: no approval or other rail can override it", status: mvp}
+- {code: A6.fail_closed,  source: "Product model A6", item: "Fail closed: never execute unchecked", status: mvp}
+- {code: A6.shadow_first, source: "Product model A6", item: "Prove it on their data first (shadow mode)", status: partly}
+- {code: A6.retry_rule,   source: "Product model A6", item: "No retry can ever become a second payment", status: mvp}
+- {code: A6.timeout,      source: "Product model A6", item: "A timeout never becomes an approval", status: mvp}
+
+- {code: A7.prototype,    source: "Product model A7", item: "Prototype phase: $18,500 flow, execution layer, exceptions, deposits, testnets, simulated bank", status: mvp}
+- {code: A7.beta,         source: "Product model A7", item: "Design-partner beta: shadow on real exports, CSV/API import, 1 real read-only adapter", status: partly}
+- {code: A7.v1,           source: "Product model A7", item: "v1: Assist/Auto for real, 2 real adapters, multi-tenant, roles, SOC 2 Type I", status: later}
+- {code: A7.v2,           source: "Product model A7", item: "v2: routing module live, bank rails via licensed partner, FXBO/B2CORE", status: later}
+- {code: A7.v3,           source: "Product model A7", item: "v3: AP2-style signed mandates, shared risk signals", status: later}
+
+- {code: B1.entity,       source: "Operating model B1", item: "UK limited company as technology provider", status: non-software}
+- {code: B1.perimeter,    source: "Operating model B1", item: "Perimeter opinion before first paid pilot; FCA PASS", status: non-software}
+- {code: B1.contracts,    source: "Operating model B1", item: "MSA, DPA, DORA Art. 30 annex, policy-ownership clause", status: partly}
+- {code: B1.client_dd,    source: "Operating model B1", item: "Own due diligence on each client", status: later}
+- {code: B1.independence, source: "Operating model B1", item: "No former-employer documents, names or designs; dated design log", status: mvp}
+
+- {code: B2.org,          source: "Operating model B2", item: "Organisation by stage and hiring priority", status: non-software}
+
+- {code: B3.lead_shadow,  source: "Operating model B3", item: "Lead to shadow report process (report in 5 working days)", status: partly}
+- {code: B3.onboarding,   source: "Operating model B3", item: "Client onboarding: rail connection, policy workshop, rules signed off, shadow", status: partly}
+- {code: B3.mode_gates,   source: "Operating model B3", item: "Weekly agreement report; client signs each mode move", status: partly}
+- {code: B3.rule_changes, source: "Operating model B3", item: "Rule changes versioned, two approvers, loosening needs compliance lead", status: mvp}
+- {code: B3.agent_eval,   source: "Operating model B3", item: "Attack and regression suite per release; weekly quality sample", status: mvp}
+- {code: B3.exceptions,   source: "Operating model B3", item: "Exceptions handling: owner, deadline by tier, held past deadline, counterparty update, backup owner", status: mvp}
+- {code: B3.kill_switch,  source: "Operating model B3", item: "Kill switch by client payments lead or on-call; restart needs client approval", status: mvp}
+- {code: B3.incident,     source: "Operating model B3", item: "Incident severity; Sev 1 for unauthorised execution, wrong credit or duplicate; replay for investigation", status: partly}
+- {code: B3.adapters,     source: "Operating model B3", item: "Adapter maintenance: daily contract tests", status: partly}
+- {code: B3.support,      source: "Operating model B3", item: "Support levels and QBRs", status: non-software}
+- {code: B3.billing,      source: "Operating model B3", item: "Monthly billing, usage measured from the ledger", status: partly}
+
+- {code: B4.rails,        source: "Operating model B4", item: "Rails as partners, client holds accounts", status: mvp}
+- {code: B4.exec_partner, source: "Operating model B4", item: "Licensed execution partner", status: later}
+- {code: B4.risk_data,    source: "Operating model B4", item: "Screening vendors on the client's contract (integrate, don't resell)", status: partly}
+- {code: B4.backoffice,   source: "Operating model B4", item: "Back-office distribution (FXBO, B2CORE)", status: later}
+- {code: B4.infra,        source: "Operating model B4", item: "UK/EU hosting, AI models, secrets vault", status: mvp}
+
+- {code: B5.hosting,      source: "Operating model B5", item: "UK or EU cloud region; residency stated", status: mvp}
+- {code: B5.security,     source: "Operating model B5", item: "Vaulted credentials, least privilege, IP allowlists, append-only audit, encryption", status: partly}
+- {code: B5.assurance,    source: "Operating model B5", item: "Pen test and security pack, SOC 2 Type I then II, ISO 27001", status: later}
+- {code: B5.resilience,   source: "Operating model B5", item: "99.9% uptime, p95 decision <5s rules-only, RTO <1h, no lost decisions", status: partly}
+- {code: B5.failsafe,     source: "Operating model B5", item: "Per-client fail-safe: hold or manual queue, never execute unchecked", status: mvp}
+
+- {code: B6.wrong_decision, source: "Operating model B6", item: "Risk: wrong automatic decision (client rules, staged modes)", status: mvp}
+- {code: B6.reclass,      source: "Operating model B6", item: "Risk: regulatory reclassification of routing", status: non-software}
+- {code: B6.ai,           source: "Operating model B6", item: "Risk: AI misbehaviour or prompt injection", status: mvp}
+- {code: B6.dependence,   source: "Operating model B6", item: "Risk: dependence on one rail or AI provider", status: partly}
+- {code: B6.former_employer, source: "Operating model B6", item: "Risk: former-employer claim", status: mvp}
+
+- {code: B7.safety,       source: "Operating model B7", item: "KPI: 0 unauthorised executions, wrong credits, duplicates", status: mvp}
+- {code: B7.exceptions,   source: "Operating model B7", item: "KPI: 0 auto-approved after timeout; 95% resolved by deadline", status: mvp}
+- {code: B7.unknown,      source: "Operating model B7", item: "KPI: median time to resolve UNKNOWN < 15 min", status: mvp}
+- {code: B7.quality,      source: "Operating model B7", item: "KPI: agreement with client decisions >= 95%", status: partly}
+- {code: B7.automation,   source: "Operating model B7", item: "KPI: share decided without a human >= 70%", status: mvp}
+- {code: B7.recon,        source: "Operating model B7", item: "KPI: automatic match rate >= 99%", status: mvp}
+- {code: B7.reliability,  source: "Operating model B7", item: "KPI: uptime and p95 latency", status: partly}
+- {code: B7.commercial,   source: "Operating model B7", item: "KPI: shadow-to-pilot 40%, pilot-to-paid 60%", status: non-software}
+- {code: B7.speed,        source: "Operating model B7", item: "KPI: <10 days pilot signed to shadow live", status: non-software}
+- {code: B7.economics,    source: "Operating model B7", item: "KPI: gross margin, NRR", status: non-software}
+- {code: B8.milestones,   source: "Operating model B8", item: "Quarterly milestones and gates", status: non-software}
+
+- {code: L1, source: "MVP launch criteria", item: "$18,500 invoice correct 10/10; ambiguous invoice flagged, never guessed", status: mvp}
+- {code: L2, source: "MVP launch criteria", item: "0 unauthorised executions across 100+ attack scenarios", status: mvp}
+- {code: L3, source: "MVP launch criteria", item: "0 duplicate payments across 30+ fault cases; same payment ID on every retry/switch", status: mvp}
+- {code: L4, source: "MVP launch criteria", item: "Timeout -> UNKNOWN, nothing resent; kill switch holds pending", status: mvp}
+- {code: L5, source: "MVP launch criteria", item: "Block never re-routed; technical failure fails over under same ID", status: mvp}
+- {code: L6, source: "MVP launch criteria", item: "Overdue escalation held + counterparty update; approval re-runs policy; raw facts first", status: mvp}
+- {code: L7, source: "MVP launch criteria", item: ">= 99% deposits auto-matched; exceptions show proposed fix", status: mvp}
+- {code: L8, source: "MVP launch criteria", item: "Every payment replayable; console labelled prototype/testnets/simulated bank", status: mvp}
+- {code: MVP.flow, source: "MVP scope section 3", item: "10-minute demo flow (invoice -> escalation -> approval -> timeout -> batch -> report)", status: mvp}
+- {code: MVP.shadow_csv, source: "MVP scope triage", item: "Shadow-mode CSV import (should have)", status: mvp}
+- {code: MVP.scenarios, source: "MVP scope triage", item: "Scenario packs per platform type (should have)", status: mvp}
+
+- {code: D.site,        source: "Developer portal 2", item: "Marketing site, 11 sections + 3 sub-pages", status: mvp}
+- {code: D.honesty,     source: "Developer portal 2", item: "Honesty guardrails (no logos, badges, licence claims; dated results)", status: mvp}
+- {code: D.docs,        source: "Developer portal 3", item: "Docs portal structure, concepts, guides, reference, changelog", status: mvp}
+- {code: D.samples,     source: "Developer portal 3", item: "Code samples in 8 languages, tested in CI", status: mvp}
+- {code: D.sdks,        source: "Developer portal 3", item: "Python and TypeScript SDKs, Postman, OpenAPI download", status: mvp}
+- {code: D.sales_led,   source: "Developer portal 4", item: "Sales-led access: org created by admin, invite, email verify, expiry", status: mvp}
+- {code: D.keys,        source: "Developer portal 4", item: "Test keys: create, roll, revoke, shown once, hashed, scoped; live disabled", status: mvp}
+- {code: D.logs,        source: "Developer portal 4", item: "Request logs with idempotency key and payment ID", status: mvp}
+- {code: D.webhooks,    source: "Developer portal 4/6", item: "Webhooks: endpoints, secret, test event, delivery log, HMAC signature, retries", status: mvp}
+- {code: D.sandbox,     source: "Developer portal 4/5", item: "Sandbox controls, test values, simulated and real test-network rails", status: mvp}
+- {code: D.usage,       source: "Developer portal 4", item: "Usage against quotas", status: mvp}
+- {code: D.console,     source: "Developer portal 4", item: "Back-office console inside the dashboard", status: mvp}
+- {code: D.abuse,       source: "Developer portal 5", item: "Abuse limits: rate limits, daily caps, wallet limits, expiring keys", status: mvp}
+- {code: D.standards,   source: "Developer portal 6", item: "API standards: auth, idempotency, errors, pagination, versioning, rate limits", status: mvp}
+- {code: D.ops_pages,   source: "Developer portal 1/7", item: "Status page, legal pages, analytics, booking and access form", status: mvp}
+
+- {code: BR.category,   source: "facts.md 16 and 17 Nov", item: "Category wording: 'agentic payment controls' in three layers (decision, orchestration, operations); never 'payments company'", status: mvp}

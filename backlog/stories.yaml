@@ -1,0 +1,2129 @@
+# Source of truth for the MVP backlog. Edit here, then run: python tools/build_backlog.py
+# pri: Must | Should | Could     est: ideal developer-days for one developer working with Claude Code
+# ms: milestone (see backlog/milestones.md)   trace: codes from backlog/model-items.yaml
+
+epics:
+  FND: {name: "Foundation", goal: "A tested, deployable skeleton with the safety guards in place from day one", track: prototype, layer: "All three (foundation)"}
+  INT: {name: "Payment intents", goal: "Every payment starts as an intent with one payment ID for life", track: prototype, layer: "Decision"}
+  POL: {name: "Policy and decisions", goal: "A deterministic, versioned, client-owned policy layer decides execute, escalate or block", track: prototype, layer: "Decision"}
+  AGT: {name: "Mandates and instruction agent", goal: "An AI agent can propose payments from invoices, only inside a signed mandate, and can never move money", track: prototype, layer: "Decision (agents serve all three)"}
+  EXE: {name: "Exactly-once execution", goal: "A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, the kill switch stops everything", track: prototype, layer: "Orchestration"}
+  RAL: {name: "Rails, routing and faults", goal: "Three rails behind one adapter contract, best-rail routing, failover on technical errors only, and fault injection to prove it", track: prototype, layer: "Orchestration"}
+  EXC: {name: "Exceptions and investigation", goal: "Every escalation has an owner and a deadline, shows raw facts first, and a timeout never becomes an approval", track: prototype, layer: "Operations"}
+  LED: {name: "Ledger, deposits and reconciliation", goal: "One ledger across rails; deposits credited once; mismatches become exceptions with proposed fixes", track: prototype, layer: "Operations"}
+  AUD: {name: "Audit and replay", goal: "Every step is recorded append-only and any payment can be replayed and exported", track: prototype, layer: "Operations"}
+  CON: {name: "Back-office console", goal: "The screens where the 10-minute demo happens", track: prototype, layer: "All three (console)"}
+  EVL: {name: "Evaluation harness", goal: "Measured proof: attacks, faults, interpretation and agreement, gated in CI and published as a results report", track: prototype, layer: "All three (proof)"}
+  DEM: {name: "Demo data and scenarios", goal: "Fictional, repeatable demo data and a one-click scenario runner", track: prototype, layer: "All three (demo)"}
+  SHD: {name: "Shadow mode", goal: "Run decisions on a prospect's exported data and produce the free shadow report", track: prototype, layer: "Decision (shadow mode)"}
+  OPS: {name: "Operational controls", goal: "The operating-model processes that need software: incidents, independence check, recovery", track: prototype, layer: "Operations"}
+  API: {name: "Public sandbox API", goal: "A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI", track: portal, layer: "All three (public API)"}
+  WHK: {name: "Webhooks", goal: "Signed, retried, logged event delivery", track: portal, layer: "All three (public API)"}
+  DSH: {name: "Developer dashboard", goal: "Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console per organisation", track: portal, layer: "All three (developer access)"}
+  SBX: {name: "Sandbox", goal: "Developers trigger every path with test values, inside quotas", track: portal, layer: "All three (developer access)"}
+  DOC: {name: "Docs portal", goal: "Concepts, guides and reference with tested samples in 8 languages", track: portal, layer: "All three (developer access)"}
+  SDK: {name: "SDKs", goal: "Typed Python and TypeScript clients with automatic idempotency and webhook helpers", track: portal, layer: "All three (developer access)"}
+  WEB: {name: "Marketing site", goal: "A public face that looks real and stays honest", track: portal, layer: "Go-to-market"}
+
+stories:
+# ---------------- FND Foundation ----------------
+- id: FND-01
+  epic: FND
+  title: Repository, tooling and CI
+  as: builder
+  want: a monorepo with the API app, migrations, lint, type checks and tests running in CI
+  so: every story ships tested and nothing merges red
+  ac:
+    - "`make test`, `make lint` (ruff) and `make typecheck` (mypy, strict on `detent/domain`) pass locally and in GitHub Actions on every push"
+    - "CI starts a Postgres 16 service and runs Alembic migrations before tests"
+    - "`.env.example` lists every setting; a secret scanner runs as a pre-commit hook and in CI"
+    - "The README explains setup in under 10 commands"
+  pri: Must
+  est: 0.5
+  deps: []
+  trace: [A7.prototype, B5.security]
+  ms: M0
+- id: FND-02
+  epic: FND
+  title: Settings and test-network guard
+  as: builder
+  want: the app to refuse to start with any mainnet chain ID or live credentials
+  so: the prototype can never move real money
+  ac:
+    - "Given a configured chain ID outside {84532 Base Sepolia, 11155111 Ethereum Sepolia, 31337 local}, when the app or worker starts, then it exits with a clear error"
+    - "Given an API key prefix `sk_live_`, when any request uses it, then it is rejected with 403 `live_mode_unavailable`"
+    - "Settings load via pydantic-settings; no setting is read from os.environ elsewhere"
+  pri: Must
+  est: 0.25
+  deps: [FND-01]
+  trace: [A6.no_custody, L8]
+  ms: M0
+- id: FND-03
+  epic: FND
+  title: Baseline schema and ID conventions
+  as: builder
+  want: the core tables, enums and constraints from spec/02-domain-model.md as the first migration
+  so: invariants are enforced by the database, not just by code
+  ac:
+    - "IDs are prefixed UUIDv7 strings (`pay_`, `att_`, `dec_`, `exc_`, `dep_`, `evt_`, `org_`)"
+    - "Money is stored as integer minor units plus an ISO currency code; no floats anywhere in money paths"
+    - "Every table carries `org_id`; every query in the repository layer filters by it"
+    - "Partial unique indexes from the domain model exist (one in-flight attempt, one confirmed attempt per payment)"
+  pri: Must
+  est: 0.5
+  deps: [FND-01]
+  trace: [A2b.states, A2.Intent]
+  ms: M0
+- id: FND-04
+  epic: FND
+  title: Demo login and acting-user switcher
+  as: demo viewer
+  want: one demo password and a switcher to act as the payments lead, compliance lead, reviewer, backup owner or on-call engineer
+  so: the demo shows who is allowed to do what without building full auth
+  ac:
+    - "One shared password protects the console; after login the viewer picks an acting user"
+    - "Every write records the acting user ID and role in the audit log"
+    - "Role checks run on the server; hiding a button is never the only control"
+  pri: Must
+  est: 0.5
+  deps: [FND-03]
+  trace: [B3.rule_changes, B3.kill_switch, A2.Exceptions]
+  ms: M0
+- id: FND-05
+  epic: FND
+  title: Controllable clock
+  as: demo viewer
+  want: to fast-forward time in demo mode
+  so: deadlines, overdue escalations and UNKNOWN resolution can be shown in minutes
+  ac:
+    - "All code reads time from a Clock service; a lint rule or test fails on direct `datetime.now()` in `detent/`"
+    - "In demo mode the console can advance the clock by 15 min, 1 h or 1 day; outside demo mode the control is absent"
+    - "Tests use a frozen clock"
+  pri: Must
+  est: 0.25
+  deps: [FND-01]
+  trace: [B3.exceptions, MVP.flow]
+  ms: M0
+- id: FND-06
+  epic: FND
+  title: Background worker and job loop
+  as: builder
+  want: one worker process running scheduled and queued jobs from Postgres
+  so: UNKNOWN resolution, deadline sweeps, chain watching and webhook delivery survive restarts
+  ac:
+    - "Jobs are claimed with `SELECT ... FOR UPDATE SKIP LOCKED`; each job is idempotent"
+    - "Killing the worker mid-job and restarting it never duplicates a side effect (tested)"
+    - "Job runs, failures and durations are logged with the payment ID where relevant"
+  pri: Must
+  est: 0.5
+  deps: [FND-03]
+  trace: [B5.resilience]
+  ms: M0
+- id: FND-07
+  epic: FND
+  title: Deploy to an EU region
+  as: founder
+  want: the web app and worker deployed in an EU region with Postgres in an EU region
+  so: the demo is reachable and data residency is truthful
+  ac:
+    - "Web service and worker deploy from main; database is Neon in an EU region"
+    - "`/healthz` checks the database and both chain RPCs and reports each"
+    - "spec/10-security-and-deploy.md records the regions; the console footer states them"
+  pri: Must
+  est: 0.5
+  deps: [FND-06]
+  trace: [B5.hosting, B4.infra, A5.data]
+  ms: M7
+- id: FND-08
+  epic: FND
+  title: Structured logs and request IDs
+  as: on-call engineer
+  want: JSON logs with request ID and payment ID on every line
+  so: any incident can be traced end to end
+  ac:
+    - "Every HTTP request gets a `request_id`, returned in the `Request-Id` header"
+    - "Log lines include `payment_id` when one is in context"
+    - "Keys, secrets, full wallet private data and invoice bodies are never logged (tested with a log capture)"
+  pri: Should
+  est: 0.25
+  deps: [FND-01]
+  trace: [B5.security, B3.incident]
+  ms: M0
+- id: FND-09
+  epic: FND
+  title: Local EVM with a mock USDC for tests
+  as: builder
+  want: a local chain (anvil) with a mock 6-decimal USDC contract deployed by script
+  so: CI and the fault suite run deterministically without faucets or public RPC limits
+  ac:
+    - "`make chain` starts anvil and deploys MockUSDC; addresses are written to a test config"
+    - "The EVM adapter runs its contract tests against the local chain in CI"
+    - "Public testnets are used only in nightly runs and the live demo"
+  pri: Must
+  est: 0.5
+  deps: [FND-01]
+  trace: [L3, A5.gate]
+  ms: M0
+
+# ---------------- INT Payment intents ----------------
+- id: INT-01
+  epic: INT
+  title: Create a payout intent
+  as: platform integrator
+  want: to POST a payout intent with amount, currency, payee, optional network, reference and notes
+  so: every payment starts with one ID and gets a decision before any money moves
+  ac:
+    - "POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status"
+    - "The payment ID is assigned once and never changes through retries, failovers or approvals"
+    - "Invalid input returns 422 with the standard error body and no intent is created"
+    - "`source` is `platform` or `agent`; `agent` requires a `mandate_id`"
+  pri: Must
+  est: 0.5
+  deps: [FND-03]
+  trace: [A2.Intent, A2b.states]
+  ms: M1
+- id: INT-02
+  epic: INT
+  title: Idempotent creates
+  as: platform integrator
+  want: an `Idempotency-Key` on every create call
+  so: a network retry on my side can never create a second payment
+  ac:
+    - "Given the same key and the same body, when I repeat the call, then I get the original response and no new intent"
+    - "Given the same key and a different body, then I get 409 `idempotency_conflict`"
+    - "Keys are scoped per organisation; two parallel requests with one key create exactly one intent (concurrency test)"
+  pri: Must
+  est: 0.5
+  deps: [INT-01]
+  trace: [A2.Execute, A6.retry_rule, D.standards, L3]
+  ms: M1
+- id: INT-03
+  epic: INT
+  title: Read and list intents
+  as: platform integrator
+  want: to fetch an intent with its full timeline and to list intents with filters
+  so: I can show status to my users and debug my integration
+  ac:
+    - "GET /v1/payment_intents/{id} includes decisions, checks, attempts, ledger postings and events"
+    - "GET /v1/payment_intents supports cursor pagination and filters by status, rail and created range"
+    - "Another organisation's ID returns 404, never 403"
+  pri: Must
+  est: 0.25
+  deps: [INT-01]
+  trace: [A2.Prove, D.standards]
+  ms: M1
+- id: INT-04
+  epic: INT
+  title: Counterparty registry with wallet history
+  as: payments lead
+  want: counterparties with KYB status, wallets or bank accounts, first-seen and last-changed times and payment history
+  so: the policy can check "new wallet", "changed details", "first payment" and "above norm" from facts
+  ac:
+    - "Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event"
+    - "Each counterparty exposes payment count and median amount, computed from confirmed payments"
+    - "Counterparties are seeded from fixtures and editable in the console"
+  pri: Must
+  est: 0.5
+  deps: [FND-03]
+  trace: [A2.Policy, A2b.unusual, A2b.raw_facts]
+  ms: M1
+- id: INT-05
+  epic: INT
+  title: Cancel an intent before it is sent
+  as: payments lead
+  want: to cancel an escalated, held or ready intent
+  so: a payment we no longer want never goes out
+  ac:
+    - "Cancel is allowed from ESCALATED, HELD or READY only; from SUBMITTED or UNKNOWN it returns 409"
+    - "CANCELLED is terminal and audited with the actor and reason"
+  pri: Should
+  est: 0.25
+  deps: [EXE-01]
+  trace: [A2.Intent]
+  ms: M12
+
+# ---------------- POL Policy ----------------
+- id: POL-01
+  epic: POL
+  title: Rule-set format and loader
+  as: compliance lead
+  want: our rules as a versioned YAML rule set with named checks and parameters
+  so: the rules are ours, readable and exactly enforced
+  ac:
+    - "Rule sets follow spec/04-policy.md and are validated against a schema on load; an invalid file is rejected with line-level errors"
+    - "A loaded version is immutable and identified by version number and content hash"
+    - "Every decision stores the version and hash it used"
+  pri: Must
+  est: 0.5
+  deps: [FND-03]
+  trace: [A2.Policy, A6.client_rules, B3.rule_changes]
+  ms: M1
+- id: POL-02
+  epic: POL
+  title: Decision engine and precedence
+  as: payments lead
+  want: every intent evaluated against all checks with execute, escalate or block and a reason per check
+  so: I can see exactly why each payment was decided
+  ac:
+    - "Each check returns PASS, ESCALATE or BLOCK with a reason code, parameters and evidence references"
+    - "Final decision: BLOCK if any check blocks; else ESCALATE if any escalates; else EXECUTE"
+    - "Same inputs and rule version always give the same decision (property-based test)"
+    - "Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08)"
+  pri: Must
+  est: 0.5
+  deps: [POL-01, INT-01]
+  trace: [A2.Decide, A6.block_final, A1.reviews]
+  ms: M1
+- id: POL-03
+  epic: POL
+  title: Compliance checks (KYB, allowlist, screening, Travel Rule, network)
+  as: compliance lead
+  want: KYB, allowlist, screening, Travel Rule and allowed-network checks
+  so: no payment reaches a payee we haven't cleared
+  ac:
+    - "KYB not verified -> BLOCK; KYB pending -> ESCALATE"
+    - "Payee not on allowlist -> ESCALATE (first payment)"
+    - "Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09"
+    - "Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE"
+    - "Network or currency not allowed for the platform -> BLOCK"
+    - "Screening sits behind a `Screening` interface so a real vendor can replace the mock"
+  pri: Must
+  est: 1.0
+  deps: [POL-02, INT-04]
+  trace: [A2.Policy, B4.risk_data]
+  ms: M1
+- id: POL-04
+  epic: POL
+  title: Limits and daily caps
+  as: compliance lead
+  want: an auto-approval limit, a hard maximum and daily caps on routine payments
+  so: large or accumulated payments always reach a human, and splitting a payment can't get around a cap
+  ac:
+    - "Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK"
+    - "Daily caps per platform and per counterparty count confirmed plus in-flight amounts"
+    - "Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test)"
+  pri: Must
+  est: 0.5
+  deps: [POL-02]
+  trace: [A2.Policy, A2b.unusual]
+  ms: M1
+- id: POL-05
+  epic: POL
+  title: Unusual activity as checkable rules
+  as: compliance lead
+  want: new wallet, changed details, first payment and amount above the counterparty's norm as explicit rules
+  so: '"unusual" is something the system can check and a reviewer can verify'
+  ac:
+    - "Wallet first seen within N days -> ESCALATE `NEW_WALLET`; destination changed within N days -> ESCALATE `CHANGED_DETAILS`"
+    - "No prior confirmed payment to this counterparty -> ESCALATE `FIRST_PAYMENT`"
+    - "Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM`"
+    - "Each hit stores the raw fact (address, timestamps, median, ratio) as evidence"
+  pri: Must
+  est: 0.5
+  deps: [POL-02, INT-04]
+  trace: [A2b.unusual, A2b.raw_facts]
+  ms: M1
+- id: POL-06
+  epic: POL
+  title: A block is final
+  as: compliance lead
+  want: a blocked payment to stay blocked whatever anyone does next
+  so: no approval, retry or other rail can override a compliance decision
+  ac:
+    - "BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it"
+    - "Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked`"
+    - "A new intent to the same payee for the same amount within 24 h of a block is escalated with a link to the blocked one"
+  pri: Must
+  est: 0.5
+  deps: [POL-02, EXE-01]
+  trace: [A6.block_final, A2b.rule, L5]
+  ms: M3
+- id: POL-07
+  epic: POL
+  title: Versioned rule changes with two approvers
+  as: compliance lead
+  want: rule changes proposed as a new version and activated only after a second person approves
+  so: no single person can quietly weaken our controls
+  ac:
+    - "A proposer creates a draft version; the console shows a diff against the active version"
+    - "Activation needs a second, different user; if any rule loosens (higher limit, removed check, shorter screening scope, longer window) the compliance lead must be one of the two"
+    - "On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability"
+    - "All versions are kept and readable; decisions link to the version used"
+  pri: Must
+  est: 0.75
+  deps: [POL-01, FND-04]
+  trace: [B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding]
+  ms: M4
+- id: POL-08
+  epic: POL
+  title: Decision-only API
+  as: platform integrator
+  want: POST /v1/decisions to get a decision without Detent executing anything
+  so: I can use Detent before my own payout process, and shadow mode can reuse the same engine
+  ac:
+    - "Returns the same decision object as intent creation, with `executed: false`"
+    - "Decisions are stored and audited but never create attempts"
+  pri: Must
+  est: 0.5
+  deps: [POL-02]
+  trace: [A2.Decide, A3.shadow]
+  ms: M1
+- id: POL-09
+  epic: POL
+  title: Fail closed
+  as: compliance lead
+  want: any internal error during a decision to hold the payment or send it to manual review
+  so: nothing is ever executed unchecked
+  ac:
+    - "If policy evaluation, screening or a data read fails, the decision is ESCALATE `SYSTEM_UNAVAILABLE` routed by the platform's fail-safe setting (`hold` or `manual_queue`)"
+    - "No code path turns an error into EXECUTE (fault-injection test on each dependency)"
+  pri: Must
+  est: 0.25
+  deps: [POL-02]
+  trace: [A6.fail_closed, B5.failsafe]
+  ms: M1
+
+# ---------------- AGT Mandates and instruction agent ----------------
+- id: MND-01
+  epic: AGT
+  title: Signed mandate for an AI agent
+  as: payments lead
+  want: to issue a mandate that limits what an agent may propose (payees, per-payment and total amounts, networks, currencies and expiry)
+  so: an agent can only ask for payments inside a scope we signed
+  ac:
+    - "Mandates are JSON with an HMAC-SHA256 signature by the platform's mandate key (format in spec/05-agents.md)"
+    - "Invalid signature, unknown agent or expired mandate are detectable without calling the model"
+    - "The format keeps fields that map to AP2-style mandates later"
+  pri: Must
+  est: 0.5
+  deps: [FND-03]
+  trace: [A2.Mandate]
+  ms: M2
+- id: MND-02
+  epic: AGT
+  title: Mandate check in the policy
+  as: compliance lead
+  want: agent-sourced intents checked against their mandate before any other check
+  so: an agent can never exceed what we delegated
+  ac:
+    - "Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason"
+    - "Cumulative usage updates atomically (concurrency test)"
+    - "The check re-runs at execution time"
+  pri: Must
+  est: 0.5
+  deps: [MND-01, POL-02]
+  trace: [A2.Mandate, A5.proposes, D.sandbox]
+  ms: M2
+- id: MND-03
+  epic: AGT
+  title: Revoke a mandate
+  as: payments lead
+  want: to revoke a mandate at once
+  so: a misbehaving agent loses its permissions immediately
+  ac:
+    - "Revocation by console or API takes effect for every intent not yet SUBMITTED"
+    - "An approved intent whose mandate is revoked before sending is BLOCKED `MANDATE_REVOKED` at the pre-send re-check"
+  pri: Must
+  est: 0.25
+  deps: [MND-02, EXE-03]
+  trace: [A2.Mandate]
+  ms: M3
+- id: AGT-01
+  epic: AGT
+  title: Instruction agent turns an invoice into a proposed intent
+  as: payments lead
+  want: the instruction agent to read a supplier invoice and propose a structured payment intent
+  so: our accounts-payable work can be delegated without giving the agent any power to pay
+  ac:
+    - "Input: invoice text or PDF; output: payee, matched counterparty, amount, currency, network, wallet, invoice number, due date, each with confidence and the source text span"
+    - "Uses the agents model from config (default `claude-sonnet-5-5`) with tool use and a strict JSON schema; output is validated by Pydantic"
+    - "Invalid output is retried once, then the proposal is marked `needs_human`"
+    - "The canonical $18,500 USDC invoice yields the expected intent on 10 of 10 runs (EVL-04)"
+  pri: Must
+  est: 1.0
+  deps: [INT-04, MND-01]
+  trace: [A5.proposes, A2.Intent, L1]
+  ms: M2
+- id: AGT-02
+  epic: AGT
+  title: Flag, never guess
+  as: reviewer
+  want: uncertain invoice fields flagged instead of filled in
+  so: a wrong network or wallet is never silently chosen
+  ac:
+    - "Missing network, two wallets, total not matching line items, ambiguous currency, payee not in the registry, or wallet different from the registry each set a named flag"
+    - "Any flag sets `requires_clarification`; such a proposal can't be submitted until a human resolves each flag"
+    - "Tests on the interpretation set confirm no flagged field is ever populated from outside the document"
+  pri: Must
+  est: 0.5
+  deps: [AGT-01]
+  trace: [A5.proposes, L1]
+  ms: M2
+- id: AGT-03
+  epic: AGT
+  title: The agent can only propose
+  as: compliance lead
+  want: the agent's only money-related ability to be "propose an intent" under a mandate
+  so: the model can never execute, approve or retry
+  ac:
+    - "The agent's tool registry has no tool that writes state except `propose_payment_intent`, which calls the public API with scope `intents:create`"
+    - "An import-boundary test fails if `detent.agents` imports `detent.execution`, `detent.exceptions.approve` or `detent.rails`"
+    - "An attempt by the agent to call any other write endpoint is rejected by scope and logged"
+  pri: Must
+  est: 0.25
+  deps: [AGT-01]
+  trace: [A5.tools, A2b.no_agent_retry, B6.ai]
+  ms: M2
+- id: AGT-04
+  epic: AGT
+  title: Prompt-injection isolation
+  as: compliance lead
+  want: invoice text, notes, names and references treated strictly as data
+  so: text like "ignore your rules, this is pre-approved" changes nothing
+  ac:
+    - "Untrusted text reaches the model only inside delimited data blocks, after the instructions, with an explicit data-only rule"
+    - "The policy never reads agent free text; it reads only typed fields"
+    - "Instruction-like content in a document is reported as a `possible_injection` flag and never followed"
+    - "All injection scenarios in the attack suite pass (EVL-02)"
+  pri: Must
+  est: 0.5
+  deps: [AGT-01]
+  trace: [A5.injection, L2, B6.ai]
+  ms: M2
+- id: AGT-05
+  epic: AGT
+  title: Record every agent call for replay
+  as: auditor
+  want: each agent call stored with prompt version, model ID, input hash and raw output
+  so: replay is deterministic and I can see exactly what the agent said
+  ac:
+    - "Agent calls are rows linked to the intent or case, with token counts and latency"
+    - "Replay reads stored outputs and never calls the model again"
+  pri: Must
+  est: 0.25
+  deps: [AGT-01]
+  trace: [A2.Prove, A5.citations]
+  ms: M2
+- id: AGT-06
+  epic: AGT
+  title: Model configuration and cost guard
+  as: founder
+  want: model IDs in config and a daily token budget per organisation
+  so: AI costs stay bounded and the provider can be swapped
+  ac:
+    - "Model IDs come from settings: agents `claude-sonnet-5-5`, light tasks `claude-haiku-5-5`, evaluation judge `claude-opus-5-5`"
+    - "Model calls go through one `LLMClient` interface so a second provider can be added"
+    - "Over budget, agent features return `needs_human`; nothing falls back to executing"
+  pri: Should
+  est: 0.25
+  deps: [AGT-01]
+  trace: [B4.infra, B6.dependence, D.abuse]
+  ms: M2
+
+# ---------------- EXE Exactly-once execution ----------------
+- id: EXE-01
+  epic: EXE
+  title: Payment state machine
+  as: builder
+  want: one transition function with an allowed-transitions table, called under a row lock
+  so: no code can put a payment into an impossible state
+  ac:
+    - "All status changes go through `transition(payment_id, to_status, reason, actor)`, which runs `SELECT ... FOR UPDATE` in one transaction"
+    - "Illegal transitions raise, change nothing and write an audit event"
+    - "Property-based tests on random event sequences never reach a state outside the table in spec/02-domain-model.md"
+  pri: Must
+  est: 0.75
+  deps: [FND-03]
+  trace: [A2b.states, A2.Execute]
+  ms: M3
+- id: EXE-02
+  epic: EXE
+  title: Attempts and exactly-once guarantees
+  as: payments lead
+  want: each send recorded as an attempt under the same payment ID, with database guarantees against a second payment
+  so: no retry or failover can ever pay twice
+  ac:
+    - "At most one attempt per payment is SUBMITTED or UNKNOWN at a time (partial unique index)"
+    - "At most one attempt per payment is CONFIRMED (partial unique index)"
+    - "A new attempt is created only when the previous one is definitively FAILED"
+    - "Rail idempotency keys are derived from the payment ID as defined in spec/06-rails-and-faults.md"
+  pri: Must
+  est: 0.75
+  deps: [EXE-01]
+  trace: [A2.Execute, A6.retry_rule, A2b.rule, L3]
+  ms: M3
+- id: EXE-03
+  epic: EXE
+  title: Pre-send checks under the lock
+  as: payments lead
+  want: the state lock, balance check, pre-funded wallet limit, kill switch and a fresh policy check right before every send
+  so: nothing is sent on stale or unsafe conditions
+  ac:
+    - "Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid"
+    - "If the decision is older than the configured age or the rule version changed, policy re-runs first"
+    - "Any failed check moves the payment to HELD with the reason; nothing is sent"
+  pri: Must
+  est: 0.5
+  deps: [EXE-02, POL-02]
+  trace: [A2.Execute, A2b.custody]
+  ms: M3
+- id: EXE-04
+  epic: EXE
+  title: Nonce manager
+  as: builder
+  want: nonces allocated per chain and wallet under a database lock and stored before broadcast
+  so: two different transactions never share a nonce
+  ac:
+    - "The nonce is written on the attempt before the transaction is broadcast"
+    - "On startup the manager reconciles with `eth_getTransactionCount(pending)` and refuses to send if they disagree"
+    - "Concurrent sends from one wallet get consecutive nonces (concurrency test)"
+  pri: Must
+  est: 0.5
+  deps: [EXE-02, RAL-02]
+  trace: [A2.Execute, A2b.custody]
+  ms: M3
+- id: EXE-05
+  epic: EXE
+  title: A timeout becomes UNKNOWN
+  as: payments lead
+  want: a send whose outcome is unclear marked UNKNOWN, never FAILED
+  so: a stuck transaction that later confirms is never paid a second time
+  ac:
+    - "A timeout, dropped connection or 5xx after the request may have reached the rail -> attempt and payment UNKNOWN"
+    - "While UNKNOWN, no new attempt can be created (database and code)"
+    - "Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED"
+  pri: Must
+  est: 0.25
+  deps: [EXE-02]
+  trace: [A2b.unknown, A2b.states, L4]
+  ms: M3
+- id: EXE-06
+  epic: EXE
+  title: UNKNOWN resolver
+  as: payments lead
+  want: UNKNOWN payments resolved from the rail's own evidence, with a human decision if they stay stuck
+  so: we learn the real outcome quickly and never guess
+  ac:
+    - "The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule"
+    - "CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found"
+    - "Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer"
+    - "Median and p95 time to resolve are recorded for the results report"
+  pri: Must
+  est: 1.0
+  deps: [EXE-05, FND-06, EXC-01]
+  trace: [A2b.unknown, B7.unknown]
+  ms: M3
+- id: EXE-07
+  epic: EXE
+  title: Deterministic retry policy
+  as: compliance lead
+  want: retries decided by configured rules in the execution layer only
+  so: the AI never decides to retry and a rejection is never retried
+  ac:
+    - "Retry config lists retryable error codes, maximum attempts and backoff"
+    - "Only `TECHNICAL_RETRYABLE` failures retry; `REJECTED_BY_RAIL` and any BLOCK never do"
+    - "Every retry keeps the payment ID and is audited with the rule that allowed it"
+  pri: Must
+  est: 0.5
+  deps: [EXE-02]
+  trace: [A2b.no_agent_retry, A6.retry_rule, A2b.rule]
+  ms: M3
+- id: EXE-08
+  epic: EXE
+  title: Kill switch
+  as: payments lead
+  want: a kill switch that I or Detent's on-call engineer can pull, and that only I can release
+  so: we can stop all sending at once during an incident
+  ac:
+    - "Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send"
+    - "Pending payments stay held; UNKNOWN attempts keep resolving read-only"
+    - "Release requires the client's payments lead, even if on-call engaged it"
+    - "A red banner shows on every console page while engaged; every change is audited"
+  pri: Must
+  est: 0.5
+  deps: [EXE-03, FND-04]
+  trace: [B3.kill_switch, A2.Execute, L4]
+  ms: M3
+- id: EXE-09
+  epic: EXE
+  title: Shadow, Assist and Auto modes
+  as: payments lead
+  want: a mode setting per platform
+  so: we can adopt step by step under signed gates
+  ac:
+    - "Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically"
+    - "Changing mode needs the payments lead and the compliance lead; each change is audited"
+    - "Orchestrate is shown as routing being enabled when 2 or more rails are connected"
+  pri: Must
+  est: 0.5
+  deps: [EXE-03, FND-04]
+  trace: [A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates]
+  ms: M4
+- id: EXE-10
+  epic: EXE
+  title: Sev 1 invariant monitor
+  as: on-call engineer
+  want: a continuous check for duplicate payments, unauthorised executions and double credits
+  so: if an invariant ever breaks we stop and know within a minute
+  ac:
+    - "Every minute and after each confirmation: two confirmed transfers for one payment ID, a confirmed attempt without an EXECUTE or approved decision, or two credits for one inbound transfer"
+    - "A hit opens a Sev 1 incident, engages the kill switch (configurable, on by default), posts to the mock outbox and shows a red banner"
+  pri: Should
+  est: 0.5
+  deps: [EXE-08, LED-05]
+  trace: [B3.incident, B7.safety]
+  ms: M12
+
+# ---------------- RAL Rails, routing and faults ----------------
+- id: RAL-01
+  epic: RAL
+  title: Rail adapter contract
+  as: builder
+  want: one adapter interface with normalised statuses and an error taxonomy
+  so: adding a rail never touches decision or execution logic
+  ac:
+    - "Interface: `eligible`, `quote`, `submit`, `status`, `health`, as in spec/06-rails-and-faults.md"
+    - "Errors normalise to TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL or TIMEOUT"
+    - "A shared contract-test suite runs against every adapter"
+  pri: Must
+  est: 0.5
+  deps: [FND-03]
+  trace: [A2.Connect, B4.rails, B6.dependence]
+  ms: M3
+- id: RAL-02
+  epic: RAL
+  title: Base Sepolia USDC adapter
+  as: demo viewer
+  want: real test USDC transfers on Base Sepolia with explorer links
+  so: the demo moves real (test) value on a real network
+  ac:
+    - "ERC-20 transfer via web3.py signed with a test key from settings; gas estimated and checked"
+    - "Confirmation threshold configurable; explorer link stored on the attempt"
+    - "Contract tests pass on the local chain and nightly on Base Sepolia"
+  pri: Must
+  est: 0.75
+  deps: [RAL-01, FND-09]
+  trace: [A2.Connect, A2b.custody, A7.prototype]
+  ms: M3
+- id: RAL-03
+  epic: RAL
+  title: Ethereum Sepolia USDC adapter
+  as: demo viewer
+  want: the same transfers on Ethereum Sepolia
+  so: routing has a real second network to choose
+  ac:
+    - "Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold"
+    - "Contract tests pass"
+  pri: Must
+  est: 0.25
+  deps: [RAL-02]
+  trace: [A2.Connect]
+  ms: M3
+- id: RAL-04
+  epic: RAL
+  title: Simulated instant bank rail
+  as: demo viewer
+  want: a mock instant bank rail with its own fees, limits, cut-off times and failure rate
+  so: routing and reconciliation span stablecoin and fiat
+  ac:
+    - "A separate FastAPI sub-app with GBP and EUR, per-payment and daily limits, cut-off times, a configurable failure rate and idempotency by key"
+    - "Status endpoint and asynchronous settlement callback; daily statement endpoint (used by LED-07)"
+    - "Deterministic test values: amounts ending .13 time out then settle; .42 fail technically"
+  pri: Must
+  est: 0.75
+  deps: [RAL-01]
+  trace: [A2.Connect, A7.prototype]
+  ms: M3
+- id: RAL-05
+  epic: RAL
+  title: Fault-injection proxy
+  as: builder
+  want: a proxy in front of chain RPC and the bank rail that injects named faults
+  so: the exactly-once claims are demonstrated, not asserted
+  ac:
+    - "Faults: timeout after forwarding, timeout before forwarding, connection reset, 5xx, delayed receipt, hidden receipt for N polls (stuck), duplicated response"
+    - "Fault chosen per attempt by scenario config in tests and sandbox; disabled in demo mode unless a scenario requests it"
+    - "Each injected fault is logged with the attempt ID"
+  pri: Must
+  est: 0.75
+  deps: [RAL-02, RAL-04]
+  trace: [L3, L4, A2b.unknown]
+  ms: M3
+- id: RAL-06
+  epic: RAL
+  title: Routing engine
+  as: payments lead
+  want: the best eligible rail chosen by cost, speed, success rate and liquidity, with the reason stored
+  so: payouts cost less and fail less, and I can see why a rail was chosen
+  ac:
+    - "Routing runs only after an EXECUTE decision; a BLOCK never reaches routing"
+    - "Eligibility first (currency, network constraint from intent or mandate, limits, cut-off, health, liquidity), then a weighted score from config"
+    - "The decision stores each candidate's score and the reason for the winner"
+  pri: Must
+  est: 0.5
+  deps: [RAL-01, POL-02]
+  trace: [A2.Route, A3.orchestrate, A1.cost]
+  ms: M3
+- id: RAL-07
+  epic: RAL
+  title: Failover on technical failure only
+  as: compliance lead
+  want: failover to another rail only after a definitive technical failure and only when the intent allows a network switch
+  so: a rejection is never re-routed and failover can't pay twice
+  ac:
+    - "Failover needs the previous attempt definitively FAILED with a technical code; never from UNKNOWN"
+    - "Never after BLOCK or REJECTED_BY_RAIL"
+    - "Network switches need `allow_network_switch` on the intent or mandate, or a human approval"
+    - "The new attempt keeps the payment ID"
+  pri: Must
+  est: 0.5
+  deps: [RAL-06, EXE-07]
+  trace: [A2.Route, A6.block_final, L5, A1.cost]
+  ms: M3
+- id: RAL-08
+  epic: RAL
+  title: Rail health and circuit breaker
+  as: payments lead
+  want: each rail's success rate, latency, balance and limit usage, and unhealthy rails taken out of routing
+  so: payments avoid a failing rail automatically
+  ac:
+    - "Rolling success rate and p95 latency per rail; balance and pre-funded limit usage"
+    - "Circuit opens after the configured failure count and closes after a successful probe"
+  pri: Should
+  est: 0.5
+  deps: [RAL-06]
+  trace: [A2.Connect, B3.adapters]
+  ms: M12
+- id: RAL-09
+  epic: RAL
+  title: Rail connection flow (mock)
+  as: payments lead
+  want: to connect a rail through a mock authorisation screen or by entering scoped API keys
+  so: onboarding looks like the real thing and we keep our own rail accounts
+  ac:
+    - "Mock OAuth-style consent screen and a scoped-key form; credentials encrypted at rest and never shown again"
+    - "Scopes listed; disconnect removes credentials and takes the rail out of routing"
+  pri: Should
+  est: 0.75
+  deps: [RAL-01]
+  trace: [A2.Connect, B3.onboarding, B5.security]
+  ms: M12
+- id: RAL-10
+  epic: RAL
+  title: Daily adapter contract tests
+  as: on-call engineer
+  want: adapter contract tests run daily against testnets and the simulator
+  so: a rail API change is caught before a demo
+  ac:
+    - "Scheduled GitHub Actions job; failure opens an issue with the failing adapter and test"
+  pri: Should
+  est: 0.25
+  deps: [RAL-03, RAL-04]
+  trace: [B3.adapters]
+  ms: M12
+- id: RAL-11
+  epic: RAL
+  title: Simulated chain rail for the sandbox
+  as: platform integrator
+  want: sandbox payouts on a simulated USDC rail that settles instantly by default
+  so: I can test every path quickly without draining faucet wallets
+  ac:
+    - "Implements the adapter contract with instant settlement and the same test values"
+    - "Sandbox organisations use it by default; real testnet is opt-in (SBX-03)"
+  pri: Must
+  est: 0.5
+  deps: [RAL-01]
+  trace: [D.sandbox]
+  ms: M9
+
+# ---------------- EXC Exceptions ----------------
+- id: EXC-01
+  epic: EXC
+  title: Exception cases with owner and deadline
+  as: payments lead
+  want: every escalation to become a case with a named owner, a backup owner and a deadline by risk tier
+  so: escalations always get answered
+  ac:
+    - "Owner assignment rules by case type and amount, in config"
+    - "Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions)"
+    - "Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited"
+  pri: Must
+  est: 0.5
+  deps: [POL-02, FND-05]
+  trace: [A2.Exceptions, B3.exceptions]
+  ms: M3
+- id: EXC-02
+  epic: EXC
+  title: Raw facts first
+  as: reviewer
+  want: to see the raw facts before the agent's summary
+  so: my judgement isn't anchored by the AI
+  ac:
+    - "Top of the case: payee as registered, full checksummed wallet address, first seen and last changed times, amount against the counterparty's median, each rule hit with its parameters, and the mandate scope"
+    - "The agent's evidence and recommendation sit below, collapsed by default"
+  pri: Must
+  est: 0.5
+  deps: [EXC-01, INT-04]
+  trace: [A2b.raw_facts, L6]
+  ms: M4
+- id: EXC-03
+  epic: EXC
+  title: Investigation agent with cited evidence
+  as: reviewer
+  want: the investigation agent to gather evidence and draft a recommendation that cites its sources
+  so: I decide faster without trusting unsupported claims
+  ac:
+    - "Read-only tools: ledger history, counterparty record, screening result, rail status, prior cases"
+    - "Each claim cites evidence record IDs; uncited claims are removed and the removal is flagged"
+    - "Recommendation is approve, reject or needs-information with a confidence; the agent cannot change any state"
+    - "Runs in the worker; the case is usable before the agent finishes"
+  pri: Must
+  est: 1.0
+  deps: [EXC-01, AGT-05]
+  trace: [A5.citations, A5.tools, A2.Exceptions, A1.reviews]
+  ms: M4
+- id: EXC-04
+  epic: EXC
+  title: Approve or reject, with policy re-run
+  as: reviewer
+  want: approval to send the payment back through policy before anything is sent
+  so: an approval can't push through something the rules now block
+  ac:
+    - "Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode"
+    - "Reject -> REJECTED (terminal); a reason is required for both"
+    - "The approver can't be the user who initiated the intent"
+  pri: Must
+  est: 0.5
+  deps: [EXC-01, EXE-03]
+  trace: [A2.Exceptions, A6.block_final, L6]
+  ms: M4
+- id: EXC-05
+  epic: EXC
+  title: Double-approval safety
+  as: payments lead
+  want: concurrent approvals of one case to have exactly one effect
+  so: a double click or two reviewers never cause two sends
+  ac:
+    - "Row lock plus version check; the second approval gets 409 `already_resolved`"
+    - "Fault suite includes parallel approvals from console and API"
+  pri: Must
+  est: 0.25
+  deps: [EXC-04]
+  trace: [L3, A6.retry_rule]
+  ms: M4
+- id: EXC-06
+  epic: EXC
+  title: Deadline sweeper - a timeout never becomes an approval
+  as: payments lead
+  want: overdue cases held, the counterparty told, and the case passed to the backup owner
+  so: nothing is auto-approved and nobody is left waiting without news
+  ac:
+    - "Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline"
+    - "The count of payments approved by timeout is always 0 and is reported"
+  pri: Must
+  est: 0.5
+  deps: [EXC-01, EXC-07, FND-06]
+  trace: [A2b.timeout_hold, A6.timeout, B3.exceptions, L6, B7.exceptions]
+  ms: M4
+- id: EXC-07
+  epic: EXC
+  title: Mock outbox
+  as: demo viewer
+  want: every outbound notification visible in an Outbox screen
+  so: the demo shows the counterparty updates without sending real email
+  ac:
+    - "Counterparty updates, owner assignments and incident notices are stored with recipient, template and body"
+    - "Nothing in the prototype sends real email"
+  pri: Must
+  est: 0.25
+  deps: [FND-03]
+  trace: [B3.exceptions]
+  ms: M4
+- id: EXC-08
+  epic: EXC
+  title: Exceptions by API
+  as: platform integrator
+  want: to list cases and approve or reject them by API
+  so: our own tools can work the queue
+  ac:
+    - "GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve`"
+    - "Same rules as the console: re-run, separation of duties, 409 on double approval"
+  pri: Must
+  est: 0.25
+  deps: [EXC-04]
+  trace: [A2.Exceptions, D.standards]
+  ms: M8
+- id: EXC-09
+  epic: EXC
+  title: Agent-versus-human agreement sample
+  as: compliance lead
+  want: a report comparing the agent's recommendations with our final decisions
+  so: we can see whether the agent deserves more trust
+  ac:
+    - "Per period: cases, agreement rate, disagreements listed with both rationales"
+  pri: Could
+  est: 0.25
+  deps: [EXC-03]
+  trace: [B3.agent_eval, B7.quality]
+  ms: M12
+
+# ---------------- LED Ledger, deposits, reconciliation ----------------
+- id: LED-01
+  epic: LED
+  title: Double-entry ledger
+  as: auditor
+  want: one immutable double-entry ledger across all rails
+  so: every balance can be explained from entries
+  ac:
+    - "Journal entries with balanced postings; accounts for user balances, platform operating, rail clearing per rail, fees and suspense"
+    - "Entries are append-only; corrections are new entries"
+    - "Every posting references a payment, deposit or adjustment ID"
+  pri: Must
+  est: 0.75
+  deps: [FND-03]
+  trace: [A2.Reconcile, A1.evidence]
+  ms: M5
+- id: LED-02
+  epic: LED
+  title: Payout postings
+  as: payments lead
+  want: payouts reserved on submission, settled on confirmation and released on final failure
+  so: balances are always right, even with UNKNOWN payments
+  ac:
+    - "SUBMITTED reserves; CONFIRMED settles and posts actual fees; final FAILED reverses the reservation; UNKNOWN keeps the reservation"
+    - "Ledger and payment status agree after every fault-suite case"
+  pri: Must
+  est: 0.5
+  deps: [LED-01, EXE-02]
+  trace: [A2.Reconcile]
+  ms: M5
+- id: LED-03
+  epic: LED
+  title: Deposit intents
+  as: platform integrator
+  want: to create a deposit intent for a user account with expected token, network and optional amount
+  so: incoming money can be matched to the right account
+  ac:
+    - "POST /v1/deposit_intents returns deposit instructions: a per-account test address, or a bank reference for the simulated rail"
+    - "Idempotent like payment intents"
+  pri: Must
+  est: 0.5
+  deps: [LED-01]
+  trace: [A1.deposits, A2.Reconcile]
+  ms: M5
+- id: LED-04
+  epic: LED
+  title: Deposit watchers
+  as: payments lead
+  want: incoming transfers on both chains and the bank rail recorded once each
+  so: no deposit is missed or counted twice
+  ac:
+    - "Reads ERC-20 Transfer logs to watched addresses, and bank-rail inbound credits"
+    - "Unique on (rail, transaction hash, log index); restarting the watcher never duplicates"
+  pri: Must
+  est: 0.5
+  deps: [LED-03, FND-06, RAL-02]
+  trace: [A1.deposits]
+  ms: M5
+- id: LED-05
+  epic: LED
+  title: Deposit decision and credit-once
+  as: payments lead
+  want: each inbound transfer matched, checked and credited once after enough confirmations
+  so: users are credited once, to the right account
+  ac:
+    - "Match on address or reference, token, network and amount within tolerance"
+    - "Policy checks the sender (screening) and the token and network match"
+    - "Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer"
+    - "Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions"
+  pri: Must
+  est: 0.75
+  deps: [LED-04, POL-03, EXC-01]
+  trace: [A1.deposits, A2.Reconcile, L7]
+  ms: M5
+- id: LED-06
+  epic: LED
+  title: Reconciliation run with proposed fixes
+  as: payments lead
+  want: a reconciliation of the ledger against every rail's records, with a proposed fix for each break
+  so: reconciliation is a review of exceptions, not a spreadsheet job
+  ac:
+    - "Matches ledger postings to chain transfers and bank statements for payouts and deposits; reports the match rate"
+    - "Each break becomes an exception with a fix drafted by the reconciliation agent (for example, credit account X, or return to sender)"
+    - "A fix is applied only after human approval, as a new adjustment entry"
+    - "On a generated set of 500 synthetic deposits and payouts with 3 designed breaks, automatic matching is 99% or more and each break gets a proposed fix"
+    - "The demo batch (20 payouts, 8 deposits) shows exactly one designed break, dep-07"
+  pri: Must
+  est: 0.75
+  deps: [LED-02, LED-05, LED-07, EXC-01]
+  trace: [A2.Reconcile, L7, B7.recon]
+  ms: M5
+- id: LED-07
+  epic: LED
+  title: Bank statement import
+  as: builder
+  want: the simulated bank's daily statement imported for reconciliation
+  so: fiat reconciliation works like it does with a real bank
+  ac:
+    - "Pulls the statement endpoint (JSON or CSV), idempotent per statement date"
+  pri: Must
+  est: 0.25
+  deps: [RAL-04]
+  trace: [A2.Reconcile]
+  ms: M5
+- id: LED-08
+  epic: LED
+  title: Usage metering
+  as: founder
+  want: payments decided per organisation per month counted from decisions and the ledger
+  so: per-payment pricing can be billed later, and sandbox usage shown now
+  ac:
+    - "Monthly counts of payments decided, agent investigations and API calls per organisation"
+  pri: Could
+  est: 0.25
+  deps: [LED-01]
+  trace: [A4.fee, B3.billing, D.usage]
+  ms: M9
+
+# ---------------- AUD Audit ----------------
+- id: AUD-01
+  epic: AUD
+  title: Append-only, hash-chained audit log
+  as: auditor
+  want: every step recorded in an append-only log I can verify
+  so: the record can't be quietly changed
+  ac:
+    - "Events written in the same transaction as the change they describe: intent, agent output, decision with rule version and checks, case events, approvals, transitions, rail requests and responses, postings, kill switch, policy changes"
+    - "A database trigger rejects UPDATE and DELETE on audit rows"
+    - "Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested)"
+  pri: Must
+  est: 0.75
+  deps: [FND-03]
+  trace: [A2.Prove, B5.security, A1.evidence]
+  ms: M1
+- id: AUD-02
+  epic: AUD
+  title: Replay any payment
+  as: auditor
+  want: to replay a payment step by step from its stored inputs, rule version and agent outputs
+  so: I can confirm the decision would be made the same way again
+  ac:
+    - "Console button and GET /v1/payment_intents/{id}/replay"
+    - "Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert"
+    - "Every payment in the demo data replays successfully (test)"
+  pri: Must
+  est: 0.75
+  deps: [AUD-01, AGT-05, POL-02]
+  trace: [A2.Prove, L8, B3.incident]
+  ms: M5
+- id: AUD-03
+  epic: AUD
+  title: Evidence export
+  as: auditor
+  want: an evidence pack for a payment or date range
+  so: I can review it offline
+  ac:
+    - "JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result"
+  pri: Should
+  est: 0.5
+  deps: [AUD-02]
+  trace: [A2.Prove, A1.evidence]
+  ms: M12
+
+# ---------------- CON Console ----------------
+- id: CON-01
+  epic: CON
+  title: Console shell and prototype labelling
+  as: demo viewer
+  want: a clean console with navigation, acting-user indicator, kill-switch state and a permanent prototype label
+  so: it looks real and is honest about what it is
+  ac:
+    - "Jinja and htmx; navigation: Overview, Payments, Exceptions, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings"
+    - "A banner on every page: 'Prototype · test networks · simulated bank rail'"
+    - "Wording uses 'agentic payment controls' and names the three layers (decision, orchestration, operations); never 'payments company' or 'payment provider'"
+  pri: Must
+  est: 0.5
+  deps: [FND-04]
+  trace: [L8, BR.category, D.honesty]
+  ms: M4
+- id: CON-02
+  epic: CON
+  title: Overview screen
+  as: payments lead
+  want: today's decisions, open and overdue cases, UNKNOWN payments, match rate and rail health at a glance
+  so: I know where attention is needed
+  ac:
+    - "Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events"
+    - "Refreshes by htmx polling"
+  pri: Must
+  est: 0.5
+  deps: [CON-01]
+  trace: [B7.automation, B7.exceptions, B7.unknown]
+  ms: M4
+- id: CON-03
+  epic: CON
+  title: Payments list and detail
+  as: reviewer
+  want: a payment page with every check, the route, attempts, postings and the timeline
+  so: I can answer "what happened to this payment" in one place
+  ac:
+    - "Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button"
+  pri: Must
+  est: 0.75
+  deps: [CON-01, AUD-01]
+  trace: [A2.Prove, A2.Decide]
+  ms: M4
+- id: CON-04
+  epic: CON
+  title: Exceptions queue screen
+  as: reviewer
+  want: my queue with deadlines counting down and the case page with approve and reject
+  so: I can work escalations quickly and correctly
+  ac:
+    - "Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason"
+  pri: Must
+  est: 0.5
+  deps: [CON-01, EXC-04]
+  trace: [A2.Exceptions, A2b.raw_facts]
+  ms: M4
+- id: CON-05
+  epic: CON
+  title: Invoice drop and agent proposal screen
+  as: demo viewer
+  want: to drop an invoice and watch the agent's proposal, flags and mandate appear
+  so: the agentic part of the demo is visible
+  ac:
+    - "Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force"
+    - "'Submit as agent' calls the public API with the agent's key and shows the decision"
+  pri: Must
+  est: 0.5
+  deps: [CON-01, AGT-02, MND-02]
+  trace: [MVP.flow, A5.proposes]
+  ms: M4
+- id: CON-06
+  epic: CON
+  title: Policy and mandates screens
+  as: compliance lead
+  want: to read, diff, propose and approve rule versions, and to manage mandates
+  so: rule ownership is visible and practical
+  ac:
+    - "Active version, history and diff; propose and approve per POL-07"
+    - "Mandates list with scope, usage against limits, expiry and revoke"
+  pri: Must
+  est: 0.5
+  deps: [POL-07, MND-03]
+  trace: [B3.rule_changes, A2.Mandate]
+  ms: M4
+- id: CON-07
+  epic: CON
+  title: Reconciliation screen
+  as: payments lead
+  want: the latest run's match rate and breaks with proposed fixes
+  so: I can approve fixes in minutes
+  ac:
+    - "Run history, match rate, breaks with proposed fix and approve button"
+  pri: Must
+  est: 0.25
+  deps: [LED-06]
+  trace: [A2.Reconcile, L7]
+  ms: M5
+- id: CON-08
+  epic: CON
+  title: Rails screen
+  as: payments lead
+  want: connected rails with balance, limits and recent results
+  so: I can see where money is going
+  ac:
+    - "Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts"
+  pri: Must
+  est: 0.25
+  deps: [CON-01, RAL-06]
+  trace: [A2.Connect]
+  ms: M4
+- id: CON-09
+  epic: CON
+  title: Demo scenario runner
+  as: founder
+  want: one-click scenarios and a reset
+  so: every demo runs the same way in under 10 minutes
+  ac:
+    - "Scenarios: the $18,500 invoice; forced timeout to UNKNOWN then CONFIRMED with no resend; 20-payment batch with deposits and one designed break; an attack sample; reset demo data"
+    - "Each scenario is scripted, idempotent and uses the controllable clock"
+  pri: Must
+  est: 0.75
+  deps: [CON-05, LED-06, EVL-01]
+  trace: [MVP.flow, MVP.scenarios]
+  ms: M7
+- id: CON-10
+  epic: CON
+  title: Settings screen
+  as: payments lead
+  want: to see and set mode, fail-safe, deadlines and routing weights
+  so: the operating choices are explicit
+  ac:
+    - "Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype"
+  pri: Should
+  est: 0.25
+  deps: [EXE-09]
+  trace: [B5.failsafe, A3.gates]
+  ms: M12
+
+# ---------------- EVL Evaluation ----------------
+- id: EVL-01
+  epic: EVL
+  title: Evaluation runner
+  as: builder
+  want: "`detent eval run --suite attacks|faults|interpretation|agreement|all` on a fresh database"
+  so: results are repeatable and comparable across commits
+  ac:
+    - "Each scenario runs in isolation with a fixed seed; output is results.json with date, commit, model IDs and per-scenario results"
+    - "Scenarios are data files under eval/scenarios/, not code"
+  pri: Must
+  est: 0.5
+  deps: [FND-09, POL-02]
+  trace: [A5.gate, B3.agent_eval]
+  ms: M6
+- id: EVL-02
+  epic: EVL
+  title: Attack suite (100+ scenarios)
+  as: compliance lead
+  want: at least 100 attack scenarios with zero unauthorised executions
+  so: the safety claim is measured
+  ac:
+    - "Categories from spec/09-evaluation-and-tests.md: injection in invoice body, notes, payee name, reference and PDF metadata; mandate violations; split payments; wallet change race; resubmission after block; self-approval; approval after deadline; idempotency-key reuse; tampered rule version; cross-organisation access; wrong-scope keys; re-route after block"
+    - "Pass means no SUBMITTED or CONFIRMED attempt without authorisation; the suite reports per category"
+  pri: Must
+  est: 1.0
+  deps: [EVL-01, AGT-04, EXC-04, RAL-07]
+  trace: [L2, A5.gate, A5.injection, B7.safety]
+  ms: M6
+- id: EVL-03
+  epic: EVL
+  title: Fault suite (30+ cases)
+  as: payments lead
+  want: at least 30 fault cases with zero duplicate payments
+  so: '"no retry can become a second payment" is proven'
+  ac:
+    - "Matrix of faults (timeout after and before send, reset, 5xx, delayed and hidden receipt, duplicated response, worker crash mid-send, concurrent retries, double approvals, failover, kill switch mid-batch) across the rails"
+    - "Pass: 0 duplicates, every retry and switch keeps the payment ID, no timeout ever becomes FAILED"
+  pri: Must
+  est: 1.0
+  deps: [EVL-01, RAL-05, EXE-06]
+  trace: [L3, L4, L5, B7.safety]
+  ms: M6
+- id: EVL-04
+  epic: EVL
+  title: Interpretation set
+  as: builder
+  want: 30 labelled invoices including 10 runs of the canonical one and ambiguous variants
+  so: the agent's accuracy and "flag, never guess" are measured
+  ac:
+    - "Metrics: field accuracy, flag recall on ambiguous cases, invented-value count (must be 0), and canonical 10/10"
+  pri: Must
+  est: 0.5
+  deps: [EVL-01, AGT-02]
+  trace: [L1, A5.proposes]
+  ms: M6
+- id: EVL-05
+  epic: EVL
+  title: Agreement set (synthetic)
+  as: founder
+  want: 50 synthetic cases labelled with an expert decision
+  so: agreement can be reported now and replaced by real anonymised cases later
+  ac:
+    - "Agreement of final decision and of agent recommendation with labels, reported separately; clearly marked synthetic"
+  pri: Should
+  est: 0.5
+  deps: [EVL-01, EXC-03]
+  trace: [B7.quality, A1.reviews]
+  ms: M6
+- id: EVL-06
+  epic: EVL
+  title: Results report
+  as: founder
+  want: a dated results report generated from results.json
+  so: I can show measured results to prospects and investors
+  ac:
+    - "HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]'"
+    - "results.json is published for the website's Measured results section"
+  pri: Must
+  est: 0.5
+  deps: [EVL-02, EVL-03, EVL-04]
+  trace: [MVP.flow, D.site, D.honesty, B7.automation]
+  ms: M6
+- id: EVL-07
+  epic: EVL
+  title: Release gate in CI
+  as: compliance lead
+  want: the attack and fault suites to block any release with a single unauthorised execution or duplicate
+  so: regressions never reach the demo or the sandbox
+  ac:
+    - "Runs on main and on release tags against the local chain and simulators; nightly against public testnets"
+    - "Any unauthorised execution or duplicate fails the build, whatever other scores say"
+  pri: Must
+  est: 0.5
+  deps: [EVL-02, EVL-03]
+  trace: [A5.gate, B3.agent_eval, B6.ai]
+  ms: M6
+- id: EVL-08
+  epic: EVL
+  title: Latency benchmark
+  as: on-call engineer
+  want: p95 decision latency measured with and without agent investigation
+  so: we can state the resilience target honestly
+  ac:
+    - "Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report"
+  pri: Should
+  est: 0.25
+  deps: [EVL-01]
+  trace: [B5.resilience, B7.reliability]
+  ms: M6
+
+# ---------------- DEM Demo data ----------------
+- id: DEM-01
+  epic: DEM
+  title: Fictional demo platform and actors
+  as: founder
+  want: one clearly fictional platform with users, counterparties, rules v1 and an agent mandate
+  so: the demo is realistic without using any real company or former-employer material
+  ac:
+    - "Names are invented and labelled fictional; no real client, partner or former-employer names"
+    - "Seed is idempotent and resettable"
+  pri: Must
+  est: 0.25
+  deps: [INT-04, POL-01, MND-01]
+  trace: [B1.independence, B6.former_employer, MVP.flow]
+  ms: M7
+- id: DEM-02
+  epic: DEM
+  title: Canonical invoice and variants
+  as: founder
+  want: the $18,500 USDC supplier invoice and its ambiguous and malicious variants as fixtures
+  so: the headline flow and its edge cases are always available
+  ac:
+    - "fixtures/invoices/ contains the canonical invoice plus missing-network, two-wallet, changed-wallet and injection variants with expected outputs"
+  pri: Must
+  est: 0.25
+  deps: []
+  trace: [L1, MVP.flow]
+  ms: M2
+- id: DEM-03
+  epic: DEM
+  title: 20-payment batch with deposits
+  as: founder
+  want: a batch fixture mixing payouts across rails with deposits and one designed reconciliation break
+  so: routing and reconciliation are shown in one run
+  ac:
+    - "Covers all three rails, at least one escalation, one block and exactly one reconciliation break"
+  pri: Must
+  est: 0.25
+  deps: [LED-06]
+  trace: [MVP.flow, L7]
+  ms: M7
+- id: DEM-04
+  epic: DEM
+  title: Wallet funding runbook and check
+  as: founder
+  want: a script that checks test-wallet balances and tells me what to top up
+  so: a demo never fails for lack of test USDC or gas
+  ac:
+    - "`detent demo check` prints USDC and gas balances per wallet and chain with faucet instructions"
+  pri: Must
+  est: 0.25
+  deps: [RAL-03]
+  trace: [A7.prototype]
+  ms: M7
+- id: DEM-05
+  epic: DEM
+  title: Demo script
+  as: founder
+  want: a written 10-minute demo script matching the scenario runner
+  so: every demo tells the same story
+  ac:
+    - "spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask"
+  pri: Must
+  est: 0.25
+  deps: [CON-09]
+  trace: [MVP.flow, B3.lead_shadow]
+  ms: M7
+- id: DEM-06
+  epic: DEM
+  title: Scenario packs per platform type
+  as: founder
+  want: seed packs for a payout platform, a crypto service provider and a marketplace
+  so: I can tailor the demo to the prospect
+  ac:
+    - "Each pack: platform, counterparties, rules and a short batch; selectable on reset"
+  pri: Should
+  est: 0.5
+  deps: [DEM-01]
+  trace: [MVP.scenarios]
+  ms: M12
+
+# ---------------- SHD Shadow mode ----------------
+- id: SHD-01
+  epic: SHD
+  title: Shadow CSV import
+  as: payments lead
+  want: to upload a month of payout and deposit exports with our actual decisions
+  so: Detent can show what it would have decided on our real data
+  ac:
+    - "Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed"
+  pri: Should
+  est: 0.75
+  deps: [POL-08]
+  trace: [MVP.shadow_csv, A3.shadow, A6.shadow_first, A7.beta, B3.lead_shadow]
+  ms: M12
+- id: SHD-02
+  epic: SHD
+  title: Shadow report
+  as: payments lead
+  want: a report of what would have been auto-approved, escalated and blocked, agreement with our decisions, unsafe approvals and routing savings
+  so: we can judge the value before any pilot
+  ac:
+    - "Sections: decision mix, agreement, unsafe approvals (approved by Detent but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF"
+  pri: Should
+  est: 0.75
+  deps: [SHD-01, RAL-06]
+  trace: [A3.shadow, B3.lead_shadow, A4.plans]
+  ms: M12
+- id: SHD-03
+  epic: SHD
+  title: Mode-gate report and sign-off
+  as: compliance lead
+  want: a gate report with agreement and unsafe approvals over a period, and a recorded sign-off
+  so: each move from Shadow to Assist to Auto is evidenced
+  ac:
+    - "Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change"
+  pri: Could
+  est: 0.5
+  deps: [SHD-02, EXE-09]
+  trace: [A3.gates, B3.mode_gates]
+  ms: M12
+- id: SHD-04
+  epic: SHD
+  title: Anonymise on import
+  as: compliance lead
+  want: names and addresses hashed with a per-import salt
+  so: sharing a shadow export doesn't expose personal data
+  ac:
+    - "Raw names and account identifiers never stored; hashes are consistent within one import"
+  pri: Should
+  est: 0.25
+  deps: [SHD-01]
+  trace: [B1.contracts, A5.data]
+  ms: M12
+
+# ---------------- OPS Operational controls ----------------
+- id: OPS-01
+  epic: OPS
+  title: Incident records
+  as: on-call engineer
+  want: incidents with severity, timeline, notification time and root cause
+  so: we can run the Sev 1 process and support clients' DORA reporting
+  ac:
+    - "Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays"
+  pri: Should
+  est: 0.5
+  deps: [EXE-10, AUD-02]
+  trace: [B3.incident]
+  ms: M12
+- id: OPS-02
+  epic: OPS
+  title: Independence check in CI
+  as: founder
+  want: CI to fail if the repo contains any term from a private denylist
+  so: no former-employer name or material ever enters the codebase
+  ac:
+    - "The denylist lives in a CI secret, never in the repo; the check scans code, fixtures and docs"
+  pri: Must
+  est: 0.25
+  deps: [FND-01]
+  trace: [B1.independence, B6.former_employer]
+  ms: M0
+- id: OPS-03
+  epic: OPS
+  title: Backup and restore drill
+  as: on-call engineer
+  want: a documented, tested restore from the database provider's point-in-time recovery
+  so: we can recover in under an hour without losing decisions
+  ac:
+    - "Runbook in spec/10; one drill done and timed; audit hash chain verified after restore"
+  pri: Could
+  est: 0.25
+  deps: [FND-07]
+  trace: [B5.resilience]
+  ms: M12
+- id: OPS-04
+  epic: OPS
+  title: Security pack draft
+  as: founder
+  want: a written description of the controls as built
+  so: it can seed a pen test and vendor due diligence later
+  ac:
+    - "docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap"
+  pri: Could
+  est: 0.25
+  deps: [EVL-07]
+  trace: [B5.assurance, B5.security]
+  ms: M12
+
+# ---------------- API Public sandbox API ----------------
+- id: API-01
+  epic: API
+  title: API keys and scopes
+  as: platform integrator
+  want: test API keys with scopes, sent as a Bearer token
+  so: my integration is authenticated and least-privileged
+  ac:
+    - "`Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin"
+    - "Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable`"
+    - "Every data access filters by the key's organisation (cross-organisation tests in EVL-02)"
+  pri: Must
+  est: 0.75
+  deps: [FND-03]
+  trace: [D.keys, D.standards, B5.security]
+  ms: M8
+- id: API-02
+  epic: API
+  title: Error model
+  as: platform integrator
+  want: consistent JSON errors with type, code, message, payment ID and request ID
+  so: I can handle errors in code
+  ac:
+    - "Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs"
+  pri: Must
+  est: 0.25
+  deps: [FND-08]
+  trace: [D.standards]
+  ms: M8
+- id: API-03
+  epic: API
+  title: Dated API versions
+  as: platform integrator
+  want: a dated version header
+  so: my integration doesn't break when the API changes
+  ac:
+    - "`Detent-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400"
+  pri: Must
+  est: 0.25
+  deps: [API-01]
+  trace: [D.standards]
+  ms: M8
+- id: API-04
+  epic: API
+  title: Rate limits
+  as: founder
+  want: per-key rate limits returned in headers
+  so: the sandbox stays healthy
+  ac:
+    - "`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After`"
+  pri: Must
+  est: 0.25
+  deps: [API-01]
+  trace: [D.standards, D.abuse]
+  ms: M8
+- id: API-05
+  epic: API
+  title: OpenAPI 3.1 file
+  as: platform integrator
+  want: a complete, polished OpenAPI file with examples for every endpoint
+  so: docs, SDKs and "try it" all come from one source
+  ac:
+    - "Generated from FastAPI, then completed with descriptions, examples and error responses"
+    - "Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift"
+  pri: Must
+  est: 1.5
+  deps: [API-02, EXC-08, LED-03]
+  trace: [D.docs, D.sdks, D.standards]
+  ms: M8
+- id: API-06
+  epic: API
+  title: Request logs
+  as: platform integrator
+  want: every API call I make logged with status, latency, idempotency key and payment ID
+  so: I can debug my own integration
+  ac:
+    - "Stored per organisation for 30 days; bodies redacted; filterable in the dashboard"
+  pri: Must
+  est: 0.5
+  deps: [API-01]
+  trace: [D.logs]
+  ms: M8
+- id: API-07
+  epic: API
+  title: Events list
+  as: platform integrator
+  want: GET /v1/events with cursor pagination
+  so: I can poll if I can't receive webhooks
+  ac:
+    - "Same event objects as webhooks; filter by type and payment ID"
+  pri: Should
+  est: 0.25
+  deps: [WHK-01]
+  trace: [D.webhooks, D.standards]
+  ms: M8
+
+# ---------------- WHK Webhooks ----------------
+- id: WHK-01
+  epic: WHK
+  title: Webhook endpoints and event types
+  as: platform integrator
+  want: to register endpoints for chosen event types
+  so: my systems react to decisions and state changes in real time
+  ac:
+    - "Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break)"
+    - "Signing secret shown once; events carry `id` and a per-payment `sequence`"
+  pri: Must
+  est: 0.5
+  deps: [API-01]
+  trace: [D.webhooks]
+  ms: M8
+- id: WHK-02
+  epic: WHK
+  title: Signed webhooks
+  as: platform integrator
+  want: an HMAC-SHA256 signature over timestamp and body with a 5-minute window
+  so: I can trust that events come from Detent
+  ac:
+    - "`Detent-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)"
+  pri: Must
+  est: 0.25
+  deps: [WHK-01]
+  trace: [D.webhooks]
+  ms: M8
+- id: WHK-03
+  epic: WHK
+  title: Delivery, retries and log
+  as: platform integrator
+  want: at-least-once delivery with retries, a delivery log, resend and a test event
+  so: I never silently miss an event
+  ac:
+    - "Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event'"
+  pri: Must
+  est: 0.5
+  deps: [WHK-02, FND-06]
+  trace: [D.webhooks]
+  ms: M8
+
+# ---------------- DSH Developer dashboard ----------------
+- id: DSH-01
+  epic: DSH
+  title: Admin creates organisations and invites
+  as: Detent admin
+  want: to create an organisation after a demo and invite its developers
+  so: sandbox access stays sales-led
+  ac:
+    - "Admin screen: organisation name, expiry (default 60 days), invite emails; invite links are single-use and expire in 7 days"
+    - "No public sign-up route exists"
+  pri: Must
+  est: 0.5
+  deps: [API-01]
+  trace: [D.sales_led, B3.onboarding]
+  ms: M9
+- id: DSH-02
+  epic: DSH
+  title: Accept invite and verify email
+  as: platform integrator
+  want: to verify my email, set a password and see my test keys
+  so: I can start integrating straight after the demo
+  ac:
+    - "Email verification link; password hashed with argon2; first login shows the keys page"
+    - "Emails go through a transactional email provider in production and the outbox in development"
+  pri: Must
+  est: 0.5
+  deps: [DSH-01]
+  trace: [D.sales_led]
+  ms: M9
+- id: DSH-03
+  epic: DSH
+  title: Organisation expiry and extension
+  as: Detent admin
+  want: sandbox access to expire unless I extend it
+  so: access is reviewed and can't linger
+  ac:
+    - "After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend"
+  pri: Must
+  est: 0.25
+  deps: [DSH-01]
+  trace: [D.sales_led, D.abuse]
+  ms: M9
+- id: DSH-04
+  epic: DSH
+  title: Keys page
+  as: platform integrator
+  want: to create, roll and revoke keys with scopes
+  so: I can manage credentials safely
+  ac:
+    - "Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate"
+  pri: Must
+  est: 0.5
+  deps: [DSH-02]
+  trace: [D.keys]
+  ms: M9
+- id: DSH-05
+  epic: DSH
+  title: Request logs page
+  as: platform integrator
+  want: to browse my request logs with filters
+  so: I can debug quickly
+  ac:
+    - "Filters by status, path, idempotency key and payment ID; detail view with redacted bodies"
+  pri: Must
+  est: 0.25
+  deps: [API-06, DSH-02]
+  trace: [D.logs]
+  ms: M9
+- id: DSH-06
+  epic: DSH
+  title: Webhooks page
+  as: platform integrator
+  want: to manage endpoints, see the secret once, send a test event and read the delivery log
+  so: I can set up webhooks without support
+  ac:
+    - "All WHK features available in the UI"
+  pri: Must
+  est: 0.25
+  deps: [WHK-03, DSH-02]
+  trace: [D.webhooks]
+  ms: M9
+- id: DSH-07
+  epic: DSH
+  title: Sandbox controls page
+  as: platform integrator
+  want: to reset test data and force scenarios
+  so: I can test every path on demand
+  ac:
+    - "Reset; force timeout to UNKNOWN, rail failure and flagged address; explorer links for real-testnet payments"
+  pri: Must
+  est: 0.25
+  deps: [SBX-01, SBX-04, DSH-02]
+  trace: [D.sandbox]
+  ms: M9
+- id: DSH-08
+  epic: DSH
+  title: Usage page
+  as: platform integrator
+  want: my usage against sandbox quotas
+  so: I know when I'll hit a limit
+  ac:
+    - "Calls, payments decided and agent investigations against daily quotas"
+  pri: Should
+  est: 0.25
+  deps: [LED-08, SBX-02]
+  trace: [D.usage]
+  ms: M9
+- id: DSH-09
+  epic: DSH
+  title: Console per organisation
+  as: platform integrator
+  want: the back-office console inside the dashboard, scoped to my organisation
+  so: I see my sandbox payments the way an operations team would
+  ac:
+    - "Console screens reused with the organisation scope; demo-only controls (clock, scenario runner) hidden"
+  pri: Must
+  est: 0.5
+  deps: [CON-04, DSH-02]
+  trace: [D.console]
+  ms: M9
+- id: DSH-10
+  epic: DSH
+  title: Access requests inbox
+  as: Detent admin
+  want: website access requests stored as leads and emailed to the sales inbox
+  so: I can follow up and approve companies
+  ac:
+    - "Form fields: name, work email, company, role, use case; stored; admin list with status; email to the sales inbox"
+  pri: Must
+  est: 0.25
+  deps: [DSH-01]
+  trace: [D.sales_led, D.ops_pages]
+  ms: M9
+
+# ---------------- SBX Sandbox ----------------
+- id: SBX-01
+  epic: SBX
+  title: Test values
+  as: platform integrator
+  want: magic values that trigger each path
+  so: I can test timeouts, failover, blocks and escalations instantly
+  ac:
+    - "Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK"
+    - "Documented in the docs and covered by tests"
+  pri: Must
+  est: 0.5
+  deps: [RAL-11, RAL-05]
+  trace: [D.sandbox]
+  ms: M9
+- id: SBX-02
+  epic: SBX
+  title: Quotas and abuse limits
+  as: founder
+  want: daily caps on payments and agent investigations per organisation, and limits on the shared wallet
+  so: sandbox costs stay bounded
+  ac:
+    - "Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap"
+  pri: Must
+  est: 0.25
+  deps: [API-04]
+  trace: [D.abuse]
+  ms: M9
+- id: SBX-03
+  epic: SBX
+  title: Real test-network mode
+  as: platform integrator
+  want: to opt in to real Base Sepolia or Ethereum Sepolia payouts
+  so: I can see real explorer links
+  ac:
+    - "Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned"
+  pri: Should
+  est: 0.5
+  deps: [RAL-03, SBX-02]
+  trace: [D.sandbox]
+  ms: M9
+- id: SBX-04
+  epic: SBX
+  title: Sandbox reset
+  as: platform integrator
+  want: to reset my organisation's test data
+  so: I can start clean
+  ac:
+    - "Deletes intents, cases, ledger and logs for the organisation; keeps keys, webhooks and settings; audited"
+  pri: Must
+  est: 0.25
+  deps: [API-01]
+  trace: [D.sandbox]
+  ms: M9
+
+# ---------------- DOC Docs ----------------
+- id: DOC-01
+  epic: DOC
+  title: Docs site and structure
+  as: platform integrator
+  want: a docs site with Get started, Concepts, Guides, API reference, Webhooks, Errors and limits, SDKs and Changelog
+  so: I can find anything in two clicks
+  ac:
+    - "Mintlify (Starter) from the repo's docs/ folder; reference generated from openapi.yaml; custom domain placeholder"
+  pri: Must
+  est: 0.5
+  deps: [API-05]
+  trace: [D.docs]
+  ms: M10
+- id: DOC-02
+  epic: DOC
+  title: Concept pages
+  as: platform integrator
+  want: concise concept pages
+  so: I understand the model before I write code
+  ac:
+    - "Payment intents and the payment ID; decisions; payment states; policies and versions; mandates; exceptions and deadlines; deposits and reconciliation; routing and failover; audit and replay"
+  pri: Must
+  est: 1.0
+  deps: [DOC-01]
+  trace: [D.docs, BR.category]
+  ms: M10
+- id: DOC-03
+  epic: DOC
+  title: Guides
+  as: platform integrator
+  want: task guides
+  so: I can complete common jobs end to end
+  ac:
+    - "Let an AI agent pay a supplier invoice ($18,500 USDC); credit deposits safely; handle UNKNOWN payments; approve escalations by API; use the kill switch; move from shadow to auto"
+  pri: Must
+  est: 1.0
+  deps: [DOC-01]
+  trace: [D.docs]
+  ms: M10
+- id: DOC-04
+  epic: DOC
+  title: Tested samples in 8 languages
+  as: platform integrator
+  want: code samples in cURL, Python, TypeScript, Go, Java, C#, PHP and Ruby that actually run
+  so: I can copy and paste with confidence
+  ac:
+    - "Guide and webhook-verification samples live as files under docs/snippets/<lang>/ and run in CI against a sandbox started in the pipeline"
+    - "Reference request samples are generated from the OpenAPI file"
+  pri: Must
+  est: 1.25
+  deps: [DOC-03, WHK-02]
+  trace: [D.samples]
+  ms: M10
+- id: DOC-05
+  epic: DOC
+  title: Try it with a sandbox key
+  as: platform integrator
+  want: to send real sandbox requests from the reference pages
+  so: I can explore without writing code
+  ac:
+    - "Works with a pasted sandbox key; visitors without a key see examples and a 'Request sandbox access' button"
+    - "Only the sandbox base URL is configurable"
+  pri: Must
+  est: 0.25
+  deps: [DOC-01]
+  trace: [D.docs, D.sales_led]
+  ms: M10
+- id: DOC-06
+  epic: DOC
+  title: Changelog and versioning page
+  as: platform integrator
+  want: dated changelog entries
+  so: I know what changed
+  ac:
+    - "One entry per release with the API version; linked from the reference"
+  pri: Should
+  est: 0.25
+  deps: [DOC-01]
+  trace: [D.docs, D.standards]
+  ms: M10
+
+# ---------------- SDK SDKs ----------------
+- id: SDK-01
+  epic: SDK
+  title: Python SDK
+  as: platform integrator
+  want: a typed Python SDK
+  so: I integrate in minutes
+  ac:
+    - "Generated from openapi.yaml then polished: typed models, automatic idempotency keys on creates, safe retries, webhook verify helper"
+    - "Tests run against the CI sandbox; package builds and installs from the repo"
+  pri: Must
+  est: 1.0
+  deps: [API-05, WHK-02]
+  trace: [D.sdks]
+  ms: M10
+- id: SDK-02
+  epic: SDK
+  title: TypeScript SDK
+  as: platform integrator
+  want: a typed TypeScript SDK
+  so: Node teams integrate as easily as Python teams
+  ac:
+    - "Same features as SDK-01; ESM and CJS builds; tests in CI"
+  pri: Must
+  est: 1.0
+  deps: [API-05, WHK-02]
+  trace: [D.sdks]
+  ms: M10
+- id: SDK-03
+  epic: SDK
+  title: Postman collection and OpenAPI download
+  as: platform integrator
+  want: a Postman collection and a downloadable spec
+  so: I can use my usual tools
+  ac:
+    - "Generated in CI from openapi.yaml and linked from the docs"
+  pri: Should
+  est: 0.25
+  deps: [API-05]
+  trace: [D.sdks]
+  ms: M10
+
+# ---------------- WEB Marketing site ----------------
+- id: WEB-01
+  epic: WEB
+  title: Home page
+  as: prospect
+  want: a home page that explains the product, shows how it works and offers a demo
+  so: I understand in one minute whether it's for me
+  ac:
+    - "Sections 1-11 from spec/08-developer-portal.md; primary CTA 'Book a demo', secondary 'Request sandbox access'"
+    - "Category wording 'agentic payment controls', with the three layers shown as one section; never 'payments company' or 'payment provider'"
+    - "Passes the honesty checklist: no logos, testimonials, customer counts, certification badges or licence claims"
+  pri: Must
+  est: 1.5
+  deps: []
+  trace: [D.site, D.honesty, BR.category, A4.plans]
+  ms: M11
+- id: WEB-02
+  epic: WEB
+  title: Product, Security and Design partners pages
+  as: prospect
+  want: deeper pages on the product, security and the shadow-report offer
+  so: I can take it to my compliance team
+  ac:
+    - "Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned')"
+    - "Design partners page explains the free shadow report and data handling"
+  pri: Must
+  est: 0.75
+  deps: [WEB-01]
+  trace: [D.site, D.honesty, B3.lead_shadow, B5.hosting]
+  ms: M11
+- id: WEB-03
+  epic: WEB
+  title: Measured results section
+  as: prospect
+  want: live numbers from the evaluation with dates
+  so: I see evidence, not claims
+  ac:
+    - "Reads results.json at build time; every figure labelled 'test-network evaluation, [date]'"
+  pri: Must
+  est: 0.25
+  deps: [EVL-06, WEB-01]
+  trace: [D.site, D.honesty]
+  ms: M11
+- id: WEB-04
+  epic: WEB
+  title: Developer code tabs
+  as: prospect
+  want: a tabbed code block creating a payment intent in 8 languages
+  so: my developers see it's real
+  ac:
+    - "Uses the same tested snippets as DOC-04"
+  pri: Must
+  est: 0.25
+  deps: [DOC-04, WEB-01]
+  trace: [D.site, D.samples]
+  ms: M11
+- id: WEB-05
+  epic: WEB
+  title: Legal pages and analytics
+  as: prospect
+  want: privacy, sandbox terms and cookie notice, with cookie-light analytics
+  so: the site meets basic GDPR expectations
+  ac:
+    - "Templates marked 'draft for legal review'; analytics without cookie banners where possible"
+  pri: Must
+  est: 0.25
+  deps: [WEB-01]
+  trace: [D.ops_pages, B1.contracts]
+  ms: M11
+- id: WEB-06
+  epic: WEB
+  title: Booking and access form
+  as: prospect
+  want: to book a demo or request sandbox access
+  so: I can start a conversation in one click
+  ac:
+    - "Booking link to the founder's appointment page; access form posts to DSH-10"
+  pri: Must
+  est: 0.25
+  deps: [DSH-10, WEB-01]
+  trace: [D.ops_pages, D.sales_led]
+  ms: M11
+- id: WEB-07
+  epic: WEB
+  title: Status page
+  as: platform integrator
+  want: a status page for the sandbox API
+  so: I know whether a failure is mine
+  ac:
+    - "Fed by health checks; shows sandbox API, dashboard and docs"
+  pri: Should
+  est: 0.25
+  deps: [FND-07]
+  trace: [D.ops_pages, B7.reliability]
+  ms: M11
+- id: WEB-08
+  epic: WEB
+  title: SEO basics
+  as: founder
+  want: titles, meta, sitemap, Open Graph and structured data paired with the category
+  so: '"Detent payment controls" and our topic searches find us'
+  ac:
+    - "Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication"
+  pri: Should
+  est: 0.25
+  deps: [WEB-01]
+  trace: [BR.category, D.site]
+  ms: M11

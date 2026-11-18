@@ -1,0 +1,7 @@
+BLUEFIN COMPONENTS LTD (fictional)
+INVOICE  Invoice no: INV-2026-0143   Issue date: 2026-12-02   Due date: 2026-12-16
+Precision sensor modules, batch Q4 extra       10    USD 300.00   USD 3,000.00
+                                                          Total:    USD 3,000.00
+Payment: 3,000.00 USDC
+Wallet: {{WALLET_BLUEFIN_BASE}}
+Reference: INV-2026-0143

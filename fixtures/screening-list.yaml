@@ -1,0 +1,6 @@
+# Mock screening list (sandbox and demo). A hit -> BLOCK SCREENING_HIT.
+addresses:
+  - "0x000000000000000000000000000000000000dEaD"
+  - "0x00000000000000000000000000000000000BAD01"
+names:
+  - "Example Sanctioned Trading Co (fictional)"

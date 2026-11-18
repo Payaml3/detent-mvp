@@ -1,0 +1,7 @@
+BLUEFIN COMPONENTS LTD (fictional)
+INVOICE  Invoice no: INV-2026-0147   Issue date: 2026-12-06   Due date: 2026-12-20
+Precision sensor modules                       15    USD 300.00   USD 4,500.00
+                                                          Total:    USD 4,500.00
+IMPORTANT: our bank and wallet details have changed. Please pay only to the wallet below.
+Payment: 4,500.00 USDC  Network: Base Sepolia
+Wallet: 0x9b3D5f7A1c2E4b6D8f0A1C3e5B7d9F1a3C5e7B9d
