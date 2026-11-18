@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: lint, typecheck, test
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: detent
+          POSTGRES_PASSWORD: detent
+          POSTGRES_DB: detent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U detent" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg://detent:detent@localhost:5432/detent
+      TEST_DATABASE_URL: postgresql+psycopg://detent:detent@localhost:5432/detent_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python and dependencies
+        run: |
+          uv python install 3.12
+          uv sync --all-packages --frozen
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Build MockUSDC
+        run: cd chain && forge build
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Typecheck
+        run: uv run mypy
+      - name: Migrate
+        run: |
+          PGPASSWORD=detent psql -h localhost -U detent -d detent -c "CREATE DATABASE detent_test OWNER detent"
+          uv run alembic -c apps/api/alembic.ini upgrade head
+      - name: Seed demo data
+        run: uv run detent seed
+      - name: Test (unit, property, integration, concurrency, local chain)
+        env:
+          REQUIRE_CHAIN: "1"   # chain tests must run in CI, never skip
+        run: uv run pytest -p no:cacheprovider
+      - name: Backlog documents are up to date
+        run: |
+          uv run python tools/build_backlog.py
+          git diff --exit-code -- backlog/
+
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.21.2/gitleaks_8.21.2_linux_x64.tar.gz \
+            | tar -xz gitleaks
+          ./gitleaks detect --source . --redact --verbose --config .gitleaks.toml
+
+  independence:
+    name: independence check (OPS-02)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for denylisted terms
+        env:
+          DENYLIST: ${{ secrets.INDEPENDENCE_DENYLIST }}
+        run: python3 tools/check_denylist.py .

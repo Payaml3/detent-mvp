@@ -89,7 +89,8 @@ apps/api/src/detent/
   console/       # Jinja + htmx back office
   dashboard/     # developer dashboard + admin
   worker/        # job loop and scheduled jobs
-  clock.py  settings.py  db.py
+  db/            # engine + org-scope guard, org-scoped repositories, Core tables
+  clock.py  settings.py  logging.py  chainguard.py  devchain.py  cli.py
 apps/api/tests/  # unit, integration, property, concurrency
 apps/banksim/    # simulated instant bank rail (separate FastAPI app)
 apps/faultproxy/ # fault-injection proxy
@@ -103,15 +104,21 @@ fixtures/  spec/  backlog/  tools/
 ## Commands (create them in FND-01, keep this list current)
 
 ```
-make setup        # install deps, pre-commit
-make db           # start local Postgres, run migrations
-make chain        # start anvil + deploy MockUSDC
-make dev          # api + worker + banksim + faultproxy
-make test         # unit + integration
-make eval         # detent eval run --suite all
+make setup        # uv sync + pre-commit hooks (ruff, gitleaks, no .env files)
+make db           # docker compose Postgres 16 + alembic upgrade head
+make db-reset     # drop the local schema, migrate and seed again
+make seed         # fictional demo org and console users (idempotent)
+make chain        # anvil (31337) + MockUSDC; writes chain/local.json; Ctrl-C stops
+make dev          # api :8000 + worker + banksim :8100 + faultproxy :8200
+make test         # unit, property, integration, concurrency, local chain (needs make db)
+make test-fast    # unit + property only, no database
 make lint typecheck
-python tools/build_backlog.py
+make eval         # detent eval run --suite all (fails until M6)
+make denylist     # OPS-02 check; needs DENYLIST in the environment
+make backlog      # python tools/build_backlog.py
 ```
+
+Migrations are plain SQL files in `apps/api/migrations/versions/` run by Alembic; they are forward-only. The test suite drops and re-migrates the `detent_test` database, and each test creates its own organisation, so no cleanup is needed.
 
 ## How to work a story
 

@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        exclude: ^tools/build_backlog\.py$
+      - id: ruff-format
+        exclude: ^tools/build_backlog\.py$
+  - repo: local
+    hooks:
+      - id: no-env-files
+        name: never commit .env files
+        entry: .env files must not be committed
+        language: fail
+        files: (^|/)\.env($|\.(?!example$))

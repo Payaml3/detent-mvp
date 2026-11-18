@@ -25,3 +25,8 @@ apps/site/dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Foundry build output and the local chain config written by `make chain`
+chain/out/
+chain/cache/
+chain/local.json

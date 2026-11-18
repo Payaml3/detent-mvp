@@ -4,6 +4,24 @@
 
 This package turns the product model, operating model, MVP scope and developer portal spec into a build-ready repository start: standing instructions for Claude Code, specs, a fully decomposed backlog with acceptance criteria, fixtures and kickoff prompts.
 
+## Developer setup
+
+Prerequisites: Python 3.12, [uv](https://docs.astral.sh/uv/), Docker, and [Foundry](https://book.getfoundry.sh/getting-started/installation) (anvil, forge).
+
+```bash
+make setup                 # dependencies and pre-commit hooks
+cp .env.example .env       # local settings; never commit .env
+make db                    # Postgres 16 in Docker, then migrations
+make seed                  # fictional demo organisation and users
+make lint typecheck test   # the gate every story must pass
+make dev                   # http://localhost:8000/console (password from DEMO_PASSWORD)
+make chain                 # in a second terminal: anvil + MockUSDC
+```
+
+Everything runs on test networks and simulated rails. The app refuses to start with any chain ID outside 84532, 11155111 and 31337, and rejects `sk_live_` keys.
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, migrations and the full test suite against Postgres 16 and anvil, a gitleaks secret scan, and the OPS-02 independence check. The independence check reads the `INDEPENDENCE_DENYLIST` repository secret (one term per line) and fails until that secret is set.
+
 ## How to use it
 
 1. Create an empty private Git repository and copy this folder's contents into its root.

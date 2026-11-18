@@ -1,0 +1,92 @@
+[project]
+name = "detent-workspace"
+version = "0.0.0"
+description = "Detent agentic payment controls (working name): development workspace"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["apps/api", "apps/banksim", "apps/faultproxy"]
+
+[tool.uv.sources]
+detent = { workspace = true }
+banksim = { workspace = true }
+faultproxy = { workspace = true }
+
+[dependency-groups]
+dev = [
+  "detent",
+  "banksim",
+  "faultproxy",
+  "pytest>=8.3",
+  "pytest-timeout>=2.3",
+  "hypothesis>=6.112",
+  "httpx>=0.27",
+  "ruff>=0.8",
+  "mypy>=1.13",
+  "types-PyYAML>=6.0",
+  "pre-commit>=4.0",
+  "pyyaml>=6.0",
+]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = ["chain/lib", "chain/out", "chain/cache", "tools/build_backlog.py", "*.md"]  # supplied script; specs are prose
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "DTZ", "TID", "RUF", "PL", "SIM", "PT"]
+ignore = [
+  "PLR0913",  # many-argument constructors are fine for value types
+  "PLR0917",  # same, for positional arguments
+  "PLC0415",  # lazy imports are deliberate (CLI startup, optional heavy deps)
+  "PLR2004",  # magic values in tests and limits
+  "S101",     # assert is used in tests and type narrowing
+  "RUF001", "RUF002", "RUF003",  # the spec uses typographic characters (·, –) on purpose
+]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+# Invariant 17: time comes from the Clock service. detent/clock.py is the one exemption.
+"datetime.datetime.now".msg = "Use detent.clock.Clock (invariant 17)."
+"datetime.datetime.utcnow".msg = "Use detent.clock.Clock (invariant 17)."
+"datetime.datetime.today".msg = "Use detent.clock.Clock (invariant 17)."
+"datetime.date.today".msg = "Use detent.clock.Clock (invariant 17)."
+"time.time".msg = "Use detent.clock.Clock (invariant 17)."
+
+[tool.ruff.lint.per-file-ignores]
+"apps/api/src/detent/clock.py" = ["TID251"]
+"apps/api/tests/**" = ["S", "PLR", "PLW1510", "TID251", "DTZ", "PT012", "PT018", "E501"]
+"apps/api/migrations/**" = ["E501"]
+"tools/**" = ["S", "PLR", "T20", "TID251", "DTZ"]
+"apps/banksim/**" = ["TID251"]
+"apps/faultproxy/**" = ["TID251"]
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "apps/api/src"
+packages = ["detent"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["web3.*", "eth_account.*", "eth_typing.*", "hexbytes.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+testpaths = ["apps/api/tests"]
+pythonpath = ["apps/api/tests"]
+addopts = "-ra --strict-markers"
+timeout = 120
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
+markers = [
+  "db: needs the Postgres test database (make db)",
+  "chain: needs anvil and forge (make setup installs nothing; see README)",
+  "slow: spawns subprocesses",
+]
