@@ -117,6 +117,7 @@ make eval         # detent eval run --suite all (fails until slice S8)
 make denylist     # OPS-02 check; needs DENYLIST in the environment
 make backlog      # python tools/build_backlog.py
 make spec         # python tools/build_spec.py: Spec Kit inventory, traceability, tasks + coverage checks
+make site-dev     # marketing site (Astro) dev server; make site builds it; make site-test runs its checks
 ```
 
 Specifications and planning use Spec Kit (`.specify/`, `specs/<feature>/`); the MVP plan is in `specs/001-detent-mvp/`.

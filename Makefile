@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec denylist secrets check
+.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec site site-dev site-test denylist secrets check
 
 setup:            ## install dependencies and pre-commit hooks
 	$(UV) sync --all-packages
@@ -55,6 +55,15 @@ eval:             ## evaluation suites (built in M6)
 
 backlog:          ## regenerate backlog documents and check coverage
 	$(UV) run python tools/build_backlog.py
+
+site-dev:         ## marketing site dev server (http://localhost:4321)
+	cd apps/site && npm install && npm run dev
+
+site:             ## build the marketing site into apps/site/dist (reports placeholders)
+	cd apps/site && npm ci && npm run build
+
+site-test:        ## site logic tests, build, then honesty/structure/SEO checks over the build
+	cd apps/site && npm ci && npm test
 
 spec:             ## regenerate specs/001-detent-mvp inventory, traceability and tasks; check coverage
 	$(UV) run python tools/build_spec.py

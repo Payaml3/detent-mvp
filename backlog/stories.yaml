@@ -2041,6 +2041,7 @@ stories:
     - "Passes the honesty checklist: no logos, testimonials, customer counts, certification badges or licence claims"
   pri: Must
   est: 1.5
+  done: [0, 1, 2]
   deps: []
   trace: [D.site, D.honesty, BR.category, A4.plans]
   ms: P4
@@ -2055,6 +2056,7 @@ stories:
     - "Design partners page explains the free shadow report and data handling"
   pri: Must
   est: 0.75
+  done: [0, 1]
   deps: [WEB-01]
   trace: [D.site, D.honesty, B3.lead_shadow, B5.hosting]
   ms: P4
@@ -2068,6 +2070,7 @@ stories:
     - "Reads results.json at build time; every figure labelled 'test-network evaluation, [date]'"
   pri: Must
   est: 0.25
+  done: [0]
   deps: [EVL-06, WEB-01]
   trace: [D.site, D.honesty]
   ms: P4
@@ -2094,6 +2097,7 @@ stories:
     - "Templates marked 'draft for legal review'; analytics without cookie banners where possible"
   pri: Must
   est: 0.25
+  done: [0]
   deps: [WEB-01]
   trace: [D.ops_pages, B1.contracts]
   ms: P4
@@ -2133,6 +2137,7 @@ stories:
     - "Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication"
   pri: Should
   est: 0.25
+  done: [0]
   deps: [WEB-01]
   trace: [BR.category, D.site]
   ms: P4

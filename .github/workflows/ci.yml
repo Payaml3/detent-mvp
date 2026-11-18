@@ -64,6 +64,23 @@ jobs:
           uv run python tools/build_backlog.py
           git diff --exit-code -- backlog/
 
+  site:
+    name: marketing site
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: apps/site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/site/package-lock.json
+      - run: npm ci
+      - name: Logic tests, build, honesty and SEO checks
+        run: npm test
+
   secrets:
     name: secret scan
     runs-on: ubuntu-24.04

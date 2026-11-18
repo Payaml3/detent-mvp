@@ -1,0 +1,62 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import config from "../../site.config.mjs";
+const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
+---
+<Base title="Request sandbox access" description={`Request access to the ${config.brandName} sandbox: test keys, simulated rails and test values for every path.`}>
+  <PageHead title="Request sandbox access." lead="Sandbox keys are issued after a short conversation, so we can set up an organisation with the test data that matches your platform.">
+    <Fragment slot="fragments">
+      <div class="frag" data-ui data-reveal><p class="frag-title">Test key · example</p><p class="mono">sk_test_••••••••••••7Q2c</p><p class="soft">Scopes: read, intents:create. Shown once.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Amount ending .13</p><span class="chip st-UNKNOWN">UNKNOWN</span><p>Times out, then confirms. Nothing is resent.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Amount ending .42</p><span class="chip st-FAILED">FAILED</span><p>Fails on the first rail, then fails over under the same payment ID.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Address ending dEaD</p><span class="chip st-BLOCKED">BLOCKED</span><p>Screening hit. Final.</p></div>
+    </Fragment>
+  </PageHead>
+  <section class="section"><div class="wrap grid">
+    <form class="form" data-reveal method="post" action={connected ? config.accessFormAction : undefined} data-access-form>
+      {!connected && <p class="notice" role="note">Preview: this form isn’t connected yet. Nothing you type is sent.</p>}
+      <label>Name<input name="name" autocomplete="name" required /></label>
+      <label>Work email<input name="email" type="email" autocomplete="email" required /></label>
+      <label>Company<input name="company" autocomplete="organization" required /></label>
+      <label>Platform type
+        <select name="platform">
+          <option>Payout platform</option><option>Crypto service provider</option><option>Broker or prop firm</option><option>Marketplace</option><option>Other</option>
+        </select>
+      </label>
+      <label>What would you like to test?<textarea name="message" rows="4"></textarea></label>
+      <button class="button" type="submit">Request access</button>
+    </form>
+    <div class="aside" data-reveal>
+      <h2>What the sandbox gives you</h2>
+      <ul>
+        <li>Test keys only, scoped, shown once.</li>
+        <li>Simulated rails by default, with real test networks on request.</li>
+        <li>Test values that trigger every path: an amount ending in .13 times out and then confirms; .42 fails over under the same payment ID; a flagged address is blocked.</li>
+        <li>Signed webhooks and request logs.</li>
+      </ul>
+    </div>
+  </div></section>
+</Base>
+<style>
+  .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; }
+  .form { display: grid; gap: 18px; background: var(--ink-raised); border-radius: 14px; padding: 32px; }
+  label { display: grid; gap: 6px; font-weight: 500; }
+  input, select, textarea { font: inherit; color: var(--paper); background: #0B1226; border: 1px solid var(--ink-line); border-radius: 6px; padding: 12px 14px; min-height: 48px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--blue-soft); outline-offset: 1px; }
+  .notice { background: rgba(242, 184, 75, 0.12); color: var(--amber); border-radius: 6px; padding: 10px 14px; font-size: 15px; }
+  .aside { display: grid; gap: 20px; align-content: start; }
+  .aside h2 { font-size: clamp(26px, 2.4vw, 36px); }
+  .aside ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--paper-soft); font-size: 18px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+</style>
+<script>
+  const form = document.querySelector("[data-access-form]");
+  if (form && !form.getAttribute("action")) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const note = form.querySelector(".notice");
+      if (note) note.textContent = "Preview: this form isn’t connected yet, so nothing was sent.";
+    });
+  }
+</script>

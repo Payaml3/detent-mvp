@@ -1,0 +1,71 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import Prose from "../components/Prose.astro";
+import config from "../../site.config.mjs";
+---
+<Base title="Security" description={`${config.brandName} is non-custodial: it never holds funds or keys. Audit and replay, a kill switch, fail-closed decisions and UK or EU hosting.`}>
+  <PageHead title="Non-custodial by design." lead="The controls sit beside your rails and never in the flow of funds. Everything they decide is recorded, can be replayed and can be stopped.">
+    <Fragment slot="fragments">
+      <div class="frag" data-ui data-reveal><p class="frag-title">Audit log · example</p>
+        <p class="row"><span>41 payment.decided</span><span class="mono soft">9f3a…c21</span></p>
+        <p class="row"><span>42 case.resolved</span><span class="mono soft">5be0…7d4</span></p>
+        <p class="row"><span>43 attempt.submitted</span><span class="mono soft">e71c…09a</span></p>
+        <span class="chip st-CONFIRMED">Chain verified</span></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Kill switch · example</p>
+        <span class="chip st-BLOCKED">Engaged by on-call</span>
+        <p>All sends stopped. 3 payments held; 1 UNKNOWN still resolving.</p>
+        <p class="soft">Release: payments lead only</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Replay · example</p>
+        <p class="mono">pay_01JDQ3…CNR5E</p>
+        <p class="row"><span>Recorded</span><span>ESCALATE → EXECUTE</span></p>
+        <p class="row"><span>Replayed</span><span>ESCALATE → EXECUTE</span></p>
+        <p class="row"><span>Model calls</span><span>0</span></p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Custody boundary</p>
+        <p class="row"><span>Signing, nonces</span><span>Your custody provider</span></p>
+        <p class="row"><span>State lock, UNKNOWN logic</span><span>Controls</span></p>
+        <p class="row"><span>Kill switch, limits check</span><span>Controls</span></p>
+        <p class="row"><span>Client funds</span><span>Never held</span></p></div>
+    </Fragment>
+  </PageHead>
+  <section class="section"><div class="wrap">
+    <Prose>
+      <h2 data-reveal>Funds and keys</h2>
+      <div class="block" data-reveal>
+        <p>In production the software never holds client funds or keys. Transaction signing and nonces stay with your custody or wallet provider; the controls keep the state lock, the UNKNOWN logic, the kill switch and a second check on pre-funded limits.</p>
+        <p>Today’s prototype runs on test networks only. It refuses to start with any mainnet chain ID and rejects live keys.</p>
+      </div>
+      <h2 data-reveal>Audit and replay</h2>
+      <div class="block" data-reveal>
+        <p>Every decision and state change writes an audit event in the same transaction. The log is append-only and hash-chained, so a change to any past event breaks the chain.</p>
+        <p>Every payment replays step by step to the decision it got, from stored inputs and stored agent outputs. Replay never calls a model.</p>
+      </div>
+      <h2 data-reveal>The kill switch</h2>
+      <div class="block" data-reveal>
+        <p>Your payments lead or our on-call engineer can engage it. It is checked inside the lock before every send, so it takes effect before the next payment. Pending payments are held; unresolved ones keep resolving. Only your payments lead can release it.</p>
+      </div>
+      <h2 data-reveal>Fail closed</h2>
+      <div class="block" data-reveal>
+        <p>Any error in a decision path, whether the database, screening, the rule set or a model, holds the payment or sends it to your manual queue, as you choose. No path executes unchecked. A block is final.</p>
+      </div>
+      <h2 data-reveal>Your rules, versioned</h2>
+      <div class="block" data-reveal>
+        <p>Rule sets are versioned. Every change needs a second, different approver, and a change that loosens a rule needs your compliance lead. Each decision records the rule version it used.</p>
+      </div>
+      <h2 data-reveal>Hosting and data</h2>
+      <div class="block" data-reveal>
+        <p>Hosted in a UK or EU cloud region, stated in the contract. Before any client data is processed, the AI provider’s terms must exclude training on it and keep processing in the UK or EU.</p>
+      </div>
+      <h2 data-reveal>Roadmap</h2>
+      <div class="block" data-reveal>
+        <ul>
+          <li>SOC 2 Type I: planned, then Type II</li>
+          <li>Penetration test and security pack: planned</li>
+          <li>ISO 27001: planned</li>
+          <li>Hardware-backed key vault: planned</li>
+          <li>IP allowlists: planned</li>
+        </ul>
+      </div>
+    </Prose>
+  </div></section>
+</Base>

@@ -1,0 +1,46 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import Prose from "../components/Prose.astro";
+import Layers from "../components/Layers.astro";
+import Irreversible from "../components/Irreversible.astro";
+import config from "../../site.config.mjs";
+const modes = [
+  { name: "Shadow", body: "Decisions on your exported or live data, nothing sent. Prove the rules on your own payments first." },
+  { name: "Assist", body: "Live recommendations. Every EXECUTE waits for a person on your team to click Send." },
+  { name: "Auto", body: "Executes within the rules you approved. Only escalations reach people." },
+  { name: "Orchestrate", body: "Routing across two or more rails: the best rail by policy, failover on technical errors only." },
+];
+---
+<Base title="Product" description={`How ${config.brandName} decides, orchestrates and operates every deposit and payout: three layers, AI agents in each, your rules deciding.`}>
+  <PageHead title="One layer, every payout." lead="Decision, orchestration and operations, beside the rails you already use. AI agents prepare the work; your rules make every decision.">
+    <Fragment slot="fragments">
+      <div class="frag" data-ui data-reveal><p class="frag-title">Decision</p><span class="chip st-ESCALATED">ESCALATE</span><p>First payment, above the $10,000 auto limit.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Approval</p><span class="chip st-READY">EXECUTE</span><p>Approved by the reviewer; rules ran again.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Execution</p><span class="chip st-UNKNOWN">UNKNOWN</span><p>Answer lost. Nothing resent; the chain is asked.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Proof</p><span class="chip st-CONFIRMED">CONFIRMED</span><p>One transfer, reconciled, replayable.</p></div>
+    </Fragment>
+  </PageHead>
+  <Layers />
+  <section class="section"><div class="wrap">
+    <Prose>
+      <h2 data-reveal>Four modes, signed off one at a time</h2>
+      <div class="block" data-reveal>
+        <ul class="modes">{modes.map((m) => <li><strong>{m.name}.</strong> {m.body}</li>)}</ul>
+        <p>Moving between modes needs both your payments lead and your compliance lead, and every change is in the audit log.</p>
+      </div>
+      <h2 data-reveal>Agents that propose and never decide</h2>
+      <div class="block" data-reveal>
+        <p><strong>Instruction agent.</strong> Turns an invoice into a payment intent, field by field, with the place in the document each value came from. If a value isn’t in the document it is left empty and flagged, never guessed.</p>
+        <p><strong>Investigation agent.</strong> Reads the facts around an escalation and writes a summary in which every claim cites its evidence. Reviewers see the raw facts first.</p>
+        <p><strong>Reconciliation agent.</strong> Drafts a fix for each break from a fixed set of actions. A person approves it, and it is applied as a new ledger entry.</p>
+        <p>Agents have read-only tools. The only thing one can create is a proposed payment intent, inside a signed mandate, and the rules decide it like any other.</p>
+      </div>
+      <h2 data-reveal>One payment ID for life</h2>
+      <div class="block" data-reveal>
+        <p>Retries, failovers and approvals all keep the same payment ID. At most one attempt is in flight and at most one is confirmed. A timeout becomes UNKNOWN and nothing is resent until the rail says what happened.</p>
+      </div>
+    </Prose>
+  </div></section>
+  <Irreversible />
+</Base>

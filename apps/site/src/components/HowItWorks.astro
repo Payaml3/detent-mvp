@@ -1,0 +1,57 @@
+---
+---
+<section class="section how" data-section="how-it-works" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <h2 id="how-title">The AI proposes. Your rules decide.</h2>
+      <p class="lead">An agent or your platform proposes a payout. It becomes an intent with one payment ID for life, your rule set decides it, and every outcome lands in the exceptions queue or the audit log.</p>
+    </div>
+    <div class="flow" data-ui data-reveal role="img" aria-label="Flow: an agent or platform proposes an intent; the policy runs every check; execute routes and sends once, escalate opens a case with an owner and deadline whose approval re-runs the policy, block is final; everything is written to a hash-chained audit log.">
+      <svg class="wires" viewBox="0 0 1200 420" preserveAspectRatio="none" aria-hidden="true">
+        <path class="wire" d="M190 210 H300" />
+        <path class="wire" d="M470 210 H560" />
+        <path class="wire go" d="M760 210 C820 210 820 70 880 70" />
+        <path class="wire" d="M760 210 H880" />
+        <path class="wire stop" d="M760 210 C820 210 820 350 880 350" />
+      </svg>
+      <div class="node n1"><span class="small soft">Proposed by</span><strong>AP agent, inside its mandate</strong><span class="soft">or your platform’s API call</span></div>
+      <div class="node n2"><span class="small soft">Payment intent</span><strong class="mono">pay_01JDQ3…CNR5E</strong><span class="soft">$18,500.00 USDC · one ID for life</span></div>
+      <div class="node n3"><span class="small soft">Policy v1 · 9 checks</span>
+        <ul class="checks">
+          <li><span class="chip st-CONFIRMED">PASS</span> Mandate scope</li>
+          <li><span class="chip st-CONFIRMED">PASS</span> KYB and screening</li>
+          <li><span class="chip st-ESCALATED">ESCALATE</span> First payment</li>
+          <li><span class="chip st-ESCALATED">ESCALATE</span> Above $10,000 auto limit</li>
+        </ul>
+      </div>
+      <div class="node b1"><span class="chip st-READY">EXECUTE</span><strong>Best rail by policy, sent once</strong></div>
+      <div class="node b2"><span class="chip st-ESCALATED">ESCALATE</span><strong>Case with owner and deadline</strong><span class="soft">approval re-runs the rules</span></div>
+      <div class="node b3"><span class="chip st-BLOCKED">BLOCK</span><strong>Final. Never retried or re-routed.</strong></div>
+      <div class="node audit"><span class="small soft">Every step</span><strong>Hash-chained audit log, replayable</strong></div>
+    </div>
+  </div>
+</section>
+<style>
+  .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-bottom: 56px; }
+  .head h2 { grid-column: 1 / span 6; }
+  .head .lead { grid-column: 8 / span 5; align-self: end; color: var(--paper-soft); }
+  .flow { position: relative; display: grid; grid-template-columns: 190px 1fr 170px 1fr 200px 1fr 300px; grid-template-rows: auto auto auto auto;
+    align-items: center; gap: 16px 0; padding: 40px; border-radius: 14px; background:
+    radial-gradient(60% 80% at 60% 50%, rgba(47, 107, 255, 0.16), transparent 70%), var(--ink-raised); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+  .wires { position: absolute; inset: 40px; width: calc(100% - 80px); height: calc(100% - 80px); pointer-events: none; }
+  .wire { fill: none; stroke: #34508F; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-dasharray: 6 8; animation: flow 1.6s linear infinite; }
+  .wire.go { stroke: var(--blue); } .wire.stop { stroke: #8A3A22; }
+  @keyframes flow { to { stroke-dashoffset: -28; } }
+  .node { position: relative; background: #0D1530; border: 1px solid var(--ink-line); border-radius: 8px; padding: 14px; display: grid; gap: 6px; transition: border-color 200ms, transform 200ms; } /* taste-skill-ignore: inside a data-ui interface fragment */
+  .node:hover { border-color: var(--blue); transform: translateY(-2px); }
+  .n1 { grid-column: 1; grid-row: 2 / span 2; } .n2 { grid-column: 3; grid-row: 2 / span 2; } .n3 { grid-column: 5; grid-row: 1 / span 4; }
+  .b1 { grid-column: 7; grid-row: 1; } .b2 { grid-column: 7; grid-row: 2 / span 2; } .b3 { grid-column: 7; grid-row: 4; }
+  .audit { grid-column: 1 / span 5; grid-row: 5; margin-top: 28px; background: rgba(47, 107, 255, 0.12); border-color: #2A4386; }
+  .checks { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+  .checks li { display: flex; align-items: center; gap: 8px; }
+  @media (max-width: 1100px) {
+    .head h2, .head .lead { grid-column: 1 / -1; }
+    .flow { grid-template-columns: 1fr; padding: 20px; } .wires { display: none; }
+    .n1, .n2, .n3, .b1, .b2, .b3, .audit { grid-column: 1; grid-row: auto; margin: 0; }
+  }
+</style>

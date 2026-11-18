@@ -1,0 +1,118 @@
+---
+import { SCENARIOS, runScenario, PAYMENT_ID } from "../scripts/scenarios.mjs";
+const runs = SCENARIOS.map((s) => runScenario(s.id));
+const first = runs.find((r) => r.id === "timeout");
+---
+<section class="section irreversible" data-section="irreversible" aria-labelledby="irr-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <h2 id="irr-title">Built for payments you can’t take back.</h2>
+      <p class="statement">A failure can retry. A rejection can’t. No retry ever becomes a second payment.</p>
+    </div>
+    <div class="demo" data-demo data-reveal>
+      <div class="stage" data-ui>
+        <canvas class="wheel" aria-hidden="true" data-wheel></canvas>
+        <div class="stage-head">
+          <div>
+            <p class="small soft">Payment ID, kept through every step</p>
+            <p class="mono pid">{PAYMENT_ID}</p>
+          </div>
+          <div class="counter"><span class="small soft">Transfers on the rail</span><strong data-transfers>{first.transfers}</strong></div>
+        </div>
+        <ol class="steps" data-steps aria-live="polite">
+          {first.steps.map((st) => (
+            <li><span class={`chip st-${st.status}`}>{st.status}</span><span>{st.event}{st.rail && <span class="soft"> · {st.rail}</span>}</span></li>
+          ))}
+        </ol>
+      </div>
+      <div class="controls">
+        <p class="ctl-title">What goes wrong?</p>
+        {runs.map((r) => (
+          <button type="button" class="ctl" data-scenario={r.id} aria-pressed={r.id === "timeout" ? "true" : "false"}>
+            <span class="ctl-name">{r.label}</span>
+            <span class="ctl-out soft">{r.steps.at(-1).status} · {r.transfers} transfer{r.transfers === 1 ? "" : "s"}</span>
+          </button>
+        ))}
+        <p class="small soft">Every path is a real state from the payment state machine. Example payment, test network.</p>
+      </div>
+    </div>
+    <div class="nojs" data-nojs>
+      {runs.map((r) => (
+        <details>
+          <summary>{r.label}: {r.summary}</summary>
+          <ol>{r.steps.map((st) => <li><strong>{st.status}</strong> {st.event}</li>)}</ol>
+        </details>
+      ))}
+    </div>
+  </div>
+  <script type="application/json" data-runs set:html={JSON.stringify(runs)} />
+</section>
+<style>
+  .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-bottom: 48px; }
+  .head h2 { grid-column: 1 / span 6; }
+  .statement { grid-column: 7 / span 6; align-self: end; font: 500 clamp(22px, 2.1vw, 32px)/1.25 var(--font-head); letter-spacing: -0.01em; color: var(--paper); }
+  .demo { display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px; }
+  .stage { position: relative; overflow: hidden; background: radial-gradient(70% 90% at 85% 50%, rgba(47,107,255,.24), transparent 70%), var(--ink-raised); border-radius: 14px; padding: 32px; min-height: 560px; display: grid; grid-template-rows: auto 1fr; gap: 28px; } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+  .wheel { position: absolute; right: -6%; top: 0; width: 62%; height: 100%; pointer-events: none; opacity: 0.9; }
+  .stage-head, .steps { position: relative; z-index: 1; }
+  .steps { max-width: 560px; }
+  .stage-head { display: flex; justify-content: space-between; gap: 24px; align-items: start; flex-wrap: wrap; }
+  .pid { font-size: 15px; margin-top: 4px; }
+  .counter { text-align: right; display: grid; gap: 2px; }
+  .counter strong { font: 600 56px/1 var(--font-head); color: var(--ok); }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; align-content: start; }
+  .steps li { display: grid; grid-template-columns: 128px 1fr; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 8px; background: rgba(13, 21, 48, 0.8); font-size: 15px; }
+  .steps li.enter { animation: step 420ms var(--ease-out) both; }
+  @keyframes step { from { opacity: 0; transform: translateX(-12px); } }
+  .controls { background: var(--ink-raised); border-radius: 14px; padding: 28px; display: grid; gap: 8px; align-content: start; }
+  .ctl-title { font: 600 24px/1.2 var(--font-head); margin-bottom: 8px; }
+  .ctl { text-align: left; padding: 14px 16px; border-radius: 8px; border: 0; background: #0D1530; color: var(--paper); font: inherit; cursor: pointer;
+    display: grid; gap: 2px; min-height: 52px; transition: background 160ms, transform 160ms; }
+  .ctl:hover { background: #17224A; }
+  .ctl:active { transform: scale(0.99); }
+  .ctl[aria-pressed="true"] { background: #1F4FCC; }
+  .ctl[aria-pressed="true"] .ctl-out { color: var(--paper); }
+  .ctl-name { font-weight: 600; }
+  .ctl-out { font-size: 13px; }
+  .nojs { margin-top: 24px; display: grid; gap: 8px; }
+  .nojs details { background: var(--ink-raised); border-radius: 8px; padding: 14px 18px; }
+  .nojs summary { cursor: pointer; }
+  :global(.js) .nojs { display: none; }
+  @media (max-width: 960px) { .wheel { opacity: 0.3; width: 100%; right: -30%; } .head h2, .statement { grid-column: 1 / -1; } .demo { grid-template-columns: 1fr; } .stage { min-height: 0; } .steps li { grid-template-columns: 1fr; gap: 6px; } }
+</style>
+<script>
+  const root = document.querySelector("[data-demo]");
+  const runs = JSON.parse(document.querySelector("[data-runs]").textContent);
+  document.documentElement.classList.add("js");
+  const list = root.querySelector("[data-steps]");
+  const counter = root.querySelector("[data-transfers]");
+  const buttons = [...root.querySelectorAll("[data-scenario]")];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let timers = [];
+  let wheel = null;
+  const canvas = root.querySelector("[data-wheel]");
+  const gl = canvas && (() => { try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; } })();
+  if (gl) import("../scripts/wheel.js").then(({ mountWheel }) => { wheel = mountWheel(canvas, { x: 1.1, y: -0.1, scale: 0.78 }); });
+  else canvas?.remove();
+  const play = (id) => {
+    timers.forEach(clearTimeout); timers = [];
+    const run = runs.find((r) => r.id === id);
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.scenario === id)));
+    list.innerHTML = ""; counter.textContent = "0";
+    let sent = 0;
+    run.steps.forEach((st, i) => {
+      timers.push(setTimeout(() => {
+        const li = document.createElement("li");
+        li.className = "enter";
+        const chip = document.createElement("span");
+        chip.className = `chip st-${st.status}`; chip.textContent = st.status;
+        const text = document.createElement("span");
+        text.textContent = st.event + (st.rail ? ` · ${st.rail}` : "");
+        li.append(chip, text); list.append(li);
+        if (st.transfer) { sent += 1; counter.textContent = String(sent); }
+        wheel?.setState(st.status, Boolean(st.transfer));
+      }, reduce ? 0 : i * 650));
+    });
+  };
+  buttons.forEach((b) => b.addEventListener("click", () => play(b.dataset.scenario)));
+</script>

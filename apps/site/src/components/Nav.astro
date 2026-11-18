@@ -1,0 +1,35 @@
+---
+import config from "../../site.config.mjs";
+const links = [
+  { href: "/product/", label: "Product" },
+  { href: "/security/", label: "Security" },
+  { href: "/design-partners/", label: "Design partners" },
+  { href: "/#developers", label: "Developers" },
+];
+const here = Astro.url.pathname;
+---
+<header class="nav">
+  <div class="wrap nav-row">
+    <a class="wordmark" href="/" aria-label={`${config.brandName} home`}>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 2 L12 12 L19 7" fill="none" stroke="#F2622E" stroke-width="2.4" stroke-linecap="square"/></svg>
+      <span>{config.brandName}</span>
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {links.map((l) => <li><a href={l.href} aria-current={here === l.href ? "page" : undefined}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <a class="button nav-cta" href={config.bookingUrl}>Book a demo</a>
+  </div>
+</header>
+<style>
+  .nav { position: absolute; inset: 0 0 auto 0; z-index: 20; }
+  .nav-row { display: flex; align-items: center; gap: 32px; height: 84px; }
+  .wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--paper); text-decoration: none; font: 700 21px/1 var(--font-head); letter-spacing: -0.02em; }
+  nav { margin-left: auto; }
+  ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+  nav a { color: var(--paper-soft); text-decoration: none; font-size: 15px; font-weight: 500; transition: color 160ms; }
+  nav a:hover, nav a[aria-current] { color: var(--paper); }
+  .nav-cta { min-height: 44px; padding: 0 18px; font-size: 15px; }
+  @media (max-width: 860px) { nav { display: none; } .nav-cta { margin-left: auto; } }
+</style>

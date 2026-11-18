@@ -1,0 +1,123 @@
+---
+import config from "../../site.config.mjs";
+import { PAYMENT_ID } from "../scripts/scenarios.mjs";
+// The example payment, phase by phase. Shown in final form without script; played in order with it.
+const phases = [
+  { layer: "decision", agent: "Instruction agent proposed $18,500.00 USDC to Bluefin Components Ltd (fictional), from invoice INV-2026-0142.", status: "ESCALATED", rule: "Rules: escalate. First payment, above the $10,000 auto limit." },
+  { layer: "decision", agent: "Sam, the reviewer, read the raw facts and approved with a reason.", status: "READY", rule: "Rules ran again on the active version: execute." },
+  { layer: "orchestration", agent: "Best rail by policy: Base Sepolia (testnet). Sent once.", status: "SUBMITTED", rule: "One attempt in flight. Payment ID unchanged." },
+  { layer: "orchestration", agent: "The rail’s answer was lost. Investigation agent: transaction seen on chain, awaiting confirmations.", status: "UNKNOWN", rule: "Rules: a timeout is UNKNOWN, never FAILED. Nothing is resent." },
+  { layer: "orchestration", agent: "Receipt found after 3 confirmations.", status: "CONFIRMED", rule: "Transfers on the rail: 1." },
+  { layer: "operations", agent: "Reconciliation agent matched the ledger posting to the chain transfer.", status: "CONFIRMED", rule: "Audit chain verified. The payment replays to its decision." },
+];
+const cards = [
+  { id: "decision", name: "Decision", question: "Should this payment happen?" },
+  { id: "orchestration", name: "Orchestration", question: "How and where should it execute?" },
+  { id: "operations", name: "Operations", question: "How is it monitored, reconciled and proven?" },
+];
+const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
+---
+<section class="hero" data-section="hero" aria-labelledby="hero-title">
+  <canvas class="agent" aria-hidden="true" data-agent></canvas>
+  <div class="wrap hero-grid">
+    <div class="intro">
+      <h1 id="hero-title" class="headline">
+        <span class="line"><span>Every payout decided,</span></span>
+        <span class="line"><span>sent once, reconciled.</span></span>
+      </h1>
+      <p class="lead" data-reveal>{config.category.charAt(0).toUpperCase() + config.category.slice(1)} across any rail. AI agents do the work in every layer; your rules make every decision.</p>
+      <div class="actions" data-reveal>
+        <a class="button" href={config.bookingUrl}>Book a demo</a>
+        <a class="textlink" href="/access/">Request sandbox access</a>
+      </div>
+    </div>
+    <div class="cards" data-ui data-hero-cards aria-label="Example payment, step by step">
+      <p class="card-top"><span class="small soft">Example payment</span><span class="mono pid">{PAYMENT_ID}</span></p>
+      {cards.map((c) => {
+        const f = finalFor(c.id);
+        return (
+          <article class="card" data-card={c.id}>
+            <p class="card-name">{c.name}</p>
+            <h2 class="card-q">{c.question}</h2>
+            <p class="card-agent"><span class="agent-dot" aria-hidden="true"></span><span data-agent-line>{f.agent}</span></p>
+            <p class="card-rule"><span class={`chip st-${f.status}`} data-chip>{f.status}</span><span data-rule-line>{f.rule}</span></p>
+          </article>
+        );
+      })}
+      <p class="small soft foot">AI agents prepare. Your rules decide. Fictional supplier, test network.</p>
+    </div>
+  </div>
+  <script type="application/json" data-hero-phases set:html={JSON.stringify(phases)} />
+</section>
+
+<style>
+  .hero { position: relative; min-height: max(780px, 100svh); overflow: hidden; background:
+    radial-gradient(55% 65% at 52% 58%, rgba(47, 107, 255, 0.30), transparent 70%), /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+    radial-gradient(35% 35% at 10% 95%, rgba(242, 98, 46, 0.10), transparent 70%), var(--ink-deep); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+  .agent { position: absolute; left: 24%; top: 22%; width: 44%; height: 84%; }
+  .hero-grid { position: relative; z-index: 2; min-height: max(780px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
+    column-gap: 24px; padding-top: 128px; padding-bottom: 48px; pointer-events: none; }
+  .hero-grid > * { pointer-events: auto; }
+  .intro { grid-column: 1 / span 6; display: grid; gap: 28px; align-content: start; }
+  .headline { font-size: clamp(42px, 5.4vw, 88px); line-height: 0.98; }
+  .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
+  .line > span { display: inline-block; white-space: nowrap; animation: rise 900ms var(--ease-out) both; }
+  .line:nth-child(2) > span { animation-delay: 110ms; }
+  @keyframes rise { from { transform: translateY(105%); } }
+  .lead { max-width: 30ch; }
+  .actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+  .cards { grid-column: 9 / span 4; align-self: center; display: grid; gap: 8px; }
+  .card-top { display: grid; gap: 2px; padding: 0 4px 4px; }
+  .pid { color: var(--paper-soft); word-break: break-all; }
+  .card { background: rgba(20, 29, 54, 0.92); border: 1px solid var(--ink-line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; /* taste-skill-ignore: inside a data-ui interface fragment */
+    transition: border-color 300ms, background 300ms, transform 300ms var(--ease-out); }
+  .card.active { border-color: var(--blue); background: rgba(23, 40, 92, 0.86); transform: translateX(-6px); }
+  .card-name { font-size: 12px; font-weight: 600; color: var(--blue-soft); letter-spacing: 0.01em; }
+  .card-q { font: 600 18px/1.2 var(--font-head); letter-spacing: -0.01em; }
+  .card-agent { display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start; color: var(--paper); }
+  .agent-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--orange); }
+  .card-rule { display: grid; gap: 6px; justify-items: start; color: var(--paper-soft); }
+  .foot { padding: 4px; }
+  @media (max-width: 1100px) {
+    .agent { left: 30%; width: 70%; height: 70%; top: 10%; }
+    .intro { grid-column: 1 / span 8; }
+    .cards { grid-column: 1 / span 7; margin-top: 48vh; align-self: start; }
+  }
+  @media (max-width: 680px) {
+    .agent { left: 0; width: 100%; top: 400px; height: 300px; }
+    .intro, .cards { grid-column: 1 / -1; }
+    .headline { font-size: 8.2vw; }
+    .cards { margin-top: 310px; }
+  }
+</style>
+
+<script>
+  const root = document.querySelector("[data-hero-cards]");
+  const phases = JSON.parse(document.querySelector("[data-hero-phases]").textContent);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cards = Object.fromEntries([...root.querySelectorAll("[data-card]")].map((c) => [c.dataset.card, c]));
+  const blank = { decision: null, orchestration: null, operations: null };
+  const show = (i) => {
+    const p = phases[i];
+    for (const [id, card] of Object.entries(cards)) {
+      card.classList.toggle("active", id === p.layer);
+      const latest = [...phases.slice(0, i + 1)].reverse().find((x) => x.layer === id) || blank[id];
+      card.style.opacity = latest ? "1" : "0.72";
+      if (!latest) continue;
+      card.querySelector("[data-agent-line]").textContent = latest.agent;
+      card.querySelector("[data-rule-line]").textContent = latest.rule;
+      const chip = card.querySelector("[data-chip]");
+      chip.textContent = latest.status;
+      chip.className = `chip st-${latest.status}`;
+    }
+  };
+  if (!reduce) {
+    let i = 0;
+    const tick = () => { show(i); const last = i === phases.length - 1; i = last ? 0 : i + 1; setTimeout(tick, last ? 5200 : 2600); };
+    tick();
+  }
+  const canvas = document.querySelector("[data-agent]");
+  const gl = canvas && (() => { try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; } })();
+  if (gl) import("../scripts/agent.js").then(({ mountAgent }) => mountAgent(canvas));
+  else canvas?.remove();
+</script>

@@ -1633,9 +1633,9 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Acceptance criteria**
 
-- [ ] Sections 1-11 from spec/08-developer-portal.md; primary CTA 'Book a demo', secondary 'Request sandbox access'
-- [ ] Category wording 'agentic payment controls', with the three layers shown as one section; never 'payments company' or 'payment provider'
-- [ ] Passes the honesty checklist: no logos, testimonials, customer counts, certification badges or licence claims
+- [x] Sections 1-11 from spec/08-developer-portal.md; primary CTA 'Book a demo', secondary 'Request sandbox access'
+- [x] Category wording 'agentic payment controls', with the three layers shown as one section; never 'payments company' or 'payment provider'
+- [x] Passes the honesty checklist: no logos, testimonials, customer counts, certification badges or licence claims
 
 **Priority:** Must · **Estimate:** 1.5 d · **Milestone:** P4 Website launch · **Depends on:** none · **Traces to:** D.site, D.honesty, BR.category, A4.plans
 
@@ -1645,8 +1645,8 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Acceptance criteria**
 
-- [ ] Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned')
-- [ ] Design partners page explains the free shadow report and data handling
+- [x] Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned')
+- [x] Design partners page explains the free shadow report and data handling
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** D.site, D.honesty, B3.lead_shadow, B5.hosting
 
@@ -1656,7 +1656,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Acceptance criteria**
 
-- [ ] Reads results.json at build time; every figure labelled 'test-network evaluation, [date]'
+- [x] Reads results.json at build time; every figure labelled 'test-network evaluation, [date]'
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** EVL-06, WEB-01 · **Traces to:** D.site, D.honesty
 
@@ -1676,7 +1676,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Acceptance criteria**
 
-- [ ] Templates marked 'draft for legal review'; analytics without cookie banners where possible
+- [x] Templates marked 'draft for legal review'; analytics without cookie banners where possible
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** D.ops_pages, B1.contracts
 
@@ -1706,6 +1706,6 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Acceptance criteria**
 
-- [ ] Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication
+- [x] Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** BR.category, D.site

@@ -1,0 +1,33 @@
+/* Brand tokens from spec/07 (D-18), set for the cinematic dark-blue style (D-19). */
+:root {
+  --ink: #0F1629;
+  --ink-deep: #070C1A;
+  --ink-raised: #141D36;
+  --ink-line: #24304F;
+  --paper: #F6F5F0;
+  --paper-soft: #B9BFCE;
+  --orange: #F2622E;
+  --orange-press: #D9521F;
+  --blue: #2F6BFF;
+  --blue-soft: #8FB0FF;
+  --blueprint: #10307A;
+  --brass: #C9935F;
+  --ok: #7FD1A4;
+  --amber: #F2B84B;
+
+  --font-head: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; /* taste-skill-ignore: used only for <pre><code> samples */
+
+  /* five type steps */
+  --t-display: clamp(44px, 6.2vw, 96px);
+  --t-h2: clamp(32px, 3.6vw, 56px);
+  --t-lead: clamp(19px, 1.5vw, 22px);
+  --t-body: 17px;
+  --t-small: 14px;
+
+  --gutter: clamp(20px, 4vw, 56px);
+  --section: clamp(120px, 14vw, 200px);
+  --radius: 10px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}

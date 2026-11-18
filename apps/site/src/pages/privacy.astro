@@ -1,0 +1,19 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import config from "../../site.config.mjs";
+---
+<Base title="Privacy notice" description={`${config.brandName} Privacy notice (draft for legal review).`}>
+  <PageHead title="Privacy notice" lead="Draft for legal review. This page is a template and is not yet in force." />
+  <section class="section"><div class="wrap">
+    <div class="legal">
+      <p class="tag">Draft for legal review</p>
+      <p>Who we are, what personal data the website and sandbox collect (contact details you send us, request logs kept for 30 days), why, how long we keep it, who processes it for us, and your rights under UK and EU data protection law.</p>
+      <p class="soft">The final text will be published after legal review, before the sandbox opens.</p>
+    </div>
+  </div></section>
+</Base>
+<style>
+  .legal { max-width: 64ch; display: grid; gap: 18px; font-size: 18px; }
+  .tag { justify-self: start; background: rgba(242, 184, 75, 0.12); color: var(--amber); border-radius: 6px; padding: 6px 12px; font-weight: 600; font-size: 15px; }
+</style>

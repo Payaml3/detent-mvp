@@ -1,0 +1,46 @@
+---
+import "../styles/site.css";
+import config from "../../site.config.mjs";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props { title?: string; description: string; schema?: boolean; }
+const { title, description, schema = false } = Astro.props;
+const brandTitle = `${config.brandName} ${config.category}`;
+const fullTitle = title ? `${title} · ${config.brandName} payment controls` : brandTitle.charAt(0).toUpperCase() + brandTitle.slice(1);
+const canonical = new URL(Astro.url.pathname, config.siteUrl).href;
+const og = new URL("/og.jpg", config.siteUrl).href;
+const jsonLd = schema ? [
+  { "@context": "https://schema.org", "@type": "Organization", name: config.brandName, url: config.siteUrl, description },
+  { "@context": "https://schema.org", "@type": "SoftwareApplication", name: `${config.brandName} payment controls`,
+    applicationCategory: "BusinessApplication", operatingSystem: "Web", description },
+] : [];
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#070C1A" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main"><slot /></main>
+    <Footer />
+    <script>
+      import "../scripts/reveal.js";
+    </script>
+  </body>
+</html>

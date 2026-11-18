@@ -1,0 +1,48 @@
+---
+import config from "../../site.config.mjs";
+const groups = [
+  { name: "Start here", items: [
+    { name: "Free shadow report", desc: "Share one month of anonymised payout and deposit exports. We return what your rules would have decided, in five working days. Nothing is executed." }, // taste-skill-ignore: "shadow report" is a product name
+  ]},
+  { name: "Plans", items: [
+    { name: "Pilot", desc: "Shadow, then Assist mode on your rails, with your rules and your reviewers." },
+    { name: "Growth", desc: "Auto mode within approved rules, the exceptions queue and reconciliation across rails." },
+    { name: "Scale", desc: "Routing across two or more rails, higher volumes and dedicated onboarding." },
+  ]},
+];
+---
+<section class="section pricing" data-section="pricing" aria-labelledby="price-title">
+  <div class="wrap grid">
+    <div class="head" data-reveal>
+      <h2 id="price-title">Pricing</h2>
+      <p class="lead soft-lead">A software fee per payment, never a share of the money you move.</p>
+    </div>
+    <div class="menu">
+      {groups.map((g) => (
+        <div class="group" data-reveal>
+          <p class="gname">{g.name}</p>
+          {g.items.map((it) => (
+            <div class="item">
+              <div class="row"><h3 class="iname">{it.name}</h3><a class="price" href={config.bookingUrl}>Talk to us</a></div>
+              <p class="desc">{it.desc}</p>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+<style>
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+  .head { grid-column: 1 / span 4; display: grid; gap: 20px; align-content: start; }
+  .soft-lead { color: var(--paper-soft); }
+  .menu { grid-column: 6 / span 7; display: grid; gap: 48px; }
+  .gname { font: 600 24px/1.2 var(--font-head); margin-bottom: 20px; color: var(--blue-soft); }
+  .item { padding: 18px 0; display: grid; gap: 6px; }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; }
+  .iname { font: 600 clamp(22px, 2vw, 28px)/1.2 var(--font-head); letter-spacing: -0.01em; }
+  .price { color: var(--orange); font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .price:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .desc { color: var(--paper-soft); max-width: 52ch; }
+  @media (max-width: 900px) { .head, .menu { grid-column: 1 / -1; } }
+</style>
