@@ -138,3 +138,9 @@ test("no third-party requests: scripts, styles and fonts are served locally", ()
     }
   }
 });
+
+test("pre-launch: every page is no-index and robots.txt blocks crawlers until config.indexable is true", () => {
+  if (config.indexable) return;
+  for (const [p, html] of allHtml()) assert.match(html, /<meta name="robots" content="noindex, nofollow"/, p);
+  assert.match(read("robots.txt"), /Disallow: \//);
+});

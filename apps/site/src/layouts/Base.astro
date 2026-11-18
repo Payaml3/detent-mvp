@@ -23,6 +23,7 @@ const jsonLd = schema ? [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    {!config.indexable && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#070C1A" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

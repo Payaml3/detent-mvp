@@ -4,6 +4,8 @@ export default {
   brandName: "Detent",
   category: "agentic payment controls",
   siteUrl: "https://example.invalid",
+  // Pre-launch: pages carry noindex and robots.txt blocks crawlers. Set true at launch (founder decision).
+  indexable: false,
   bookingUrl: "PLACEHOLDER:booking-url",
   accessFormAction: "PLACEHOLDER:access-endpoint",
   salesInbox: "PLACEHOLDER:sales-inbox",
