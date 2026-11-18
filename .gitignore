@@ -30,3 +30,6 @@ apps/site/dist/
 chain/out/
 chain/cache/
 chain/local.json
+
+# design-skill working files
+.taste-skill/
