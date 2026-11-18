@@ -1,0 +1,12 @@
+[profile.default]
+src = "src"
+out = "out"
+cache_path = "cache"
+solc_version = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+evm_version = "cancun"
+
+[lint]
+# name/symbol/decimals are ERC-20 interface names and must stay lower case.
+exclude_lints = ["screaming-snake-case-const"]
