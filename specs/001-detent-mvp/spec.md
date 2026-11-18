@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 81 requirements confirmed; 19 proposed and 2 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 82 requirements confirmed; 19 proposed and 1 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -454,7 +454,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 **Website**
 
 - **FR-111**: The marketing site has the eleven home sections and three sub-pages, dated results, booking and access form, legal pages, status page and SEO basics, and passes the honesty checklist.
-- **FR-112**: Wording rules naming another company comply with the independence rule (pending founder answer on 'Ralio'). *(open: C-18)*
+- **FR-112**: Public wording avoids a competitor's terms ('trust layer', 'guardrails') and the repository names no competitor.
 <!-- FR:END -->
 
 ### Key Entities

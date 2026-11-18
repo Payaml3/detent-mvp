@@ -44,7 +44,7 @@ is **proposed** (C-17); the stories themselves are unchanged.
 | IV. Evidence by construction | Hash-chained audit in the same transaction (done); append-only ledger; replay from `agent_calls` | Pass |
 | V. Test networks, integer money, isolation, Clock | All enforced and tested in M0 | Pass |
 | VI. Test-first | [tasks.md](tasks.md) puts a test task before every implementation task; [traceability.md](traceability.md) gives each criterion a test | Pass |
-| VII. No invented rules | 19 proposed and 2 open requirements are marked as such and wait for the founder ([decisions.md](decisions.md)) | Pass, conditional on founder review |
+| VII. No invented rules | 19 proposed and 1 open requirements are marked as such and wait for the founder ([decisions.md](decisions.md)) | Pass, conditional on founder review |
 
 **Post-design re-check (after Phase 1)**: the data model and contracts add no new business rule beyond the register.
 Three M0 artefacts encode proposed rules (permission cells, enum values); they are listed in

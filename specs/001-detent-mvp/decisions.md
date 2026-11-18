@@ -50,7 +50,7 @@ original documents would let me check every Proposed item below against them.
 | C-15 | The rule set blocks KYB status `unknown`, but spec/02 lists only verified, pending, failed | default-policy.yaml `kyb_status`; spec/02 | Allow `unknown` (already in the M0 migration's CHECK) | **Proposed** |
 | C-16 | The changed-wallet invoice's expected decision is "ESCALATE or BLOCK", which is not a deterministic test oracle | fixtures/invoices/expected-outputs.yaml | Resolved by G-01: an unregistered address is recorded as a new destination and escalates NEW_WALLET (plus the agent flag) | **Proposed** |
 | C-17 | Milestones M1 to M5 build the layers in order, so no money moves end to end until M3 and nothing is clickable until M4; your request asks for small end-to-end milestones | backlog/milestones.md | Re-slice the same stories into vertical slices S1 to S9 ([plan.md](plan.md#milestones), [slices.yaml](slices.yaml)). No story changes, only its milestone | **Proposed** |
-| C-18 | `spec/product-definition.md` names "Ralio". If that is a former employer, the file breaks the independence rule and will fail OPS-02 | product-definition.md "Rules for wording"; CLAUDE.md | Founder to confirm; if it is on the denylist, rephrase without the name | **Open** (asked 2026-11-18, unanswered) |
+| C-18 | `spec/product-definition.md` named a competitor in its wording rules; the founder doesn't want competitor names in the repository | product-definition.md "Rules for wording" | Keep the rule, drop the name: "Avoid the terms 'trust layer' and 'guardrails' (a competitor's wording)". Not a former employer, so no independence issue | **Confirmed** 2026-11-18 (founder: "our competitor and we don't need it here") |
 | C-19 | Webhook signing secrets are "hashed and shown once", but Detent must sign every delivery with the plaintext secret, which a hash can't give back | spec/02 `webhook_endpoints`; spec/10 `WEBHOOK_SECRET_PEPPER`; spec/03 signature | Store the secret encrypted with the credentials key (Fernet, as for rail credentials, RAL-09); still shown once | **Proposed** |
 
 ## Missing business rules (G)
@@ -103,6 +103,7 @@ original documents would let me check every Proposed item below against them.
 | D-04 | A user payout profile exists (spec/04), excluding the `user_verified` detail (see G-10) | 2026-11-18 | Same; commit 73de33b |
 | D-05 | `counters` table, `VARCHAR(8)` currency, `org_id` on every table (spec/02) | 2026-11-18 | Same; commit b90b953 |
 | D-06 | FND-08 (structured logs) is part of M0 | 2026-11-18 | Same; commit 19ed765 |
+| D-07 | C-18: the named company is a competitor, not a former employer; keep the wording rule without its name, and keep competitor names out of the repository | 2026-11-18 | Founder reply in this session |
 
 ### Technical decisions already implemented in M0 (no business rule involved)
 
@@ -131,6 +132,5 @@ All of these are reversible with a new forward migration if you decide otherwise
 1. **C-13: scope and timeline.** Full scope (about 12 weeks), prototype first (M0 to M7, about 8.5 weeks), or trim?
 2. **C-17: milestone order.** Adopt the end-to-end slices S1 to S9 instead of the layered M1 to M7?
 3. **C-04: sandbox reset.** May reset bypass the append-only rule for sandbox organisations, or should it start a new data generation (my proposal)?
-4. **C-18:** is "Ralio" a former employer (and on the denylist)?
-5. **G-06, G-05, G-08, G-09: approval authority.** Confirm who may approve, approve after a deadline, approve by API and click Send.
-6. All other Proposed items: approve as a batch, or list the ones to change.
+4. **G-06, G-05, G-08, G-09: approval authority.** Confirm who may approve, approve after a deadline, approve by API and click Send.
+5. All other Proposed items: approve as a batch, or list the ones to change.

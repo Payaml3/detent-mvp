@@ -29,7 +29,7 @@ AI agents work across all three, preparing intents, investigating escalations an
 - Never call Detent a "payments company" or "payment provider". It never holds funds or keys.
 - Pair the name with the category in public: "Detent agentic payment controls" or "Detent payment controls".
 - Rails are chosen by policy, never by an AI agent.
-- Avoid Ralio's words: "trust layer" and "guardrails".
+- Avoid the terms "trust layer" and "guardrails" (a competitor's wording).
 
 ## How modules map to layers
 

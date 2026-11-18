@@ -1310,9 +1310,9 @@ Sources: [spec/08 §website-web](../../spec/08-developer-portal.md#website-web);
 | [WEB-07](../../backlog/user-stories.md#web-07) | P4 | 0 | Fed by health checks; shows sandbox API, dashboard and docs | planned | site: `site build check + manual honesty checklist` |
 | [WEB-08](../../backlog/user-stories.md#web-08) | P4 | 0 | Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication | planned | site: `site build check + manual honesty checklist` |
 
-## FR-112 · Website (open)
+## FR-112 · Website (confirmed)
 
-Wording rules naming another company comply with the independence rule (pending founder answer on 'Ralio').
+Public wording avoids a competitor's terms ('trust layer', 'guardrails') and the repository names no competitor.
 
 Sources: [spec/product-definition.md §rules-for-wording](../../spec/product-definition.md#rules-for-wording)
 
