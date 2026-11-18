@@ -116,7 +116,11 @@ make lint typecheck
 make eval         # detent eval run --suite all (fails until M6)
 make denylist     # OPS-02 check; needs DENYLIST in the environment
 make backlog      # python tools/build_backlog.py
+make spec         # python tools/build_spec.py: Spec Kit inventory, traceability, tasks + coverage checks
 ```
+
+Specifications and planning use Spec Kit (`.specify/`, `specs/<feature>/`); the MVP plan is in `specs/001-detent-mvp/`.
+Rules marked Proposed or Open in `specs/001-detent-mvp/decisions.md` are not business rules until the founder approves them.
 
 Migrations are plain SQL files in `apps/api/migrations/versions/` run by Alembic; they are forward-only. The test suite drops and re-migrates the `detent_test` database, and each test creates its own organisation, so no cleanup is needed.
 

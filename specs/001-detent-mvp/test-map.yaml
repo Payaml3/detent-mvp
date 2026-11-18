@@ -1,0 +1,50 @@
+# Test evidence for acceptance criteria that are done. Keys: story ID, then the criterion's index
+# (0-based, as in backlog/stories.yaml `done`). Values: pytest node IDs relative to apps/api/tests,
+# or "ci:<what>" / "manual:<what>" for evidence that is not a pytest test.
+# tools/build_spec.py checks that every node ID exists and that every ticked criterion has evidence.
+# Criteria without an entry get a planned test from the rules in build_spec.py.
+
+FND-01:
+  0: ["ci:GitHub Actions run 44325416011 (lint, typecheck, 326 tests)", "ci:make lint typecheck test"]
+  1: ["ci:.github/workflows/ci.yml postgres service and 'Migrate' step", "conftest.py::engine"]
+  2: ["manual:.env.example lists every Settings field", "ci:.github/workflows/ci.yml 'secret scan' job", "manual:.pre-commit-config.yaml gitleaks hook"]
+  3: ["manual:README.md 'Developer setup' has 7 commands"]
+FND-02:
+  0: ["integration/test_startup_guard.py::test_mainnet_chain_id_stops_startup",
+      "integration/test_startup_guard.py::test_rpc_reporting_a_different_chain_stops_startup",
+      "integration/test_startup_guard.py::test_widening_allowed_chain_ids_stops_startup",
+      "unit/test_settings.py::test_mainnet_chain_in_rails_config_refuses"]
+  1: ["integration/test_api.py::test_live_keys_are_always_rejected", "integration/test_api.py::test_live_key_rejected_on_post_too"]
+  2: ["unit/test_source_rules.py::test_environment_only_read_in_settings"]
+FND-03:
+  0: ["unit/test_ids.py::test_new_id_is_prefixed_uuid7", "unit/test_ids.py::test_every_prefix"]
+  1: ["unit/test_money.py::test_floats_rejected_everywhere", "unit/test_source_rules.py::test_money_module_has_no_floats",
+      "integration/test_schema.py::test_no_floating_point_columns_anywhere", "property/test_state_machine_property.py::test_money_round_trips_through_decimal_strings"]
+  2: ["integration/test_schema.py::test_every_table_has_org_id_not_null", "integration/test_schema.py::test_engine_guard_blocks_unscoped_query",
+      "integration/test_schema.py::test_cross_org_reference_rejected", "unit/test_scope_guard.py::test_unscoped_queries_raise"]
+  3: ["integration/test_schema.py::test_one_inflight_attempt_per_payment", "integration/test_schema.py::test_one_confirmed_attempt_per_payment",
+      "integration/test_schema.py::test_retry_allowed_only_after_definitive_failure"]
+FND-04:
+  0: ["integration/test_console.py::test_console_requires_login", "integration/test_console.py::test_login_then_pick_acting_user",
+      "integration/test_console.py::test_wrong_password_rejected"]
+  1: ["integration/test_console.py::test_switching_user_is_audited_with_id_and_role", "integration/test_console.py::test_demo_clock_fast_forward"]
+  2: ["integration/test_console.py::test_role_checks_run_on_the_server", "unit/test_roles.py::test_only_payments_lead_releases_kill_switch"]
+FND-05:
+  0: ["unit/test_source_rules.py::test_no_direct_time"]
+  1: ["integration/test_console.py::test_demo_clock_fast_forward", "integration/test_console.py::test_clock_control_absent_outside_demo_mode"]
+  2: ["unit/test_clock.py::test_frozen_clock_moves_only_when_told", "conftest.py::clock"]
+FND-06:
+  0: ["concurrency/test_job_claims.py::test_parallel_workers_run_each_job_exactly_once", "integration/test_worker.py::test_dedupe_key_makes_enqueue_idempotent"]
+  1: ["integration/test_worker.py::test_killed_worker_never_duplicates_a_side_effect", "integration/test_worker.py::test_lost_lease_rolls_back_effects"]
+  2: ["integration/test_worker.py::test_job_runs_once_and_is_done"]
+FND-08:
+  0: ["integration/test_api.py::test_every_response_has_a_request_id"]
+  1: ["unit/test_logging.py::test_context_ids_on_every_line", "integration/test_worker.py::test_job_runs_once_and_is_done"]
+  2: ["integration/test_api.py::test_request_logs_carry_request_id_and_never_keys", "unit/test_logging.py::test_keys_and_bearer_tokens_redacted"]
+FND-09:
+  0: ["integration/test_chain.py::test_local_chain_is_31337", "integration/test_chain.py::test_mock_usdc_has_6_decimals_and_funded_accounts",
+      "integration/test_chain.py::test_write_config"]
+  2: ["manual:.github/workflows/ci.yml uses no public RPC"]
+OPS-02:
+  0: ["unit/test_denylist.py::test_term_in_code_docs_or_fixtures_fails", "unit/test_denylist.py::test_missing_denylist_fails_closed",
+      "ci:.github/workflows/ci.yml 'independence check' job (fails until INDEPENDENCE_DENYLIST is set)"]

@@ -1,0 +1,122 @@
+# PROPOSED (decision C-17): end-to-end milestone slices. Every backlog story appears in exactly one
+# slice. Stories, estimates and acceptance criteria are unchanged; only the build order changes.
+# tools/build_spec.py checks: full coverage, no story twice, and no dependency in a later slice.
+# If the founder approves, each story's `ms` in backlog/stories.yaml can be updated to its slice.
+
+slices:
+- id: S0
+  name: "Foundation (done)"
+  status: done
+  goal: "Tested skeleton with the safety guards from day one."
+  exit: "CI green with migrations and the local chain; mainnet chain IDs and live keys refused; demo login and role switcher work."
+  stories: [FND-01, FND-02, FND-03, FND-04, FND-05, FND-06, FND-08, FND-09, OPS-02]
+
+- id: S1
+  name: "A platform payout is decided through the API"
+  goal: "API request to audited decision: the decision layer end to end, with every check and its evidence."
+  exit: >-
+    POST /v1/payment_intents returns the correct EXECUTE, ESCALATE or BLOCK with a reason for every check across the
+    fixture counterparties (Harbor executes, Quill escalates CHANGED_DETAILS, Nova escalates, the flagged payee is
+    blocked); the same Idempotency-Key twice creates one payment; 20 parallel intents at the daily cap never all
+    pass; a failing dependency never gives EXECUTE; the audit chain verifies.
+  stories: [INT-01, INT-02, INT-03, INT-04, POL-01, POL-02, POL-03, POL-04, POL-08, POL-09, AUD-01]
+
+- id: S2
+  name: "An EXECUTE decision is sent exactly once"
+  goal: "Orchestration's core: the state machine, attempts, pre-send checks under the lock, nonces and the first chain adapter."
+  exit: >-
+    On anvil: an EXECUTE payout sends one MockUSDC transfer and reaches CONFIRMED under its pay_ ID; a BLOCKED one
+    sends nothing; the kill-switch flag or an insufficient balance holds the payment before sending; parallel send
+    triggers produce one transaction.
+  stories: [EXE-01, EXE-02, EXE-03, EXE-04, RAL-01, RAL-02]
+
+- id: S3
+  name: "Escalate, review raw facts, approve with a policy re-run"
+  goal: "The human loop: unusual payments escalate to an owned case, the reviewer sees raw facts first, approval re-runs the rules."
+  exit: >-
+    A first payment escalates FIRST_PAYMENT into a case with owner and deadline; in the console the reviewer sees the
+    full address and history before anything else, approves with a reason, the re-run executes and one transfer is
+    sent; a second parallel approval gets 409; approving or resubmitting a blocked payment never sends.
+  stories: [POL-05, POL-06, EXC-01, EXC-02, EXC-04, EXC-05, EXC-07, CON-01, CON-03, CON-04]
+
+- id: S4
+  name: "Never paid twice"
+  goal: "Timeouts, retries, failover, the kill switch, the second chain and the bank simulator."
+  exit: >-
+    On the local chain and banksim: a forced timeout becomes UNKNOWN and then CONFIRMED with one transfer; a reverted
+    transaction fails over under the same payment ID; a block is never routed; the kill switch stops a batch and only
+    the payments lead releases it.
+  stories: [EXE-05, EXE-06, EXE-07, EXE-08, RAL-03, RAL-04, RAL-05, RAL-06, RAL-07, CON-08]
+
+- id: S5
+  name: "An AI agent proposes the $18,500 invoice inside a mandate"
+  goal: "Demo minutes 1 to 6 end to end: invoice in, agent proposal, escalation, approval, send."
+  exit: >-
+    Dropping the canonical invoice gives the expected proposal with source highlights and no flags (10 of 10 runs with
+    recorded responses); submit as agent escalates FIRST_PAYMENT and ABOVE_AUTO_LIMIT; approval sends it once;
+    ambiguous variants are flagged; the injection variant changes nothing; an over-scope intent is BLOCKED.
+  stories: [DEM-02, MND-01, MND-02, MND-03, AGT-01, AGT-02, AGT-03, AGT-04, AGT-05, AGT-06, CON-05]
+
+- id: S6
+  name: "Operations around escalations"
+  goal: "Overdue cases, investigation with citations, rule changes with two approvers, operating modes."
+  exit: >-
+    An overdue case stays held, the counterparty update is in the outbox and the backup owner has it; the
+    investigation shows only cited claims; a loosening rule change cannot activate without the compliance lead;
+    Shadow sends nothing and Assist waits for Send.
+  stories: [EXC-03, EXC-06, POL-07, EXE-09, CON-02, CON-06]
+
+- id: S7
+  name: "One ledger, deposits credited once, reconciliation, replay"
+  goal: "Operations layer complete for money in and out."
+  exit: >-
+    The demo deposits credit once each (the duplicate notification included); reconciliation reaches 99% or more on
+    the 500-item set with a proposed fix per break; the ledger always balances; every demo payment replays to its
+    decision without a model call.
+  stories: [LED-01, LED-02, LED-03, LED-04, LED-05, LED-06, LED-07, AUD-02, CON-07]
+
+- id: S8
+  name: "Proof and release gate"
+  goal: "The attack, fault and interpretation suites gate every release."
+  exit: >-
+    make eval passes: 100+ attacks with 0 unauthorised, 30+ faults with 0 duplicates, canonical invoice 10/10; the
+    dated report is generated; CI blocks a deliberately injected regression.
+  stories: [EVL-01, EVL-02, EVL-03, EVL-04, EVL-05, EVL-06, EVL-07, EVL-08]
+
+- id: S9
+  name: "Demo-ready prototype in the EU"
+  goal: "The 10-minute script runs on real testnets from the deployed instance."
+  exit: "The deployed EU instance runs spec/11 end to end on Base Sepolia and Ethereum Sepolia; mismatches are fixed in spec/11."
+  stories: [FND-07, CON-09, DEM-01, DEM-03, DEM-04, DEM-05]
+
+- id: P1
+  name: "Public sandbox API and webhooks"
+  goal: "An external developer integrates against the API."
+  exit: "An external client with a test key creates an intent, receives signed webhooks and sees its request logs; the OpenAPI file lints and matches the code."
+  stories: [API-01, API-02, API-03, API-04, API-05, API-06, API-07, WHK-01, WHK-02, WHK-03, EXC-08]
+
+- id: P2
+  name: "Dashboard and sandbox"
+  goal: "Sales-led onboarding through to triggering every test value."
+  exit: "Admin invites a developer, who verifies, gets keys, triggers every test value and sees results in their own console; an expired organisation is locked."
+  stories: [DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-08, DSH-09, DSH-10,
+            SBX-01, SBX-02, SBX-03, SBX-04, RAL-11, LED-08]
+
+- id: P3
+  name: "Docs and SDKs"
+  goal: "Self-serve learning after access is granted."
+  exit: "The docs site is live; the quickstart works in 5 minutes; all 8-language snippets pass in CI; both SDKs pass against the sandbox."
+  stories: [DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, DOC-06, SDK-01, SDK-02, SDK-03]
+
+- id: P4
+  name: "Website launch"
+  goal: "Buyers find, understand and contact."
+  exit: "The site is live with dated results, booking and the access form; the honesty checklist is signed off by the founder."
+  stories: [WEB-01, WEB-02, WEB-03, WEB-04, WEB-05, WEB-06, WEB-07, WEB-08]
+
+- id: L
+  name: "After launch (Should and Could)"
+  goal: "Shadow mode and operations hardening; first shadow report from a CSV export."
+  exit: "The first free shadow report is produced from a CSV export."
+  stories: [SHD-01, SHD-02, SHD-03, SHD-04, RAL-08, RAL-09, RAL-10, EXE-10, OPS-01, OPS-03, OPS-04, AUD-03,
+            CON-10, DEM-06, EXC-09, INT-05]

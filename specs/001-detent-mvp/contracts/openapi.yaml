@@ -1,0 +1,607 @@
+openapi: 3.1.0
+info:
+  title: Detent payment controls API (sandbox)
+  version: "2026-12-01"
+  summary: Agentic payment controls - decision, orchestration and operations. Test networks only.
+  description: |
+    Contract for spec/03-api.md. Detent is the working name. Sandbox, pre-launch: every key is an `sk_test_` key and
+    every rail is a test network or a simulator. `sk_live_` keys always get 403 `live_mode_unavailable`.
+
+    Items marked PROPOSED depend on a pending decision in specs/001-detent-mvp/decisions.md.
+servers:
+  - url: https://sandbox.api.example.invalid/v1
+    description: Placeholder until the final name and domain are decided
+security:
+  - bearerAuth: []
+
+tags:
+  - {name: Decision, description: "Should this payment happen? Intents, decisions, mandates, rule versions."}
+  - {name: Orchestration, description: "How and where it goes. Sending in Assist mode, the kill switch."}
+  - {name: Operations, description: "Exceptions, deposits, reconciliation, replay, events."}
+  - {name: Sandbox, description: "Sandbox-only controls."}
+
+paths:
+  /payment_intents:
+    post:
+      tags: [Decision]
+      operationId: createPaymentIntent
+      summary: Create a payout intent; it is decided synchronously (INT-01, INT-02)
+      x-scope: intents:create
+      parameters: [{$ref: "#/components/parameters/IdempotencyKey"}, {$ref: "#/components/parameters/DetentVersion"}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntentCreate"}}}
+      responses:
+        "201": {description: Created and decided, content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntent"}}}}
+        "200": {description: Replay of a stored response for the same Idempotency-Key and body, content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntent"}}}}
+        "401": {$ref: "#/components/responses/Error"}
+        "403": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+    get:
+      tags: [Decision]
+      operationId: listPaymentIntents
+      summary: List intents (INT-03)
+      x-scope: read
+      parameters:
+        - {$ref: "#/components/parameters/Limit"}
+        - {$ref: "#/components/parameters/StartingAfter"}
+        - {name: status, in: query, schema: {$ref: "#/components/schemas/PaymentStatus"}}
+        - {name: rail, in: query, schema: {type: string}}
+        - {name: "created[gte]", in: query, schema: {type: string, format: date-time}}
+        - {name: "created[lte]", in: query, schema: {type: string, format: date-time}}
+      responses:
+        "200": {description: A page, content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntentList"}}}}
+        "401": {$ref: "#/components/responses/Error"}
+  /payment_intents/{id}:
+    get:
+      tags: [Decision]
+      operationId: getPaymentIntent
+      summary: Intent with decisions, checks, route, attempts, postings and events (INT-03)
+      x-scope: read
+      parameters: [{$ref: "#/components/parameters/PaymentId"}]
+      responses:
+        "200": {description: The intent, content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntentDetail"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+  /payment_intents/{id}/cancel:
+    post:
+      tags: [Decision]
+      operationId: cancelPaymentIntent
+      summary: Cancel before it is sent (INT-05; who may cancel is PROPOSED, G-17)
+      x-scope: intents:create
+      parameters: [{$ref: "#/components/parameters/PaymentId"}, {$ref: "#/components/parameters/IdempotencyKey"}]
+      responses:
+        "200": {description: Cancelled, content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntent"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+  /payment_intents/{id}/send:
+    post:
+      tags: [Orchestration]
+      operationId: sendPaymentIntent
+      summary: Assist mode - a human confirms sending (EXE-09; who may send is PROPOSED, G-09)
+      x-scope: exceptions:approve
+      parameters: [{$ref: "#/components/parameters/PaymentId"}, {$ref: "#/components/parameters/IdempotencyKey"}]
+      responses:
+        "200": {description: Queued for sending, content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntent"}}}}
+        "403": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+  /payment_intents/{id}/replay:
+    get:
+      tags: [Operations]
+      operationId: replayPaymentIntent
+      summary: Step-by-step replay and its match result; never calls a model (AUD-02)
+      x-scope: read
+      parameters: [{$ref: "#/components/parameters/PaymentId"}]
+      responses:
+        "200": {description: Replay, content: {application/json: {schema: {$ref: "#/components/schemas/Replay"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+  /decisions:
+    post:
+      tags: [Decision]
+      operationId: createDecision
+      summary: Decision only; nothing is created or executed (POL-08)
+      x-scope: intents:create
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntentCreate"}}}
+      responses:
+        "200": {description: The decision, content: {application/json: {schema: {$ref: "#/components/schemas/Decision"}}}}
+        "422": {$ref: "#/components/responses/Error"}
+  /exceptions:
+    get:
+      tags: [Operations]
+      operationId: listExceptions
+      summary: List cases (EXC-08)
+      x-scope: read
+      parameters:
+        - {$ref: "#/components/parameters/Limit"}
+        - {$ref: "#/components/parameters/StartingAfter"}
+        - {name: status, in: query, schema: {$ref: "#/components/schemas/CaseStatus"}}
+        - {name: owner, in: query, schema: {type: string}}
+        - {name: tier, in: query, schema: {type: integer}}
+        - {name: overdue, in: query, schema: {type: boolean}}
+      responses:
+        "200": {description: A page, content: {application/json: {schema: {$ref: "#/components/schemas/ExceptionList"}}}}
+  /exceptions/{id}:
+    get:
+      tags: [Operations]
+      operationId: getException
+      summary: Raw facts, rule hits and agent evidence (EXC-08)
+      x-scope: read
+      parameters: [{$ref: "#/components/parameters/ExceptionId"}]
+      responses:
+        "200": {description: The case, content: {application/json: {schema: {$ref: "#/components/schemas/ExceptionCase"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+  /exceptions/{id}/approve:
+    post:
+      tags: [Operations]
+      operationId: approveException
+      summary: Approve with a reason; re-runs the policy (EXC-04, D-01). Approver must not be the initiator
+      x-scope: exceptions:approve
+      parameters: [{$ref: "#/components/parameters/ExceptionId"}, {$ref: "#/components/parameters/IdempotencyKey"}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/Resolution"}}}
+      responses:
+        "200": {description: Resolved; the payment's new status is returned, content: {application/json: {schema: {$ref: "#/components/schemas/ExceptionCase"}}}}
+        "403": {$ref: "#/components/responses/Error"}
+        "409": {$ref: "#/components/responses/Error"}
+  /exceptions/{id}/reject:
+    post:
+      tags: [Operations]
+      operationId: rejectException
+      summary: Reject with a reason; the payment becomes REJECTED (terminal)
+      x-scope: exceptions:approve
+      parameters: [{$ref: "#/components/parameters/ExceptionId"}, {$ref: "#/components/parameters/IdempotencyKey"}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/Resolution"}}}
+      responses:
+        "200": {description: Rejected, content: {application/json: {schema: {$ref: "#/components/schemas/ExceptionCase"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+  /deposit_intents:
+    post:
+      tags: [Operations]
+      operationId: createDepositIntent
+      summary: Create deposit instructions (LED-03)
+      x-scope: intents:create
+      parameters: [{$ref: "#/components/parameters/IdempotencyKey"}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/DepositIntentCreate"}}}
+      responses:
+        "201": {description: Created, content: {application/json: {schema: {$ref: "#/components/schemas/DepositIntent"}}}}
+        "409": {$ref: "#/components/responses/Error"}
+        "422": {$ref: "#/components/responses/Error"}
+  /deposit_intents/{id}:
+    get:
+      tags: [Operations]
+      operationId: getDepositIntent
+      summary: Status and credits (LED-03)
+      x-scope: read
+      parameters: [{name: id, in: path, required: true, schema: {type: string, pattern: "^dep_"}}]
+      responses:
+        "200": {description: The deposit intent, content: {application/json: {schema: {$ref: "#/components/schemas/DepositIntent"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+  /mandates:
+    get:
+      tags: [Decision]
+      operationId: listMandates
+      x-scope: admin
+      summary: List agent mandates (MND-01)
+      responses:
+        "200": {description: Mandates, content: {application/json: {schema: {type: object, properties: {data: {type: array, items: {$ref: "#/components/schemas/Mandate"}}, has_more: {type: boolean}, next_cursor: {type: [string, "null"]}}}}}}
+    post:
+      tags: [Decision]
+      operationId: createMandate
+      x-scope: admin
+      summary: Issue a signed mandate (MND-01)
+      parameters: [{$ref: "#/components/parameters/IdempotencyKey"}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: "#/components/schemas/MandateCreate"}}}
+      responses:
+        "201": {description: Issued, content: {application/json: {schema: {$ref: "#/components/schemas/Mandate"}}}}
+  /mandates/{id}/revoke:
+    post:
+      tags: [Decision]
+      operationId: revokeMandate
+      x-scope: admin
+      summary: Revoke; affects every intent not yet submitted (MND-03)
+      parameters: [{name: id, in: path, required: true, schema: {type: string, pattern: "^mnd_"}}]
+      responses:
+        "200": {description: Revoked, content: {application/json: {schema: {$ref: "#/components/schemas/Mandate"}}}}
+  /policy/versions:
+    get:
+      tags: [Decision]
+      operationId: listPolicyVersions
+      x-scope: read
+      summary: Rule versions (changes happen in the console) (POL-01)
+      responses:
+        "200": {description: Versions, content: {application/json: {schema: {type: object, properties: {data: {type: array, items: {$ref: "#/components/schemas/PolicyVersion"}}}}}}}
+  /policy/versions/{v}:
+    get:
+      tags: [Decision]
+      operationId: getPolicyVersion
+      x-scope: read
+      parameters: [{name: v, in: path, required: true, schema: {type: integer, minimum: 1}}]
+      responses:
+        "200": {description: A version, content: {application/json: {schema: {$ref: "#/components/schemas/PolicyVersion"}}}}
+        "404": {$ref: "#/components/responses/Error"}
+  /kill_switch:
+    post:
+      tags: [Orchestration]
+      operationId: engageKillSwitch
+      x-scope: admin
+      summary: Engage - stops every send; pending payments held (EXE-08)
+      responses:
+        "200": {description: Engaged, content: {application/json: {schema: {$ref: "#/components/schemas/KillSwitch"}}}}
+    delete:
+      tags: [Orchestration]
+      operationId: releaseKillSwitch
+      x-scope: admin
+      summary: Release - the key's named user must be the payments lead (invariant 10; key-to-user binding PROPOSED, G-08)
+      responses:
+        "200": {description: Released, content: {application/json: {schema: {$ref: "#/components/schemas/KillSwitch"}}}}
+        "403": {$ref: "#/components/responses/Error"}
+  /reconciliation/runs:
+    get:
+      tags: [Operations]
+      operationId: listReconciliationRuns
+      x-scope: read
+      summary: Runs and match rates (LED-06)
+      responses:
+        "200": {description: Runs, content: {application/json: {schema: {type: object, properties: {data: {type: array, items: {$ref: "#/components/schemas/ReconciliationRun"}}}}}}}
+  /reconciliation/breaks:
+    get:
+      tags: [Operations]
+      operationId: listReconciliationBreaks
+      x-scope: read
+      summary: Breaks with proposed fixes (LED-06)
+      responses:
+        "200": {description: Breaks, content: {application/json: {schema: {type: object, properties: {data: {type: array, items: {$ref: "#/components/schemas/ReconciliationBreak"}}}}}}}
+  /events:
+    get:
+      tags: [Operations]
+      operationId: listEvents
+      x-scope: read
+      summary: Polling alternative to webhooks (API-07)
+      parameters: [{$ref: "#/components/parameters/Limit"}, {$ref: "#/components/parameters/StartingAfter"}]
+      responses:
+        "200": {description: Events, content: {application/json: {schema: {type: object, properties: {data: {type: array, items: {$ref: "#/components/schemas/Event"}}, has_more: {type: boolean}, next_cursor: {type: [string, "null"]}}}}}}
+  /sandbox/reset:
+    post:
+      tags: [Sandbox]
+      operationId: resetSandbox
+      x-scope: admin
+      summary: Reset the organisation's test data; keeps keys, webhooks and settings (SBX-04; method OPEN, C-04)
+      responses:
+        "200": {description: Reset, content: {application/json: {schema: {type: object, properties: {reset_at: {type: string, format: date-time}}}}}}
+  /sandbox/scenarios:
+    post:
+      tags: [Sandbox]
+      operationId: forceScenario
+      x-scope: admin
+      summary: Force the next payment's scenario (DSH-07)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scenario]
+              properties: {scenario: {type: string, enum: [timeout_unknown, rail_failure, flagged_address]}}
+      responses:
+        "200": {description: Set}
+
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, description: "sk_test_ keys only; hashed at rest; scopes read, intents:create, exceptions:approve, admin"}
+  parameters:
+    IdempotencyKey: {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 255}}
+    DetentVersion: {name: Detent-Version, in: header, required: false, schema: {type: string, example: "2026-12-01"}}
+    PaymentId: {name: id, in: path, required: true, schema: {type: string, pattern: "^pay_"}}
+    ExceptionId: {name: id, in: path, required: true, schema: {type: string, pattern: "^exc_"}}
+    Limit: {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+    StartingAfter: {name: starting_after, in: query, schema: {type: string}}
+  headers:
+    RequestId: {schema: {type: string}, description: "On every response"}
+  responses:
+    Error:
+      description: Error envelope
+      headers: {Request-Id: {$ref: "#/components/headers/RequestId"}}
+      content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}
+    RateLimited:
+      description: Rate limited
+      headers:
+        Retry-After: {schema: {type: integer}}
+        RateLimit-Limit: {schema: {type: integer}}
+        RateLimit-Remaining: {schema: {type: integer}}
+        RateLimit-Reset: {schema: {type: integer}}
+      content: {application/json: {schema: {$ref: "#/components/schemas/Error"}}}
+  schemas:
+    Money:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount: {type: string, pattern: "^-?(0|[1-9][0-9]*)(\\.[0-9]{1,6})?$", description: "Decimal string; never a float"}
+        currency: {$ref: "#/components/schemas/Currency"}
+    Currency: {type: string, enum: [USDC, GBP, EUR]}
+    PaymentStatus:
+      type: string
+      enum: [RECEIVED, BLOCKED, ESCALATED, READY, SHADOWED, HELD, SUBMITTED, UNKNOWN, CONFIRMED, FAILED, FAILED_FINAL, REJECTED, CANCELLED]
+    Outcome: {type: string, enum: [EXECUTE, ESCALATE, BLOCK]}
+    ReasonCode:
+      type: string
+      enum: [MANDATE_MISSING, MANDATE_SIGNATURE_INVALID, MANDATE_EXPIRED, MANDATE_REVOKED, MANDATE_PAYEE_OUT_OF_SCOPE,
+             MANDATE_AMOUNT_EXCEEDED, MANDATE_TOTAL_EXCEEDED, MANDATE_NETWORK_OUT_OF_SCOPE, KYB_FAILED, KYB_PENDING,
+             NOT_ALLOWLISTED, SCREENING_HIT, TRAVEL_RULE_MISSING, NETWORK_NOT_ALLOWED, ABOVE_AUTO_LIMIT, ABOVE_HARD_MAX,
+             DAILY_CAP_PLATFORM, DAILY_CAP_COUNTERPARTY, NEW_WALLET, CHANGED_DETAILS, FIRST_PAYMENT, ABOVE_NORM,
+             RESUBMISSION_AFTER_BLOCK, SYSTEM_UNAVAILABLE]
+    Destination:
+      type: object
+      required: [kind, network]
+      properties:
+        kind: {type: string, enum: [evm_wallet, bank_account]}
+        network: {type: string, examples: [base-sepolia, eth-sepolia, banksim-fps, banksim-sepa-inst, simchain]}
+        address: {type: string, description: "EVM address; an unregistered address becomes a new destination (PROPOSED, G-01)"}
+        destination_id: {type: string, pattern: "^dst_"}
+    PaymentIntentCreate:
+      type: object
+      required: [kind, source, destination, amount]
+      properties:
+        kind: {type: string, const: payout}
+        source: {type: string, enum: [platform, agent]}
+        mandate_id: {type: string, pattern: "^mnd_", description: "Required when source is agent"}
+        counterparty_id: {type: string, pattern: "^cpt_"}
+        user_account_ref: {type: string, description: "Payout to the platform's own end user (user payout profile, D-04); exactly one of counterparty_id or user_account_ref"}
+        destination: {$ref: "#/components/schemas/Destination"}
+        amount: {$ref: "#/components/schemas/Money"}
+        allow_network_switch: {type: boolean, default: false}
+        reference: {type: string, maxLength: 140}
+        notes: {type: string, maxLength: 1000, description: "Untrusted text; never read by the policy"}
+        travel_rule: {type: object, description: "Optional for platform intents; must match registry data (D-03). Ignored for agent intents"}
+      oneOf:
+        - required: [counterparty_id]
+        - required: [user_account_ref]
+    Check:
+      type: object
+      required: [check, result]
+      properties:
+        check: {type: string}
+        result: {type: string, enum: [PASS, ESCALATE, BLOCK, NOT_EVALUATED]}
+        reason: {$ref: "#/components/schemas/ReasonCode"}
+        evidence: {type: object, additionalProperties: true}
+    RouteCandidate:
+      type: object
+      properties:
+        rail: {type: string}
+        eligible: {type: boolean}
+        score: {type: string, description: "Decimal string"}
+        fee: {$ref: "#/components/schemas/Money"}
+        expected_seconds: {type: integer}
+        reason: {type: string}
+    Decision:
+      type: object
+      required: [id, outcome, policy_version, checks]
+      properties:
+        id: {type: string, pattern: "^dec_"}
+        outcome: {$ref: "#/components/schemas/Outcome"}
+        policy_version: {type: integer}
+        policy_hash: {type: string}
+        checks: {type: array, items: {$ref: "#/components/schemas/Check"}}
+        approved_reasons: {type: array, items: {$ref: "#/components/schemas/ReasonCode"}, description: "Reasons a human approved before this re-run (D-01)"}
+        route: {type: object, properties: {candidates: {type: array, items: {$ref: "#/components/schemas/RouteCandidate"}}, chosen: {type: string}}}
+        decided_at: {type: string, format: date-time}
+    ExceptionRef:
+      type: object
+      properties:
+        id: {type: string, pattern: "^exc_"}
+        owner: {type: string, pattern: "^usr_"}
+        deadline_at: {type: string, format: date-time}
+    PaymentIntent:
+      type: object
+      required: [id, status, amount, created_at]
+      properties:
+        id: {type: string, pattern: "^pay_", description: "The payment ID for life"}
+        status: {$ref: "#/components/schemas/PaymentStatus"}
+        source: {type: string, enum: [platform, agent]}
+        amount: {$ref: "#/components/schemas/Money"}
+        counterparty_id: {type: [string, "null"]}
+        user_account_ref: {type: [string, "null"]}
+        destination: {$ref: "#/components/schemas/Destination"}
+        decision: {$ref: "#/components/schemas/Decision"}
+        exception: {oneOf: [{$ref: "#/components/schemas/ExceptionRef"}, {type: "null"}]}
+        awaiting_send_click: {type: boolean}
+        created_at: {type: string, format: date-time}
+    Attempt:
+      type: object
+      properties:
+        id: {type: string, pattern: "^att_"}
+        attempt_no: {type: integer, minimum: 1}
+        rail: {type: string}
+        status: {type: string, enum: [CREATED, SUBMITTED, UNKNOWN, CONFIRMED, FAILED]}
+        failure_class: {type: [string, "null"], enum: [TECHNICAL_RETRYABLE, TECHNICAL_FINAL, REJECTED_BY_RAIL, TIMEOUT, null]}
+        nonce: {type: [integer, "null"]}
+        tx_hash: {type: [string, "null"]}
+        explorer_url: {type: [string, "null"]}
+        submitted_at: {type: [string, "null"], format: date-time}
+        resolved_at: {type: [string, "null"], format: date-time}
+    Posting:
+      type: object
+      properties:
+        account: {type: string}
+        direction: {type: string, enum: [debit, credit]}
+        amount: {$ref: "#/components/schemas/Money"}
+        journal_id: {type: string, pattern: "^jrn_"}
+    PaymentIntentDetail:
+      allOf:
+        - {$ref: "#/components/schemas/PaymentIntent"}
+        - type: object
+          properties:
+            decisions: {type: array, items: {$ref: "#/components/schemas/Decision"}}
+            attempts: {type: array, items: {$ref: "#/components/schemas/Attempt"}}
+            postings: {type: array, items: {$ref: "#/components/schemas/Posting"}}
+            events: {type: array, items: {$ref: "#/components/schemas/Event"}}
+    PaymentIntentList:
+      type: object
+      required: [data, has_more]
+      properties:
+        data: {type: array, items: {$ref: "#/components/schemas/PaymentIntent"}}
+        has_more: {type: boolean}
+        next_cursor: {type: [string, "null"]}
+    CaseStatus: {type: string, enum: [OPEN, HELD_OVERDUE, RESOLVED]}
+    Resolution:
+      type: object
+      required: [reason]
+      properties: {reason: {type: string, minLength: 1, maxLength: 2000}}
+    ExceptionCase:
+      type: object
+      required: [id, status, type, deadline_at]
+      properties:
+        id: {type: string, pattern: "^exc_"}
+        payment_id: {type: [string, "null"]}
+        deposit_id: {type: [string, "null"]}
+        type: {type: string}
+        tier: {type: integer, description: "Deadline class (PROPOSED meaning, C-07)"}
+        reasons: {type: array, items: {$ref: "#/components/schemas/ReasonCode"}}
+        status: {$ref: "#/components/schemas/CaseStatus"}
+        owner: {type: string}
+        backup_owner: {type: string}
+        deadline_at: {type: string, format: date-time}
+        raw_facts: {type: object, additionalProperties: true, description: "Shown before agent content (EXC-02)"}
+        agent_evidence: {type: [object, "null"], description: "AI-generated, cited; every claim has evidence_ids", additionalProperties: true}
+        resolution: {type: [string, "null"], enum: [approved, rejected, cancelled, superseded, null]}
+        payment_status: {$ref: "#/components/schemas/PaymentStatus"}
+    ExceptionList:
+      type: object
+      properties:
+        data: {type: array, items: {$ref: "#/components/schemas/ExceptionCase"}}
+        has_more: {type: boolean}
+        next_cursor: {type: [string, "null"]}
+    DepositIntentCreate:
+      type: object
+      required: [account_ref, currency, network]
+      properties:
+        account_ref: {type: string}
+        currency: {$ref: "#/components/schemas/Currency"}
+        network: {type: string}
+        expected_amount: {$ref: "#/components/schemas/Money"}
+    DepositIntent:
+      type: object
+      properties:
+        id: {type: string, pattern: "^dep_"}
+        account_ref: {type: string}
+        status: {type: string, enum: [OPEN, RECEIVED, CREDITED, EXCEPTION, EXPIRED], description: "PROPOSED values (D-P03)"}
+        deposit_address: {type: [string, "null"]}
+        reference: {type: [string, "null"]}
+        credits: {type: array, items: {type: object, properties: {inbound_tx_hash: {type: string}, amount: {$ref: "#/components/schemas/Money"}, credited_at: {type: string, format: date-time}}}}
+    MandateScope:
+      type: object
+      required: [payees, max_per_payment, max_total, networks, currencies]
+      properties:
+        payees: {type: array, items: {type: string, pattern: "^cpt_"}}
+        max_per_payment: {$ref: "#/components/schemas/Money"}
+        max_total: {$ref: "#/components/schemas/Money"}
+        networks: {type: array, items: {type: string}}
+        currencies: {type: array, items: {$ref: "#/components/schemas/Currency"}}
+        purpose: {type: string}
+    MandateCreate:
+      type: object
+      required: [agent, scope, valid_from, expires_at]
+      properties:
+        agent: {type: object, required: [agent_id], properties: {agent_id: {type: string}, description: {type: string}}}
+        scope: {$ref: "#/components/schemas/MandateScope"}
+        valid_from: {type: string, format: date-time}
+        expires_at: {type: string, format: date-time}
+    Mandate:
+      allOf:
+        - {$ref: "#/components/schemas/MandateCreate"}
+        - type: object
+          properties:
+            mandate_id: {type: string, pattern: "^mnd_"}
+            version: {type: integer}
+            signature: {type: object, properties: {alg: {const: HS256}, key_id: {type: string}, value: {type: string}}}
+            revoked_at: {type: [string, "null"], format: date-time}
+            usage: {type: object, properties: {total: {$ref: "#/components/schemas/Money"}, count: {type: integer}}}
+    PolicyVersion:
+      type: object
+      properties:
+        version: {type: integer}
+        status: {type: string, enum: [draft, active, superseded]}
+        content_hash: {type: string}
+        yaml: {type: string}
+        loosening: {type: boolean}
+        approved_by: {type: array, items: {type: string}}
+        attestation: {type: [string, "null"]}
+        activated_at: {type: [string, "null"], format: date-time}
+    KillSwitch:
+      type: object
+      properties:
+        engaged: {type: boolean}
+        engaged_by: {type: [string, "null"]}
+        engaged_at: {type: [string, "null"], format: date-time}
+        released_by: {type: [string, "null"]}
+        released_at: {type: [string, "null"], format: date-time}
+    ReconciliationRun:
+      type: object
+      properties:
+        id: {type: string, pattern: "^rec_"}
+        started_at: {type: string, format: date-time}
+        finished_at: {type: [string, "null"], format: date-time}
+        items: {type: integer}
+        matched: {type: integer}
+        match_rate: {type: string, description: "Decimal string, e.g. 0.994"}
+    ReconciliationBreak:
+      type: object
+      properties:
+        id: {type: string, pattern: "^brk_"}
+        subject: {type: object, additionalProperties: true}
+        proposed_fix:
+          type: object
+          properties:
+            action: {type: string, enum: [match_to, credit_account, return_to_sender, write_off_to_suspense, needs_investigation]}
+            target: {type: [string, "null"]}
+        rationale: {type: object, properties: {text: {type: string}, evidence_ids: {type: array, items: {type: string}}}}
+        status: {type: string, enum: [OPEN, APPROVED, REJECTED, APPLIED], description: "PROPOSED values (D-P04)"}
+    Replay:
+      type: object
+      properties:
+        payment_id: {type: string}
+        steps: {type: array, items: {type: object, properties: {at: {type: string, format: date-time}, kind: {type: string}, recorded: {type: object}, replayed: {type: object}, match: {type: boolean}}}}
+        match: {type: boolean}
+        model_calls: {type: integer, const: 0}
+    Event:
+      type: object
+      required: [id, type, created, data]
+      properties:
+        id: {type: string, pattern: "^evt_"}
+        type: {$ref: "#/components/schemas/EventType"}
+        created: {type: integer, description: "Unix seconds"}
+        sequence: {type: integer, description: "Increases per payment"}
+        data: {type: object, properties: {object: {type: object}}}
+    EventType:
+      type: string
+      enum: [payment_intent.decided, payment_intent.escalated, payment_intent.ready, payment_intent.submitted,
+             payment_intent.unknown, payment_intent.confirmed, payment_intent.failed, payment_intent.blocked,
+             payment_intent.rejected, payment_intent.cancelled, exception.created, exception.overdue,
+             exception.resolved, deposit.received, deposit.credited, deposit.exception, reconciliation.break,
+             kill_switch.engaged, kill_switch.released]
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [type, code, message, request_id]
+          properties:
+            type: {type: string, enum: [invalid_request, authentication, permission, not_found, conflict, rate_limit, quota, internal]}
+            code:
+              type: string
+              examples: [idempotency_conflict, payment_blocked, already_resolved, invalid_transition, insufficient_scope,
+                         live_mode_unavailable, organisation_expired, quota_exceeded, unknown_version, mandate_invalid,
+                         self_approval_forbidden, kill_switch_engaged, not_cancellable, validation_error]
+            message: {type: string}
+            payment_id: {type: [string, "null"]}
+            request_id: {type: string}
+            param: {type: [string, "null"]}

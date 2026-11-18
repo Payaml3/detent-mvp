@@ -1,0 +1,337 @@
+# Functional requirements for the Detent MVP: the source of spec.md's FR list, inventory.md and
+# traceability.md. Edit here, then run: python tools/build_spec.py
+#
+# id:      FR-nnn, stable
+# area:    capability area; layer: decision | orchestration | operations | cross-cutting | portal
+# text:    the requirement, testable
+# src:     source references. "spec/04#checks" = spec/04-policy.md heading anchor; "inv:N" = CLAUDE.md
+#          invariant N; "fixture:<path>"; "story:<ID>" = acceptance criteria in backlog/stories.yaml
+# stories: backlog stories that implement it (model-item codes are taken from their `trace`)
+# status:  confirmed (stated in a source) | proposed (my decision, pending) | open (founder decides)
+# decision: register IDs in decisions.md, when status is proposed or open, or when a confirmed
+#          decision changed the source
+
+requirements:
+# ------------------------------------------------------------------ cross-cutting foundation
+- {id: FR-001, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-01, OPS-02],
+   src: ["spec/09#release-gate-evl-07", "spec/10#security-controls-in-the-mvp"],
+   text: "Every push runs lint, type checks, migrations and the full test suite in CI, plus a secret scan and the independence (denylist) check; any failure blocks the merge."}
+- {id: FR-002, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-02],
+   src: ["inv:14", "spec/10#settings-envexample"],
+   text: "The API and worker refuse to start when any configured or RPC-reported chain ID is outside 84532, 11155111 and 31337, and any request using an sk_live_ key gets 403 live_mode_unavailable."}
+- {id: FR-003, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-03],
+   src: ["spec/02#conventions", "spec/02#exactly-once-constraints-database", "inv:15", "inv:16"],
+   text: "Every record carries its organisation; every read or change is scoped to one organisation; IDs are prefixed UUIDv7; money is integer minor units plus a currency."}
+- {id: FR-004, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-04],
+   src: ["story:FND-04", "spec/07#07--back-office-console"],
+   text: "The console is protected by one demo password; the viewer picks an acting user; every write records that user and role; permissions are checked on the server."}
+- {id: FR-005, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-05],
+   src: ["inv:17", "story:FND-05"],
+   text: "All time comes from one clock service; in demo mode the clock can be advanced by 15 minutes, 1 hour or 1 day; outside demo mode the control does not exist."}
+- {id: FR-006, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-06],
+   src: ["spec/01#processes", "story:FND-06"],
+   text: "Background jobs survive restarts; each job's effects happen exactly once even if a worker dies mid-job."}
+- {id: FR-007, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-08],
+   src: ["story:FND-08", "spec/10#security-controls-in-the-mvp"],
+   text: "Logs are structured and carry the request and payment IDs; keys, secrets and invoice bodies never appear in logs."}
+- {id: FR-008, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-09],
+   src: ["story:FND-09", "spec/06#rails-in-the-mvp"],
+   text: "A local chain with a 6-decimal mock USDC lets CI and the fault suite run without faucets; public testnets are used only nightly and in the live demo."}
+- {id: FR-009, area: Foundation, layer: cross-cutting, status: confirmed, stories: [FND-07],
+   src: ["spec/10#hosting", "story:FND-07"],
+   text: "The prototype is deployed with its database in an EU region; a health endpoint reports the database and both chain RPCs; the console footer states the regions."}
+
+# ------------------------------------------------------------------ decision: intents
+- {id: FR-010, area: Intents, layer: decision, status: confirmed, stories: [INT-01],
+   src: ["spec/03#create-a-payout-intent", "inv:1"],
+   text: "A platform or an agent creates a payout intent and gets a pay_ ID, the decision and the status synchronously; the ID never changes through retries, failovers or approvals."}
+- {id: FR-011, area: Intents, layer: decision, status: confirmed, stories: [INT-02],
+   src: ["spec/03#standards", "spec/02#exactly-once-constraints-database"],
+   text: "Every create carries an Idempotency-Key; the same key and body return the stored response; the same key with a different body returns 409 idempotency_conflict."}
+- {id: FR-012, area: Intents, layer: decision, status: confirmed, stories: [INT-03],
+   src: ["spec/03#endpoints"],
+   text: "An intent can be read with its decisions, checks, route, attempts, postings and events, and listed with filters and cursor pagination."}
+- {id: FR-013, area: Intents, layer: decision, status: confirmed, stories: [INT-04],
+   src: ["story:INT-04", "spec/04#checks"],
+   text: "A counterparty registry holds KYB status, allowlist flag, destinations with first-seen and last-changed times, and statistics from confirmed payments; editing a destination is audited."}
+- {id: FR-014, area: Intents, layer: decision, status: proposed, decision: [G-01, C-16], stories: [INT-01, INT-04, POL-05],
+   src: ["spec/03#create-a-payout-intent", "fixture:fixtures/invoices/expected-outputs.yaml"],
+   text: "An intent naming an address that is not a registered destination of the counterparty records it as a new destination, so NEW_WALLET escalates; it is never trusted silently."}
+- {id: FR-015, area: Intents, layer: decision, status: proposed, decision: [G-17], stories: [INT-05],
+   src: ["spec/02#payment-state-machine", "spec/03#endpoints"],
+   text: "An intent can be cancelled by the platform or the payments lead until it is submitted, never after."}
+- {id: FR-016, area: Intents, layer: decision, status: confirmed, decision: [D-04, G-10], stories: [INT-01, POL-03],
+   src: ["spec/04#user-payouts-payouts-to-the-platforms-own-end-users"],
+   text: "A payout to the platform's own end user (account reference instead of counterparty) uses the user payout profile: counterparty KYB, allowlist, first-payment and above-norm checks are skipped; screening, networks, limits, caps and wallet checks apply."}
+
+# ------------------------------------------------------------------ decision: policy
+- {id: FR-020, area: Policy, layer: decision, status: confirmed, stories: [POL-01],
+   src: ["spec/04#rule-set-format", "fixture:fixtures/policy/default-policy.yaml"],
+   text: "Rules are a versioned YAML rule set, validated against a schema; each version is immutable once active and decisions record the version and its hash."}
+- {id: FR-021, area: Policy, layer: decision, status: confirmed, stories: [POL-02],
+   src: ["spec/04#principles"],
+   text: "The decision is deterministic: same inputs and rule version give the same outcome; BLOCK beats ESCALATE beats EXECUTE; every check runs and reports its result, reason and evidence; an invalid mandate short-circuits to BLOCK."}
+- {id: FR-022, area: Policy, layer: decision, status: confirmed, decision: [D-03], stories: [POL-03],
+   src: ["spec/04#checks", "spec/04#travel-rule-data-travel_rule-check"],
+   text: "Compliance checks: KYB (block failed or unknown, escalate pending), allowlist, screening of address and name, travel-rule fields above the threshold taken from registry and organisation data, and allowed networks per currency."}
+- {id: FR-023, area: Policy, layer: decision, status: proposed, decision: [G-07], stories: [POL-03],
+   src: ["spec/04#checks", "fixture:fixtures/screening-list.yaml"],
+   text: "Screening matches addresses case-insensitively and names after case-folding and whitespace collapsing; no fuzzy matching in the MVP."}
+- {id: FR-024, area: Policy, layer: decision, status: confirmed, decision: [D-05], stories: [POL-04],
+   src: ["spec/04#checks", "spec/04#counters-and-concurrency"],
+   text: "Above the auto limit escalates; above the hard maximum blocks; daily caps per platform and per counterparty count confirmed plus in-flight amounts and update atomically under concurrency."}
+- {id: FR-025, area: Policy, layer: decision, status: proposed, decision: [G-14, G-12], stories: [POL-04, MND-02],
+   src: ["spec/04#counters-and-concurrency", "spec/05#mandates-mnd-01-to-mnd-03"],
+   text: "Daily caps use the UTC calendar day; mandate totals cover the mandate's whole validity window; reserved amounts are released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED."}
+- {id: FR-026, area: Policy, layer: decision, status: confirmed, stories: [POL-05],
+   src: ["spec/04#checks", "story:POL-05"],
+   text: "Unusual activity is checkable rules: new wallet, changed details, first payment, above k times the counterparty median (only with enough confirmed history); each hit stores the raw facts."}
+- {id: FR-027, area: Policy, layer: decision, status: proposed, decision: [G-13], stories: [POL-05],
+   src: ["spec/04#checks"],
+   text: "Above-norm compares only with confirmed payments in the same currency; otherwise it is reported as not evaluated."}
+- {id: FR-028, area: Policy, layer: decision, status: confirmed, stories: [POL-06],
+   src: ["inv:4", "story:POL-06"],
+   text: "A block is final: approve, retry, reroute or resubmit of a blocked payment returns 409 payment_blocked and the database rejects any status change away from BLOCKED or REJECTED."}
+- {id: FR-029, area: Policy, layer: decision, status: proposed, decision: [C-05], stories: [POL-06],
+   src: ["story:POL-06", "spec/09#attacks-evl-02-at-least-100-scenarios-pass--0-unauthorised-executions"],
+   text: "A new intent to the same counterparty or destination address within 24 hours of a block escalates RESUBMISSION_AFTER_BLOCK with a link to the blocked payment, whatever the amount."}
+- {id: FR-030, area: Policy, layer: decision, status: confirmed, stories: [POL-07],
+   src: ["spec/04#rule-changes-pol-07", "story:POL-07"],
+   text: "Rule changes are drafts with a structured diff; activation needs a second, different user; a loosening change needs the compliance lead; the attestation, approvers and times are recorded; in-flight decisions keep their version."}
+- {id: FR-031, area: Policy, layer: decision, status: proposed, decision: [C-06, C-08], stories: [POL-07],
+   src: ["spec/04#rule-changes-pol-07", "story:POL-07"],
+   text: "The compliance lead is one of the two approvers on every activation; the loosening detector uses the union of the spec/04 and POL-07 lists."}
+- {id: FR-032, area: Policy, layer: decision, status: confirmed, stories: [POL-08],
+   src: ["spec/03#endpoints"],
+   text: "A decision-only endpoint evaluates an intent without creating or executing anything."}
+- {id: FR-033, area: Policy, layer: decision, status: confirmed, stories: [POL-09],
+   src: ["inv:9", "spec/01#fail-safe"],
+   text: "Any failure in a decision path (database, screening, policy load, model) gives ESCALATE SYSTEM_UNAVAILABLE handled by the organisation's fail-safe; no error ever becomes EXECUTE."}
+- {id: FR-034, area: Policy, layer: decision, status: proposed, decision: [C-03], stories: [POL-09, EXE-01],
+   src: ["spec/02#payment-state-machine", "spec/01#fail-safe"],
+   text: "With fail-safe 'hold', a payment whose decision failed moves RECEIVED to HELD; with 'manual_queue' it moves to ESCALATED."}
+- {id: FR-035, area: Policy, layer: decision, status: confirmed, decision: [D-01], stories: [EXC-04, EXE-03],
+   src: ["spec/04#re-runs-after-approval-exc-04-exe-03"],
+   text: "A re-run after approval executes only if every remaining escalation reason was approved with unchanged evidence; a new reason opens a new case; a BLOCK always blocks; the pre-send re-check applies the same rule."}
+
+# ------------------------------------------------------------------ decision: mandates and agents
+- {id: FR-040, area: Mandates, layer: decision, status: confirmed, stories: [MND-01],
+   src: ["spec/05#mandates-mnd-01-to-mnd-03"],
+   text: "An agent mandate has a scope (payees, per-payment and total limits, networks, currencies, purpose), a validity window and an HMAC signature over canonical JSON."}
+- {id: FR-041, area: Mandates, layer: decision, status: confirmed, stories: [MND-02],
+   src: ["spec/04#checks", "story:MND-02"],
+   text: "Agent intents are checked against their mandate first; missing, forged, expired or revoked mandates, payees, amounts, totals or networks out of scope BLOCK with the specific reason; usage updates atomically; the check re-runs before sending."}
+- {id: FR-042, area: Mandates, layer: decision, status: confirmed, stories: [MND-03],
+   src: ["story:MND-03"],
+   text: "Revoking a mandate affects every intent not yet submitted; an approved intent whose mandate is revoked is BLOCKED MANDATE_REVOKED at the pre-send re-check."}
+- {id: FR-043, area: Agents, layer: decision, status: confirmed, stories: [AGT-01, DEM-02],
+   src: ["spec/05#instruction-agent-agt-01-agt-02-agt-04", "fixture:fixtures/invoices/expected-outputs.yaml"],
+   text: "The instruction agent turns an invoice into a proposed intent with per-field value, confidence and source span; the canonical $18,500 invoice gives the same correct proposal on 10 of 10 runs."}
+- {id: FR-044, area: Agents, layer: decision, status: confirmed, stories: [AGT-02],
+   src: ["spec/05#instruction-agent-agt-01-agt-02-agt-04"],
+   text: "The agent never guesses: a value not found at its source span is nulled and flagged; ambiguous invoices raise the defined flag codes and require clarification."}
+- {id: FR-045, area: Agents, layer: decision, status: confirmed, stories: [AGT-03],
+   src: ["inv:5", "spec/05#containment-rules-apply-to-every-agent", "spec/01#module-boundaries"],
+   text: "Agents can only propose: read-only tools plus propose_payment_intent through the API with a mandate-bound key; an import-boundary test forbids agents from importing execution, rails or approval code."}
+- {id: FR-046, area: Agents, layer: decision, status: confirmed, stories: [AGT-04],
+   src: ["inv:11", "spec/05#containment-rules-apply-to-every-agent"],
+   text: "Untrusted text reaches models only inside delimited data blocks; instructions inside them are ignored and flagged POSSIBLE_INJECTION."}
+- {id: FR-047, area: Agents, layer: cross-cutting, status: confirmed, stories: [AGT-05],
+   src: ["spec/05#containment-rules-apply-to-every-agent", "spec/02#entities"],
+   text: "Every model call is recorded (model, prompt version, input hash, raw and parsed output, tokens, latency) so replay never calls a model."}
+- {id: FR-048, area: Agents, layer: cross-cutting, status: confirmed, stories: [AGT-06],
+   src: ["spec/05#models-from-settings-dont-hard-code", "spec/05#containment-rules-apply-to-every-agent"],
+   text: "Model IDs come from settings behind one client wrapper; a daily token budget makes agents return needs_human when exceeded."}
+
+# ------------------------------------------------------------------ orchestration
+- {id: FR-050, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-01],
+   src: ["spec/02#payment-state-machine", "inv:13"],
+   text: "Every status change goes through one transition function, under a row lock, using the allowed-transitions table; terminal states never change."}
+- {id: FR-051, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-02],
+   src: ["inv:2", "spec/02#exactly-once-constraints-database", "spec/06#idempotency-keys-passed-to-rails"],
+   text: "At most one in-flight and one confirmed attempt per payment, enforced by the database; rails receive idempotency keys derived from the payment ID."}
+- {id: FR-052, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-03],
+   src: ["story:EXE-03", "spec/01#the-main-flow-agent-proposed-payout"],
+   text: "Inside the lock before every send: kill switch off, balance covers amount plus fees, pre-funded limit has room, mandate valid; a stale decision or changed rule version re-runs the policy; any failure holds the payment."}
+- {id: FR-053, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-04],
+   src: ["spec/06#idempotency-keys-passed-to-rails", "spec/01#production-custody-boundary-not-built-in-the-mvp"],
+   text: "Nonces are allocated per wallet and chain and stored before broadcast, behind a signer interface that a custody provider can replace."}
+- {id: FR-054, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-05],
+   src: ["inv:3", "spec/06#adapter-contract-ral-01"],
+   text: "A timeout or dropped connection makes the attempt UNKNOWN, never FAILED; nothing is resent while any attempt is UNKNOWN."}
+- {id: FR-055, area: Execution, layer: orchestration, status: confirmed, decision: [D-02], stories: [EXE-06],
+   src: ["spec/06#unknown-resolution-exe-06"],
+   text: "The UNKNOWN resolver polls on a schedule and resolves only on definitive rail evidence; when the node never saw the transaction it re-broadcasts the same signed transaction; after the stuck threshold a case opens for the payments lead."}
+- {id: FR-056, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-07],
+   src: ["inv:6", "fixture:fixtures/policy/default-policy.yaml"],
+   text: "Only the execution layer retries, only on TECHNICAL_RETRYABLE, by configured attempts and backoff, keeping the payment ID."}
+- {id: FR-057, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-08],
+   src: ["inv:10", "story:EXE-08"],
+   text: "The kill switch stops all sends (checked inside the lock), holds pending payments, lets UNKNOWN attempts keep resolving, shows a red banner, is audited, and only the payments lead releases it."}
+- {id: FR-058, area: Execution, layer: orchestration, status: proposed, decision: [G-15], stories: [EXE-08],
+   src: ["spec/02#payment-state-machine"],
+   text: "On release of the kill switch each held payment re-runs the policy automatically; EXECUTE resumes, anything else stays held or escalates."}
+- {id: FR-059, area: Execution, layer: orchestration, status: confirmed, decision: [C-09], stories: [EXE-09],
+   src: ["story:EXE-09", "spec/00#product-principles"],
+   text: "Shadow records decisions and sends nothing; Assist waits for a human Send click on EXECUTE; Auto sends automatically; a mode change needs the payments lead and the compliance lead and is audited."}
+- {id: FR-060, area: Execution, layer: orchestration, status: proposed, decision: [G-09, G-16], stories: [EXE-09],
+   src: ["spec/02#payment-state-machine", "spec/03#endpoints"],
+   text: "The mode is read inside the send lock; in Assist the Send click needs an approver role and cannot be made by the initiator."}
+- {id: FR-061, area: Execution, layer: operations, status: confirmed, stories: [EXE-10],
+   src: ["spec/10#runbooks-write-as-the-features-land", "story:EXE-10"],
+   text: "An invariant monitor detects unauthorised executions, wrong credits and duplicates, engages the kill switch and opens a Sev 1 incident."}
+- {id: FR-062, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-01],
+   src: ["spec/06#adapter-contract-ral-01"],
+   text: "Every rail implements one adapter contract (eligible, quote, submit, status, health) and normalises failures to four classes."}
+- {id: FR-063, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-02, RAL-03],
+   src: ["spec/06#rails-in-the-mvp", "spec/10#settings-envexample"],
+   text: "USDC adapters for Base Sepolia and Ethereum Sepolia (and the local chain) use the configured confirmation thresholds and testnet contract addresses."}
+- {id: FR-064, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-04],
+   src: ["spec/06#rails-in-the-mvp"],
+   text: "A separate bank simulator offers Faster Payments-style GBP and SEPA Instant-style EUR schemes with fees, limits, cut-offs, failure rates, idempotent payments, statements and a settlement webhook."}
+- {id: FR-065, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-05],
+   src: ["spec/06#fault-injection-ral-05"],
+   text: "A fault proxy sits in every rail call and injects the nine named faults on demand, never in demo mode unless the scenario runner sets them."}
+- {id: FR-066, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-06],
+   src: ["spec/06#routing-ral-06"],
+   text: "Routing runs only after EXECUTE, filters eligible rails and picks the lowest weighted score; all candidates, scores and the reason are stored."}
+- {id: FR-067, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-07],
+   src: ["spec/06#failover-ral-07", "spec/00#launch-criteria-from-mvp-scope"],
+   text: "Failover happens only after TECHNICAL_FINAL or exhausted retries, when a network switch is allowed and another rail is eligible; never from UNKNOWN, after a block or after a rail rejection; the payment ID is kept."}
+- {id: FR-068, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-08, RAL-09, RAL-10],
+   src: ["spec/06#routing-ral-06", "spec/07#screens", "spec/10#security-controls-in-the-mvp"],
+   text: "(Should) Rail health with a circuit breaker, a mock connection flow with encrypted credentials, and daily adapter contract tests."}
+- {id: FR-069, area: Rails, layer: orchestration, status: confirmed, stories: [RAL-11],
+   src: ["spec/06#rails-in-the-mvp", "spec/08#sandbox-sbx"],
+   text: "A simulated chain rail is the default for sandbox organisations."}
+
+# ------------------------------------------------------------------ operations
+- {id: FR-070, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-01],
+   src: ["spec/04#rule-set-format", "story:EXC-01"],
+   text: "Every escalation opens a case with an owner, a backup owner and a deadline from the rule set; statuses OPEN, HELD_OVERDUE, RESOLVED; one open case per payment; every change audited."}
+- {id: FR-071, area: Exceptions, layer: operations, status: proposed, decision: [C-07, G-03], stories: [EXC-01],
+   src: ["story:EXC-01", "spec/04#rule-set-format"],
+   text: "A case's tier is its deadline class from the rule set; business days are Monday to Friday UTC without holidays."}
+- {id: FR-072, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-02],
+   src: ["spec/07#screens", "spec/07#ux-rules"],
+   text: "The case shows raw facts first (registered payee, full address, first seen, last changed, amount against median, rule hits, mandate scope); agent content is collapsed and visually separate."}
+- {id: FR-073, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-03],
+   src: ["spec/05#investigation-agent-exc-03"],
+   text: "An investigation agent runs asynchronously with read-only tools; every claim cites evidence IDs or is removed; the case is usable before it finishes."}
+- {id: FR-074, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-04],
+   src: ["story:EXC-04", "inv:8"],
+   text: "Approve or reject needs a reason; approve re-runs the policy; reject is terminal; the approver is never the initiator."}
+- {id: FR-075, area: Exceptions, layer: operations, status: proposed, decision: [G-05, G-06, G-08], stories: [EXC-04, EXC-08],
+   src: ["spec/00#who-uses-the-mvp", "spec/09#attacks-evl-02-at-least-100-scenarios-pass--0-unauthorised-executions"],
+   text: "Reviewer, backup owner and payments lead may approve or reject; after the deadline only the current owner or the payments lead may; an API approval acts as the named user the key was issued to."}
+- {id: FR-076, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-05],
+   src: ["story:EXC-05"],
+   text: "Parallel approvals are safe: the second gets 409 already_resolved."}
+- {id: FR-077, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-06, EXC-07],
+   src: ["inv:7", "story:EXC-06", "story:EXC-07"],
+   text: "Past the deadline the case is HELD_OVERDUE, the payment stays held, the counterparty gets a status update in the outbox and the backup owner takes over; no payment is ever approved by timeout; nothing sends real email."}
+- {id: FR-078, area: Exceptions, layer: operations, status: proposed, decision: [G-02, G-04], stories: [EXC-06],
+   src: ["story:EXC-06"],
+   text: "Counterparties carry a fictional contact address for updates; the backup owner gets a deadline of the same length; a second overdue passes the case to the payments lead."}
+- {id: FR-079, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-08, EXC-09],
+   src: ["spec/03#endpoints", "story:EXC-09"],
+   text: "Exceptions can be listed, read, approved and rejected by API; (Could) a weekly agent-versus-human agreement sample."}
+- {id: FR-080, area: Ledger, layer: operations, status: confirmed, stories: [LED-01, LED-02],
+   src: ["spec/02#ledger-accounts-and-postings"],
+   text: "One append-only double-entry ledger records payouts as specified; every journal balances; UNKNOWN keeps the reservation pending; corrections are new entries."}
+- {id: FR-081, area: Ledger, layer: operations, status: confirmed, stories: [LED-03, LED-04, LED-05],
+   src: ["spec/03#endpoints", "story:LED-05", "spec/04#checks"],
+   text: "Deposit intents give instructions; watchers record inbound transfers; deposits are matched and checked (token, network, sender screening, amount) and credited once, after the confirmation threshold; mismatches open deposit exceptions."}
+- {id: FR-082, area: Ledger, layer: operations, status: proposed, decision: [G-11], stories: [LED-05],
+   src: ["story:LED-05"],
+   text: "Deposit amount tolerance is a per-organisation setting, default 0 (exact)."}
+- {id: FR-083, area: Ledger, layer: operations, status: confirmed, stories: [LED-06, LED-07],
+   src: ["story:LED-06", "spec/05#reconciliation-agent-led-06"],
+   text: "Reconciliation matches ledger postings with chain transfers and bank statements, reports the match rate (99% or more on the 500-item set), and each break gets a fix from a fixed set applied only after human approval."}
+- {id: FR-084, area: Ledger, layer: operations, status: confirmed, stories: [LED-08],
+   src: ["story:LED-08"],
+   text: "(Could) Usage is metered from the ledger against quotas."}
+- {id: FR-085, area: Audit, layer: operations, status: confirmed, stories: [AUD-01],
+   src: ["inv:12", "spec/02#entities"],
+   text: "The audit log is append-only and hash-chained per organisation, written in the same transaction as each change, and its chain can be verified."}
+- {id: FR-086, area: Audit, layer: operations, status: confirmed, stories: [AUD-02, AUD-03],
+   src: ["spec/03#endpoints", "story:AUD-02"],
+   text: "Any payment replays from stored inputs and agent outputs to its recorded decision without calling a model; (Should) evidence export."}
+
+# ------------------------------------------------------------------ console, evaluation, demo
+- {id: FR-090, area: Console, layer: cross-cutting, status: confirmed, stories: [CON-01],
+   src: ["spec/07#07--back-office-console", "spec/00#honesty-rules-product-docs-and-website"],
+   text: "Every console page shows the prototype banner, the acting user and role, the kill-switch state and, in demo mode, the clock."}
+- {id: FR-091, area: Console, layer: cross-cutting, status: confirmed,
+   stories: [CON-02, CON-03, CON-04, CON-05, CON-06, CON-07, CON-08, CON-10],
+   src: ["spec/07#screens", "spec/07#ux-rules"],
+   text: "Console screens: Overview, Invoice drop, Payments and detail, Exceptions and case, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings, Demo, following the UX rules (full addresses in mono, one colour per status, in-page confirmation)."}
+- {id: FR-092, area: Evaluation, layer: cross-cutting, status: confirmed, stories: [EVL-01, EVL-02, EVL-03],
+   src: ["spec/09#evaluation-suites-eval"],
+   text: "An evaluation runner executes YAML scenarios: 100+ attacks across the eleven categories with 0 unauthorised executions, and 30+ faults with 0 duplicates, the ID preserved and no timeout turned FAILED."}
+- {id: FR-093, area: Evaluation, layer: cross-cutting, status: confirmed, stories: [EVL-04, EVL-05],
+   src: ["spec/09#interpretation-evl-04", "spec/09#agreement-evl-05-synthetic"],
+   text: "30 interpretation invoices measure field accuracy, flag recall and invented values (must be 0); (Should) 50 synthetic agreement cases."}
+- {id: FR-094, area: Evaluation, layer: cross-cutting, status: confirmed, stories: [EVL-06, EVL-07, EVL-08],
+   src: ["spec/09#results-report-evl-06", "spec/09#release-gate-evl-07"],
+   text: "A dated results report with the caveat; the release gate fails the build on any unauthorised execution, duplicate, timeout turned FAILED or auto-approval after timeout; (Should) a latency benchmark."}
+- {id: FR-095, area: Demo, layer: cross-cutting, status: confirmed, stories: [DEM-01, DEM-03, DEM-04, DEM-05, CON-09],
+   src: ["spec/11#11--the-10-minute-demo-update-to-match-the-built-screens-dem-05", "fixture:fixtures/batches/demo-batch-20.yaml"],
+   text: "A fictional demo platform, the 20-payment batch with deposits, a wallet-funding check and a scenario runner make the 10-minute script reproducible on real testnets."}
+- {id: FR-096, area: Demo, layer: cross-cutting, status: proposed, decision: [C-10], stories: [DEM-03, DEM-05],
+   src: ["spec/11#11--the-10-minute-demo-update-to-match-the-built-screens-dem-05"],
+   text: "The demo's match figure counts only items that moved money (proposed: 26 of 27 with one designed break), and spec/11 is updated to the measured numbers."}
+- {id: FR-097, area: Demo, layer: cross-cutting, status: confirmed, stories: [DEM-06],
+   src: ["story:DEM-06"],
+   text: "(Should) Scenario packs per platform type."}
+- {id: FR-098, area: Shadow, layer: decision, status: confirmed, stories: [SHD-01, SHD-02, SHD-03, SHD-04],
+   src: ["spec/00#product-principles", "story:SHD-01"],
+   text: "(Should) A CSV export can be decided in shadow mode, anonymised on import, and summarised in a shadow report; (Could) a mode-gate report and sign-off."}
+- {id: FR-099, area: Operations, layer: operations, status: confirmed, stories: [OPS-01, OPS-03, OPS-04],
+   src: ["spec/10#runbooks-write-as-the-features-land"],
+   text: "(Should/Could) Incident records, a restore drill under one hour, and a security pack draft."}
+
+# ------------------------------------------------------------------ developer portal
+- {id: FR-100, area: API, layer: portal, status: confirmed, stories: [API-01, API-02, API-03, API-04],
+   src: ["spec/03#standards", "spec/03#error-codes-starter-catalogue"],
+   text: "The public API uses scoped, hashed test keys, a standard error envelope, dated versions pinned per organisation, and per-key rate limits with standard headers."}
+- {id: FR-101, area: API, layer: portal, status: proposed, decision: [G-08], stories: [API-01],
+   src: ["spec/03#standards"],
+   text: "Every API key is issued to a named user, who is the actor in the audit log for that key's writes."}
+- {id: FR-102, area: API, layer: portal, status: confirmed, stories: [API-05, API-06, API-07],
+   src: ["spec/03#03--public-api-sandbox", "spec/08#dashboard-dsh"],
+   text: "An OpenAPI 3.1 file matches the code; request logs (30 days, bodies redacted) and an events list are available."}
+- {id: FR-103, area: Webhooks, layer: portal, status: confirmed, stories: [WHK-01, WHK-02, WHK-03],
+   src: ["spec/03#webhooks"],
+   text: "Webhook endpoints subscribe to the listed event types; deliveries are signed (HMAC-SHA256 with timestamp, 300 s tolerance), at least once, with sequence per payment, retries and a delivery log."}
+- {id: FR-104, area: Webhooks, layer: portal, status: proposed, decision: [G-20], stories: [WHK-03],
+   src: ["spec/03#webhooks"],
+   text: "Webhook retries back off at 1 min, 5 min, 30 min, 2 h, 6 h and 24 h, then the delivery is marked failed."}
+- {id: FR-113, area: Webhooks, layer: portal, status: proposed, decision: [C-19], stories: [WHK-01, WHK-02],
+   src: ["spec/03#webhooks", "spec/02#entities"],
+   text: "Webhook signing secrets are shown once and stored encrypted (not hashed), because every delivery is signed with the plaintext secret."}
+- {id: FR-105, area: Dashboard, layer: portal, status: confirmed,
+   stories: [DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-08, DSH-09, DSH-10],
+   src: ["spec/08#dashboard-dsh"],
+   text: "Sales-led access: the admin creates organisations (60-day expiry) and single-use invites (7 days); developers verify email and set a password; keys, logs, webhooks, sandbox controls, usage and the per-organisation console; an access-requests inbox."}
+- {id: FR-106, area: Sandbox, layer: portal, status: confirmed, stories: [SBX-01, SBX-02, SBX-03],
+   src: ["spec/08#sandbox-sbx", "spec/06#sandbox-test-values-sbx-01"],
+   text: "Sandbox test values trigger every path; quotas and abuse limits apply; expired organisations get 403 organisation_expired; (Should) opt-in real testnet mode from a capped faucet wallet."}
+- {id: FR-107, area: Sandbox, layer: portal, status: open, decision: [C-04], stories: [SBX-04],
+   src: ["story:SBX-04", "inv:12"],
+   text: "Sandbox reset clears an organisation's test data without deleting audit or ledger rows (method to be decided: proposed new data generation)."}
+- {id: FR-108, area: Sandbox, layer: portal, status: proposed, decision: [G-18, G-19], stories: [DSH-01, SBX-04],
+   src: ["spec/08#sandbox-sbx"],
+   text: "A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days (pending legal review)."}
+- {id: FR-109, area: Docs, layer: portal, status: confirmed, stories: [DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, DOC-06],
+   src: ["spec/08#docs-doc"],
+   text: "Docs site with the listed sections; samples in 8 languages run in CI against the sandbox; try-it uses sandbox keys only; (Should) changelog."}
+- {id: FR-110, area: SDKs, layer: portal, status: confirmed, stories: [SDK-01, SDK-02, SDK-03],
+   src: ["spec/08#sdks-sdk"],
+   text: "Python and TypeScript SDKs from the OpenAPI file add idempotency keys automatically, retry only safe cases with the same key, and verify webhooks; (Should) Postman collection."}
+- {id: FR-111, area: Website, layer: portal, status: confirmed, stories: [WEB-01, WEB-02, WEB-03, WEB-04, WEB-05, WEB-06, WEB-07, WEB-08],
+   src: ["spec/08#website-web", "spec/00#honesty-rules-product-docs-and-website", "spec/product-definition.md#rules-for-wording"],
+   text: "The marketing site has the eleven home sections and three sub-pages, dated results, booking and access form, legal pages, status page and SEO basics, and passes the honesty checklist."}
+- {id: FR-112, area: Website, layer: portal, status: open, decision: [C-18], stories: [WEB-01, OPS-02],
+   src: ["spec/product-definition.md#rules-for-wording"],
+   text: "Wording rules naming another company comply with the independence rule (pending founder answer on 'Ralio')."}
