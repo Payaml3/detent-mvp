@@ -1,0 +1,44 @@
+# Constrained fields in data-model.md (unique, check, trigger or enum constraints) and the stories that
+# implement them. tools/build_spec.py checks every field appears in its entity's row in data-model.md,
+# every story exists, and cites the fields on each story's implementation task in tasks.md.
+
+fields:
+  payment_intents.id: [INT-01, EXE-01]                 # the payment ID for life (invariant 1)
+  payment_intents.amount_minor: [INT-01]               # integer, > 0 (invariant 15)
+  payment_intents.currency: [INT-01]                   # USDC, GBP, EUR
+  payment_intents.mandate_id: [INT-01, MND-02]         # required when source = agent
+  payment_intents.user_account_ref: [INT-01, POL-03]   # exactly one of counterparty_id / user_account_ref (D-04)
+  payment_intents.idempotency_key: [INT-02]            # unique per organisation
+  payment_intents.status: [EXE-01, POL-06]             # enum; terminal states frozen by trigger
+  payment_intents.awaiting_send_click: [EXE-09]        # Assist mode
+  decisions.outcome: [POL-02]                          # EXECUTE, ESCALATE, BLOCK
+  decisions.policy_version_id: [POL-02, POL-07]        # the version used
+  decisions.approved_reasons: [EXC-04, EXE-03]         # D-01 re-run rule
+  attempts.status: [EXE-02]                            # one in-flight, one confirmed
+  attempts.failure_class: [EXE-05, RAL-01]             # never TIMEOUT on FAILED
+  attempts.nonce: [EXE-04]                             # one transaction per nonce per wallet and chain
+  attempts.raw_tx: [EXE-04, EXE-06]                    # stored before broadcast (D-02)
+  attempts.evidence: [EXE-06]                          # required for UNKNOWN -> FAILED
+  rails.chain_id: [RAL-02, RAL-03]                     # test networks only
+  policy_versions.status: [POL-01, POL-07]             # one active; active and superseded frozen
+  counters.amount_minor: [POL-04, MND-02]              # >= 0, updated atomically
+  mandate_usage.total_minor: [MND-02]                  # >= 0, updated atomically
+  counterparties.kyb_status: [POL-03]                  # verified, pending, failed, unknown
+  destinations.first_seen_at: [INT-04, POL-05]         # NEW_WALLET
+  destinations.last_changed_at: [INT-04, POL-05]       # CHANGED_DETAILS
+  exception_cases.status: [EXC-01, EXC-06]             # OPEN, HELD_OVERDUE, RESOLVED; one open per payment
+  exception_cases.resolution: [EXC-04]                 # set exactly when resolved
+  kill_switch.engaged: [EXE-08]                        # read inside the send lock
+  organisations.mode: [EXE-09]                         # shadow, assist, auto
+  organisations.fail_safe: [POL-09]                    # hold, manual_queue
+  organisations.expires_at: [DSH-03]                   # 403 organisation_expired
+  inbound_transfers.tx_hash: [LED-04]                  # unique with rail_id and log_index
+  credits.inbound_transfer_id: [LED-05]                # one credit per inbound transfer
+  postings.direction: [LED-01, LED-02]                 # debit or credit; append-only
+  deposit_intents.idempotency_key: [LED-03]            # unique per organisation
+  deposit_intents.status: [LED-03, LED-05]             # PROPOSED values (D-P03)
+  recon_breaks.status: [LED-06]                        # PROPOSED values (D-P04)
+  audit_events.hash: [AUD-01]                          # hash chain, append-only
+  api_keys.prefix: [API-01]                            # sk_test_ only
+  webhook_endpoints.secret_hash: [WHK-01]              # to become encrypted storage (C-19)
+  jobs.dedupe_key: [FND-06]                            # unique per organisation and kind

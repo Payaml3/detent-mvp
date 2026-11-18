@@ -275,6 +275,9 @@ requirements:
 - {id: FR-094, area: Evaluation, layer: cross-cutting, status: confirmed, stories: [EVL-06, EVL-07, EVL-08],
    src: ["spec/09#results-report-evl-06", "spec/09#release-gate-evl-07"],
    text: "A dated results report with the caveat; the release gate fails the build on any unauthorised execution, duplicate, timeout turned FAILED or auto-approval after timeout; (Should) a latency benchmark."}
+- {id: FR-114, area: Evaluation, layer: cross-cutting, status: confirmed, stories: [EXE-06, EVL-06, EVL-08],
+   src: ["spec/01#performance-targets-estimate", "spec/09#results-report-evl-06", "story:EXE-06"],
+   text: "Performance is measured and reported: UNKNOWN resolution median and p95 (median under 15 minutes, B7.unknown) by the resolver; rules-only decision p50 and p95 (targets 50 ms locally, 5 s in production) by the latency benchmark."}
 - {id: FR-095, area: Demo, layer: cross-cutting, status: confirmed, stories: [DEM-01, DEM-03, DEM-04, DEM-05, CON-09],
    src: ["spec/11#11--the-10-minute-demo-update-to-match-the-built-screens-dem-05", "fixture:fixtures/batches/demo-batch-20.yaml"],
    text: "A fictional demo platform, the 20-payment batch with deposits, a wallet-funding check and a scenario runner make the 10-minute script reproducible on real testnets."}

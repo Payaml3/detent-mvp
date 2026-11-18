@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 82 requirements confirmed; 19 proposed and 1 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 83 requirements confirmed; 19 proposed and 1 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -406,6 +406,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-092**: An evaluation runner executes YAML scenarios: 100+ attacks across the eleven categories with 0 unauthorised executions, and 30+ faults with 0 duplicates, the ID preserved and no timeout turned FAILED.
 - **FR-093**: 30 interpretation invoices measure field accuracy, flag recall and invented values (must be 0); (Should) 50 synthetic agreement cases.
 - **FR-094**: A dated results report with the caveat; the release gate fails the build on any unauthorised execution, duplicate, timeout turned FAILED or auto-approval after timeout; (Should) a latency benchmark.
+- **FR-114**: Performance is measured and reported: UNKNOWN resolution median and p95 (median under 15 minutes, B7.unknown) by the resolver; rules-only decision p50 and p95 (targets 50 ms locally, 5 s in production) by the latency benchmark.
 
 **Demo**
 

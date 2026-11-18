@@ -55,7 +55,7 @@ proposed decision in [decisions.md](decisions.md).
 | **deposit_intents** | id, org_id, account_ref, currency, network, expected_amount_minor, deposit_address or reference, status, idempotency_key | Status values **(P, D-P03)**; tolerance setting **(P, G-11)** |
 | **inbound_transfers** | id, org_id, rail_id, tx_hash, log_index, from/to address, amount_minor, token, confirmations, seen_at | Unique `(rail_id, tx_hash, log_index)` |
 | **credits** | id, inbound_transfer_id, deposit_intent_id, account_ref, amount_minor, journal_id | Unique `inbound_transfer_id`: one credit per inbound transfer |
-| **accounts**, **journal_entries**, **postings** | Double entry; postings are debit or credit, amount > 0 | Journal entries and postings are append-only (UPDATE, DELETE, TRUNCATE raise); balance check per journal in LED-01 |
+| **accounts**, **journal_entries**, **postings** | accounts: kind, ref, currency; journal_entries: kind, payment_id or deposit_id, adjustment_of, memo; postings: journal_id, account_id, direction (debit, credit), amount_minor (> 0), currency | Journal entries and postings are append-only (UPDATE, DELETE, TRUNCATE raise); balance check per journal in LED-01 |
 | **recon_runs**, **recon_breaks** | stats; subject, proposed_fix, rationale, status, approved_by | Break status values **(P, D-P04)** |
 | **agent_calls** | id, kind, subject_id, model, prompt_version, input_hash, raw_output, parsed, tokens, latency_ms | Replay reads these; never calls a model |
 | **audit_events**, **audit_heads** | seq, at, actor, actor_role, kind, subject_id, payload, prev_hash, hash | Hash chain per organisation; append-only; payloads JSON-native without floats |

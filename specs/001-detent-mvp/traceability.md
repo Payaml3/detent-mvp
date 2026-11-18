@@ -1067,6 +1067,22 @@ Sources: [spec/09 §results-report-evl-06](../../spec/09-evaluation-and-tests.md
 | [EVL-07](../../backlog/user-stories.md#evl-07) | S8 | 1 | Any unauthorised execution or duplicate fails the build, whatever other scores say | planned | eval: `eval/scenarios (runner: detent eval) for EVL-07` |
 | [EVL-08](../../backlog/user-stories.md#evl-08) | S8 | 0 | Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report | planned | eval: `eval/scenarios (runner: detent eval) for EVL-08` |
 
+## FR-114 · Evaluation (confirmed)
+
+Performance is measured and reported: UNKNOWN resolution median and p95 (median under 15 minutes, B7.unknown) by the resolver; rules-only decision p50 and p95 (targets 50 ms locally, 5 s in production) by the latency benchmark.
+
+Sources: [spec/01 §performance-targets-estimate](../../spec/01-architecture.md#performance-targets-estimate); [spec/09 §results-report-evl-06](../../spec/09-evaluation-and-tests.md#results-report-evl-06); [EXE-06 criteria](../../backlog/user-stories.md#exe-06)
+
+| Story | Slice | # | Acceptance criterion | State | Test |
+|---|---|---|---|---|---|
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 0 | The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 1 | CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 2 | Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 3 | Median and p95 time to resolve are recorded for the results report | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
+| [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 0 | HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]' | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
+| [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 1 | results.json is published for the website's Measured results section | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
+| [EVL-08](../../backlog/user-stories.md#evl-08) | S8 | 0 | Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report | planned | eval: `eval/scenarios (runner: detent eval) for EVL-08` |
+
 ## FR-095 · Demo (confirmed)
 
 A fictional demo platform, the 20-payment batch with deposits, a wallet-funding check and a scenario runner make the 10-minute script reproducible on real testnets.

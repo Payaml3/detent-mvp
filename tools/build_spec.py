@@ -132,6 +132,17 @@ def resolve_src(ref: str, errors: list[str], where: str) -> str:
     return f"[{label}{(' §' + anchor) if anchor else ''}]({rel}{('#' + anchor) if anchor else ''})"
 
 
+def data_model_rows() -> dict[str, str]:
+    """Entity name -> its table row text in data-model.md (rows start with | **entity** ...)."""
+    rows: dict[str, str] = {}
+    for line in (FEAT / "data-model.md").read_text().splitlines():
+        if line.startswith("| **"):
+            first_cell = line.split("|")[1]
+            for name in re.findall(r"\*\*([a-z_]+)\*\*", first_cell):
+                rows[name] = line
+    return rows
+
+
 def test_ids() -> set[str]:
     """Every test function and fixture name, as 'relative/path.py::name'."""
     ids: set[str] = set()
@@ -179,6 +190,21 @@ def main() -> int:
     test_map = yaml.safe_load((FEAT / "test-map.yaml").read_text()) or {}
     decisions_text = (FEAT / "decisions.md").read_text()
     known_tests = test_ids()
+    field_map = yaml.safe_load((FEAT / "field-map.yaml").read_text())["fields"]
+    entity_rows = data_model_rows()
+    story_fields: dict[str, list[str]] = defaultdict(list)
+    for field, sids in field_map.items():
+        entity, _, col = field.partition(".")
+        row = entity_rows.get(entity)
+        if row is None:
+            errors.append(f"field-map: entity {entity} has no row in data-model.md")
+        elif col not in row:
+            errors.append(f"field-map: {field} is not listed in data-model.md's {entity} row")
+        for sid in sids:
+            if sid not in stories:
+                errors.append(f"field-map: {field} cites unknown story {sid}")
+            else:
+                story_fields[sid].append(field)
 
     # ---------------------------------------------------------------- requirements
     req_stories: dict[str, list[str]] = {}
@@ -266,7 +292,7 @@ def main() -> int:
 
     write_inventory(reqs, req_links, req_models, items, item_reqs, inv_reqs, stories)
     write_traceability(reqs, req_links, stories, test_map, slice_of)
-    write_tasks(slices, stories, story_reqs, test_map)
+    write_tasks(slices, stories, story_reqs, test_map, story_fields)
     inject_fr_list(reqs)
 
     n_ac = sum(len(s["ac"]) for s in stories.values())
@@ -302,7 +328,15 @@ def inject_fr_list(reqs) -> None:  # type: ignore[no-untyped-def]
         lines.append(f"- **{r['id']}**: {r['text']}{tag}")
     head, rest = text.split(begin, 1)
     _, tail = rest.split(end, 1)
-    spec.write_text(head + begin + "\n" + "\n".join(lines).strip() + "\n" + end + tail)
+    text = head + begin + "\n" + "\n".join(lines).strip() + "\n" + end + tail
+    n = {k: sum(1 for r in reqs if r["status"] == k) for k in ("confirmed", "proposed", "open")}
+    text = re.sub(
+        r"\*\*Status\*\*: Draft: .*",
+        f"**Status**: Draft: {n['confirmed']} requirements confirmed; {n['proposed']} proposed and {n['open']} open, "
+        "awaiting the founder (see [decisions.md](decisions.md))",
+        text,
+    )
+    spec.write_text(text)
 
 
 def _story_link(sid: str) -> str:
@@ -412,7 +446,7 @@ def write_traceability(reqs, req_links, stories, test_map, slice_of) -> None:  #
     (FEAT / "traceability.md").write_text("\n".join(out) + "\n")
 
 
-def write_tasks(slices, stories, story_reqs, test_map) -> None:  # type: ignore[no-untyped-def]
+def write_tasks(slices, stories, story_reqs, test_map, story_fields) -> None:  # type: ignore[no-untyped-def]
     out = [
         "---",
         'description: "Task list for the Detent MVP, by end-to-end slice"',
@@ -467,6 +501,12 @@ def write_tasks(slices, stories, story_reqs, test_map) -> None:  # type: ignore[
                 f"- [{box_i}] T{n:03d} {par}[{sl['id']}] Implement {sid} in `{EPIC_PATH[sid.split('-')[0]]}`"
                 f"{deps}; run `make lint typecheck test`{' and `make eval`' if sid.split('-')[0] in {'POL', 'EXE', 'RAL', 'EXC', 'LED'} else ''}"
                 f"{note}"
+                + (
+                    "; fields: "
+                    + ", ".join(f"[data-model.md](data-model.md) `{f}`" for f in story_fields[sid])
+                    if story_fields.get(sid)
+                    else ""
+                )
             )
         out += [
             "",
