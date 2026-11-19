@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Policy{% endblock %}
+{% block main %}
+<h1>Policy</h1>
+<p class="lead">Your rules decide every payment. A change is a new version: one lead proposes it, a second, different person approves it, and the compliance lead is always one of the two and attests to it. Every version is kept; each decision names the version it used.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+{% if active %}
+<section class="card" data-section="active">
+  <h2>Active: version {{ active.version }}</h2>
+  <p class="small">Activated {{ active.activated_at or '' }} · proposed by {{ names.get(active.proposed_by, active.proposed_by) }}{% if active.approved_by %} · approved by {% for a in active.approved_by %}{{ names.get(a, a) }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}
+    · hash <span class="mono">{{ active.content_hash[:12] }}</span></p>
+  {% if active.attestation %}<p class="note">Attestation{% if active.attested_by %} by {{ names.get(active.attested_by, active.attested_by) }}{% endif %}: {{ active.attestation }}</p>{% endif %}
+  <details><summary>Rule set (YAML)</summary><pre class="yaml">{{ active.yaml }}</pre></details>
+</section>
+{% endif %}
+
+{% if draft %}
+<section class="card" data-section="draft">
+  <h2>Draft: version {{ draft.version }} {% if draft.loosening %}<span class="late">loosening</span>{% else %}<span class="muted">tightening or neutral</span>{% endif %}</h2>
+  <p class="small">Proposed by {{ names.get(draft.proposed_by, draft.proposed_by) }} · based on version {{ draft.base_version }}{% if draft.attested_by %} · attested by {{ names.get(draft.attested_by, draft.attested_by) }}{% endif %}</p>
+  {% if draft.loosening_reasons %}
+  <h3>Why it counts as loosening</h3>
+  <ul>{% for r in draft.loosening_reasons %}<li><strong>{{ r.code }}</strong> <span class="mono">{{ r.path }}</span>: {{ r.detail }}</li>{% endfor %}</ul>
+  {% endif %}
+  <h3>Changes against version {{ draft.base_version }}</h3>
+  <table data-section="diff">
+    <thead><tr><th>Setting</th><th>Active</th><th>Draft</th></tr></thead>
+    <tbody>{% for c in changes %}<tr><td class="mono">{{ c.path }}</td><td class="mono diff-old">{{ c.old if c.old is not none else '(none)' }}</td><td class="mono diff-new">{{ c.new if c.new is not none else '(removed)' }}</td></tr>
+    {% else %}<tr><td colspan="3" class="muted">No changes.</td></tr>{% endfor %}</tbody>
+  </table>
+  {% if can_approve %}
+  <form method="post" action="/console/policy/{{ draft.id }}/approve">
+    {% if user.role.value == 'compliance_lead' %}
+    <label class="inline"><input type="checkbox" name="attest" value="yes" required> I attest: the client approves these rules and keeps its AML accountability.</label>
+    {% endif %}
+    <button class="primary">Approve and activate version {{ draft.version }}</button>
+  </form>
+  {% elif draft.proposed_by == user.id %}
+  <p class="muted">Waiting for a second person{% if user.role.value != 'compliance_lead' %} (the compliance lead){% endif %} to approve.</p>
+  {% else %}
+  <p class="muted">You can't approve this draft: approval needs a lead other than the proposer, and the compliance lead must be one of the two.</p>
+  {% endif %}
+  {% if user.role.value in ('payments_lead', 'compliance_lead') %}
+  <form method="post" action="/console/policy/{{ draft.id }}/withdraw"><button>Withdraw draft</button></form>
+  {% endif %}
+</section>
+{% elif can_propose %}
+<details class="card" data-section="propose">
+  <summary>Propose a new version</summary>
+  <form method="post" action="/console/policy/propose">
+    <p class="small">Edit the complete rule set. The version number must be the next one. Nothing changes until a second person approves.</p>
+    <textarea class="yaml" name="yaml_text" spellcheck="false">{{ template_yaml }}</textarea>
+    {% if user.role.value == 'compliance_lead' %}
+    <label class="inline"><input type="checkbox" name="attest" value="yes" required> I attest: the client approves these rules and keeps its AML accountability.</label>
+    {% endif %}
+    <button class="primary">Propose draft</button>
+  </form>
+</details>
+{% endif %}
+
+<h2>History</h2>
+<table data-section="history">
+  <thead><tr><th>Version</th><th>Status</th><th>Proposed by</th><th>Approved by</th><th>Loosening</th><th>Activated (UTC)</th></tr></thead>
+  <tbody>
+  {% for v in versions %}
+    <tr><td><a href="/v1/policy/versions/{{ v.version }}" title="Read through the API">{{ v.version }}</a></td><td>{{ v.status }}</td><td>{{ names.get(v.proposed_by, v.proposed_by) }}</td>
+        <td>{% for a in v.approved_by %}{{ names.get(a, a) }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+        <td>{{ 'yes' if v.loosening else 'no' }}</td><td>{{ (v.activated_at or '')[:16] }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

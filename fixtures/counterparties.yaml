@@ -10,6 +10,7 @@ users:
   - {id: usr_oc, name: "Detent on-call", role: oncall}
 counterparties:
   - id: cpt_bluefin
+    contact_email: "payables@bluefin.example.invalid"   # fictional; outbox only (G-02)
     name: "Bluefin Components Ltd (fictional)"
     kyb_status: verified
     allowlisted: true
@@ -18,6 +19,7 @@ counterparties:
     destinations:
       - {id: dst_bluefin_base, kind: evm_wallet, network: base-sepolia, address: "{{WALLET_BLUEFIN_BASE}}", first_seen_days_ago: 41, last_changed_days_ago: 41}
   - id: cpt_harbor
+    contact_email: "payables@harbor.example.invalid"   # fictional; outbox only (G-02)
     name: "Harbor Logistics GmbH (fictional)"
     kyb_status: verified
     allowlisted: true
@@ -26,6 +28,7 @@ counterparties:
     destinations:
       - {id: dst_harbor_iban, kind: bank_account, network: banksim-sepa-inst, iban_masked: "DE89 **** **** 3000", first_seen_days_ago: 300, last_changed_days_ago: 300}
   - id: cpt_quill
+    contact_email: "payables@quill.example.invalid"   # fictional; outbox only (G-02)
     name: "Quill Studio Ltd (fictional)"
     kyb_status: verified
     allowlisted: true
@@ -34,6 +37,7 @@ counterparties:
     destinations:
       - {id: dst_quill_acct, kind: bank_account, network: banksim-fps, sort_code_masked: "**-**-01", first_seen_days_ago: 200, last_changed_days_ago: 3}   # CHANGED_DETAILS
   - id: cpt_nova
+    contact_email: "payables@nova.example.invalid"   # fictional; outbox only (G-02)
     name: "Nova Freelance Collective (fictional)"
     kyb_status: pending
     allowlisted: false
@@ -42,6 +46,7 @@ counterparties:
     destinations:
       - {id: dst_nova_eth, kind: evm_wallet, network: eth-sepolia, address: "{{WALLET_NOVA_ETH}}", first_seen_days_ago: 2, last_changed_days_ago: 2}   # NEW_WALLET
   - id: cpt_flagged
+    contact_email: "payables@flagged.example.invalid"   # fictional; outbox only (G-02)
     name: "Example Sanctioned Trading Co (fictional)"
     kyb_status: verified
     allowlisted: true

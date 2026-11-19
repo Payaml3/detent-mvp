@@ -158,7 +158,9 @@ class RecordedLLM:
         )
 
 
-def llm_for(settings: Any, placeholders: Mapping[str, str] | None = None) -> tuple[LLMClient, str]:
+def llm_for(
+    settings: Any, placeholders: Mapping[str, str] | None = None, kind: str = "instruction"
+) -> tuple[LLMClient, str]:
     """The client the product uses, and a label the console shows ("Claude API" or "Recorded response")."""
     from detent.settings import REPO_ROOT
 
@@ -167,6 +169,6 @@ def llm_for(settings: Any, placeholders: Mapping[str, str] | None = None) -> tup
         key = settings.anthropic_api_key.get_secret_value() if settings.anthropic_api_key else None
         return AnthropicLLM(key), "Claude API"
     return (
-        RecordedLLM.from_dir(REPO_ROOT / "fixtures" / "agent-recordings" / "instruction", placeholders),
+        RecordedLLM.from_dir(REPO_ROOT / "fixtures" / "agent-recordings" / kind, placeholders),
         "Recorded response (offline stand-in, not a live model call)",
     )

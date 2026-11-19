@@ -1,0 +1,18 @@
+{
+  "_provenance": "HAND-WRITTEN STAND-IN for a model response, used by tests and offline demos. It is NOT a recording of a real model run: the build environment had no Anthropic API key. It deliberately includes one uncited claim so the cite-or-drop check is visible. Replace it by recording real runs.",
+  "match": "\"ev_cpt_cpt_bluefin\"",
+  "usage": {"input_tokens": 2400, "output_tokens": 380},
+  "output": {
+    "summary": "First payment to a verified, allowlisted supplier; the wallet has not changed since it was registered.",
+    "claims": [
+      {"text": "Bluefin Components Ltd (fictional) is KYB verified and on the allowlist.", "evidence_ids": ["ev_cpt_cpt_bluefin"]},
+      {"text": "The destination wallet has not changed since it was first seen.", "evidence_ids": ["ev_dst_dst_bluefin_base"]},
+      {"text": "Screening found no hit on the destination.", "evidence_ids": ["ev_scr_{{PAYMENT_ID}}"]},
+      {"text": "The payment escalated because it is the first payment to this payee and above the auto limit.", "evidence_ids": ["ev_dec_{{DECISION_ID}}"]},
+      {"text": "The supplier confirmed the invoice by phone this morning.", "evidence_ids": []}
+    ],
+    "recommendation": "approve",
+    "confidence": 0.7,
+    "open_questions": ["Confirm the invoice INV-2026-0142 with the supplier's known contact before approving."]
+  }
+}

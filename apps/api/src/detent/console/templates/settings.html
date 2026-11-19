@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block main %}
+<h1>Settings</h1>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<section class="card" data-section="mode">
+  <h2>Mode: {{ mode }}</h2>
+  <dl class="facts">
+    <dt>Shadow</dt><dd>Every decision is recorded; nothing is sent. {% if mode == 'shadow' %}<strong>(current)</strong>{% endif %}</dd>
+    <dt>Assist</dt><dd>An EXECUTE decision waits for a person to click Send. {% if mode == 'assist' %}<strong>(current)</strong>{% endif %}</dd>
+    <dt>Auto</dt><dd>An EXECUTE decision is sent automatically. {% if mode == 'auto' %}<strong>(current)</strong>{% endif %}</dd>
+    <dt>Orchestrate</dt><dd>{% if orch.enabled %}On: routing chooses between {{ orch.rails }} connected rails.{% else %}Off: {{ orch.rails }} rail{{ '' if orch.rails == 1 else 's' }} connected; routing needs 2 or more.{% endif %}</dd>
+  </dl>
+  <p class="small muted">The mode is read again at the moment of sending: a payment that was READY under Auto waits for a Send click if the mode is now Assist, and nothing is sent in Shadow.</p>
+  {% if pending %}
+  <p class="note">Change to <strong>{{ pending.to_mode }}</strong> proposed by {{ pending.proposed_by }} ({{ pending.proposed_role }}): {{ pending.reason }}</p>
+  {% if can_approve %}
+  <form method="post" action="/console/settings/mode/{{ pending.id }}/approve"><button class="primary">Approve the change to {{ pending.to_mode }}</button></form>
+  {% else %}<p class="muted small">Approval needs the other lead: the payments lead and the compliance lead, as two different people.</p>{% endif %}
+  {% if can_withdraw %}<form method="post" action="/console/settings/mode/{{ pending.id }}/withdraw"><button>Withdraw</button></form>{% endif %}
+  {% elif can_propose %}
+  <form method="post" action="/console/settings/mode/propose" class="filters">
+    <label>Change to
+      <select name="to_mode">{% for m in ['shadow', 'assist', 'auto'] if m != mode %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>
+    </label>
+    <label>Reason (required)<input name="reason" required maxlength="500"></label>
+    <button class="primary">Propose</button>
+  </form>
+  {% else %}<p class="muted small">Only the payments lead and the compliance lead change the mode.</p>{% endif %}
+</section>
+<section class="card"><h2>Fail-safe</h2><p>If any part of a decision fails, the payment goes to <strong>{{ fail_safe.replace('_', ' ') }}</strong>; it is never sent.</p></section>
+<h2>Mode changes</h2>
+<table>
+  <thead><tr><th>When (UTC)</th><th>Change</th><th>Status</th><th>Proposed by</th><th>Approved by</th><th>Reason</th></tr></thead>
+  <tbody>{% for h in history %}<tr><td>{{ h.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ h.from_mode }} → {{ h.to_mode }}</td><td>{{ h.status }}</td><td class="mono">{{ h.proposed_by }}</td><td class="mono">{{ h.approved_by or '' }}</td><td>{{ h.reason }}</td></tr>
+  {% else %}<tr><td colspan="6" class="muted">No mode changes yet.</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

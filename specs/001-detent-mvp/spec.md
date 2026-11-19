@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 92 requirements confirmed; 11 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 95 requirements confirmed; 8 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -323,7 +323,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-028**: A block is final: approve, retry, reroute or resubmit of a blocked payment returns 409 payment_blocked and the database rejects any status change away from BLOCKED or REJECTED.
 - **FR-029**: A new intent to the same counterparty or destination address within 24 hours of a block escalates RESUBMISSION_AFTER_BLOCK with a link to the blocked payment, whatever the amount.
 - **FR-030**: Rule changes are drafts with a structured diff; activation needs a second, different user; a loosening change needs the compliance lead; the attestation, approvers and times are recorded; in-flight decisions keep their version.
-- **FR-031**: The compliance lead is one of the two approvers on every activation; the loosening detector uses the union of the spec/04 and POL-07 lists. *(proposed: C-06, C-08)*
+- **FR-031**: The compliance lead is one of the two approvers on every activation; the loosening detector uses the union of the spec/04 and POL-07 lists.
 - **FR-032**: A decision-only endpoint evaluates an intent without creating or executing anything.
 - **FR-033**: Any failure in a decision path (database, screening, policy load, model) gives ESCALATE SYSTEM_UNAVAILABLE handled by the organisation's fail-safe; no error ever becomes EXECUTE.
 - **FR-034**: With fail-safe 'hold', a payment whose decision failed moves RECEIVED to HELD; with 'manual_queue' it moves to ESCALATED.
@@ -377,10 +377,10 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-072**: The case shows raw facts first (registered payee, full address, first seen, last changed, amount against median, rule hits, mandate scope); agent content is collapsed and visually separate.
 - **FR-073**: An investigation agent runs asynchronously with read-only tools; every claim cites evidence IDs or is removed; the case is usable before it finishes.
 - **FR-074**: Approve or reject needs a reason; approve re-runs the policy; reject is terminal; the approver is never the initiator.
-- **FR-075**: Reviewer, backup owner and payments lead may approve or reject; after the deadline only the current owner or the payments lead may; an API approval acts as the named user the key was issued to. *(proposed: G-05, G-06, G-08)*
+- **FR-075**: Reviewer, backup owner and payments lead may approve or reject; after the deadline only the current owner or the payments lead may; an API approval acts as the named user the key was issued to.
 - **FR-076**: Parallel approvals are safe: the second gets 409 already_resolved.
 - **FR-077**: Past the deadline the case is HELD_OVERDUE, the payment stays held, the counterparty gets a status update in the outbox and the backup owner takes over; no payment is ever approved by timeout; nothing sends real email.
-- **FR-078**: Counterparties carry a fictional contact address for updates; the backup owner gets a deadline of the same length; a second overdue passes the case to the payments lead. *(proposed: G-02, G-04)*
+- **FR-078**: Counterparties carry a fictional contact address for updates; the backup owner gets a deadline of the same length; a second overdue passes the case to the payments lead.
 - **FR-079**: Exceptions can be listed, read, approved and rejected by API; (Could) a weekly agent-versus-human agreement sample.
 
 **Ledger**

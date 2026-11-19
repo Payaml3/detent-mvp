@@ -62,3 +62,11 @@ label.inline input { display: inline; width: auto; }
 section.card, details.card { margin-bottom: 16px; }
 button.danger { border-color: #c62828; color: #c62828; }
 mark { background: #ffe9a8; padding: 0 2px; } pre.doc { white-space: pre-wrap; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 12px 0 20px; }
+.stat { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+.stat b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.ok { color: #2e7d32; } .attention { color: #c62828; font-weight: 600; }
+.diff-old { color: #c62828; } .diff-new { color: #2e7d32; }
+pre.yaml { background: #fff; border: 1px solid var(--line); padding: 8px 12px; overflow-x: auto; font-size: 12px; max-height: 420px; }
+textarea.yaml { width: 100%; min-height: 360px; font-family: ui-monospace, monospace; font-size: 12px; }

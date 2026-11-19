@@ -355,12 +355,12 @@ Sources: [spec/04 §rule-changes-pol-07](../../spec/04-policy.md#rule-changes-po
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 0 | A proposer creates a draft version; the console shows a diff against the active version | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 1 | Activation needs a second, different user; if any rule loosens (higher limit, removed check, shorter screening scope, longer window) the compliance lead must be one of the two | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 2 | On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 3 | All versions are kept and readable; decisions link to the version used | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 0 | A proposer creates a draft version; the console shows a diff against the active version | done | `integration/test_rule_changes.py::test_draft_does_not_change_the_active_version`<br>`integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation`<br>`unit/test_policy_diff.py::test_diff_lists_changed_paths_with_old_and_new_values` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 1 | Activation needs a second, different user; if any rule loosens (higher limit, removed check, shorter screening scope, longer window) the compliance lead must be one of the two | done | `integration/test_rule_changes.py::test_proposer_cannot_approve_their_own_draft`<br>`integration/test_rule_changes.py::test_compliance_lead_must_be_one_of_the_two`<br>`integration/test_rule_changes.py::test_roles_outside_the_leads_cannot_propose_or_approve`<br>`unit/test_policy_diff.py::test_each_loosening_kind_is_detected`<br>`unit/test_policy_diff.py::test_tightening_is_not_loosening` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 2 | On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability | done | `integration/test_rule_changes.py::test_activation_records_attestation_and_supersedes`<br>`integration/test_rule_changes.py::test_compliance_lead_can_propose_and_payments_lead_approves` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 3 | All versions are kept and readable; decisions link to the version used | done | `integration/test_rule_changes.py::test_version_must_follow_the_latest_and_one_draft_at_a_time`<br>`integration/test_rule_changes.py::test_stored_versions_cannot_be_edited_or_deleted`<br>`integration/test_rule_changes.py::test_decisions_link_to_the_version_they_used` |
 
-## FR-031 · Policy (proposed)
+## FR-031 · Policy (confirmed)
 
 The compliance lead is one of the two approvers on every activation; the loosening detector uses the union of the spec/04 and POL-07 lists.
 
@@ -368,10 +368,10 @@ Sources: [spec/04 §rule-changes-pol-07](../../spec/04-policy.md#rule-changes-po
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 0 | A proposer creates a draft version; the console shows a diff against the active version | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 1 | Activation needs a second, different user; if any rule loosens (higher limit, removed check, shorter screening scope, longer window) the compliance lead must be one of the two | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 2 | On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
-| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 3 | All versions are kept and readable; decisions link to the version used | planned | unit: `apps/api/tests/unit/test_pol_07.py` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 0 | A proposer creates a draft version; the console shows a diff against the active version | done | `integration/test_rule_changes.py::test_draft_does_not_change_the_active_version`<br>`integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation`<br>`unit/test_policy_diff.py::test_diff_lists_changed_paths_with_old_and_new_values` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 1 | Activation needs a second, different user; if any rule loosens (higher limit, removed check, shorter screening scope, longer window) the compliance lead must be one of the two | done | `integration/test_rule_changes.py::test_proposer_cannot_approve_their_own_draft`<br>`integration/test_rule_changes.py::test_compliance_lead_must_be_one_of_the_two`<br>`integration/test_rule_changes.py::test_roles_outside_the_leads_cannot_propose_or_approve`<br>`unit/test_policy_diff.py::test_each_loosening_kind_is_detected`<br>`unit/test_policy_diff.py::test_tightening_is_not_loosening` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 2 | On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability | done | `integration/test_rule_changes.py::test_activation_records_attestation_and_supersedes`<br>`integration/test_rule_changes.py::test_compliance_lead_can_propose_and_payments_lead_approves` |
+| [POL-07](../../backlog/user-stories.md#pol-07) | S6 | 3 | All versions are kept and readable; decisions link to the version used | done | `integration/test_rule_changes.py::test_version_must_follow_the_latest_and_one_draft_at_a_time`<br>`integration/test_rule_changes.py::test_stored_versions_cannot_be_edited_or_deleted`<br>`integration/test_rule_changes.py::test_decisions_link_to_the_version_they_used` |
 
 ## FR-032 · Policy (confirmed)
 
@@ -653,9 +653,9 @@ Sources: [EXE-09 criteria](../../backlog/user-stories.md#exe-09); [spec/00 §pro
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 0 | Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically | planned | integration: `apps/api/tests/integration/test_exe_09.py` |
-| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 1 | Changing mode needs the payments lead and the compliance lead; each change is audited | planned | integration: `apps/api/tests/integration/test_exe_09.py` |
-| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 2 | Orchestrate is shown as routing being enabled when 2 or more rails are connected | planned | integration: `apps/api/tests/integration/test_exe_09.py` |
+| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 0 | Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically | done | `integration/test_modes.py::test_shadow_records_the_decision_and_sends_nothing`<br>`integration/test_modes.py::test_auto_sends_execute_decisions_automatically`<br>`integration/test_modes.py::test_assist_waits_for_a_send_click`<br>`integration/test_modes.py::test_mode_is_read_at_send_time`<br>`integration/test_modes.py::test_shadow_after_ready_sends_nothing_even_with_a_click`<br>`integration/test_modes.py::test_send_click_over_the_api`<br>`integration/test_console_operations.py::test_assist_send_button` |
+| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 1 | Changing mode needs the payments lead and the compliance lead; each change is audited | done | `integration/test_modes.py::test_mode_change_needs_both_leads_as_two_people`<br>`integration/test_console_operations.py::test_settings_mode_change_needs_both_leads` |
+| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 2 | Orchestrate is shown as routing being enabled when 2 or more rails are connected | done | `integration/test_modes.py::test_orchestrate_means_routing_with_two_or_more_rails` |
 
 ## FR-060 · Execution (proposed)
 
@@ -665,9 +665,9 @@ Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 0 | Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically | planned | integration: `apps/api/tests/integration/test_exe_09.py` |
-| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 1 | Changing mode needs the payments lead and the compliance lead; each change is audited | planned | integration: `apps/api/tests/integration/test_exe_09.py` |
-| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 2 | Orchestrate is shown as routing being enabled when 2 or more rails are connected | planned | integration: `apps/api/tests/integration/test_exe_09.py` |
+| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 0 | Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically | done | `integration/test_modes.py::test_shadow_records_the_decision_and_sends_nothing`<br>`integration/test_modes.py::test_auto_sends_execute_decisions_automatically`<br>`integration/test_modes.py::test_assist_waits_for_a_send_click`<br>`integration/test_modes.py::test_mode_is_read_at_send_time`<br>`integration/test_modes.py::test_shadow_after_ready_sends_nothing_even_with_a_click`<br>`integration/test_modes.py::test_send_click_over_the_api`<br>`integration/test_console_operations.py::test_assist_send_button` |
+| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 1 | Changing mode needs the payments lead and the compliance lead; each change is audited | done | `integration/test_modes.py::test_mode_change_needs_both_leads_as_two_people`<br>`integration/test_console_operations.py::test_settings_mode_change_needs_both_leads` |
+| [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 2 | Orchestrate is shown as routing being enabled when 2 or more rails are connected | done | `integration/test_modes.py::test_orchestrate_means_routing_with_two_or_more_rails` |
 
 ## FR-061 · Execution (confirmed)
 
@@ -823,10 +823,10 @@ Sources: [spec/05 §investigation-agent-exc-03](../../spec/05-agents.md#investig
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 0 | Read-only tools: ledger history, counterparty record, screening result, rail status, prior cases | planned | integration: `apps/api/tests/integration/test_exc_03.py` |
-| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 1 | Each claim cites evidence record IDs; uncited claims are removed and the removal is flagged | planned | integration: `apps/api/tests/integration/test_exc_03.py` |
-| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 2 | Recommendation is approve, reject or needs-information with a confidence; the agent cannot change any state | planned | integration: `apps/api/tests/integration/test_exc_03.py` |
-| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 3 | Runs in the worker; the case is usable before the agent finishes | planned | integration: `apps/api/tests/integration/test_exc_03.py` |
+| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 0 | Read-only tools: ledger history, counterparty record, screening result, rail status, prior cases | done | `integration/test_investigation.py::test_tools_are_read_only`<br>`integration/test_investigation.py::test_cited_claims_kept_uncited_removed_and_flagged` |
+| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 1 | Each claim cites evidence record IDs; uncited claims are removed and the removal is flagged | done | `integration/test_investigation.py::test_cited_claims_kept_uncited_removed_and_flagged`<br>`integration/test_investigation.py::test_unknown_evidence_ids_never_survive`<br>`integration/test_console_operations.py::test_case_page_shows_cited_claims_and_overdue_rules` |
+| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 2 | Recommendation is approve, reject or needs-information with a confidence; the agent cannot change any state | done | `integration/test_investigation.py::test_cited_claims_kept_uncited_removed_and_flagged`<br>`integration/test_investigation.py::test_bad_output_twice_needs_a_human`<br>`integration/test_investigation.py::test_untrusted_text_is_inside_the_data_block`<br>`unit/test_agent_boundaries.py::test_agents_never_reach_execution_approval_or_rails_even_indirectly` |
+| [EXC-03](../../backlog/user-stories.md#exc-03) | S6 | 3 | Runs in the worker; the case is usable before the agent finishes | done | `integration/test_investigation.py::test_opening_a_case_queues_the_agent_and_the_worker_runs_it`<br>`integration/test_console_operations.py::test_case_page_shows_cited_claims_and_overdue_rules` |
 
 ## FR-074 · Exceptions (confirmed)
 
@@ -840,7 +840,7 @@ Sources: [EXC-04 criteria](../../backlog/user-stories.md#exc-04); [Invariant 8](
 | [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | done | `integration/test_cases.py::test_reject_is_terminal_and_needs_a_reason` |
 | [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | done | `integration/test_cases.py::test_initiator_cannot_approve`<br>`integration/test_cases.py::test_api_approval_errors` |
 
-## FR-075 · Exceptions (proposed)
+## FR-075 · Exceptions (confirmed)
 
 Reviewer, backup owner and payments lead may approve or reject; after the deadline only the current owner or the payments lead may; an API approval acts as the named user the key was issued to.
 
@@ -873,12 +873,12 @@ Sources: [Invariant 7](../../CLAUDE.md#non-negotiable-invariants); [EXC-06 crite
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 0 | Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline | planned | integration: `apps/api/tests/integration/test_exc_06.py` |
-| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 1 | The count of payments approved by timeout is always 0 and is reported | planned | fault: `apps/api/tests/integration/test_exc_06.py` |
+| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 0 | Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline | done | `integration/test_deadlines.py::test_overdue_case_is_held_counterparty_told_and_backup_owner_takes_over`<br>`integration/test_deadlines.py::test_second_miss_goes_to_the_payments_lead_and_the_payment_stays_held`<br>`integration/test_deadlines.py::test_sweeping_twice_is_a_no_op`<br>`integration/test_deadlines.py::test_the_worker_runs_the_sweeper`<br>`integration/test_deadlines.py::test_after_the_deadline_only_the_current_owner_or_payments_lead_may_approve` |
+| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 1 | The count of payments approved by timeout is always 0 and is reported | done | `integration/test_deadlines.py::test_overdue_without_a_human_decision_is_never_approved_across_orgs`<br>`integration/test_console_operations.py::test_overview_counts_and_polls` |
 | [EXC-07](../../backlog/user-stories.md#exc-07) | S3 | 0 | Counterparty updates, owner assignments and incident notices are stored with recipient, template and body | planned | integration: `apps/api/tests/integration/test_exc_07.py` |
 | [EXC-07](../../backlog/user-stories.md#exc-07) | S3 | 1 | Nothing in the prototype sends real email | done | `integration/test_console_review.py::test_outbox_lists_assignment_notices`<br>`manual:the prototype has no email provider; outbox rows are never sent` |
 
-## FR-078 · Exceptions (proposed)
+## FR-078 · Exceptions (confirmed)
 
 Counterparties carry a fictional contact address for updates; the backup owner gets a deadline of the same length; a second overdue passes the case to the payments lead.
 
@@ -886,8 +886,8 @@ Sources: [EXC-06 criteria](../../backlog/user-stories.md#exc-06)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 0 | Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline | planned | integration: `apps/api/tests/integration/test_exc_06.py` |
-| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 1 | The count of payments approved by timeout is always 0 and is reported | planned | fault: `apps/api/tests/integration/test_exc_06.py` |
+| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 0 | Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline | done | `integration/test_deadlines.py::test_overdue_case_is_held_counterparty_told_and_backup_owner_takes_over`<br>`integration/test_deadlines.py::test_second_miss_goes_to_the_payments_lead_and_the_payment_stays_held`<br>`integration/test_deadlines.py::test_sweeping_twice_is_a_no_op`<br>`integration/test_deadlines.py::test_the_worker_runs_the_sweeper`<br>`integration/test_deadlines.py::test_after_the_deadline_only_the_current_owner_or_payments_lead_may_approve` |
+| [EXC-06](../../backlog/user-stories.md#exc-06) | S6 | 1 | The count of payments approved by timeout is always 0 and is reported | done | `integration/test_deadlines.py::test_overdue_without_a_human_decision_is_never_approved_across_orgs`<br>`integration/test_console_operations.py::test_overview_counts_and_polls` |
 
 ## FR-079 · Exceptions (confirmed)
 
@@ -1016,13 +1016,13 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [CON-02](../../backlog/user-stories.md#con-02) | S6 | 0 | Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events | planned | console: `apps/api/tests/integration/test_con_02.py` |
-| [CON-02](../../backlog/user-stories.md#con-02) | S6 | 1 | Refreshes by htmx polling | planned | console: `apps/api/tests/integration/test_con_02.py` |
+| [CON-02](../../backlog/user-stories.md#con-02) | S6 | 1 | Refreshes by htmx polling | done | `integration/test_console_operations.py::test_overview_counts_and_polls` |
 | [CON-03](../../backlog/user-stories.md#con-03) | S3 | 0 | Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button | planned | console: `apps/api/tests/integration/test_con_03.py` |
 | [CON-04](../../backlog/user-stories.md#con-04) | S3 | 0 | Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason | done | `integration/test_console_review.py::test_exceptions_queue_filters_and_countdown`<br>`integration/test_console_review.py::test_console_approve_requires_reason_and_permission` |
 | [CON-05](../../backlog/user-stories.md#con-05) | S5 | 0 | Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force | planned | console: `apps/api/tests/integration/test_con_05.py` |
 | [CON-05](../../backlog/user-stories.md#con-05) | S5 | 1 | 'Submit as agent' calls the public API with the agent's key and shows the decision | done | `integration/test_agent_submit.py::test_console_invoice_drop_and_submit` |
-| [CON-06](../../backlog/user-stories.md#con-06) | S6 | 0 | Active version, history and diff; propose and approve per POL-07 | planned | console: `apps/api/tests/integration/test_con_06.py` |
-| [CON-06](../../backlog/user-stories.md#con-06) | S6 | 1 | Mandates list with scope, usage against limits, expiry and revoke | planned | console: `apps/api/tests/integration/test_con_06.py` |
+| [CON-06](../../backlog/user-stories.md#con-06) | S6 | 0 | Active version, history and diff; propose and approve per POL-07 | done | `integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation`<br>`integration/test_console_operations.py::test_reviewer_sees_policy_but_cannot_propose` |
+| [CON-06](../../backlog/user-stories.md#con-06) | S6 | 1 | Mandates list with scope, usage against limits, expiry and revoke | done | `integration/test_console_operations.py::test_mandates_screen_shows_scope_usage_expiry_and_revoke`<br>`integration/test_mandates.py::test_revoke_by_api_and_console` |
 | [CON-07](../../backlog/user-stories.md#con-07) | S7 | 0 | Run history, match rate, breaks with proposed fix and approve button | planned | console: `apps/api/tests/integration/test_con_07.py` |
 | [CON-08](../../backlog/user-stories.md#con-08) | S4 | 0 | Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts | done | `integration/test_console_rails.py::test_rails_screen` |
 | [CON-10](../../backlog/user-stories.md#con-10) | L | 0 | Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype | planned | console: `apps/api/tests/integration/test_con_10.py` |

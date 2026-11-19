@@ -98,7 +98,7 @@ requirements:
 - {id: FR-030, area: Policy, layer: decision, status: confirmed, stories: [POL-07],
    src: ["spec/04#rule-changes-pol-07", "story:POL-07"],
    text: "Rule changes are drafts with a structured diff; activation needs a second, different user; a loosening change needs the compliance lead; the attestation, approvers and times are recorded; in-flight decisions keep their version."}
-- {id: FR-031, area: Policy, layer: decision, status: proposed, decision: [C-06, C-08], stories: [POL-07],
+- {id: FR-031, area: Policy, layer: decision, status: confirmed, decision: [C-06, C-08], stories: [POL-07],
    src: ["spec/04#rule-changes-pol-07", "story:POL-07"],
    text: "The compliance lead is one of the two approvers on every activation; the loosening detector uses the union of the spec/04 and POL-07 lists."}
 - {id: FR-032, area: Policy, layer: decision, status: confirmed, stories: [POL-08],
@@ -221,7 +221,7 @@ requirements:
 - {id: FR-074, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-04],
    src: ["story:EXC-04", "inv:8"],
    text: "Approve or reject needs a reason; approve re-runs the policy; reject is terminal; the approver is never the initiator."}
-- {id: FR-075, area: Exceptions, layer: operations, status: proposed, decision: [G-05, G-06, G-08], stories: [EXC-04, EXC-08],
+- {id: FR-075, area: Exceptions, layer: operations, status: confirmed, decision: [G-05, G-06, G-08], stories: [EXC-04, EXC-08],
    src: ["spec/00#who-uses-the-mvp", "spec/09#attacks-evl-02-at-least-100-scenarios-pass--0-unauthorised-executions"],
    text: "Reviewer, backup owner and payments lead may approve or reject; after the deadline only the current owner or the payments lead may; an API approval acts as the named user the key was issued to."}
 - {id: FR-076, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-05],
@@ -230,7 +230,7 @@ requirements:
 - {id: FR-077, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-06, EXC-07],
    src: ["inv:7", "story:EXC-06", "story:EXC-07"],
    text: "Past the deadline the case is HELD_OVERDUE, the payment stays held, the counterparty gets a status update in the outbox and the backup owner takes over; no payment is ever approved by timeout; nothing sends real email."}
-- {id: FR-078, area: Exceptions, layer: operations, status: proposed, decision: [G-02, G-04], stories: [EXC-06],
+- {id: FR-078, area: Exceptions, layer: operations, status: confirmed, decision: [G-02, G-04], stories: [EXC-06],
    src: ["story:EXC-06"],
    text: "Counterparties carry a fictional contact address for updates; the backup owner gets a deadline of the same length; a second overdue passes the case to the payments lead."}
 - {id: FR-079, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-08, EXC-09],

@@ -1,0 +1,34 @@
+<p class="muted small" data-section="mode">Mode: <strong>{{ s.mode }}</strong>{% if s.pending_mode_change %} (change to {{ s.pending_mode_change.to_mode }} waiting for approval){% endif %}
+  · Orchestrate: {% if s.orchestrate.enabled %}routing across {{ s.orchestrate.rails }} connected rails{% else %}off ({{ s.orchestrate.rails }} rail{{ '' if s.orchestrate.rails == 1 else 's' }} connected; routing needs 2 or more){% endif %}
+  · updated {{ now.strftime('%H:%M:%S') }} UTC</p>
+<div class="stats">
+  <div class="stat" data-stat="execute"><b>{{ s.by_outcome.EXECUTE }}</b><span>Executed today</span></div>
+  <div class="stat" data-stat="escalate"><b>{{ s.by_outcome.ESCALATE }}</b><span>Escalated today</span></div>
+  <div class="stat" data-stat="block"><b>{{ s.by_outcome.BLOCK }}</b><span>Blocked today</span></div>
+  <div class="stat" data-stat="auto"><b>{{ s.auto_pct ~ '%' if s.auto_pct is not none else '–' }}</b><span>Decided without a person ({{ s.decided_today }} today)</span></div>
+  <div class="stat" data-stat="unknown"><b class="{{ 'attention' if s.unknown_count else '' }}">{{ s.unknown_count }}</b><span>UNKNOWN now{% if s.oldest_unknown %} · oldest {{ s.oldest_unknown }}{% endif %}</span></div>
+  <div class="stat" data-stat="open"><b>{{ s.open_cases }}</b><span>Open cases</span></div>
+  <div class="stat" data-stat="overdue"><b class="{{ 'attention' if s.overdue_cases else '' }}">{{ s.overdue_cases }}</b><span>Overdue cases (held, never auto-approved)</span></div>
+  <div class="stat" data-stat="timeout"><b>{{ s.approved_by_timeout }}</b><span>Approved by timeout (always 0)</span></div>
+  <div class="stat" data-stat="match"><b>–</b><span>Match rate: reconciliation arrives in slice S7</span></div>
+</div>
+{% if s.by_status %}<p class="small">Today by status: {% for k, v in s.by_status.items() %}<span class="st st-{{ k|lower }}">{{ k }}</span> {{ v }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
+<h2>Rail health</h2>
+<table>
+  <thead><tr><th>Rail</th><th>Network</th><th>Currency</th><th>Health</th><th class="num">Attempts today</th><th class="num">Failed today</th><th class="num">UNKNOWN</th></tr></thead>
+  <tbody>
+  {% for r in s.rails %}
+    <tr><td class="mono">{{ r.id }}</td><td>{{ r.network }}</td><td>{{ r.currency }}</td><td class="{{ r.health }}">{{ r.health }}</td>
+        <td class="num">{{ r.attempts_today }}</td><td class="num">{{ r.failed_today }}</td><td class="num">{{ r.unknown_now }}</td></tr>
+  {% else %}<tr><td colspan="7" class="muted">No rails connected.</td></tr>{% endfor %}
+  </tbody>
+</table>
+<h2>Recent events</h2>
+<table>
+  <thead><tr><th>When (UTC)</th><th>Event</th><th>Subject</th><th>Actor</th></tr></thead>
+  <tbody>
+  {% for e in s.events %}
+    <tr><td>{{ e.at.strftime('%Y-%m-%d %H:%M:%S') }}</td><td class="mono">{{ e.kind }}</td><td class="mono">{{ e.subject_id or '' }}</td><td class="mono">{{ e.actor }}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted">No events yet.</td></tr>{% endfor %}
+  </tbody>
+</table>

@@ -49,7 +49,7 @@ stateDiagram-v2
 
 - **Terminal states:** CONFIRMED, BLOCKED, REJECTED, CANCELLED, FAILED_FINAL, SHADOWED.
 - **Overdue escalations:** the payment stays ESCALATED and the case becomes HELD_OVERDUE. There is no ESCALATED to READY path without an approval.
-- **Assist mode:** READY payments have `awaiting_send_click = true` and are not picked up by the sender until a user clicks Send.
+- **Assist mode:** READY payments have `awaiting_send_click = true` and are not picked up by the sender until a user clicks Send (`send_confirmed_by` records who). The mode is read again inside the send lock (G-16): a payment that became READY under Auto waits for a click if the mode is now Assist, and nothing is sent in Shadow.
 - **The table is code.** `domain/states.py` holds `ALLOWED: dict[Status, set[Status]]`. A database trigger mirrors it for terminal states: any UPDATE of `status` on a row whose old status is terminal raises an error.
 
 ## Attempt states
@@ -108,14 +108,14 @@ Audit and ledger tables get `BEFORE UPDATE OR DELETE` triggers that raise an err
 | `organisations` | id, name, mode (shadow, assist, auto), fail_safe (hold, manual_queue), expires_at, api_version | Demo org plus sandbox orgs |
 | `users` | id, org_id, email, role (payments_lead, compliance_lead, reviewer, backup_owner, oncall, admin), password_hash | Console demo users are seeded |
 | `api_keys` | id, org_id, prefix, hash, scopes[], last_used_at, revoked_at, expires_at | Shown once |
-| `counterparties` | id, org_id, name, kyb_status (verified, pending, failed), allowlisted, jurisdiction, payment_count, median_amount_minor | Stats are refreshed on confirmation |
+| `counterparties` | id, org_id, name, kyb_status (verified, pending, failed), allowlisted, jurisdiction, payment_count, median_amount_minor, contact_email | Stats are refreshed on confirmation. `contact_email` is fictional and only ever used in the outbox (G-02) |
 | `destinations` | id, counterparty_id, kind (evm_wallet, bank_account), network, address or iban_masked, first_seen_at, last_changed_at | Editing sets last_changed_at |
 | `mandates` | id, org_id, agent_id, payload jsonb, signature, valid_from, expires_at, revoked_at | Format in spec/05 |
 | `mandate_usage` | mandate_id, total_minor, count | Updated atomically |
-| `policy_versions` | id, org_id, version, content_hash, yaml, status (draft, active, superseded), proposed_by, approved_by, loosening bool, attestation | Immutable after activation |
+| `policy_versions` | id, org_id, version, content_hash, yaml, status (draft, active, superseded, withdrawn), proposed_by, approved_by, approver_roles, loosening bool, loosening_reasons, base_version, attestation, attested_by | A draft's rules can't be edited; nothing is deleted; at most one draft and one active version (POL-07) |
 | `payment_intents` | id, org_id, kind (payout), source (platform, agent), mandate_id, counterparty_id or user_account_ref (exactly one), destination_id, amount_minor, currency, network_constraint, allow_network_switch, reference, notes, travel_rule jsonb, status, idempotency_key, request_hash, awaiting_send_click | The payment ID for life |
 | `decisions` | id, payment_id, outcome, policy_version_id, policy_hash, inputs_snapshot jsonb, checks jsonb[], route jsonb, approved_reasons text[], decided_at, actor | One per evaluation; re-runs add rows. `approved_reasons` lists the escalation reasons a human approved before this re-run (spec/04) |
-| `exception_cases` | id, payment_id or deposit_id, type, tier, owner_id, backup_owner_id, deadline_at, status (OPEN, HELD_OVERDUE, RESOLVED), resolution, resolved_by | |
+| `exception_cases` | id, payment_id or deposit_id, type, tier, owner_id, backup_owner_id, deadline_at, deadline_seconds, overdue_count, status (OPEN, HELD_OVERDUE, RESOLVED), resolution, resolved_by | The sweeper moves an overdue case to HELD_OVERDUE and a new owner; it never resolves it (EXC-06) |
 | `case_events` | case_id, kind, actor, payload | Assignment, overdue, comment |
 | `attempts` | see above | |
 | `rails` | id, org_id, kind (evm, banksim, simchain), network, currency, enabled, weights, prefunded_daily_limit_minor | |
@@ -131,6 +131,7 @@ Audit and ledger tables get `BEFORE UPDATE OR DELETE` triggers that raise an err
 | `audit_events` | id, org_id, seq, at, actor, actor_role, kind, subject_id, payload jsonb, prev_hash, hash | Append-only (UPDATE, DELETE and TRUNCATE raise), hash-chained per org. Payloads are JSON-native with no floats |
 | `audit_heads` | org_id, seq, hash | Head of each chain; appending locks it, so `seq` has no gaps |
 | `demo_clock` | org_id, offset_seconds | Demo-mode clock offset (FND-05) |
+| `mode_changes` | id, org_id, from_mode, to_mode, reason, proposed_by, proposed_role, approved_by, approved_role, status (proposed, applied, withdrawn) | One lead proposes, the other approves (EXE-09, C-09); at most one open proposal |
 | `outbox` | id, org_id, channel (email_mock, webhook), recipient, template, body, created_at, sent_at | |
 | `webhook_endpoints`, `webhook_events`, `webhook_deliveries` | Signing secret shown once and stored **encrypted** with `CREDENTIALS_ENCRYPTION_KEY`, not hashed, because every delivery is signed with the plaintext (D-12); deliveries log status | |
 | `request_logs` | org_id, key_id, method, path, status, latency_ms, idempotency_key, payment_id, request_id, at | 30 days |

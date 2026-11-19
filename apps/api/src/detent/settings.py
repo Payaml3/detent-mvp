@@ -83,6 +83,8 @@ class Settings(BaseSettings):
     worker_id: str | None = None
     worker_poll_seconds: float = 1.0
     worker_lease_seconds: int = 60
+    # EXC-06: how often the worker checks for overdue cases (domain time still comes from the Clock).
+    deadline_sweep_seconds: float = 30.0
     worker_max_attempts: int = 8
     # Extra handler modules, for tests only (rejected outside APP_ENV=test).
     worker_extra_handler_modules: Annotated[tuple[str, ...], NoDecode] = ()

@@ -61,3 +61,15 @@ def routine(**kw: object) -> Facts:
         mandate=None,
     )
     return dataclasses.replace(base, **kw)  # type: ignore[arg-type]
+
+
+BASE = (REPO_ROOT / "fixtures" / "policy" / "default-policy.yaml").read_text()
+
+
+def v2(*edits: tuple[str, str]) -> str:
+    """The fixture rule set as version 2, with each (old, new) text edit applied once (POL-07 tests)."""
+    text = BASE.replace("version: 1", "version: 2", 1)
+    for old, new in edits:
+        assert old in text, old
+        text = text.replace(old, new, 1)
+    return text

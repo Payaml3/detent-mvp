@@ -119,5 +119,7 @@ Daily caps and mandate totals use one row per (org, scope, day) in `counters`, u
    - shrinks `block_on` or `escalate_on`
    - raises the travel-rule threshold or removes a required field
    - widens the allowed networks
-3. A second, different user approves. If the change is loosening, one of the two users must be the compliance lead.
-4. On activation, the attestation text, approvers and timestamps are recorded, and the previous version becomes `superseded`. Decisions in flight keep the version they started with. The pre-send re-check uses the new one.
+   - shortens the screening scope (any change to the screening list counts), or raises the above-norm multiplier or minimum history (POL-07; C-08: the union of both lists)
+3. A second, different user approves. The compliance lead is one of the two on **every** activation, loosening or not (C-06, confirmed 2026-11-19), and attests when proposing or approving.
+4. On activation, the attestation text, the attesting compliance lead, both approvers and their roles, and timestamps are recorded, and the previous version becomes `superseded`. A draft nobody approves is `withdrawn`; nothing is deleted. Decisions in flight keep the version they started with. The pre-send re-check uses the new one.
+5. Only one draft is open at a time, its version is the next number, and a draft based on a version that is no longer active can't be activated.

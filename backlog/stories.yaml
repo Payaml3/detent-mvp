@@ -372,6 +372,7 @@ stories:
   deps: [POL-01, FND-04]
   trace: [B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding]
   ms: S6
+  done: [0, 1, 2, 3]
 - id: POL-08
   epic: POL
   title: Decision-only API
@@ -696,6 +697,7 @@ stories:
   deps: [EXE-03, FND-04]
   trace: [A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates]
   ms: S6
+  done: [0, 1, 2]
 - id: EXE-10
   epic: EXE
   title: Sev 1 invariant monitor
@@ -928,6 +930,7 @@ stories:
   deps: [EXC-01, AGT-05]
   trace: [A5.citations, A5.tools, A2.Exceptions, A1.reviews]
   ms: S6
+  done: [0, 1, 2, 3]
 - id: EXC-04
   epic: EXC
   title: Approve or reject, with policy re-run
@@ -973,6 +976,7 @@ stories:
   deps: [EXC-01, EXC-07, FND-06]
   trace: [A2b.timeout_hold, A6.timeout, B3.exceptions, L6, B7.exceptions]
   ms: S6
+  done: [0, 1]
 - id: EXC-07
   epic: EXC
   title: Mock outbox
@@ -1211,6 +1215,7 @@ stories:
   deps: [CON-01]
   trace: [B7.automation, B7.exceptions, B7.unknown]
   ms: S6
+  done: [1]
 - id: CON-03
   epic: CON
   title: Payments list and detail
@@ -1267,6 +1272,7 @@ stories:
   deps: [POL-07, MND-03]
   trace: [B3.rule_changes, A2.Mandate]
   ms: S6
+  done: [0, 1]
 - id: CON-07
   epic: CON
   title: Reconciliation screen

@@ -63,7 +63,8 @@ slices:
   stories: [DEM-02, MND-01, MND-02, MND-03, AGT-01, AGT-02, AGT-03, AGT-04, AGT-05, AGT-06, CON-05]
 
 - id: S6
-  name: "Operations around escalations"
+  name: "Operations around escalations (done)"
+  status: done
   goal: "Overdue cases, investigation with citations, rule changes with two approvers, operating modes."
   exit: >-
     An overdue case stays held, the counterparty update is in the outbox and the backup owner has it; the

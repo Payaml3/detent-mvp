@@ -101,6 +101,8 @@ Each tool result carries `evidence_id`s.
 
 The console shows this below the raw facts, collapsed (EXC-02).
 
+**Checks in code (EXC-03, G-22 confirmed 2026-11-19):** `recommendation` is one of `approve`, `reject` or `needs_information`. A claim whose `evidence_ids` are empty or all unknown is removed and the case shows `UNCITED_CLAIMS_REMOVED`; unknown IDs on an otherwise cited claim are dropped (`UNKNOWN_EVIDENCE_IDS`). The console shows only the kept claims, the recommendation, the confidence and the open questions; the free-text `summary` is stored but not shown, because it carries no citations. The recommendation never changes the decision or the case. A model error, an invalid answer twice or the daily budget gives `needs_human`, and the reviewer works from the raw facts. Until an API key is configured, the worker serves hand-written stand-in answers (`fixtures/agent-recordings/investigation`), labelled as such in the console.
+
 ## Reconciliation agent (LED-06)
 
 **Input:** one break (an unmatched ledger posting or an unmatched rail record) and nearby candidates.

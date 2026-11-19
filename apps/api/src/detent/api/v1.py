@@ -312,3 +312,62 @@ def revoke_mandate_api(
     except LookupError:
         return error_response(404, "not_found", "not_found", "No such mandate.", request_id=_rid())
     return JSONResponse({"mandate_id": mandate_id, "revoked": True})
+
+
+# ------------------------------------------------------------------------------- policy versions (POL-07)
+@router.get("/policy/versions")
+def list_policy_versions(
+    request: Request, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    """Every rule version, newest first. Changes happen in the console with two approvers (POL-07)."""
+    from detent.policy.changes import list_versions
+
+    require(principal, "read")
+    with request.app.state.runtime.engine.connect() as conn:
+        return JSONResponse(
+            {"data": list_versions(conn, principal.org_id), "has_more": False, "next_cursor": None}
+        )
+
+
+@router.get("/policy/versions/{version}")
+def get_policy_version(
+    request: Request, version: int, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    from detent.policy.changes import get_version
+
+    require(principal, "read")
+    with request.app.state.runtime.engine.connect() as conn:
+        v = get_version(conn, principal.org_id, version)
+    if v is None:
+        return error_response(404, "not_found", "not_found", f"No rule version {version}.", request_id=_rid())
+    return JSONResponse(v)
+
+
+# ------------------------------------------------------------------------------------- Send (EXE-09)
+@router.post("/payment_intents/{payment_id}/send")
+def send_payment_intent(
+    request: Request, payment_id: str, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    """Assist mode: a person confirms sending. The worker then sends it with every pre-send check."""
+    from detent.execution.modes import ModeError, confirm_send
+
+    require(principal, "exceptions:approve")
+    rt = request.app.state.runtime
+    try:
+        confirm_send(
+            rt.engine,
+            rt.clock,
+            org_id=principal.org_id,
+            payment_id=payment_id,
+            actor=Actor(principal.user_id, principal.role),
+        )
+    except ModeError as exc:
+        if exc.status == 403:
+            return error_response(403, "permission", exc.code, str(exc), request_id=_rid())
+        if exc.status == 404:
+            return error_response(404, "not_found", exc.code, str(exc), request_id=_rid())
+        return error_response(exc.status, "conflict", exc.code, str(exc), request_id=_rid())
+    with rt.engine.connect() as conn:
+        from detent.intents.service import payment_view
+
+        return JSONResponse(payment_view(conn, principal.org_id, payment_id))

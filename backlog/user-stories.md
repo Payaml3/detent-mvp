@@ -269,12 +269,12 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 **Acceptance criteria**
 
-- [ ] A proposer creates a draft version; the console shows a diff against the active version
-- [ ] Activation needs a second, different user; if any rule loosens (higher limit, removed check, shorter screening scope, longer window) the compliance lead must be one of the two
-- [ ] On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability
-- [ ] All versions are kept and readable; decisions link to the version used
+- [x] A proposer creates a draft version; the console shows a diff against the active version
+- [x] Activation needs a second, different user; if any rule loosens (higher limit, removed check, shorter screening scope, longer window) the compliance lead must be one of the two
+- [x] On activation the compliance lead's attestation is recorded: the client approves these rules and keeps AML accountability
+- [x] All versions are kept and readable; decisions link to the version used
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S6 Operations around escalations · **Depends on:** POL-01, FND-04 · **Traces to:** B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S6 Operations around escalations (done) · **Depends on:** POL-01, FND-04 · **Traces to:** B3.rule_changes, A6.client_rules, B1.contracts, B3.onboarding
 
 ### POL-08 · Decision-only API
 
@@ -519,11 +519,11 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically
-- [ ] Changing mode needs the payments lead and the compliance lead; each change is audited
-- [ ] Orchestrate is shown as routing being enabled when 2 or more rails are connected
+- [x] Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically
+- [x] Changing mode needs the payments lead and the compliance lead; each change is audited
+- [x] Orchestrate is shown as routing being enabled when 2 or more rails are connected
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** EXE-03, FND-04 · **Traces to:** A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations (done) · **Depends on:** EXE-03, FND-04 · **Traces to:** A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates
 
 ### EXE-10 · Sev 1 invariant monitor
 
@@ -700,12 +700,12 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Read-only tools: ledger history, counterparty record, screening result, rail status, prior cases
-- [ ] Each claim cites evidence record IDs; uncited claims are removed and the removal is flagged
-- [ ] Recommendation is approve, reject or needs-information with a confidence; the agent cannot change any state
-- [ ] Runs in the worker; the case is usable before the agent finishes
+- [x] Read-only tools: ledger history, counterparty record, screening result, rail status, prior cases
+- [x] Each claim cites evidence record IDs; uncited claims are removed and the removal is flagged
+- [x] Recommendation is approve, reject or needs-information with a confidence; the agent cannot change any state
+- [x] Runs in the worker; the case is usable before the agent finishes
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** S6 Operations around escalations · **Depends on:** EXC-01, AGT-05 · **Traces to:** A5.citations, A5.tools, A2.Exceptions, A1.reviews
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S6 Operations around escalations (done) · **Depends on:** EXC-01, AGT-05 · **Traces to:** A5.citations, A5.tools, A2.Exceptions, A1.reviews
 
 ### EXC-04 · Approve or reject, with policy re-run
 
@@ -736,10 +736,10 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline
-- [ ] The count of payments approved by timeout is always 0 and is reported
+- [x] Past the deadline: case HELD_OVERDUE, payment stays held, a status update goes to the counterparty via the outbox, and the backup owner gets the case with a new deadline
+- [x] The count of payments approved by timeout is always 0 and is reported
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** EXC-01, EXC-07, FND-06 · **Traces to:** A2b.timeout_hold, A6.timeout, B3.exceptions, L6, B7.exceptions
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations (done) · **Depends on:** EXC-01, EXC-07, FND-06 · **Traces to:** A2b.timeout_hold, A6.timeout, B3.exceptions, L6, B7.exceptions
 
 ### EXC-07 · Mock outbox
 
@@ -930,9 +930,9 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 **Acceptance criteria**
 
 - [ ] Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events
-- [ ] Refreshes by htmx polling
+- [x] Refreshes by htmx polling
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** CON-01 · **Traces to:** B7.automation, B7.exceptions, B7.unknown
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations (done) · **Depends on:** CON-01 · **Traces to:** B7.automation, B7.exceptions, B7.unknown
 
 ### CON-03 · Payments list and detail
 
@@ -971,10 +971,10 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Active version, history and diff; propose and approve per POL-07
-- [ ] Mandates list with scope, usage against limits, expiry and revoke
+- [x] Active version, history and diff; propose and approve per POL-07
+- [x] Mandates list with scope, usage against limits, expiry and revoke
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations · **Depends on:** POL-07, MND-03 · **Traces to:** B3.rule_changes, A2.Mandate
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations (done) · **Depends on:** POL-07, MND-03 · **Traces to:** B3.rule_changes, A2.Mandate
 
 ### CON-07 · Reconciliation screen
 

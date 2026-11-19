@@ -48,6 +48,7 @@ class Prefix(StrEnum):
     REQ = "req"  # request log / request ID
     INV = "inv"  # invite
     LED = "lead"  # website access request
+    MCH = "mch"  # mode change
 
 
 _CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"

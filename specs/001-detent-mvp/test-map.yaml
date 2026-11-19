@@ -261,3 +261,25 @@ AGT-06:
   2: ["integration/test_instruction_agent.py::test_over_budget_returns_needs_human_without_calling_the_model"]
 CON-05:
   1: ["integration/test_agent_submit.py::test_console_invoice_drop_and_submit"]
+POL-07:
+  0: ["integration/test_rule_changes.py::test_draft_does_not_change_the_active_version", "integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation", "unit/test_policy_diff.py::test_diff_lists_changed_paths_with_old_and_new_values"]
+  1: ["integration/test_rule_changes.py::test_proposer_cannot_approve_their_own_draft", "integration/test_rule_changes.py::test_compliance_lead_must_be_one_of_the_two", "integration/test_rule_changes.py::test_roles_outside_the_leads_cannot_propose_or_approve", "unit/test_policy_diff.py::test_each_loosening_kind_is_detected", "unit/test_policy_diff.py::test_tightening_is_not_loosening"]
+  2: ["integration/test_rule_changes.py::test_activation_records_attestation_and_supersedes", "integration/test_rule_changes.py::test_compliance_lead_can_propose_and_payments_lead_approves"]
+  3: ["integration/test_rule_changes.py::test_version_must_follow_the_latest_and_one_draft_at_a_time", "integration/test_rule_changes.py::test_stored_versions_cannot_be_edited_or_deleted", "integration/test_rule_changes.py::test_decisions_link_to_the_version_they_used"]
+EXE-09:
+  0: ["integration/test_modes.py::test_shadow_records_the_decision_and_sends_nothing", "integration/test_modes.py::test_auto_sends_execute_decisions_automatically", "integration/test_modes.py::test_assist_waits_for_a_send_click", "integration/test_modes.py::test_mode_is_read_at_send_time", "integration/test_modes.py::test_shadow_after_ready_sends_nothing_even_with_a_click", "integration/test_modes.py::test_send_click_over_the_api", "integration/test_console_operations.py::test_assist_send_button"]
+  1: ["integration/test_modes.py::test_mode_change_needs_both_leads_as_two_people", "integration/test_console_operations.py::test_settings_mode_change_needs_both_leads"]
+  2: ["integration/test_modes.py::test_orchestrate_means_routing_with_two_or_more_rails"]
+EXC-03:
+  0: ["integration/test_investigation.py::test_tools_are_read_only", "integration/test_investigation.py::test_cited_claims_kept_uncited_removed_and_flagged"]
+  1: ["integration/test_investigation.py::test_cited_claims_kept_uncited_removed_and_flagged", "integration/test_investigation.py::test_unknown_evidence_ids_never_survive", "integration/test_console_operations.py::test_case_page_shows_cited_claims_and_overdue_rules"]
+  2: ["integration/test_investigation.py::test_cited_claims_kept_uncited_removed_and_flagged", "integration/test_investigation.py::test_bad_output_twice_needs_a_human", "integration/test_investigation.py::test_untrusted_text_is_inside_the_data_block", "unit/test_agent_boundaries.py::test_agents_never_reach_execution_approval_or_rails_even_indirectly"]
+  3: ["integration/test_investigation.py::test_opening_a_case_queues_the_agent_and_the_worker_runs_it", "integration/test_console_operations.py::test_case_page_shows_cited_claims_and_overdue_rules"]
+EXC-06:
+  0: ["integration/test_deadlines.py::test_overdue_case_is_held_counterparty_told_and_backup_owner_takes_over", "integration/test_deadlines.py::test_second_miss_goes_to_the_payments_lead_and_the_payment_stays_held", "integration/test_deadlines.py::test_sweeping_twice_is_a_no_op", "integration/test_deadlines.py::test_the_worker_runs_the_sweeper", "integration/test_deadlines.py::test_after_the_deadline_only_the_current_owner_or_payments_lead_may_approve"]
+  1: ["integration/test_deadlines.py::test_overdue_without_a_human_decision_is_never_approved_across_orgs", "integration/test_console_operations.py::test_overview_counts_and_polls"]
+CON-02:
+  1: ["integration/test_console_operations.py::test_overview_counts_and_polls"]
+CON-06:
+  0: ["integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation", "integration/test_console_operations.py::test_reviewer_sees_policy_but_cannot_propose"]
+  1: ["integration/test_console_operations.py::test_mandates_screen_shows_scope_usage_expiry_and_revoke", "integration/test_mandates.py::test_revoke_by_api_and_console"]

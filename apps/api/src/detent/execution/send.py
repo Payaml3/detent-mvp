@@ -1,7 +1,8 @@
 """Send a READY payment exactly once (EXE-02, EXE-03, EXE-04).
 
 Step 1, in one transaction under the payment's row lock:
-  - nothing happens unless the payment is READY and not waiting for a Send click;
+  - nothing happens unless the payment is READY and not waiting for a Send click, and the mode read
+    now allows it (G-16): Shadow never sends, Assist sends only after a person clicked Send;
   - the policy re-runs first if the decision is older than the configured age or the active rule
     version changed;
   - pre-send checks: kill switch off, mandate valid, the rail can carry it and the wallet covers the
@@ -35,6 +36,7 @@ from detent.domain.money import Currency, Money
 from detent.domain.states import AttemptStatus, FailureClass, Status
 from detent.execution import nonces
 from detent.execution.attempts import create_attempt, mark_attempt
+from detent.execution.modes import current_mode, hold_for_click
 from detent.intents.registry import refresh_stats
 from detent.intents.service import reevaluate, release_counters
 from detent.intents.transition import transition
@@ -179,7 +181,7 @@ def _prepare(  # noqa: PLR0912, PLR0915 - the pre-send checks in the order EXE-0
     p = conn.execute(
         text(
             "SELECT p.id, p.status, p.awaiting_send_click, p.source, p.counterparty_id, p.amount_minor, "
-            "p.mandate_id, p.counted_on, "
+            "p.mandate_id, p.counted_on, p.send_confirmed_by, "
             "p.currency, "
             "p.network_constraint, p.allow_network_switch, p.created_at, d.address, d.account_masked "
             "FROM payment_intents p "
@@ -191,6 +193,10 @@ def _prepare(  # noqa: PLR0912, PLR0915 - the pre-send checks in the order EXE-0
     status = Status(p.status)
     if status is not Status.READY or p.awaiting_send_click:
         return status, None  # already sent, held, blocked or waiting for a person: nothing to do
+    mode = current_mode(conn, org_id, lock=True)  # G-16: the mode now, not the mode at decision time
+    if mode == "shadow" or (mode == "assist" and p.send_confirmed_by is None):
+        hold_for_click(conn, clock, org_id, pid, mode)
+        return status, None
     amount = Money(int(p.amount_minor), Currency(p.currency))
     try:
         rerun = _maybe_rerun(conn, clock, org_id, p, screening, mandate_key)

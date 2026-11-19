@@ -3,9 +3,12 @@
 {% block main %}
 <h1>Overview</h1>
 <p class="lead">{{ brand }} is agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules. AI agents prepare and investigate; the rules make every decision.</p>
+<div id="overview-stats" hx-get="/console/overview/stats" hx-trigger="every 5s" hx-swap="innerHTML">
+  {% include "overview_stats.html" %}
+</div>
 <div class="layers">
-  <section class="card"><h2>Decision</h2><p>Should this payment happen? Execute, escalate or block under rules you own.</p><a href="/console/exceptions">Exceptions queue</a></section>
-  <section class="card"><h2>Orchestration</h2><p>How and where does it go? Sent once, a timeout is unknown and never resent, and the kill switch stops everything.</p><a href="/console/payments">Payments</a></section>
+  <section class="card"><h2>Decision</h2><p>Should this payment happen? Execute, escalate or block under rules you own.</p><a href="/console/policy">Rules</a> · <a href="/console/exceptions">Exceptions queue</a></section>
+  <section class="card"><h2>Orchestration</h2><p>How and where does it go? Sent once, a timeout is unknown and never resent, and the kill switch stops everything.</p><a href="/console/payments">Payments</a> · <a href="/console/rails">Rails</a></section>
   <section class="card"><h2>Operations</h2><p>What happens around it? Cases, reconciliation and an audit log you can verify.</p><a href="/console/outbox">Outbox</a></section>
 </div>
 <dl class="facts">
@@ -13,5 +16,4 @@
   <dt>Acting user</dt><dd>{{ user.display_name }} <span class="mono">{{ user.id }}</span></dd>
   <dt>Role</dt><dd>{{ user.role.value }}</dd>
 </dl>
-<p><a href="/console/counterparties">Counterparties and payout details</a></p>
 {% endblock %}

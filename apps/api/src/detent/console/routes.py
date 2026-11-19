@@ -26,6 +26,7 @@ from detent.console.auth import (
 from detent.db.engine import transaction
 from detent.db.repo import OrgScoped
 from detent.db.tables import kill_switch
+from detent.domain.roles import Role
 from detent.intents.registry import update_destination
 from detent.runtime import Runtime
 
@@ -123,7 +124,25 @@ def overview(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
-    return page(request, rt, "overview.html", user)
+    from detent.console.overview import overview_stats
+
+    with rt.engine.connect() as conn:
+        stats = overview_stats(conn, user.org_id, rt.clock.now())
+    return page(request, rt, "overview.html", user, s=stats)
+
+
+@router.get("/overview/stats", response_class=HTMLResponse)
+def overview_stats_partial(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    """CON-02: the numbers alone, polled by htmx every few seconds."""
+    from detent.console.overview import overview_stats
+
+    with rt.engine.connect() as conn:
+        stats = overview_stats(conn, user.org_id, rt.clock.now())
+    return templates.TemplateResponse(request, "overview_stats.html", {"s": stats, "now": rt.clock.now()})
 
 
 @router.post("/clock/advance")
@@ -240,10 +259,8 @@ def edit_destination(
 # ---------------------------------------------------------------------------------- S3: review loop
 SECTIONS_NOT_BUILT = {
     "reconciliation": ("Reconciliation", "Matching deposits and payouts across rails (LED-06, slice S6)."),
-    "policy": ("Policy", "Rule versions, diffs and two-person approval (POL-07, slice S6)."),
     "audit": ("Audit", "Searchable audit log, replay and evidence export (AUD-02, AUD-03)."),
     "evaluation": ("Evaluation", "Release-gate suites and the results report (EVL, slice S8)."),
-    "settings": ("Settings", "Mode, fail-safe and kill switch settings (EXE-08, EXE-09)."),
 }
 
 
@@ -299,7 +316,56 @@ def payment_detail(
                 {"o": user.org_id, "p": payment_id},
             )
         }
-    return page(request, rt, "payment_detail.html", user, p=view, explorer=expl)
+        from detent.execution.modes import current_mode
+
+        mode = current_mode(conn, user.org_id)
+        initiator = conn.execute(
+            text("SELECT initiated_by FROM payment_intents WHERE org_id=:o AND id=:p"),
+            {"o": user.org_id, "p": payment_id},
+        ).scalar_one()
+    from detent.domain.roles import allowed
+
+    can_send = (
+        view["status"] == "READY"
+        and view.get("awaiting_send_click")
+        and mode != "shadow"
+        and allowed("exception.approve", user.role)
+        and initiator != user.id
+    )
+    return page(
+        request,
+        rt,
+        "payment_detail.html",
+        user,
+        p=view,
+        explorer=expl,
+        mode=mode,
+        can_send=can_send,
+        error=request.query_params.get("error"),
+    )
+
+
+@router.post("/payments/{payment_id}/send")
+def console_send(
+    request: Request,
+    payment_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("exception.approve")),  # noqa: B008
+) -> Response:
+    """EXE-09 Assist mode: a person clicks Send (G-09: never the initiator)."""
+    from detent.execution.modes import ModeError, confirm_send
+
+    try:
+        confirm_send(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            payment_id=payment_id,
+            actor=Actor(user.id, user.role.value),
+        )
+    except ModeError as exc:
+        return RedirectResponse(f"/console/payments/{payment_id}?error={exc.code}", status_code=303)
+    return RedirectResponse(f"/console/payments/{payment_id}", status_code=303)
 
 
 @router.get("/exceptions", response_class=HTMLResponse)
@@ -322,7 +388,8 @@ def exceptions_queue(
                 "WHERE c.org_id=:o AND c.status IN ('OPEN','HELD_OVERDUE') "
                 "AND (CAST(:own AS text) IS NULL OR c.owner_id = :own) "
                 "AND (CAST(:tier AS int) IS NULL OR c.tier = :tier) "
-                "AND (NOT :ovd OR c.deadline_at < :now) ORDER BY c.deadline_at, c.id"
+                "AND (NOT :ovd OR c.deadline_at < :now OR c.status = 'HELD_OVERDUE') ORDER BY "
+                "c.deadline_at, c.id"
             ),
             {"o": user.org_id, "own": owner, "tier": tier, "ovd": bool(overdue), "now": now},
         ).all()
@@ -336,7 +403,7 @@ def exceptions_queue(
         {
             **r._mapping,
             "countdown": _countdown(r.deadline_at, now),
-            "late": r.deadline_at < now,
+            "late": r.deadline_at < now or r.status == "HELD_OVERDUE",
             "amount": str(Money(int(r.amount_minor), Currency(r.currency)))
             if r.amount_minor is not None
             else "",
@@ -437,10 +504,16 @@ def case_page(
         if case is None:
             raise HTTPException(status_code=404)
         facts = _raw_facts(conn, user.org_id, case)
+        from detent.agents.investigation import latest_investigation
+
+        inv = latest_investigation(conn, user.org_id, case.id)
+    overdue = case.status == "HELD_OVERDUE" or rt.clock.now() >= case.deadline_at
     can = (
         allowed("exception.approve", user.role)
         and facts["initiated_by"] != user.id
         and case.status != "RESOLVED"
+        # G-05: after the deadline only the current owner or the payments lead may approve.
+        and (not overdue or user.role is Role.PAYMENTS_LEAD or user.id == case.owner_id)
     )
     return page(
         request,
@@ -451,6 +524,8 @@ def case_page(
         f=facts,
         countdown=_countdown(case.deadline_at, rt.clock.now()),
         can_decide=can,
+        overdue=overdue,
+        inv=inv,
         error=request.query_params.get("error"),
     )
 
@@ -863,6 +938,250 @@ def submit_as_agent(
             f"/console/invoices/{proposal_id}?error={quote(r.text[:300])}", status_code=303
         )
     return RedirectResponse(f"/console/invoices/{proposal_id}", status_code=303)
+
+
+# ------------------------------------------------------------------------------- CON-06 / POL-07 policy
+@router.get("/policy", response_class=HTMLResponse)
+def policy_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    from detent.domain.roles import allowed
+    from detent.policy.changes import draft_diff, get_version, list_versions
+
+    with rt.engine.connect() as conn:
+        versions = list_versions(conn, user.org_id)
+        active = next((v for v in versions if v["status"] == "active"), None)
+        active_full = get_version(conn, user.org_id, active["version"]) if active else None
+        draft_row = next((v for v in versions if v["status"] == "draft"), None)
+        draft = get_version(conn, user.org_id, draft_row["version"]) if draft_row else None
+        changes = draft_diff(conn, user.org_id, draft) if draft else []
+        people = conn.execute(
+            text("SELECT id, display_name, role FROM users WHERE org_id=:o"), {"o": user.org_id}
+        ).all()
+    names = {u.id: u.display_name for u in people}
+    roles = {u.id: u.role for u in people}
+    next_version = (max((v["version"] for v in versions), default=0)) + 1
+    template_yaml = ""
+    if active_full:
+        import re as _re
+
+        template_yaml = _re.sub(
+            r"(?m)^version:\s*\d+", f"version: {next_version}", active_full["yaml"], count=1
+        )
+    can_approve = (
+        draft is not None
+        and allowed("policy.approve", user.role)
+        and draft["proposed_by"] != user.id
+        # C-06: the compliance lead is one of the two people on every activation.
+        and Role.COMPLIANCE_LEAD.value in {roles.get(draft["proposed_by"]), user.role.value}
+    )
+    return page(
+        request,
+        rt,
+        "policy.html",
+        user,
+        versions=versions,
+        active=active_full,
+        draft=draft,
+        changes=changes,
+        names=names,
+        can_propose=allowed("policy.propose", user.role) and draft is None,
+        can_approve=can_approve,
+        template_yaml=template_yaml,
+        error=request.query_params.get("error"),
+    )
+
+
+def _policy_redirect(exc: Exception | None = None) -> RedirectResponse:
+    from urllib.parse import quote
+
+    url = "/console/policy" + (f"?error={quote(str(exc)[:300])}" if exc else "")
+    return RedirectResponse(url, status_code=303)
+
+
+@router.post("/policy/propose")
+def console_propose_policy(
+    request: Request,
+    yaml_text: str = Form(""),
+    attest: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("policy.propose")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.policy.changes import ChangeError, propose_draft
+
+    try:
+        propose_draft(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            actor=Actor(user.id, user.role.value),
+            yaml_text=yaml_text.replace("\r\n", "\n"),
+            attest=attest == "yes",
+        )
+    except ChangeError as exc:
+        return _policy_redirect(exc)
+    return _policy_redirect()
+
+
+@router.post("/policy/{draft_id}/approve")
+def console_approve_policy(
+    request: Request,
+    draft_id: str,
+    attest: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("policy.approve")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.policy.changes import ChangeError, approve_draft
+
+    try:
+        approve_draft(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            draft_id=draft_id,
+            actor=Actor(user.id, user.role.value),
+            attest=attest == "yes",
+        )
+    except ChangeError as exc:
+        return _policy_redirect(exc)
+    return _policy_redirect()
+
+
+@router.post("/policy/{draft_id}/withdraw")
+def console_withdraw_policy(
+    request: Request,
+    draft_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("policy.propose")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.policy.changes import ChangeError, withdraw_draft
+
+    try:
+        withdraw_draft(
+            rt.engine, rt.clock, org_id=user.org_id, draft_id=draft_id, actor=Actor(user.id, user.role.value)
+        )
+    except ChangeError as exc:
+        return _policy_redirect(exc)
+    return _policy_redirect()
+
+
+# ------------------------------------------------------------------------------------ EXE-09 settings
+@router.get("/settings", response_class=HTMLResponse)
+def settings_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    from detent.domain.roles import allowed, mode_change_approved
+    from detent.execution.modes import current_mode, orchestrate_status, pending_mode_change
+
+    with rt.engine.connect() as conn:
+        mode = current_mode(conn, user.org_id)
+        pending = pending_mode_change(conn, user.org_id)
+        orch = orchestrate_status(conn, user.org_id)
+        fail_safe = conn.execute(
+            text("SELECT fail_safe FROM organisations WHERE org_id=:o"), {"o": user.org_id}
+        ).scalar_one()
+        history = conn.execute(
+            text("SELECT * FROM mode_changes WHERE org_id=:o ORDER BY created_at DESC, id DESC LIMIT 10"),
+            {"o": user.org_id},
+        ).all()
+    can_approve = pending is not None and mode_change_approved(
+        proposer=(pending.proposed_by, Role(pending.proposed_role)), approver=(user.id, user.role)
+    )
+    return page(
+        request,
+        rt,
+        "settings.html",
+        user,
+        mode=mode,
+        pending=pending,
+        orch=orch,
+        fail_safe=fail_safe,
+        history=history,
+        can_propose=allowed("org.change_mode.propose", user.role) and pending is None,
+        can_approve=can_approve,
+        can_withdraw=pending is not None and allowed("org.change_mode.propose", user.role),
+        error=request.query_params.get("error"),
+    )
+
+
+def _settings_redirect(exc: Exception | None = None) -> RedirectResponse:
+    from urllib.parse import quote
+
+    return RedirectResponse(
+        "/console/settings" + (f"?error={quote(str(exc)[:300])}" if exc else ""), status_code=303
+    )
+
+
+@router.post("/settings/mode/propose")
+def console_propose_mode(
+    request: Request,
+    to_mode: str = Form(""),
+    reason: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("org.change_mode.propose")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.execution.modes import ModeError, propose_mode_change
+
+    try:
+        propose_mode_change(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            actor=Actor(user.id, user.role.value),
+            to_mode=to_mode,
+            reason=reason,
+        )
+    except ModeError as exc:
+        return _settings_redirect(exc)
+    return _settings_redirect()
+
+
+@router.post("/settings/mode/{change_id}/approve")
+def console_approve_mode(
+    request: Request,
+    change_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("org.change_mode.propose")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.execution.modes import ModeError, approve_mode_change
+
+    try:
+        approve_mode_change(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            change_id=change_id,
+            actor=Actor(user.id, user.role.value),
+        )
+    except ModeError as exc:
+        return _settings_redirect(exc)
+    return _settings_redirect()
+
+
+@router.post("/settings/mode/{change_id}/withdraw")
+def console_withdraw_mode(
+    request: Request,
+    change_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("org.change_mode.propose")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.execution.modes import ModeError, withdraw_mode_change
+
+    try:
+        withdraw_mode_change(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            change_id=change_id,
+            actor=Actor(user.id, user.role.value),
+        )
+    except ModeError as exc:
+        return _settings_redirect(exc)
+    return _settings_redirect()
 
 
 @router.get("/{section}", response_class=HTMLResponse)

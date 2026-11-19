@@ -5,6 +5,15 @@
 <p><span class="st st-{{ p.status|lower }}">{{ p.status }}</span> · {{ p.amount.amount }} {{ p.amount.currency }} · {{ p.source }}{% if p.reference %} · {{ p.reference }}{% endif %}
   {% if p.exception %} · <a href="/console/exceptions/{{ p.exception.id }}">Open case</a>{% endif %}
   <button disabled title="Replay arrives with AUD-02">Replay</button></p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if p.status == 'READY' and p.awaiting_send_click %}
+<section class="card" data-section="send">
+  <p>Mode <strong>{{ mode }}</strong>: this payment passed the rules and is waiting for a person to click Send. Every pre-send check runs again when it is sent.</p>
+  {% if can_send %}<form method="post" action="/console/payments/{{ p.id }}/send"><button class="primary">Send</button></form>
+  {% elif mode == 'shadow' %}<p class="muted">Nothing is sent in Shadow mode.</p>
+  {% else %}<p class="muted">Send needs the reviewer, backup owner or payments lead role, and never the person who started the payment.</p>{% endif %}
+</section>
+{% endif %}
 
 <h2>Decisions</h2>
 {% for d in p.decisions %}

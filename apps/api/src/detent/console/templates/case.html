@@ -2,7 +2,7 @@
 {% block title %}Case {{ case.id }}{% endblock %}
 {% block main %}
 <h1>Case <span class="mono">{{ case.id }}</span></h1>
-<p>{{ case.status }} · tier {{ case.tier }} · owner {{ case.owner_name or 'none' }}{% if case.backup_name %} (backup {{ case.backup_name }}){% endif %} · {{ countdown }}
+<p>{% if case.status == 'HELD_OVERDUE' %}<span class="late">HELD_OVERDUE</span> (deadline missed {{ case.overdue_count }}×; the payment stays held and is never approved by timeout){% else %}{{ case.status }}{% endif %} · tier {{ case.tier }} · owner {{ case.owner_name or 'none' }}{% if case.backup_name %} (backup {{ case.backup_name }}){% endif %} · {{ countdown }}
   · payment <a class="mono" href="/console/payments/{{ case.payment_id }}">{{ case.payment_id }}</a></p>
 
 <section class="card" data-section="raw-facts">
@@ -15,7 +15,7 @@
     <dt>Last changed</dt><dd>{{ f.last_changed.strftime('%Y-%m-%d %H:%M') if f.last_changed else 'unknown' }} UTC{% if f.changed_by %} by {{ f.changed_by }}{% endif %}</dd>
     <dt>Amount</dt><dd>{{ f.amount }}</dd>
     <dt>Median</dt><dd>{% if f.median %}{{ f.median }} over {{ f.payment_count }} confirmed payments{% if f.ratio %} · this is {{ f.ratio }}× the median{% endif %}{% else %}no confirmed payments yet{% endif %}</dd>
-    <dt>Mandate scope</dt><dd>{% if f.source == 'agent' %}<span class="mono">{{ f.mandate }}</span> (verification arrives with MND-02){% else %}Not applicable: platform intent{% endif %}</dd>
+    <dt>Mandate scope</dt><dd>{% if f.source == 'agent' %}<span class="mono">{{ f.mandate }}</span> (signature and scope re-checked before every send){% else %}Not applicable: platform intent{% endif %}</dd>
     <dt>Reference</dt><dd>{{ f.reference or '' }}</dd>
   </dl>
   <h3>Rule hits</h3>
@@ -25,8 +25,21 @@
 </section>
 
 <details class="card" data-section="agent-evidence">
-  <summary>Agent evidence and recommendation</summary>
-  <p class="muted">No agent evidence for this case. The investigation agent arrives in a later slice; its recommendation never changes the decision.</p>
+  <summary>Agent evidence and recommendation{% if inv and inv.recommendation %}: {{ inv.recommendation.replace('_', ' ') }}{% endif %}</summary>
+  {% if not inv %}
+  <p class="muted">The investigation agent is still working, or has not run. Everything you need to decide is in the raw facts above; the agent never changes the decision.</p>
+  {% elif inv.status != 'recorded' %}
+  <p class="muted">No recommendation: {% for fl in inv.flags %}{{ fl.code }} ({{ fl.detail }}){% endfor %}. Decide from the raw facts.</p>
+  {% else %}
+  <p class="small muted">{{ 'Recorded response (offline stand-in, not a live model call)' if inv.source == 'recording' else inv.model }} · {{ inv.created_at }} · advisory only: it cannot approve, reject or send.</p>
+  <p>Recommendation: <strong>{{ inv.recommendation.replace('_', ' ') }}</strong> · confidence {{ (inv.confidence * 100)|round|int }}%</p>
+  <h3>Cited claims</h3>
+  <ul data-section="claims">{% for c in inv.claims %}<li>{{ c.text }} {% for e in c.evidence_ids %}<a class="mono small" href="#{{ e }}">[{{ e }}]</a> {% endfor %}</li>{% endfor %}</ul>
+  {% for fl in inv.flags %}<p class="note small" data-flag="{{ fl.code }}">{{ fl.code }}: {{ fl.detail }}</p>{% endfor %}
+  {% if inv.open_questions %}<h3>Open questions</h3><ul>{% for q in inv.open_questions %}<li>{{ q }}</li>{% endfor %}</ul>{% endif %}
+  <h3>Evidence</h3>
+  {% for eid, rec in inv.evidence.items() %}<details id="{{ eid }}"><summary class="mono small">{{ eid }} · {{ rec.type }}</summary><pre class="yaml">{{ rec|tojson(indent=1) }}</pre></details>{% endfor %}
+  {% endif %}
 </details>
 
 {% if case.status == 'RESOLVED' %}
@@ -42,6 +55,6 @@
   <p class="muted small">Approving re-runs every check with the active rule version. A block stays blocked; a new reason opens a new case.</p>
 </section>
 {% else %}
-<p class="muted">You can't decide this case: approval needs the reviewer, backup owner or payments lead role, and never the person who started the payment.</p>
+<p class="muted">You can't decide this case: approval needs the reviewer, backup owner or payments lead role, and never the person who started the payment.{% if overdue %} After the deadline only the case's current owner or the payments lead may approve.{% endif %}</p>
 {% endif %}
 {% endblock %}

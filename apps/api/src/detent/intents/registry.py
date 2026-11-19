@@ -55,8 +55,9 @@ def seed_registry(conn: Connection, clock: Clock, org_id: str, fixture: Path = F
             text(
                 "INSERT INTO counterparties (id, org_id, name, kyb_status, allowlisted, jurisdiction, "
                 "payment_count, "
-                "median_amount_minor, median_currency, created_at) VALUES (:id, :o, :n, :k, :a, :j, :c, "
-                ":mm, :mc, :t) "
+                "median_amount_minor, median_currency, contact_email, created_at) VALUES (:id, :o, "
+                ":n, :k, :a, "
+                ":j, :c, :mm, :mc, :ce, :t) "
                 "ON CONFLICT (org_id, id) DO NOTHING RETURNING id"
             ),
             {
@@ -69,6 +70,7 @@ def seed_registry(conn: Connection, clock: Clock, org_id: str, fixture: Path = F
                 "c": hist.get("payment_count", 0),
                 "mm": m.amount_minor if m else None,
                 "mc": m.currency.value if m else None,
+                "ce": cp.get("contact_email"),
                 "t": now,
             },
         ).scalar_one_or_none()

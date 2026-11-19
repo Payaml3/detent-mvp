@@ -119,9 +119,10 @@ def open_case(
         tier, deadline_key = 1, "payout_above_auto_limit"
     else:
         tier, deadline_key = 2, "payout_other"
-    deadline = now + parse_duration(
+    length = parse_duration(
         rules.deadlines.get(deadline_key, "PT30M" if case_type == "unknown_stuck" else "PT4H")
     )
+    deadline = now + length
     rule = next((o for o in rules.owners if o.match.get("type") == case_type), None)
     owner = _pick_owner(conn, org_id, rule.owner_role) if rule else None
     backup = _pick_owner(conn, org_id, rule.backup_role) if rule else None
@@ -132,8 +133,8 @@ def open_case(
         text(
             "INSERT INTO exception_cases (id, org_id, payment_id, type, tier, reasons, owner_id, "
             "backup_owner_id, "
-            "deadline_at, status, created_at) VALUES (:id, :o, :p, :t, :tier, :r, :own, :bk, :dl, 'OPEN', "
-            ":now)"
+            "deadline_at, deadline_seconds, status, created_at) VALUES (:id, :o, :p, :t, :tier, :r, :own, "
+            ":bk, :dl, :secs, 'OPEN', :now)"
         ),
         {
             "id": case_id,
@@ -145,6 +146,7 @@ def open_case(
             "own": owner,
             "bk": backup,
             "dl": deadline,
+            "secs": int(length.total_seconds()),
             "now": now,
         },
     )
@@ -173,6 +175,16 @@ def open_case(
             "deadline_at": deadline.isoformat(),
         },
     )
+    if case_type == "payout":
+        # EXC-03: the investigation agent runs in the worker; the case is usable before it finishes.
+        enqueue(
+            conn,
+            clock,
+            org_id=org_id,
+            kind="case.investigate",
+            dedupe_key=case_id,
+            payload={"case_id": case_id},
+        )
     if owner:
         _outbox(
             conn,
@@ -233,7 +245,9 @@ def _case_event(
     )
 
 
-def _lock(conn: Connection, org_id: str, case_id: str, actor: Actor, action: str) -> tuple[Any, Any]:
+def _lock(
+    conn: Connection, org_id: str, case_id: str, actor: Actor, action: str, clock: Clock | None = None
+) -> tuple[Any, Any]:
     case = conn.execute(
         text("SELECT * FROM exception_cases WHERE org_id=:o AND id=:c FOR UPDATE"),
         {"o": org_id, "c": case_id},
@@ -248,6 +262,17 @@ def _lock(conn: Connection, org_id: str, case_id: str, actor: Actor, action: str
         raise NotPermitted(f"{role.value} may not {action}")
     if case.status not in OPEN_STATUSES:
         raise AlreadyResolved(case_id)
+    overdue = case.status == "HELD_OVERDUE" or (clock is not None and clock.now() >= case.deadline_at)
+    # G-05: after the deadline only the case's current owner or the payments lead may approve.
+    if (
+        action == "exception.approve"
+        and overdue
+        and role is not Role.PAYMENTS_LEAD
+        and actor.id != case.owner_id
+    ):
+        raise NotPermitted(
+            "after the deadline only the case's current owner or the payments lead may approve"
+        )
     pay = conn.execute(
         text("SELECT id, status, initiated_by FROM payment_intents WHERE org_id=:o AND id=:p FOR UPDATE"),
         {"o": org_id, "p": case.payment_id},
@@ -308,7 +333,7 @@ def approve(
 
     why = _need_reason(reason)
     with transaction(engine) as conn:
-        case, pay = _lock(conn, org_id, case_id, actor, "exception.approve")
+        case, pay = _lock(conn, org_id, case_id, actor, "exception.approve", clock)
         if pay.initiated_by == actor.id:
             raise SelfApproval("the approver cannot be the user who initiated the payment")
         result, policy = reevaluate(

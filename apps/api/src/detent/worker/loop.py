@@ -28,7 +28,9 @@ class Worker:
         self.worker_id = worker_id or rt.settings.worker_id or default_worker_id()
         self.lease = timedelta(seconds=rt.settings.worker_lease_seconds)
         self.stop = threading.Event()
+        self._last_sweep: float | None = None
         importlib.import_module("detent.execution.jobs")  # payment.send, payment.confirm
+        importlib.import_module("detent.exceptions.investigation_job")  # case.investigate (EXC-03)
         for mod in rt.settings.worker_extra_handler_modules:
             importlib.import_module(mod)
 
@@ -69,11 +71,30 @@ class Worker:
 
         reconcile_all(self.rt.engine, self.rt.clock, self.rt.settings)
 
+    def tick(self, *, force: bool = False) -> dict[str, list[str]]:
+        """Scheduled work between jobs: the deadline sweeper (EXC-06). Returns the cases it moved."""
+        from detent.exceptions.deadlines import sweep_all
+
+        mono = time.monotonic()  # scheduling cadence only; the sweep itself reads the Clock
+        recent = (
+            self._last_sweep is not None and mono - self._last_sweep < self.rt.settings.deadline_sweep_seconds
+        )
+        if recent and not force:
+            return {}
+        self._last_sweep = mono
+        moved = sweep_all(self.rt.engine, self.rt.clock)
+        if moved:
+            log.info(
+                "overdue cases held and reassigned", extra={"cases": sum(len(v) for v in moved.values())}
+            )
+        return moved
+
     def run(self) -> None:
         log.info("worker started", extra={"worker_id": self.worker_id, "handlers": registry.kinds()})
         self.startup()
         while not self.stop.is_set():
             try:
+                self.tick()
                 busy = self.run_one()
             except Exception:
                 # Database unavailable or similar: back off, never crash-loop.

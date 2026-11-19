@@ -1,0 +1,14 @@
+{
+  "_provenance": "HAND-WRITTEN STAND-IN for a model response, used by tests and offline demos when no more specific stand-in applies. It is NOT a recording of a real model run.",
+  "match": "<evidence>",
+  "usage": {"input_tokens": 1900, "output_tokens": 160},
+  "output": {
+    "summary": "The rules escalated this payment; the evidence does not settle it either way.",
+    "claims": [
+      {"text": "The decision escalated this payment for the reasons listed on the case.", "evidence_ids": ["ev_dec_{{DECISION_ID}}", "ev_case_{{CASE_ID}}"]}
+    ],
+    "recommendation": "needs_information",
+    "confidence": 0.4,
+    "open_questions": ["Check each escalation reason against the raw facts above."]
+  }
+}
