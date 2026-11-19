@@ -49,6 +49,7 @@ def send_job(ctx: JobContext) -> None:
         org_id=ctx.job.org_id,
         payment_id=pid,
         screening=MockScreening.from_fixture(),
+        mandate_key=ctx.settings.mandate_signing_key_demo if ctx.settings else None,
     )
     if st is Status.SUBMITTED:
         enqueue(

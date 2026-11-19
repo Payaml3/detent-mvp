@@ -63,11 +63,12 @@ class TravelRuleFacts:
 
 @dataclass(frozen=True, slots=True)
 class MandateFacts:
-    """Filled in by MND-02 (slice S5)."""
+    """The result of verifying a signed mandate against an intent (MND-02)."""
 
     id: str
     valid: bool
     reason: str | None = None
+    evidence: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True, slots=True)

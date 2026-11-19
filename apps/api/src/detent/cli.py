@@ -6,6 +6,8 @@ detent worker            run the job worker
 detent seed              seed the fictional demo organisation, users, counterparties and rule set
 detent audit verify      verify an organisation's hash-chained audit log (AUD-01)
 detent keys create       issue an sk_test_ API key to a named user (G-08)
+detent agent record      run the instruction agent on an invoice with the Claude API and save the response
+                         as a recording (replaces the hand-written stand-ins; EVL-04)
 detent eval run ...      evaluation suites (built in M6)
 """
 
@@ -136,6 +138,40 @@ def cmd_keys_create(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_agent_record(args: argparse.Namespace) -> int:
+    import json
+    from datetime import UTC
+    from pathlib import Path
+
+    settings = _load_settings()
+    if settings.anthropic_api_key is None:
+        print("detent: ANTHROPIC_API_KEY is not set; nothing recorded", file=sys.stderr)
+        return 2
+    from detent.agents.instruction import SCHEMA, build_prompt
+    from detent.agents.llm import AnthropicLLM
+    from detent.runtime import build_runtime
+
+    rt = build_runtime(settings)
+    doc = Path(args.invoice).read_text()
+    with rt.engine.connect() as conn:
+        system, user = build_prompt(conn, args.org or settings.demo_org_id, doc, args.mandate)
+    res = AnthropicLLM(settings.anthropic_api_key.get_secret_value()).complete(
+        model=settings.model_agent, system=system, user=user, schema=SCHEMA
+    )
+    out = {
+        "_provenance": (
+            f"Recorded from {res.served_model} on {rt.clock.now().astimezone(UTC).date()} "
+            "with `detent agent record`."
+        ),
+        "match": args.match,
+        "usage": {"input_tokens": res.tokens_in, "output_tokens": res.tokens_out},
+        "output": json.loads(res.raw_text),
+    }
+    Path(args.out).write_text(json.dumps(out, indent=2) + "\n")
+    print(f"recorded {args.out} ({res.tokens_in} in, {res.tokens_out} out)")
+    return 0
+
+
 def cmd_eval(_: argparse.Namespace) -> int:
     print(
         "detent eval: not built yet (EVL-01, milestone M6). Failing so CI can't pass by accident.",
@@ -162,6 +198,13 @@ def main(argv: list[str] | None = None) -> int:
     k.add_argument("--user", required=True)
     k.add_argument("--scopes", default="read,intents:create")
     k.set_defaults(fn=cmd_keys_create)
+    ag = sub.add_parser("agent").add_subparsers(dest="agent_cmd", required=True).add_parser("record")
+    ag.add_argument("--invoice", required=True)
+    ag.add_argument("--match", required=True, help="text in the invoice that selects this recording")
+    ag.add_argument("--out", required=True)
+    ag.add_argument("--org", default=None)
+    ag.add_argument("--mandate", default="mnd_demo_ap_agent")
+    ag.set_defaults(fn=cmd_agent_record)
     e = sub.add_parser("eval")
     e.add_argument("action", nargs="?", default="run")
     e.add_argument("--suite", default="all")

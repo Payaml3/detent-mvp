@@ -1,0 +1,62 @@
+{
+  "_provenance": "HAND-WRITTEN STAND-IN for a model response, used by tests and offline demos. It is NOT a recording of a real model run: the build environment had no Anthropic API key. Replace it by recording real runs with `detent agent record` (EVL-04 needs real runs for the 10-of-10 claim).",
+  "match": "INV-2026-0143",
+  "usage": {
+    "input_tokens": 1800,
+    "output_tokens": 420
+  },
+  "output": {
+    "proposal": {
+      "payee_name": {
+        "value": "Bluefin Components Ltd",
+        "confidence": 0.98,
+        "source_span": null
+      },
+      "counterparty_id": {
+        "value": "cpt_bluefin",
+        "confidence": 0.95,
+        "source_span": null
+      },
+      "amount": {
+        "value": "3000.00",
+        "confidence": 0.98,
+        "source_span": null
+      },
+      "currency": {
+        "value": "USDC",
+        "confidence": 0.98,
+        "source_span": null
+      },
+      "network": {
+        "value": null,
+        "confidence": 0.98,
+        "source_span": null
+      },
+      "wallet_address": {
+        "value": "{{WALLET_BLUEFIN_BASE}}",
+        "confidence": 0.98,
+        "source_span": null
+      },
+      "invoice_number": {
+        "value": "INV-2026-0143",
+        "confidence": 0.98,
+        "source_span": null
+      },
+      "due_date": {
+        "value": "2026-12-16",
+        "confidence": 0.98,
+        "source_span": null
+      }
+    },
+    "flags": [
+      {
+        "code": "MISSING_NETWORK",
+        "detail": "The invoice names no network.",
+        "fields": [
+          "network"
+        ]
+      }
+    ],
+    "requires_clarification": true
+  }
+}

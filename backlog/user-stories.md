@@ -308,11 +308,11 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Mandates are JSON with an HMAC-SHA256 signature by the platform's mandate key (format in spec/05-agents.md)
-- [ ] Invalid signature, unknown agent or expired mandate are detectable without calling the model
-- [ ] The format keeps fields that map to AP2-style mandates later
+- [x] Mandates are JSON with an HMAC-SHA256 signature by the platform's mandate key (format in spec/05-agents.md)
+- [x] Invalid signature, unknown agent or expired mandate are detectable without calling the model
+- [x] The format keeps fields that map to AP2-style mandates later
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** FND-03 · **Traces to:** A2.Mandate
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** FND-03 · **Traces to:** A2.Mandate
 
 ### MND-02 · Mandate check in the policy
 
@@ -320,11 +320,11 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason
-- [ ] Cumulative usage updates atomically (concurrency test)
-- [ ] The check re-runs at execution time
+- [x] Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason
+- [x] Cumulative usage updates atomically (concurrency test)
+- [x] The check re-runs at execution time
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** MND-01, POL-02 · **Traces to:** A2.Mandate, A5.proposes, D.sandbox
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** MND-01, POL-02 · **Traces to:** A2.Mandate, A5.proposes, D.sandbox
 
 ### MND-03 · Revoke a mandate
 
@@ -332,10 +332,10 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Revocation by console or API takes effect for every intent not yet SUBMITTED
-- [ ] An approved intent whose mandate is revoked before sending is BLOCKED `MANDATE_REVOKED` at the pre-send re-check
+- [x] Revocation by console or API takes effect for every intent not yet SUBMITTED
+- [x] An approved intent whose mandate is revoked before sending is BLOCKED `MANDATE_REVOKED` at the pre-send re-check
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** MND-02, EXE-03 · **Traces to:** A2.Mandate
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** MND-02, EXE-03 · **Traces to:** A2.Mandate
 
 ### AGT-01 · Instruction agent turns an invoice into a proposed intent
 
@@ -343,12 +343,12 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Input: invoice text or PDF; output: payee, matched counterparty, amount, currency, network, wallet, invoice number, due date, each with confidence and the source text span
-- [ ] Uses the agents model from config (default `claude-sonnet-5-5`) with tool use and a strict JSON schema; output is validated by Pydantic
-- [ ] Invalid output is retried once, then the proposal is marked `needs_human`
+- [x] Input: invoice text or PDF; output: payee, matched counterparty, amount, currency, network, wallet, invoice number, due date, each with confidence and the source text span
+- [x] Uses the agents model from config (default `claude-sonnet-5-5`) with tool use and a strict JSON schema; output is validated by Pydantic
+- [x] Invalid output is retried once, then the proposal is marked `needs_human`
 - [ ] The canonical $18,500 USDC invoice yields the expected intent on 10 of 10 runs (EVL-04)
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** INT-04, MND-01 · **Traces to:** A5.proposes, A2.Intent, L1
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** INT-04, MND-01 · **Traces to:** A5.proposes, A2.Intent, L1
 
 ### AGT-02 · Flag, never guess
 
@@ -356,11 +356,11 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Missing network, two wallets, total not matching line items, ambiguous currency, payee not in the registry, or wallet different from the registry each set a named flag
-- [ ] Any flag sets `requires_clarification`; such a proposal can't be submitted until a human resolves each flag
-- [ ] Tests on the interpretation set confirm no flagged field is ever populated from outside the document
+- [x] Missing network, two wallets, total not matching line items, ambiguous currency, payee not in the registry, or wallet different from the registry each set a named flag
+- [x] Any flag sets `requires_clarification`; such a proposal can't be submitted until a human resolves each flag
+- [x] Tests on the interpretation set confirm no flagged field is ever populated from outside the document
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A5.proposes, L1
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** AGT-01 · **Traces to:** A5.proposes, L1
 
 ### AGT-03 · The agent can only propose
 
@@ -368,11 +368,11 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] The agent's tool registry has no tool that writes state except `propose_payment_intent`, which calls the public API with scope `intents:create`
-- [ ] An import-boundary test fails if `detent.agents` imports `detent.execution`, `detent.exceptions.approve` or `detent.rails`
-- [ ] An attempt by the agent to call any other write endpoint is rejected by scope and logged
+- [x] The agent's tool registry has no tool that writes state except `propose_payment_intent`, which calls the public API with scope `intents:create`
+- [x] An import-boundary test fails if `detent.agents` imports `detent.execution`, `detent.exceptions.approve` or `detent.rails`
+- [x] An attempt by the agent to call any other write endpoint is rejected by scope and logged
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A5.tools, A2b.no_agent_retry, B6.ai
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** AGT-01 · **Traces to:** A5.tools, A2b.no_agent_retry, B6.ai
 
 ### AGT-04 · Prompt-injection isolation
 
@@ -380,12 +380,12 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Untrusted text reaches the model only inside delimited data blocks, after the instructions, with an explicit data-only rule
-- [ ] The policy never reads agent free text; it reads only typed fields
-- [ ] Instruction-like content in a document is reported as a `possible_injection` flag and never followed
+- [x] Untrusted text reaches the model only inside delimited data blocks, after the instructions, with an explicit data-only rule
+- [x] The policy never reads agent free text; it reads only typed fields
+- [x] Instruction-like content in a document is reported as a `possible_injection` flag and never followed
 - [ ] All injection scenarios in the attack suite pass (EVL-02)
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A5.injection, L2, B6.ai
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** AGT-01 · **Traces to:** A5.injection, L2, B6.ai
 
 ### AGT-05 · Record every agent call for replay
 
@@ -393,10 +393,10 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Agent calls are rows linked to the intent or case, with token counts and latency
-- [ ] Replay reads stored outputs and never calls the model again
+- [x] Agent calls are rows linked to the intent or case, with token counts and latency
+- [x] Replay reads stored outputs and never calls the model again
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** A2.Prove, A5.citations
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** AGT-01 · **Traces to:** A2.Prove, A5.citations
 
 ### AGT-06 · Model configuration and cost guard
 
@@ -404,11 +404,11 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 
 **Acceptance criteria**
 
-- [ ] Model IDs come from settings: agents `claude-sonnet-5-5`, light tasks `claude-haiku-5-5`, evaluation judge `claude-opus-5-5`
-- [ ] Model calls go through one `LLMClient` interface so a second provider can be added
-- [ ] Over budget, agent features return `needs_human`; nothing falls back to executing
+- [x] Model IDs come from settings: agents `claude-sonnet-5-5`, light tasks `claude-haiku-5-5`, evaluation judge `claude-opus-5-5`
+- [x] Model calls go through one `LLMClient` interface so a second provider can be added
+- [x] Over budget, agent features return `needs_human`; nothing falls back to executing
 
-**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** AGT-01 · **Traces to:** B4.infra, B6.dependence, D.abuse
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** AGT-01 · **Traces to:** B4.infra, B6.dependence, D.abuse
 
 ## EXE · Exactly-once execution
 
@@ -961,9 +961,9 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 **Acceptance criteria**
 
 - [ ] Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force
-- [ ] 'Submit as agent' calls the public API with the agent's key and shows the decision
+- [x] 'Submit as agent' calls the public API with the agent's key and shows the decision
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** CON-01, AGT-02, MND-02 · **Traces to:** MVP.flow, A5.proposes
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** CON-01, AGT-02, MND-02 · **Traces to:** MVP.flow, A5.proposes
 
 ### CON-06 · Policy and mandates screens
 
@@ -1127,9 +1127,9 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [ ] fixtures/invoices/ contains the canonical invoice plus missing-network, two-wallet, changed-wallet and injection variants with expected outputs
+- [x] fixtures/invoices/ contains the canonical invoice plus missing-network, two-wallet, changed-wallet and injection variants with expected outputs
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate · **Depends on:** none · **Traces to:** L1, MVP.flow
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** none · **Traces to:** L1, MVP.flow
 
 ### DEM-03 · 20-payment batch with deposits
 

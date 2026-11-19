@@ -25,6 +25,7 @@ from collections.abc import Mapping
 from datetime import timedelta
 from typing import Any
 
+from pydantic import SecretStr
 from sqlalchemy import Connection, Engine, text
 
 from detent.audit.log import Actor, append
@@ -37,6 +38,8 @@ from detent.execution.attempts import create_attempt, mark_attempt
 from detent.intents.registry import refresh_stats
 from detent.intents.service import reevaluate, release_counters
 from detent.intents.transition import transition
+from detent.mandates.store import verify as verify_mandate
+from detent.policy.facts import Unavailable
 from detent.policy.screening import Screening
 from detent.policy.store import active_policy
 from detent.rails.base import AttemptView, NonceRail, RailAdapter, RailError
@@ -111,7 +114,9 @@ def _check_prefund(conn: Connection, org_id: str, rail_id: str, amount: Money, d
     )
 
 
-def _maybe_rerun(conn: Connection, clock: Clock, org_id: str, p: Any, screening: Screening) -> str | None:
+def _maybe_rerun(
+    conn: Connection, clock: Clock, org_id: str, p: Any, screening: Screening, mandate_key: SecretStr | None
+) -> str | None:
     """Re-run the policy when the decision is stale or the rule version changed. Returns a non-EXECUTE
     outcome, or None to carry on."""
     last = conn.execute(
@@ -135,7 +140,13 @@ def _maybe_rerun(conn: Connection, clock: Clock, org_id: str, p: Any, screening:
     if not reasons:
         return None
     result, _ = reevaluate(
-        conn, clock, org_id=org_id, payment_id=p.id, screening=screening, reason=",".join(reasons)
+        conn,
+        clock,
+        org_id=org_id,
+        payment_id=p.id,
+        screening=screening,
+        reason=",".join(reasons),
+        mandate_key=mandate_key,
     )
     return None if result.outcome == "EXECUTE" else result.outcome
 
@@ -156,17 +167,19 @@ def _free_nonce(conn: Connection, org_id: str, pid: str, rail_id: str, address: 
     ).scalar_one_or_none()
 
 
-def _prepare(
+def _prepare(  # noqa: PLR0912, PLR0915 - the pre-send checks in the order EXE-03 lists them
     conn: Connection,
     clock: Clock,
     adapters: Mapping[str, RailAdapter],
     org_id: str,
     pid: str,
     screening: Screening,
+    mandate_key: SecretStr | None = None,
 ) -> tuple[Status, AttemptView | None]:
     p = conn.execute(
         text(
             "SELECT p.id, p.status, p.awaiting_send_click, p.source, p.counterparty_id, p.amount_minor, "
+            "p.mandate_id, p.counted_on, "
             "p.currency, "
             "p.network_constraint, p.allow_network_switch, p.created_at, d.address, d.account_masked "
             "FROM payment_intents p "
@@ -180,7 +193,7 @@ def _prepare(
         return status, None  # already sent, held, blocked or waiting for a person: nothing to do
     amount = Money(int(p.amount_minor), Currency(p.currency))
     try:
-        rerun = _maybe_rerun(conn, clock, org_id, p, screening)
+        rerun = _maybe_rerun(conn, clock, org_id, p, screening, mandate_key)
         if rerun == "BLOCK":
             transition(
                 conn,
@@ -201,7 +214,32 @@ def _prepare(
         if engaged is not False:  # engaged, or no row at all: fail closed
             raise _Hold("KILL_SWITCH_ENGAGED")
         if p.source == "agent":
-            raise _Hold("MANDATE_NOT_VERIFIABLE", {"note": "mandate verification arrives with MND-02 (S5)"})
+            # MND-02/MND-03: the mandate is checked again inside the lock before every send.
+            m = verify_mandate(
+                conn,
+                org_id=org_id,
+                mandate_id=p.mandate_id,
+                key=mandate_key,
+                now=clock.now(),
+                payee=p.counterparty_id,
+                amount=amount,
+                network=p.network_constraint,
+                already_counted=p.counted_on is not None,
+            )
+            if isinstance(m, Unavailable):
+                raise _Hold("MANDATE_UNVERIFIABLE", {"dependency": m.dependency, "error": m.error})
+            if not m.valid:
+                transition(
+                    conn,
+                    clock,
+                    org_id=org_id,
+                    payment_id=pid,
+                    to=Status.BLOCKED,
+                    actor=ACTOR,
+                    reason=f"pre-send mandate re-check: {m.reason}",
+                )
+                release_counters(conn, org_id, pid)
+                return Status.BLOCKED, None
         rt = route(conn, adapters, org_id=org_id, payment=p, day=clock.now().date().isoformat())
         store_route(conn, org_id, pid, rt)
         if rt.chosen is None:
@@ -389,10 +427,11 @@ def send_payment(  # noqa: PLR0911 - each return is a distinct outcome
     org_id: str,
     payment_id: str,
     screening: Screening,
+    mandate_key: SecretStr | None = None,
 ) -> Status:
     try:
         with transaction(engine) as conn:
-            status, view = _prepare(conn, clock, adapters, org_id, payment_id, screening)
+            status, view = _prepare(conn, clock, adapters, org_id, payment_id, screening, mandate_key)
     except Exception as exc:
         # Fail closed: an unexpected error before anything was broadcast holds the payment.
         log.exception("pre-send failed; holding the payment", extra={"for_payment": payment_id})

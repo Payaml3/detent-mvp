@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Proposal {{ p.id }}{% endblock %}
+{% block main %}
+<h1>Proposal <span class="mono">{{ p.id }}</span></h1>
+<p>{{ p.status }} · answered by: <strong>{{ label }}</strong>{% if row.served_model %} · model {{ row.served_model }}{% endif %}</p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<section class="card">
+  <h2>Extracted fields</h2>
+  <table>
+    <thead><tr><th>Field</th><th>Value</th><th>Confidence</th><th>Source</th></tr></thead>
+    <tbody>
+    {% for k, v in p.proposal.items() %}
+      <tr><td class="mono">{{ k }}</td><td class="mono">{{ v.value if v.value is not none else 'empty' }}</td>
+        <td>{{ '%d%%' % (v.confidence * 100) if v.value is not none else '' }}</td>
+        <td class="small">{% if v.source_span %}characters {{ v.source_span[0] }} to {{ v.source_span[1] }}{% elif k == 'counterparty_id' and v.value %}matched from the registry{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>Flags</h2>
+  {% if p.flags %}
+  <ul>{% for f in p.flags %}<li><strong>{{ f.code }}</strong>: {{ f.detail }}{% if f.fields %} <span class="mono small">({{ f.fields|join(', ') }})</span>{% endif %}</li>{% endfor %}</ul>
+  {% else %}<p>No flags.</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>Mandate in force</h2>
+  {% if mandate %}
+  <p class="mono">{{ mandate.id }}{% if mandate.revoked_at %} <span class="late">revoked</span>{% endif %}</p>
+  <p>Payees {{ mandate.payload.scope.payees|join(', ') }} · up to {{ mandate.payload.scope.max_per_payment.amount }} {{ mandate.payload.scope.max_per_payment.currency }} per payment · {{ mandate.payload.scope.max_total.amount }} {{ mandate.payload.scope.max_total.currency }} in total · networks {{ mandate.payload.scope.networks|join(', ') }}</p>
+  {% else %}<p class="note">No mandate: an intent from this proposal would be blocked.</p>{% endif %}
+</section>
+
+{% if payment %}
+<section class="card">
+  <h2>Decision</h2>
+  <p>Payment <a class="mono" href="/console/payments/{{ payment.id }}">{{ payment.id }}</a> is <strong>{{ payment.status }}</strong>{% if payment.decision %} ({{ payment.decision.outcome }}){% endif %}.</p>
+  {% if payment.decision %}<ul>{% for c in payment.decision.checks if c.result in ('ESCALATE', 'BLOCK') %}<li>{{ c.reason }} ({{ c.check }})</li>{% endfor %}</ul>{% endif %}
+  {% if payment.exception %}<p><a href="/console/exceptions/{{ payment.exception.id }}">Open the case</a></p>{% endif %}
+</section>
+{% elif p.status == 'needs_human' %}
+<p class="note">The agent could not produce a usable proposal. A person must enter this payment.</p>
+{% elif p.flags and not row.resolution %}
+<section class="card">
+  <h2>Resolve each flag before submitting</h2>
+  <form method="post" action="/console/invoices/{{ p.id }}/resolve">
+    {% for k, v in p.proposal.items() %}{% if v.value is none %}
+    <label>{{ k }} (from the supplier, not guessed)<input name="value_{{ k }}"></label>
+    {% endif %}{% endfor %}
+    <label>Note (how you checked)<input name="note" required></label>
+    <button>Resolve flags</button>
+  </form>
+</section>
+{% else %}
+<form method="post" action="/console/invoices/{{ p.id }}/submit">
+  <button class="primary">Submit as agent</button>
+  <span class="muted small">Goes through the public API with the agent's key; your rules decide.</span>
+</form>
+{% endif %}
+
+<section class="card">
+  <h2>Invoice</h2>
+  <pre class="mono doc">{{ highlighted }}</pre>
+</section>
+{% endblock %}

@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 91 requirements confirmed; 12 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 92 requirements confirmed; 11 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -317,7 +317,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-022**: Compliance checks: KYB (block failed or unknown, escalate pending), allowlist, screening of address and name, travel-rule fields above the threshold taken from registry and organisation data, and allowed networks per currency.
 - **FR-023**: Screening matches addresses case-insensitively and names after case-folding and whitespace collapsing; no fuzzy matching in the MVP.
 - **FR-024**: Above the auto limit escalates; above the hard maximum blocks; daily caps per platform and per counterparty count confirmed plus in-flight amounts and update atomically under concurrency.
-- **FR-025**: Daily caps use the UTC calendar day; mandate totals cover the mandate's whole validity window; reserved amounts are released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED. *(proposed: G-14, G-12)*
+- **FR-025**: Daily caps use the UTC calendar day; mandate totals cover the mandate's whole validity window; reserved amounts are released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED.
 - **FR-026**: Unusual activity is checkable rules: new wallet, changed details, first payment, above k times the counterparty median (only with enough confirmed history); each hit stores the raw facts.
 - **FR-027**: Above-norm compares only with confirmed payments in the same currency; otherwise it is reported as not evaluated.
 - **FR-028**: A block is final: approve, retry, reroute or resubmit of a blocked payment returns 409 payment_blocked and the database rejects any status change away from BLOCKED or REJECTED.

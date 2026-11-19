@@ -80,7 +80,7 @@ requirements:
 - {id: FR-024, area: Policy, layer: decision, status: confirmed, decision: [D-05], stories: [POL-04],
    src: ["spec/04#checks", "spec/04#counters-and-concurrency"],
    text: "Above the auto limit escalates; above the hard maximum blocks; daily caps per platform and per counterparty count confirmed plus in-flight amounts and update atomically under concurrency."}
-- {id: FR-025, area: Policy, layer: decision, status: proposed, decision: [G-14, G-12], stories: [POL-04, MND-02],
+- {id: FR-025, area: Policy, layer: decision, status: confirmed, decision: [G-14, G-12, D-23, D-29], stories: [POL-04, MND-02],
    src: ["spec/04#counters-and-concurrency", "spec/05#mandates-mnd-01-to-mnd-03"],
    text: "Daily caps use the UTC calendar day; mandate totals cover the mandate's whole validity window; reserved amounts are released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED."}
 - {id: FR-026, area: Policy, layer: decision, status: confirmed, stories: [POL-05],

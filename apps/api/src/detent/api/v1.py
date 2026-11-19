@@ -34,6 +34,17 @@ def _create(
     require(principal, "intents:create")
     if not key:
         raise MissingIdempotencyKey()
+    if principal.mandate_id is not None and (
+        body.source != "agent" or body.mandate_id != principal.mandate_id
+    ):
+        return error_response(
+            403,
+            "permission",
+            "mandate_mismatch",
+            "This key belongs to an agent mandate; it can only propose agent intents under it.",
+            request_id=_rid(),
+            param="mandate_id",
+        )
     rt = request.app.state.runtime
     code, out = submit_intent(
         rt.engine,
@@ -45,6 +56,7 @@ def _create(
         request=body,
         decision_only=decision_only,
         screening=request.app.state.screening,
+        mandate_key=rt.settings.mandate_signing_key_demo,
     )
     return JSONResponse(out, status_code=code)
 
@@ -177,10 +189,20 @@ def _resolve_case(
     rt = request.app.state.runtime
     actor = Actor(principal.user_id, principal.role)
     try:
-        fn = approve if action == "approve" else reject
-        res = fn(
-            rt.engine, rt.clock, case_id=case_id, org_id=principal.org_id, actor=actor, reason=body.reason
-        )
+        if action == "approve":
+            res = approve(
+                rt.engine,
+                rt.clock,
+                case_id=case_id,
+                org_id=principal.org_id,
+                actor=actor,
+                reason=body.reason,
+                mandate_key=rt.settings.mandate_signing_key_demo,
+            )
+        else:
+            res = reject(
+                rt.engine, rt.clock, case_id=case_id, org_id=principal.org_id, actor=actor, reason=body.reason
+            )
     except CaseError as exc:
         kinds: dict[int, ErrorType] = {404: "not_found", 403: "permission", 409: "conflict"}
         return error_response(
@@ -225,7 +247,13 @@ def _kill_switch(request: Request, principal: Principal, engage_it: bool) -> JSO
         if engage_it:
             engage(rt.engine, rt.clock, org_id=principal.org_id, actor=actor)
         else:
-            release(rt.engine, rt.clock, org_id=principal.org_id, actor=actor)
+            release(
+                rt.engine,
+                rt.clock,
+                org_id=principal.org_id,
+                actor=actor,
+                mandate_key=rt.settings.mandate_signing_key_demo,
+            )
     except PermissionError as exc:
         return error_response(403, "permission", "insufficient_role", str(exc), request_id=_rid())
     return JSONResponse({"engaged": is_engaged(rt.engine, principal.org_id)})
@@ -243,3 +271,44 @@ def release_kill_switch(
     request: Request, principal: Annotated[Principal, Depends(authenticate)]
 ) -> JSONResponse:
     return _kill_switch(request, principal, False)
+
+
+# --------------------------------------------------------------------------------- mandates (MND-01, MND-03)
+@router.get("/mandates")
+def list_mandates_api(
+    request: Request, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    from detent.mandates.store import list_mandates
+
+    require(principal, "read")
+    with request.app.state.runtime.engine.connect() as conn:
+        return JSONResponse(
+            {"data": list_mandates(conn, principal.org_id), "has_more": False, "next_cursor": None}
+        )
+
+
+@router.post("/mandates/{mandate_id}/revoke")
+def revoke_mandate_api(
+    request: Request, mandate_id: str, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    from detent.domain.roles import Role, allowed
+    from detent.mandates.store import revoke_mandate
+
+    require(principal, "admin")
+    if not allowed("mandate.revoke", Role(principal.role)):
+        return error_response(
+            403,
+            "permission",
+            "insufficient_role",
+            "Only the payments lead revokes a mandate.",
+            request_id=_rid(),
+        )
+    rt = request.app.state.runtime
+    try:
+        with rt.engine.begin() as conn:
+            revoke_mandate(
+                conn, rt.clock, principal.org_id, mandate_id, actor=Actor(principal.user_id, principal.role)
+            )
+    except LookupError:
+        return error_response(404, "not_found", "not_found", "No such mandate.", request_id=_rid())
+    return JSONResponse({"mandate_id": mandate_id, "revoked": True})

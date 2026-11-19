@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Invoices{% endblock %}
+{% block main %}
+<h1>Invoices</h1>
+<p class="lead">Drop an invoice and the instruction agent proposes a payment inside its mandate. It flags anything it can't read from the document, and it never sends: the proposal goes through your rules like any other intent.</p>
+<section class="card">
+  <h2>Drop an invoice</h2>
+  <form method="post" action="/console/invoices" enctype="multipart/form-data">
+    <label>Invoice text<textarea name="text" rows="10" style="width:100%;font-family:var(--font-mono)"></textarea></label>
+    <label>Or a file (text or PDF)<input type="file" name="file" accept=".txt,.pdf,text/plain,application/pdf"></label>
+    {% if mandates %}
+    <label>Mandate in force
+      <select name="mandate_id">{% for m in mandates %}<option value="{{ m.id }}">{{ m.id }} · {{ m.agent_id }}</option>{% endfor %}</select>
+    </label>
+    {% else %}<p class="note">No mandate in force: the agent can still read the invoice, but its intent would be blocked.</p>{% endif %}
+    <button class="primary">Propose a payment</button>
+  </form>
+</section>
+<h2>Recent proposals</h2>
+<table>
+  <thead><tr><th>Proposal</th><th>Status</th><th>Answered by</th><th>Payment</th><th>Created</th></tr></thead>
+  <tbody>
+  {% for r in recent %}<tr><td class="mono"><a href="/console/invoices/{{ r.id }}">{{ r.id }}</a></td><td>{{ r.status }}</td>
+    <td>{{ 'Claude API' if r.source == 'model' else 'Recorded response' }}</td>
+    <td class="mono">{% if r.payment_id %}<a href="/console/payments/{{ r.payment_id }}">{{ r.payment_id }}</a>{% endif %}</td>
+    <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">None yet.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

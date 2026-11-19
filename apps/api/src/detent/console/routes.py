@@ -241,7 +241,6 @@ def edit_destination(
 SECTIONS_NOT_BUILT = {
     "reconciliation": ("Reconciliation", "Matching deposits and payouts across rails (LED-06, slice S6)."),
     "policy": ("Policy", "Rule versions, diffs and two-person approval (POL-07, slice S6)."),
-    "mandates": ("Mandates", "Signed agent mandates and revocation (MND-01 to MND-03, slice S5)."),
     "audit": ("Audit", "Searchable audit log, replay and evidence export (AUD-02, AUD-03)."),
     "evaluation": ("Evaluation", "Release-gate suites and the results report (EVL, slice S8)."),
     "settings": ("Settings", "Mode, fail-safe and kill switch settings (EXE-08, EXE-09)."),
@@ -463,16 +462,26 @@ def _console_resolve(
 
     if not reason.strip():
         raise HTTPException(status_code=400, detail="a reason is required")
-    fn = approve if action == "approve" else reject
     try:
-        fn(
-            rt.engine,
-            rt.clock,
-            case_id=case_id,
-            org_id=user.org_id,
-            actor=Actor(user.id, user.role.value),
-            reason=reason,
-        )
+        if action == "approve":
+            approve(
+                rt.engine,
+                rt.clock,
+                case_id=case_id,
+                org_id=user.org_id,
+                actor=Actor(user.id, user.role.value),
+                reason=reason,
+                mandate_key=rt.settings.mandate_signing_key_demo,
+            )
+        else:
+            reject(
+                rt.engine,
+                rt.clock,
+                case_id=case_id,
+                org_id=user.org_id,
+                actor=Actor(user.id, user.role.value),
+                reason=reason,
+            )
     except CaseError as exc:
         raise HTTPException(status_code=exc.status, detail=exc.code) from exc
     return RedirectResponse(f"/console/exceptions/{case_id}", status_code=303)
@@ -537,7 +546,13 @@ def console_release(
 ) -> RedirectResponse:
     from detent.execution.kill_switch import release
 
-    release(rt.engine, rt.clock, org_id=user.org_id, actor=Actor(user.id, user.role.value))
+    release(
+        rt.engine,
+        rt.clock,
+        org_id=user.org_id,
+        actor=Actor(user.id, user.role.value),
+        mandate_key=rt.settings.mandate_signing_key_demo,
+    )
     return RedirectResponse(request.headers.get("referer") or "/console/", status_code=303)
 
 
@@ -601,6 +616,253 @@ def rails_screen(
                 {"row": r, "usage": usage, "attempts": attempts, "balance": balance, "per_payment": ppl}
             )
     return page(request, rt, "rails.html", user, rails=rails)
+
+
+@router.get("/mandates", response_class=HTMLResponse)
+def mandates_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    from detent.domain.roles import allowed
+    from detent.mandates.store import list_mandates
+
+    with rt.engine.connect() as conn:
+        items = list_mandates(conn, user.org_id)
+    return page(
+        request, rt, "mandates.html", user, mandates=items, can_revoke=allowed("mandate.revoke", user.role)
+    )
+
+
+@router.post("/mandates/{mandate_id}/revoke")
+def console_revoke_mandate(
+    request: Request,
+    mandate_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("mandate.revoke")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.mandates.store import revoke_mandate
+
+    try:
+        with transaction(rt.engine) as conn:
+            revoke_mandate(conn, rt.clock, user.org_id, mandate_id, actor=Actor(user.id, user.role.value))
+    except LookupError as exc:
+        raise HTTPException(status_code=404) from exc
+    return RedirectResponse("/console/mandates", status_code=303)
+
+
+# ---------------------------------------------------------------------------------- CON-05 invoices
+def _mandates_in_force(conn: Any, org_id: str, now: Any) -> list[Any]:
+    rows = conn.execute(
+        text(
+            "SELECT id, agent_id, payload FROM mandates WHERE org_id=:o AND revoked_at IS NULL "
+            "AND valid_from <= :t AND expires_at >= :t ORDER BY created_at, id"
+        ),
+        {"o": org_id, "t": now},
+    ).all()
+    return list(rows)
+
+
+def _highlight(doc: str, proposal: dict[str, Any]) -> Any:
+    from markupsafe import Markup, escape
+
+    spans = sorted(
+        (v["source_span"][0], v["source_span"][1], k)
+        for k, v in proposal.items()
+        if v.get("source_span") and v["value"] is not None
+    )
+    out, pos = [], 0
+    for s, e, k in spans:
+        if s < pos:
+            continue  # overlapping spans: keep the first
+        out.append(escape(doc[pos:s]))
+        out.append(Markup('<mark title="{}">').format(k) + escape(doc[s:e]) + Markup("</mark>"))
+        pos = e
+    out.append(escape(doc[pos:]))
+    return Markup("").join(out)
+
+
+@router.get("/invoices", response_class=HTMLResponse)
+def invoices(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    with rt.engine.connect() as conn:
+        mandates = _mandates_in_force(conn, user.org_id, rt.clock.now())
+        recent = conn.execute(
+            text(
+                "SELECT id, status, created_at, payment_id, source FROM agent_calls WHERE org_id=:o "
+                "AND kind='instruction' ORDER BY created_at DESC, id DESC LIMIT 20"
+            ),
+            {"o": user.org_id},
+        ).all()
+    return page(request, rt, "invoices.html", user, mandates=mandates, recent=recent)
+
+
+@router.post("/invoices")
+async def drop_invoice(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    from starlette.concurrency import run_in_threadpool
+
+    form = await request.form()
+    doc = str(form.get("text") or "")
+    upload = form.get("file")
+    if upload is not None and hasattr(upload, "read"):
+        data = await upload.read()
+        if data[:4] == b"%PDF":
+            doc = await run_in_threadpool(_pdf_text, data)
+        elif data:
+            doc = data.decode("utf-8", errors="replace")
+    if not doc.strip():
+        raise HTTPException(status_code=400, detail="paste the invoice text or choose a file")
+    return await run_in_threadpool(_propose, rt, user, doc, str(form.get("mandate_id") or ""))
+
+
+def _pdf_text(data: bytes) -> str:
+    import io
+
+    import pdfplumber
+
+    with pdfplumber.open(io.BytesIO(data)) as pdf:
+        return "\n".join(page.extract_text() or "" for page in pdf.pages)
+
+
+def _propose(rt: Runtime, user: ActingUser, doc: str, mandate_id: str) -> RedirectResponse:
+    from detent.agents.instruction import fixture_placeholders, propose_from_invoice
+    from detent.agents.llm import llm_for
+
+    with rt.engine.connect() as conn:
+        mandates = _mandates_in_force(conn, user.org_id, rt.clock.now())
+        placeholders = fixture_placeholders(conn, user.org_id)
+    mid = mandate_id or (mandates[0].id if mandates else None)
+    llm, _ = llm_for(rt.settings, placeholders)
+    p = propose_from_invoice(
+        rt.engine,
+        rt.clock,
+        org_id=user.org_id,
+        document=doc,
+        mandate_id=mid,
+        llm=llm,
+        model=rt.settings.model_agent,
+        daily_token_budget=rt.settings.ai_daily_token_budget,
+    )
+    return RedirectResponse(f"/console/invoices/{p.id}", status_code=303)
+
+
+@router.get("/invoices/{proposal_id}", response_class=HTMLResponse)
+def proposal_page(
+    request: Request,
+    proposal_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    from detent.agents.instruction import replay_proposal
+    from detent.intents.service import payment_view
+
+    with rt.engine.connect() as conn:
+        try:
+            p = replay_proposal(conn, user.org_id, proposal_id)
+        except Exception as exc:
+            raise HTTPException(status_code=404) from exc
+        row = conn.execute(
+            text(
+                "SELECT source, resolution, resolved_by, payment_id, model, served_model FROM agent_calls "
+                "WHERE org_id=:o AND id=:i"
+            ),
+            {"o": user.org_id, "i": proposal_id},
+        ).one()
+        mandate = conn.execute(
+            text("SELECT id, payload, revoked_at FROM mandates WHERE org_id=:o AND id=:m"),
+            {"o": user.org_id, "m": p.mandate_id},
+        ).one_or_none()
+        payment = payment_view(conn, user.org_id, row.payment_id) if row.payment_id else None
+    label = (
+        "Claude API"
+        if row.source == "model"
+        else "Recorded response (offline stand-in, not a live model call)"
+    )
+    return page(
+        request,
+        rt,
+        "proposal.html",
+        user,
+        p=p,
+        row=row,
+        label=label,
+        mandate=mandate,
+        payment=payment,
+        highlighted=_highlight(p.document, p.proposal),
+        error=request.query_params.get("error"),
+    )
+
+
+@router.post("/invoices/{proposal_id}/resolve")
+async def resolve_proposal(
+    request: Request,
+    proposal_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("exception.approve")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.agents.submit import NotReady, resolve_flags
+
+    form = await request.form()
+    values = {k[6:]: str(v).strip() for k, v in form.items() if k.startswith("value_") and str(v).strip()}
+    try:
+        resolve_flags(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            proposal_id=proposal_id,
+            actor=Actor(user.id, user.role.value),
+            values=values,
+            note=str(form.get("note") or ""),
+        )
+    except (ValueError, NotReady) as exc:
+        from urllib.parse import quote
+
+        return RedirectResponse(f"/console/invoices/{proposal_id}?error={quote(str(exc))}", status_code=303)
+    return RedirectResponse(f"/console/invoices/{proposal_id}", status_code=303)
+
+
+@router.post("/invoices/{proposal_id}/submit")
+def submit_as_agent(
+    request: Request,
+    proposal_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    """'Submit as agent': the proposal goes through the public API with the agent's own key."""
+    from fastapi.testclient import TestClient
+
+    from detent.agents.submit import NotReady, submit_proposal
+
+    key = rt.settings.agent_api_key
+    if key is None:
+        raise HTTPException(status_code=409, detail="the agent's API key is not configured (AGENT_API_KEY)")
+    try:
+        # An in-process HTTP client: the request passes through the whole /v1 stack (key, scope, mandate).
+        with TestClient(request.app, raise_server_exceptions=True) as http:
+            r = submit_proposal(
+                rt.engine,
+                rt.clock,
+                http,
+                agent_key=key.get_secret_value(),
+                org_id=user.org_id,
+                proposal_id=proposal_id,
+            )
+    except NotReady as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    if r.status_code not in (200, 201):
+        from urllib.parse import quote
+
+        return RedirectResponse(
+            f"/console/invoices/{proposal_id}?error={quote(r.text[:300])}", status_code=303
+        )
+    return RedirectResponse(f"/console/invoices/{proposal_id}", status_code=303)
 
 
 @router.get("/{section}", response_class=HTMLResponse)

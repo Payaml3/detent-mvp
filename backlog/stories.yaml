@@ -419,6 +419,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Mandate]
   ms: S5
+  done: [0, 1, 2]
 - id: MND-02
   epic: AGT
   title: Mandate check in the policy
@@ -434,6 +435,7 @@ stories:
   deps: [MND-01, POL-02]
   trace: [A2.Mandate, A5.proposes, D.sandbox]
   ms: S5
+  done: [0, 1, 2]
 - id: MND-03
   epic: AGT
   title: Revoke a mandate
@@ -448,6 +450,7 @@ stories:
   deps: [MND-02, EXE-03]
   trace: [A2.Mandate]
   ms: S5
+  done: [0, 1]
 - id: AGT-01
   epic: AGT
   title: Instruction agent turns an invoice into a proposed intent
@@ -464,6 +467,7 @@ stories:
   deps: [INT-04, MND-01]
   trace: [A5.proposes, A2.Intent, L1]
   ms: S5
+  done: [0, 1, 2]
 - id: AGT-02
   epic: AGT
   title: Flag, never guess
@@ -479,6 +483,7 @@ stories:
   deps: [AGT-01]
   trace: [A5.proposes, L1]
   ms: S5
+  done: [0, 1, 2]
 - id: AGT-03
   epic: AGT
   title: The agent can only propose
@@ -494,6 +499,7 @@ stories:
   deps: [AGT-01]
   trace: [A5.tools, A2b.no_agent_retry, B6.ai]
   ms: S5
+  done: [0, 1, 2]
 - id: AGT-04
   epic: AGT
   title: Prompt-injection isolation
@@ -510,6 +516,7 @@ stories:
   deps: [AGT-01]
   trace: [A5.injection, L2, B6.ai]
   ms: S5
+  done: [0, 1, 2]
 - id: AGT-05
   epic: AGT
   title: Record every agent call for replay
@@ -524,6 +531,7 @@ stories:
   deps: [AGT-01]
   trace: [A2.Prove, A5.citations]
   ms: S5
+  done: [0, 1]
 - id: AGT-06
   epic: AGT
   title: Model configuration and cost guard
@@ -539,6 +547,7 @@ stories:
   deps: [AGT-01]
   trace: [B4.infra, B6.dependence, D.abuse]
   ms: S5
+  done: [0, 1, 2]
 
 # ---------------- EXE Exactly-once execution ----------------
 - id: EXE-01
@@ -1243,6 +1252,7 @@ stories:
   deps: [CON-01, AGT-02, MND-02]
   trace: [MVP.flow, A5.proposes]
   ms: S5
+  done: [1]
 - id: CON-06
   epic: CON
   title: Policy and mandates screens
@@ -1451,6 +1461,7 @@ stories:
   deps: []
   trace: [L1, MVP.flow]
   ms: S5
+  done: [0]
 - id: DEM-03
   epic: DEM
   title: 20-payment batch with deposits

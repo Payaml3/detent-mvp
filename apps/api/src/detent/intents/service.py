@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictStr, field_validator, model_validator
 from sqlalchemy import Connection, Engine, text
 
 from detent.audit.log import Actor, append
@@ -27,6 +27,8 @@ from detent.domain.money import Currency, Money, MoneyError
 from detent.domain.states import Status
 from detent.intents.registry import counterparty_stats
 from detent.intents.transition import transition
+from detent.mandates.store import add_usage, release_usage
+from detent.mandates.store import verify as verify_mandate
 from detent.policy.engine import CheckResult, Evaluation, evaluate
 from detent.policy.facts import (
     CounterpartyFacts,
@@ -278,10 +280,12 @@ def add_to_counters(
             ),
             {"a": amount.amount_minor, "o": org_id, "s": scope, "p": day},
         )
-    conn.execute(
-        text("UPDATE payment_intents SET counted_on=:d WHERE org_id=:o AND id=:p"),
+    mnd = conn.execute(
+        text("UPDATE payment_intents SET counted_on=:d WHERE org_id=:o AND id=:p RETURNING mandate_id"),
         {"d": day, "o": org_id, "p": payment_id},
-    )
+    ).scalar_one()
+    if mnd:
+        add_usage(conn, org_id, mnd, amount)  # the mandate's total counts in-flight payments too (D-29)
 
 
 def release_counters(conn: Connection, org_id: str, payment_id: str) -> None:
@@ -289,7 +293,7 @@ def release_counters(conn: Connection, org_id: str, payment_id: str) -> None:
     Only a payment that was counted is released, on the day it was counted."""
     p = conn.execute(
         text(
-            "SELECT counterparty_id, amount_minor, currency, counted_on FROM payment_intents "
+            "SELECT counterparty_id, amount_minor, currency, counted_on, mandate_id FROM payment_intents "
             "WHERE org_id=:o AND id=:p FOR UPDATE"
         ),
         {"o": org_id, "p": payment_id},
@@ -310,6 +314,8 @@ def release_counters(conn: Connection, org_id: str, payment_id: str) -> None:
         text("UPDATE payment_intents SET counted_on=NULL WHERE org_id=:o AND id=:p"),
         {"o": org_id, "p": payment_id},
     )
+    if p.mandate_id:
+        release_usage(conn, org_id, p.mandate_id, amount)
 
 
 def find_recent_block(
@@ -531,6 +537,7 @@ class _Ctx:
     decision_only: bool
     endpoint: str
     rhash: str
+    mandate_key: SecretStr | None = None
 
 
 def _claim_idempotency(conn: Connection, clock: Clock, c: _Ctx) -> tuple[int, dict[str, Any]] | None:
@@ -727,6 +734,8 @@ def build_facts(
     supplied_travel_rule: dict[str, Any] | None,
     screening: Screening,
     already_counted: Money | None,
+    mandate_id: str | None = None,
+    mandate_key: SecretStr | None = None,
 ) -> Facts:
     """Gather the typed facts for one evaluation. ``already_counted`` is this payment's own amount when a
     re-run happens while it is in flight, so it is not counted against the cap twice."""
@@ -745,8 +754,24 @@ def build_facts(
         recent_block = find_recent_block(conn, org_id, cp.id, dest.address, since)
     mandate: MandateFacts | Unavailable | None = None
     if source == "agent":
-        # Mandate signatures and scope are verified by MND-02 (slice S5). Until then: fail closed.
-        mandate = Unavailable("mandate_verifier", "not_built")
+        mandate = (
+            _try(
+                "mandate",
+                lambda: verify_mandate(
+                    conn,
+                    org_id=org_id,
+                    mandate_id=mandate_id,
+                    key=mandate_key,
+                    now=now,
+                    payee=cp.id,
+                    amount=amount,
+                    network=network,
+                    already_counted=already_counted is not None,
+                ),
+            )
+            if mandate_id
+            else None
+        )
     return Facts(
         now=now,
         source=source,  # type: ignore[arg-type]
@@ -850,6 +875,7 @@ def reevaluate(
     screening: Screening,
     reason: str,
     approved_reasons: list[str] | None = None,
+    mandate_key: SecretStr | None = None,
 ) -> tuple[Evaluation, ActivePolicy]:
     """Re-run every check with the active rule version on an existing payment (EXE-03, EXC-04; spec/04).
 
@@ -867,7 +893,7 @@ def reevaluate(
     p = conn.execute(
         text(
             "SELECT source, counterparty_id, destination_id, amount_minor, currency, network_constraint, "
-            "travel_rule, status, counted_on FROM payment_intents WHERE org_id=:o AND id=:p"
+            "travel_rule, status, counted_on, mandate_id FROM payment_intents WHERE org_id=:o AND id=:p"
         ),
         {"o": org_id, "p": payment_id},
     ).one()
@@ -891,6 +917,8 @@ def reevaluate(
         supplied_travel_rule=p.travel_rule,
         screening=screening,
         already_counted=amount if in_flight else None,
+        mandate_id=p.mandate_id,
+        mandate_key=mandate_key,
     )
     result = evaluate(facts, policy.rules)
     facts_json = _jsonable(facts)
@@ -979,6 +1007,8 @@ def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tu
         supplied_travel_rule=c.req.travel_rule,
         screening=screening,
         already_counted=None,
+        mandate_id=c.req.mandate_id,
+        mandate_key=c.mandate_key,
     )
     result: Evaluation = evaluate(facts, rules)
     status = _status_for(
@@ -1037,6 +1067,7 @@ def submit_intent(
     decision_only: bool,
     screening: Screening,
     actor_role: str | None = None,
+    mandate_key: SecretStr | None = None,
 ) -> tuple[int, dict[str, Any]]:
     endpoint = "decisions" if decision_only else "payment_intents"
     c = _Ctx(
@@ -1047,6 +1078,7 @@ def submit_intent(
         decision_only,
         endpoint,
         request_hash(endpoint, request),
+        mandate_key,
     )
     try:
         with transaction(engine) as conn:

@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from pydantic import SecretStr
 from sqlalchemy import Engine, text
 
 from detent.audit.log import Actor, append
@@ -78,7 +79,13 @@ def engage(engine: Engine, clock: Clock, *, org_id: str, actor: Actor) -> list[s
 
 
 def release(
-    engine: Engine, clock: Clock, *, org_id: str, actor: Actor, screening: Screening | None = None
+    engine: Engine,
+    clock: Clock,
+    *,
+    org_id: str,
+    actor: Actor,
+    screening: Screening | None = None,
+    mandate_key: SecretStr | None = None,
 ) -> dict[str, list[str]]:
     from detent.exceptions.cases import open_case
     from detent.intents.service import SEND_JOB, reevaluate, release_counters
@@ -135,6 +142,7 @@ def release(
                 screening=scr,
                 reason="kill switch released",
                 approved_reasons=list(approved) or None,
+                mandate_key=mandate_key,
             )
             conn.execute(
                 text("UPDATE payment_intents SET held_reason=NULL WHERE org_id=:o AND id=:p"),

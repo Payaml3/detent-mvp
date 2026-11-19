@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Any
 
+from pydantic import SecretStr
 from sqlalchemy import Connection, Engine, text
 
 from detent.audit.log import Actor, append
@@ -301,6 +302,7 @@ def approve(
     actor: Actor,
     reason: str,
     screening: Screening | None = None,
+    mandate_key: SecretStr | None = None,
 ) -> Resolution:
     from detent.intents.service import SEND_JOB, add_to_counters, load_org, reevaluate
 
@@ -317,6 +319,7 @@ def approve(
             screening=screening or MockScreening.from_fixture(),
             reason=f"approval of {case.id}",
             approved_reasons=list(case.reasons),
+            mandate_key=mandate_key,
         )
         pid = case.payment_id
         if result.outcome == "BLOCK":

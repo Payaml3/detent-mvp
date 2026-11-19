@@ -127,7 +127,7 @@ Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | done | `integration/test_intents_api.py::test_harbor_executes`<br>`integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 1 | The payment ID is assigned once and never changes through retries, failovers or approvals | planned | integration: `apps/api/tests/integration/test_int_01.py` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_idempotency_key_is_required` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_without_a_mandate_key_fails_closed` |
 
 ## FR-011 · Intents (confirmed)
 
@@ -176,7 +176,7 @@ Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | done | `integration/test_intents_api.py::test_harbor_executes`<br>`integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 1 | The payment ID is assigned once and never changes through retries, failovers or approvals | planned | integration: `apps/api/tests/integration/test_int_01.py` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_idempotency_key_is_required` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_without_a_mandate_key_fails_closed` |
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 0 | Each payout destination stores `first_seen_at` and `last_changed_at`; editing it updates `last_changed_at` and writes an audit event | done | `integration/test_registry.py::test_editing_a_destination_updates_last_changed_and_audits`<br>`integration/test_registry.py::test_fixture_counterparties_are_seeded` |
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 1 | Each counterparty exposes payment count and median amount, computed from confirmed payments | done | `integration/test_registry.py::test_stats_are_computed_from_confirmed_payments` |
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 2 | Counterparties are seeded from fixtures and editable in the console | done | `integration/test_registry.py::test_fixture_counterparties_are_seeded`<br>`integration/test_registry.py::test_destination_editable_in_console_by_payments_lead_only` |
@@ -207,7 +207,7 @@ Sources: [spec/04 §user-payouts-payouts-to-the-platforms-own-end-users](../../s
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 0 | POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status | done | `integration/test_intents_api.py::test_harbor_executes`<br>`integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 1 | The payment ID is assigned once and never changes through retries, failovers or approvals | planned | integration: `apps/api/tests/integration/test_int_01.py` |
 | [INT-01](../../backlog/user-stories.md#int-01) | S1 | 2 | Invalid input returns 422 with the standard error body and no intent is created | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_idempotency_key_is_required` |
-| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist` |
+| [INT-01](../../backlog/user-stories.md#int-01) | S1 | 3 | `source` is `platform` or `agent`; `agent` requires a `mandate_id` | done | `integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing`<br>`integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused`<br>`integration/test_intents_api.py::test_agent_intent_without_a_mandate_key_fails_closed` |
 | [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 0 | KYB not verified -> BLOCK; KYB pending -> ESCALATE | done | `unit/test_policy_engine.py::test_kyb` |
 | [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 1 | Payee not on allowlist -> ESCALATE (first payment) | done | `unit/test_policy_engine.py::test_not_allowlisted_escalates`<br>`integration/test_intents_api.py::test_nova_escalates` |
 | [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 2 | Mock screening list hit on address or name -> BLOCK `SCREENING_HIT`; screening unavailable -> fail closed per POL-09 | done | `unit/test_policy_engine.py::test_screening_hit_blocks_with_the_matched_entry`<br>`unit/test_policy_engine.py::test_screening_unavailable_fails_closed`<br>`integration/test_intents_api.py::test_flagged_payee_is_blocked` |
@@ -282,7 +282,7 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks); [spec/04 §counters
 | [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 1 | Daily caps per platform and per counterparty count confirmed plus in-flight amounts | done | `unit/test_policy_engine.py::test_daily_caps_count_what_is_already_used`<br>`unit/test_policy_engine.py::test_daily_cap_exactly_reached_passes`<br>`integration/test_intents_api.py::test_decision_only_executes_nothing` |
 | [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 2 | Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test) | done | `concurrency/test_decision_races.py::test_parallel_intents_at_the_daily_cap_never_all_execute` |
 
-## FR-025 · Policy (proposed)
+## FR-025 · Policy (confirmed)
 
 Daily caps use the UTC calendar day; mandate totals cover the mandate's whole validity window; reserved amounts are released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED.
 
@@ -293,9 +293,9 @@ Sources: [spec/04 §counters-and-concurrency](../../spec/04-policy.md#counters-a
 | [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 0 | Above the auto limit -> ESCALATE; above the hard maximum -> BLOCK | done | `unit/test_policy_engine.py::test_limits` |
 | [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 1 | Daily caps per platform and per counterparty count confirmed plus in-flight amounts | done | `unit/test_policy_engine.py::test_daily_caps_count_what_is_already_used`<br>`unit/test_policy_engine.py::test_daily_cap_exactly_reached_passes`<br>`integration/test_intents_api.py::test_decision_only_executes_nothing` |
 | [POL-04](../../backlog/user-stories.md#pol-04) | S1 | 2 | Cap counters update atomically; 20 parallel intents that together exceed the cap never all execute (concurrency test) | done | `concurrency/test_decision_races.py::test_parallel_intents_at_the_daily_cap_never_all_execute` |
-| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 0 | Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason | planned | unit: `apps/api/tests/unit/test_mnd_02.py` |
-| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 1 | Cumulative usage updates atomically (concurrency test) | planned | concurrency: `apps/api/tests/concurrency/test_mnd_02.py` |
-| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 2 | The check re-runs at execution time | planned | unit: `apps/api/tests/unit/test_mnd_02.py` |
+| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 0 | Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason | done | `integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason`<br>`integration/test_mandates.py::test_an_unreadable_stored_signature_is_invalid_not_a_crash` |
+| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 1 | Cumulative usage updates atomically (concurrency test) | done | `integration/test_mandates.py::test_cumulative_total_is_atomic_under_parallel_intents` |
+| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 2 | The check re-runs at execution time | done | `integration/test_mandates.py::test_revocation_blocks_an_approved_intent_before_sending` |
 
 ## FR-026 · Policy (confirmed)
 
@@ -432,9 +432,9 @@ Sources: [spec/05 §mandates-mnd-01-to-mnd-03](../../spec/05-agents.md#mandates-
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [MND-01](../../backlog/user-stories.md#mnd-01) | S5 | 0 | Mandates are JSON with an HMAC-SHA256 signature by the platform's mandate key (format in spec/05-agents.md) | planned | unit: `apps/api/tests/unit/test_mnd_01.py` |
-| [MND-01](../../backlog/user-stories.md#mnd-01) | S5 | 1 | Invalid signature, unknown agent or expired mandate are detectable without calling the model | planned | unit: `apps/api/tests/unit/test_mnd_01.py` |
-| [MND-01](../../backlog/user-stories.md#mnd-01) | S5 | 2 | The format keeps fields that map to AP2-style mandates later | planned | unit: `apps/api/tests/unit/test_mnd_01.py` |
+| [MND-01](../../backlog/user-stories.md#mnd-01) | S5 | 0 | Mandates are JSON with an HMAC-SHA256 signature by the platform's mandate key (format in spec/05-agents.md) | done | `integration/test_mandates.py::test_signature_covers_canonical_json_without_the_signature` |
+| [MND-01](../../backlog/user-stories.md#mnd-01) | S5 | 1 | Invalid signature, unknown agent or expired mandate are detectable without calling the model | done | `integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason`<br>`integration/test_mandates.py::test_keys_bound_to_a_mandate_can_only_propose_under_it` |
+| [MND-01](../../backlog/user-stories.md#mnd-01) | S5 | 2 | The format keeps fields that map to AP2-style mandates later | done | `integration/test_mandates.py::test_format_keeps_ap2_style_fields` |
 
 ## FR-041 · Mandates (confirmed)
 
@@ -444,9 +444,9 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks); [MND-02 criteria](.
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 0 | Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason | planned | unit: `apps/api/tests/unit/test_mnd_02.py` |
-| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 1 | Cumulative usage updates atomically (concurrency test) | planned | concurrency: `apps/api/tests/concurrency/test_mnd_02.py` |
-| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 2 | The check re-runs at execution time | planned | unit: `apps/api/tests/unit/test_mnd_02.py` |
+| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 0 | Missing or invalid signature, revoked or expired mandate, payee outside scope, amount above per-payment limit, cumulative total above limit, or network outside scope -> BLOCK with the specific reason | done | `integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason`<br>`integration/test_mandates.py::test_an_unreadable_stored_signature_is_invalid_not_a_crash` |
+| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 1 | Cumulative usage updates atomically (concurrency test) | done | `integration/test_mandates.py::test_cumulative_total_is_atomic_under_parallel_intents` |
+| [MND-02](../../backlog/user-stories.md#mnd-02) | S5 | 2 | The check re-runs at execution time | done | `integration/test_mandates.py::test_revocation_blocks_an_approved_intent_before_sending` |
 
 ## FR-042 · Mandates (confirmed)
 
@@ -456,8 +456,8 @@ Sources: [MND-03 criteria](../../backlog/user-stories.md#mnd-03)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [MND-03](../../backlog/user-stories.md#mnd-03) | S5 | 0 | Revocation by console or API takes effect for every intent not yet SUBMITTED | planned | unit: `apps/api/tests/unit/test_mnd_03.py` |
-| [MND-03](../../backlog/user-stories.md#mnd-03) | S5 | 1 | An approved intent whose mandate is revoked before sending is BLOCKED `MANDATE_REVOKED` at the pre-send re-check | planned | unit: `apps/api/tests/unit/test_mnd_03.py` |
+| [MND-03](../../backlog/user-stories.md#mnd-03) | S5 | 0 | Revocation by console or API takes effect for every intent not yet SUBMITTED | done | `integration/test_mandates.py::test_revoke_by_api_and_console` |
+| [MND-03](../../backlog/user-stories.md#mnd-03) | S5 | 1 | An approved intent whose mandate is revoked before sending is BLOCKED `MANDATE_REVOKED` at the pre-send re-check | done | `integration/test_mandates.py::test_revocation_blocks_an_approved_intent_before_sending` |
 
 ## FR-043 · Agents (confirmed)
 
@@ -467,11 +467,11 @@ Sources: [spec/05 §instruction-agent-agt-01-agt-02-agt-04](../../spec/05-agents
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [AGT-01](../../backlog/user-stories.md#agt-01) | S5 | 0 | Input: invoice text or PDF; output: payee, matched counterparty, amount, currency, network, wallet, invoice number, due date, each with confidence and the source text span | planned | unit: `apps/api/tests/unit/test_agt_01.py` |
-| [AGT-01](../../backlog/user-stories.md#agt-01) | S5 | 1 | Uses the agents model from config (default `claude-sonnet-5-5`) with tool use and a strict JSON schema; output is validated by Pydantic | planned | unit: `apps/api/tests/unit/test_agt_01.py` |
-| [AGT-01](../../backlog/user-stories.md#agt-01) | S5 | 2 | Invalid output is retried once, then the proposal is marked `needs_human` | planned | unit: `apps/api/tests/unit/test_agt_01.py` |
+| [AGT-01](../../backlog/user-stories.md#agt-01) | S5 | 0 | Input: invoice text or PDF; output: payee, matched counterparty, amount, currency, network, wallet, invoice number, due date, each with confidence and the source text span | done | `integration/test_instruction_agent.py::test_canonical_invoice_highlights_its_sources_and_is_stable` |
+| [AGT-01](../../backlog/user-stories.md#agt-01) | S5 | 1 | Uses the agents model from config (default `claude-sonnet-5-5`) with tool use and a strict JSON schema; output is validated by Pydantic | done | `unit/test_anthropic_llm.py::test_request_shape_and_tool_loop`<br>`unit/test_agent_boundaries.py::test_models_come_from_settings` |
+| [AGT-01](../../backlog/user-stories.md#agt-01) | S5 | 2 | Invalid output is retried once, then the proposal is marked `needs_human` | done | `integration/test_instruction_agent.py::test_invalid_output_is_retried_once_then_needs_human` |
 | [AGT-01](../../backlog/user-stories.md#agt-01) | S5 | 3 | The canonical $18,500 USDC invoice yields the expected intent on 10 of 10 runs (EVL-04) | planned | eval: `eval/scenarios (runner: detent eval) for AGT-01` |
-| [DEM-02](../../backlog/user-stories.md#dem-02) | S5 | 0 | fixtures/invoices/ contains the canonical invoice plus missing-network, two-wallet, changed-wallet and injection variants with expected outputs | planned | scenario: `detent demo run (DEM-02)` |
+| [DEM-02](../../backlog/user-stories.md#dem-02) | S5 | 0 | fixtures/invoices/ contains the canonical invoice plus missing-network, two-wallet, changed-wallet and injection variants with expected outputs | done | `integration/test_instruction_agent.py::test_each_fixture_gives_its_expected_fields_and_flags` |
 
 ## FR-044 · Agents (confirmed)
 
@@ -481,9 +481,9 @@ Sources: [spec/05 §instruction-agent-agt-01-agt-02-agt-04](../../spec/05-agents
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [AGT-02](../../backlog/user-stories.md#agt-02) | S5 | 0 | Missing network, two wallets, total not matching line items, ambiguous currency, payee not in the registry, or wallet different from the registry each set a named flag | planned | unit: `apps/api/tests/unit/test_agt_02.py` |
-| [AGT-02](../../backlog/user-stories.md#agt-02) | S5 | 1 | Any flag sets `requires_clarification`; such a proposal can't be submitted until a human resolves each flag | planned | unit: `apps/api/tests/unit/test_agt_02.py` |
-| [AGT-02](../../backlog/user-stories.md#agt-02) | S5 | 2 | Tests on the interpretation set confirm no flagged field is ever populated from outside the document | planned | unit: `apps/api/tests/unit/test_agt_02.py` |
+| [AGT-02](../../backlog/user-stories.md#agt-02) | S5 | 0 | Missing network, two wallets, total not matching line items, ambiguous currency, payee not in the registry, or wallet different from the registry each set a named flag | done | `integration/test_instruction_agent.py::test_each_fixture_gives_its_expected_fields_and_flags` |
+| [AGT-02](../../backlog/user-stories.md#agt-02) | S5 | 1 | Any flag sets `requires_clarification`; such a proposal can't be submitted until a human resolves each flag | done | `integration/test_agent_submit.py::test_flagged_proposal_cannot_be_submitted_until_each_flag_is_resolved`<br>`integration/test_agent_submit.py::test_console_flagged_invoice_shows_flags_and_blocks_submit` |
+| [AGT-02](../../backlog/user-stories.md#agt-02) | S5 | 2 | Tests on the interpretation set confirm no flagged field is ever populated from outside the document | done | `integration/test_instruction_agent.py::test_values_not_in_the_document_are_nulled_and_flagged`<br>`integration/test_instruction_agent.py::test_a_followed_injection_is_undone_by_the_code_checks` |
 
 ## FR-045 · Agents (confirmed)
 
@@ -493,9 +493,9 @@ Sources: [Invariant 5](../../CLAUDE.md#non-negotiable-invariants); [spec/05 §co
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [AGT-03](../../backlog/user-stories.md#agt-03) | S5 | 0 | The agent's tool registry has no tool that writes state except `propose_payment_intent`, which calls the public API with scope `intents:create` | planned | unit: `apps/api/tests/unit/test_agt_03.py` |
-| [AGT-03](../../backlog/user-stories.md#agt-03) | S5 | 1 | An import-boundary test fails if `detent.agents` imports `detent.execution`, `detent.exceptions.approve` or `detent.rails` | planned | unit: `apps/api/tests/unit/test_agt_03.py` |
-| [AGT-03](../../backlog/user-stories.md#agt-03) | S5 | 2 | An attempt by the agent to call any other write endpoint is rejected by scope and logged | planned | unit: `apps/api/tests/unit/test_agt_03.py` |
+| [AGT-03](../../backlog/user-stories.md#agt-03) | S5 | 0 | The agent's tool registry has no tool that writes state except `propose_payment_intent`, which calls the public API with scope `intents:create` | done | `unit/test_agent_boundaries.py::test_agent_tools_are_read_only_except_propose`<br>`integration/test_agent_submit.py::test_clean_proposal_submits_as_agent_and_escalates` |
+| [AGT-03](../../backlog/user-stories.md#agt-03) | S5 | 1 | An import-boundary test fails if `detent.agents` imports `detent.execution`, `detent.exceptions.approve` or `detent.rails` | done | `unit/test_agent_boundaries.py::test_agents_never_reach_execution_approval_or_rails_even_indirectly` |
+| [AGT-03](../../backlog/user-stories.md#agt-03) | S5 | 2 | An attempt by the agent to call any other write endpoint is rejected by scope and logged | done | `integration/test_agent_submit.py::test_agent_key_cannot_call_other_write_endpoints` |
 
 ## FR-046 · Agents (confirmed)
 
@@ -505,9 +505,9 @@ Sources: [Invariant 11](../../CLAUDE.md#non-negotiable-invariants); [spec/05 §c
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [AGT-04](../../backlog/user-stories.md#agt-04) | S5 | 0 | Untrusted text reaches the model only inside delimited data blocks, after the instructions, with an explicit data-only rule | planned | unit: `apps/api/tests/unit/test_agt_04.py` |
-| [AGT-04](../../backlog/user-stories.md#agt-04) | S5 | 1 | The policy never reads agent free text; it reads only typed fields | planned | unit: `apps/api/tests/unit/test_agt_04.py` |
-| [AGT-04](../../backlog/user-stories.md#agt-04) | S5 | 2 | Instruction-like content in a document is reported as a `possible_injection` flag and never followed | planned | unit: `apps/api/tests/unit/test_agt_04.py` |
+| [AGT-04](../../backlog/user-stories.md#agt-04) | S5 | 0 | Untrusted text reaches the model only inside delimited data blocks, after the instructions, with an explicit data-only rule | done | `integration/test_instruction_agent.py::test_untrusted_text_only_inside_delimited_data_blocks`<br>`integration/test_instruction_agent.py::test_document_cannot_close_the_data_block_early` |
+| [AGT-04](../../backlog/user-stories.md#agt-04) | S5 | 1 | The policy never reads agent free text; it reads only typed fields | done | `unit/test_policy_engine.py::test_checks_never_see_free_text` |
+| [AGT-04](../../backlog/user-stories.md#agt-04) | S5 | 2 | Instruction-like content in a document is reported as a `possible_injection` flag and never followed | done | `integration/test_instruction_agent.py::test_each_fixture_gives_its_expected_fields_and_flags`<br>`integration/test_agent_submit.py::test_injected_invoice_submits_only_what_the_document_says` |
 | [AGT-04](../../backlog/user-stories.md#agt-04) | S5 | 3 | All injection scenarios in the attack suite pass (EVL-02) | planned | unit: `apps/api/tests/unit/test_agt_04.py` |
 
 ## FR-047 · Agents (confirmed)
@@ -518,8 +518,8 @@ Sources: [spec/05 §containment-rules-apply-to-every-agent](../../spec/05-agents
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [AGT-05](../../backlog/user-stories.md#agt-05) | S5 | 0 | Agent calls are rows linked to the intent or case, with token counts and latency | planned | unit: `apps/api/tests/unit/test_agt_05.py` |
-| [AGT-05](../../backlog/user-stories.md#agt-05) | S5 | 1 | Replay reads stored outputs and never calls the model again | planned | unit: `apps/api/tests/unit/test_agt_05.py` |
+| [AGT-05](../../backlog/user-stories.md#agt-05) | S5 | 0 | Agent calls are rows linked to the intent or case, with token counts and latency | done | `integration/test_instruction_agent.py::test_every_call_is_recorded_and_replay_never_calls_the_model` |
+| [AGT-05](../../backlog/user-stories.md#agt-05) | S5 | 1 | Replay reads stored outputs and never calls the model again | done | `integration/test_instruction_agent.py::test_every_call_is_recorded_and_replay_never_calls_the_model` |
 
 ## FR-048 · Agents (confirmed)
 
@@ -529,9 +529,9 @@ Sources: [spec/05 §models-from-settings-dont-hard-code](../../spec/05-agents.md
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [AGT-06](../../backlog/user-stories.md#agt-06) | S5 | 0 | Model IDs come from settings: agents `claude-sonnet-5-5`, light tasks `claude-haiku-5-5`, evaluation judge `claude-opus-5-5` | planned | unit: `apps/api/tests/unit/test_agt_06.py` |
-| [AGT-06](../../backlog/user-stories.md#agt-06) | S5 | 1 | Model calls go through one `LLMClient` interface so a second provider can be added | planned | unit: `apps/api/tests/unit/test_agt_06.py` |
-| [AGT-06](../../backlog/user-stories.md#agt-06) | S5 | 2 | Over budget, agent features return `needs_human`; nothing falls back to executing | planned | unit: `apps/api/tests/unit/test_agt_06.py` |
+| [AGT-06](../../backlog/user-stories.md#agt-06) | S5 | 0 | Model IDs come from settings: agents `claude-sonnet-5-5`, light tasks `claude-haiku-5-5`, evaluation judge `claude-opus-5-5` | done | `unit/test_agent_boundaries.py::test_models_come_from_settings` |
+| [AGT-06](../../backlog/user-stories.md#agt-06) | S5 | 1 | Model calls go through one `LLMClient` interface so a second provider can be added | done | `unit/test_agent_boundaries.py::test_only_llm_module_imports_the_model_sdk` |
+| [AGT-06](../../backlog/user-stories.md#agt-06) | S5 | 2 | Over budget, agent features return `needs_human`; nothing falls back to executing | done | `integration/test_instruction_agent.py::test_over_budget_returns_needs_human_without_calling_the_model` |
 
 ## FR-050 · Execution (confirmed)
 
@@ -1020,7 +1020,7 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 | [CON-03](../../backlog/user-stories.md#con-03) | S3 | 0 | Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button | planned | console: `apps/api/tests/integration/test_con_03.py` |
 | [CON-04](../../backlog/user-stories.md#con-04) | S3 | 0 | Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason | done | `integration/test_console_review.py::test_exceptions_queue_filters_and_countdown`<br>`integration/test_console_review.py::test_console_approve_requires_reason_and_permission` |
 | [CON-05](../../backlog/user-stories.md#con-05) | S5 | 0 | Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force | planned | console: `apps/api/tests/integration/test_con_05.py` |
-| [CON-05](../../backlog/user-stories.md#con-05) | S5 | 1 | 'Submit as agent' calls the public API with the agent's key and shows the decision | planned | console: `apps/api/tests/integration/test_con_05.py` |
+| [CON-05](../../backlog/user-stories.md#con-05) | S5 | 1 | 'Submit as agent' calls the public API with the agent's key and shows the decision | done | `integration/test_agent_submit.py::test_console_invoice_drop_and_submit` |
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 0 | Active version, history and diff; propose and approve per POL-07 | planned | console: `apps/api/tests/integration/test_con_06.py` |
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 1 | Mandates list with scope, usage against limits, expiry and revoke | planned | console: `apps/api/tests/integration/test_con_06.py` |
 | [CON-07](../../backlog/user-stories.md#con-07) | S7 | 0 | Run history, match rate, breaks with proposed fix and approve button | planned | console: `apps/api/tests/integration/test_con_07.py` |

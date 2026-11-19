@@ -163,10 +163,11 @@ def test_agent_intent_with_unknown_mandate_is_refused(
         )
 
 
-def test_agent_intent_never_executes_before_mandate_checks_exist(
+def test_agent_intent_without_a_mandate_key_fails_closed(
     api: TestClient, dorg: DecisionOrg, engine: Engine, clock: FrozenClock
 ) -> None:
-    # MND-02 (slice S5) verifies mandates. Until then an agent intent fails closed, whatever it asks for.
+    # The API here has no mandate signing key configured: the mandate can't be verified, so the intent
+    # escalates and never executes (fail closed). With a key, MND-02 checks it (tests/integration/test_mandates.py).
     with engine.begin() as c:
         c.execute(
             text(
@@ -182,7 +183,7 @@ def test_agent_intent_never_executes_before_mandate_checks_exist(
         "check": "mandate_scope",
         "result": "ESCALATE",
         "reason": "SYSTEM_UNAVAILABLE",
-        "evidence": {"dependency": "mandate_verifier", "error": "not_built"},
+        "evidence": {"dependency": "mandate_key", "error": "not_configured"},
     }
 
 

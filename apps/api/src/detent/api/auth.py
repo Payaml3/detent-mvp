@@ -35,6 +35,7 @@ class Principal:
     user_id: str
     role: str
     scopes: frozenset[str]
+    mandate_id: str | None = None  # an agent's key, bound to one mandate (AGT-03)
 
 
 def hash_key(key: str, pepper: str) -> str:
@@ -42,17 +43,27 @@ def hash_key(key: str, pepper: str) -> str:
 
 
 def issue_key(
-    conn: Connection, clock: Clock, org_id: str, user_id: str, scopes: list[str], pepper: str
+    conn: Connection,
+    clock: Clock,
+    org_id: str,
+    user_id: str,
+    scopes: list[str],
+    pepper: str,
+    *,
+    mandate_id: str | None = None,
+    key: str | None = None,
 ) -> str:
     unknown = set(scopes) - SCOPES
     if unknown:
         raise ValueError(f"unknown scopes: {sorted(unknown)}")
-    key = TEST_PREFIX + secrets.token_urlsafe(24)
+    if key is not None and not key.startswith(TEST_PREFIX):
+        raise ValueError("keys must be sk_test_ keys")
+    key = key or TEST_PREFIX + secrets.token_urlsafe(24)
     now = clock.now()
     conn.execute(
         text(
-            "INSERT INTO api_keys (id, org_id, prefix, hash, scopes, user_id, created_at) "
-            "VALUES (:id, :o, :p, :h, :s, :u, :t)"
+            "INSERT INTO api_keys (id, org_id, prefix, hash, scopes, user_id, mandate_id, created_at) "
+            "VALUES (:id, :o, :p, :h, :s, :u, :m, :t)"
         ),
         {
             "id": new_id(Prefix.KEY, now),
@@ -61,6 +72,7 @@ def issue_key(
             "h": hash_key(key, pepper),
             "s": sorted(scopes),
             "u": user_id,
+            "m": mandate_id,
             "t": now,
         },
     )
@@ -82,7 +94,8 @@ def authenticate(request: Request) -> Principal:
     with rt.engine.connect() as conn:
         row = conn.execute(
             text(
-                "SELECT k.id, k.org_id, k.scopes, k.user_id, u.role, k.revoked_at, k.expires_at "
+                "SELECT k.id, k.org_id, k.scopes, k.user_id, u.role, k.revoked_at, k.expires_at, "
+                "k.mandate_id "
                 "FROM api_keys k JOIN users u ON u.org_id = k.org_id AND u.id = k.user_id "
                 "WHERE k.hash = :h"
             ).execution_options(cross_org="api key lookup: the key names the organisation"),
@@ -90,7 +103,7 @@ def authenticate(request: Request) -> Principal:
         ).one_or_none()
     if row is None or row.revoked_at is not None or (row.expires_at is not None and row.expires_at <= now):
         raise AuthError(401, "authentication", "invalid_api_key", "The API key is not valid.")
-    return Principal(row.org_id, row.id, row.user_id, row.role, frozenset(row.scopes))
+    return Principal(row.org_id, row.id, row.user_id, row.role, frozenset(row.scopes), row.mandate_id)
 
 
 def require(principal: Principal, scope: str) -> None:

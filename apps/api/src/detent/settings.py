@@ -56,6 +56,10 @@ class Settings(BaseSettings):
     model_light: str = "claude-haiku-5-5"
     model_eval_judge: str = "claude-opus-5-5"
     ai_daily_token_budget: int = 2_000_000
+    # "auto" uses the Claude API when ANTHROPIC_API_KEY is set, otherwise the recorded stand-in responses
+    # in fixtures/agent-recordings (offline demos and tests; the console says which one answered).
+    agent_llm: Literal["auto", "anthropic", "recorded"] = "auto"
+    agent_api_key: SecretStr | None = None  # the instruction agent's own sk_test_ key, bound to its mandate
 
     rails_config: Path = REPO_ROOT / "fixtures" / "rails.yaml"
     allowed_chain_ids: Annotated[frozenset[int], NoDecode] = TESTNET_CHAIN_IDS

@@ -69,7 +69,7 @@ INT-01:
   0: ["integration/test_intents_api.py::test_harbor_executes", "integration/test_intents_api.py::test_bluefin_18500_escalates_first_payment_and_auto_limit"]
   2: ["integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing", "integration/test_intents_api.py::test_idempotency_key_is_required"]
   3: ["integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing", "integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused",
-      "integration/test_intents_api.py::test_agent_intent_never_executes_before_mandate_checks_exist"]
+      "integration/test_intents_api.py::test_agent_intent_without_a_mandate_key_fails_closed"]
 INT-02:
   0: ["integration/test_intents_api.py::test_same_key_same_body_returns_the_original"]
   1: ["integration/test_intents_api.py::test_same_key_different_body_conflicts"]
@@ -219,3 +219,45 @@ RAL-07:
   3: ["chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id"]
 CON-08:
   0: ["integration/test_console_rails.py::test_rails_screen"]
+DEM-02:
+  0: ["integration/test_instruction_agent.py::test_each_fixture_gives_its_expected_fields_and_flags"]
+MND-01:
+  0: ["integration/test_mandates.py::test_signature_covers_canonical_json_without_the_signature"]
+  1: ["integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason", "integration/test_mandates.py::test_keys_bound_to_a_mandate_can_only_propose_under_it"]
+  2: ["integration/test_mandates.py::test_format_keeps_ap2_style_fields"]
+MND-02:
+  0: ["integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason", "integration/test_mandates.py::test_an_unreadable_stored_signature_is_invalid_not_a_crash"]
+  1: ["integration/test_mandates.py::test_cumulative_total_is_atomic_under_parallel_intents"]
+  2: ["integration/test_mandates.py::test_revocation_blocks_an_approved_intent_before_sending"]
+MND-03:
+  0: ["integration/test_mandates.py::test_revoke_by_api_and_console"]
+  1: ["integration/test_mandates.py::test_revocation_blocks_an_approved_intent_before_sending"]
+AGT-01:
+  0: ["integration/test_instruction_agent.py::test_canonical_invoice_highlights_its_sources_and_is_stable"]
+  1: ["unit/test_anthropic_llm.py::test_request_shape_and_tool_loop", "unit/test_agent_boundaries.py::test_models_come_from_settings"]
+  2: ["integration/test_instruction_agent.py::test_invalid_output_is_retried_once_then_needs_human"]
+AGT-02:
+  0: ["integration/test_instruction_agent.py::test_each_fixture_gives_its_expected_fields_and_flags"]
+  1: ["integration/test_agent_submit.py::test_flagged_proposal_cannot_be_submitted_until_each_flag_is_resolved",
+      "integration/test_agent_submit.py::test_console_flagged_invoice_shows_flags_and_blocks_submit"]
+  2: ["integration/test_instruction_agent.py::test_values_not_in_the_document_are_nulled_and_flagged",
+      "integration/test_instruction_agent.py::test_a_followed_injection_is_undone_by_the_code_checks"]
+AGT-03:
+  0: ["unit/test_agent_boundaries.py::test_agent_tools_are_read_only_except_propose", "integration/test_agent_submit.py::test_clean_proposal_submits_as_agent_and_escalates"]
+  1: ["unit/test_agent_boundaries.py::test_agents_never_reach_execution_approval_or_rails_even_indirectly"]
+  2: ["integration/test_agent_submit.py::test_agent_key_cannot_call_other_write_endpoints"]
+AGT-04:
+  0: ["integration/test_instruction_agent.py::test_untrusted_text_only_inside_delimited_data_blocks",
+      "integration/test_instruction_agent.py::test_document_cannot_close_the_data_block_early"]
+  1: ["unit/test_policy_engine.py::test_checks_never_see_free_text"]
+  2: ["integration/test_instruction_agent.py::test_each_fixture_gives_its_expected_fields_and_flags",
+      "integration/test_agent_submit.py::test_injected_invoice_submits_only_what_the_document_says"]
+AGT-05:
+  0: ["integration/test_instruction_agent.py::test_every_call_is_recorded_and_replay_never_calls_the_model"]
+  1: ["integration/test_instruction_agent.py::test_every_call_is_recorded_and_replay_never_calls_the_model"]
+AGT-06:
+  0: ["unit/test_agent_boundaries.py::test_models_come_from_settings"]
+  1: ["unit/test_agent_boundaries.py::test_only_llm_module_imports_the_model_sdk"]
+  2: ["integration/test_instruction_agent.py::test_over_budget_returns_needs_human_without_calling_the_model"]
+CON-05:
+  1: ["integration/test_agent_submit.py::test_console_invoice_drop_and_submit"]

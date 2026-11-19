@@ -90,6 +90,7 @@ def seed_demo(rt: Runtime, fixture: Path = FIXTURE) -> dict[str, int]:
         )
         seed_registry(conn, rt.clock, org_id, fixture)
         seed_rails(conn, org_id, rt.settings)
+        _seed_agent(conn, rt, org_id)
         has_policy = conn.execute(
             text("SELECT 1 FROM policy_versions WHERE org_id=:o AND status='active'"), {"o": org_id}
         ).first()
@@ -107,3 +108,44 @@ def seed_demo(rt: Runtime, fixture: Path = FIXTURE) -> dict[str, int]:
                 payload={"orgs_added": orgs_added, "users_added": users_added},
             )
     return {"orgs_added": orgs_added, "users_added": users_added}
+
+
+def _seed_agent(conn: Connection, rt: Runtime, org_id: str) -> None:
+    """The demo accounts-payable agent: its signed mandate and its own key (S5). Needs the mandate signing
+    key and, for the key, the API pepper and AGENT_API_KEY; without them the agent is simply not set up."""
+    from detent.api.auth import issue_key
+    from detent.mandates.store import fixture_mandate, issue_mandate
+
+    s = rt.settings
+    if s.mandate_signing_key_demo is None:
+        return
+    exists = conn.execute(
+        text("SELECT 1 FROM mandates WHERE org_id=:o AND id='mnd_demo_ap_agent'"), {"o": org_id}
+    ).first()
+    if exists is None:
+        issue_mandate(
+            conn,
+            rt.clock,
+            org_id,
+            fixture_mandate(rt.clock, org_id),
+            s.mandate_signing_key_demo,
+            actor=Actor.system("seed"),
+        )
+    if s.agent_api_key is not None and s.api_key_pepper is not None:
+        from detent.api.auth import hash_key
+
+        h = hash_key(s.agent_api_key.get_secret_value(), s.api_key_pepper.get_secret_value())
+        known = conn.execute(
+            text("SELECT 1 FROM api_keys WHERE org_id=:o AND hash=:h"), {"o": org_id, "h": h}
+        ).first()
+        if known is None:
+            issue_key(
+                conn,
+                rt.clock,
+                org_id,
+                "usr_pl",
+                ["intents:create"],
+                s.api_key_pepper.get_secret_value(),
+                mandate_id="mnd_demo_ap_agent",
+                key=s.agent_api_key.get_secret_value(),
+            )

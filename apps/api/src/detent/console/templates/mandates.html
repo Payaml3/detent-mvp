@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Mandates{% endblock %}
+{% block main %}
+<h1>Mandates</h1>
+<p class="lead">A mandate is the signed scope an AI agent may propose payments within: payees, per-payment and total limits, networks and dates. The agent proposes; your rules decide. Revoking a mandate blocks every intent under it that has not been submitted yet.</p>
+{% for m in mandates %}
+<section class="card">
+  <h2><span class="mono">{{ m.mandate_id }}</span> · {{ m.agent_id }} {% if m.revoked_at %}<span class="late">revoked {{ m.revoked_at[:16] }}</span>{% endif %}</h2>
+  <dl class="facts">
+    <dt>Payees</dt><dd class="mono">{{ m.scope.payees|join(', ') }}</dd>
+    <dt>Per payment</dt><dd>{{ m.scope.max_per_payment.amount }} {{ m.scope.max_per_payment.currency }}</dd>
+    <dt>Total</dt><dd>{{ m.used }} used of {{ m.max_total }}</dd>
+    <dt>Networks</dt><dd>{{ m.scope.networks|join(', ') }}</dd>
+    <dt>Purpose</dt><dd>{{ m.scope.purpose }}</dd>
+    <dt>Valid</dt><dd>{{ m.valid_from[:16] }} to {{ m.expires_at[:16] }} UTC</dd>
+  </dl>
+  {% if can_revoke and not m.revoked_at %}
+  <form method="post" action="/console/mandates/{{ m.mandate_id }}/revoke"><button class="danger">Revoke mandate</button></form>
+  {% endif %}
+</section>
+{% else %}<p class="muted">No mandates.</p>{% endfor %}
+{% endblock %}

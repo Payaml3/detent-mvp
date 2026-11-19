@@ -65,6 +65,8 @@ Wrap all calls in `LLMClient` so that a second provider can be added (B6 depende
 - `POSSIBLE_INJECTION`
 - `UNREADABLE`
 
+**As built (S5).** Four more flag codes come from code, not the model: `NOT_IN_DOCUMENT` (a value the post-check could not find), `INVALID_OUTPUT` (two answers that failed the schema), `BUDGET_EXCEEDED` and `MODEL_UNAVAILABLE` (both mean `needs_human`). The post-check also verifies the amount against the invoice's own line items, total and payment line; takes the wallet only from a wallet line; flags instruction-like text as `POSSIBLE_INJECTION`; matches the payee from the registry by name; and checks the mandate's scope. The agent's key is bound to its mandate (`api_keys.mandate_id`): it can only create agent intents under that mandate. Offline, the agent answers from `fixtures/agent-recordings` (hand-written stand-ins, labelled in the console as not a live model call); `detent agent record` replaces them with real recordings.
+
 **Never guess.** If a value is not in the document, set `value: null` and add a flag. A post-check in code verifies that every non-null value appears in the document at `source_span`, except `counterparty_id`, which is matched from the registry. If the post-check fails, the value is nulled and flagged.
 
 ## Investigation agent (EXC-03)

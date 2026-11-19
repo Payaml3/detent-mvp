@@ -84,9 +84,12 @@ def mandate_scope(f: Facts, r: RuleSet) -> CheckResult:
         return _unavailable(n, f.mandate)
     if not f.mandate.valid:
         return CheckResult(
-            n, "BLOCK", f.mandate.reason or "MANDATE_SIGNATURE_INVALID", {"mandate_id": f.mandate.id}
+            n,
+            "BLOCK",
+            f.mandate.reason or "MANDATE_SIGNATURE_INVALID",
+            f.mandate.evidence or {"mandate_id": f.mandate.id},
         )
-    return _pass(n, mandate_id=f.mandate.id)
+    return CheckResult(n, "PASS", evidence=f.mandate.evidence or {"mandate_id": f.mandate.id})
 
 
 def kyb_status(f: Facts, r: RuleSet) -> CheckResult:

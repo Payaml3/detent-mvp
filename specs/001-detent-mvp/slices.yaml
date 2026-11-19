@@ -53,7 +53,8 @@ slices:
   stories: [EXE-05, EXE-06, EXE-07, EXE-08, RAL-03, RAL-04, RAL-05, RAL-06, RAL-07, CON-08]
 
 - id: S5
-  name: "An AI agent proposes the $18,500 invoice inside a mandate"
+  name: "An AI agent proposes the $18,500 invoice inside a mandate (done)"
+  status: done
   goal: "Demo minutes 1 to 6 end to end: invoice in, agent proposal, escalation, approval, send."
   exit: >-
     Dropping the canonical invoice gives the expected proposal with source highlights and no flags (10 of 10 runs with

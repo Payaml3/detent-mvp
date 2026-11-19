@@ -68,7 +68,7 @@ original documents would let me check every Proposed item below against them.
 | G-09 | Who may click Send in Assist mode, and may the initiator click it | spec/02 Assist mode; spec/03 `/send` scope `exceptions:approve` | Same roles as exception approval (G-06); not the initiator | **Proposed** |
 | G-10 | User payouts: destinations of end users and their verification status | spec/04 user payout profile; demo batch p07 to p20 | Seed one destination per user account; the platform supplies a typed `user_verified` flag; false → ESCALATE. **Note:** `user_verified` was added to spec/04 after your approval of the user-payout profile, so that detail is still Proposed | **Proposed** |
 | G-11 | Deposit amount tolerance | LED-05 AC1; spec/04 deposit checks | Exact match by default; per-organisation tolerance setting, default 0 | **Proposed** |
-| G-12 | Mandate `max_total` period | spec/05 mandate scope | The mandate's whole validity window; counts confirmed plus in-flight; released on FAILED_FINAL, CANCELLED, BLOCKED, REJECTED | **Proposed** |
+| G-12 | Mandate `max_total` period | spec/05 mandate scope | The mandate's whole validity window; counts confirmed plus in-flight; released on FAILED_FINAL, CANCELLED, BLOCKED, REJECTED | **Confirmed** 2026-11-19 (founder, D-29) |
 | G-13 | Above-norm with history in another currency | POL-05; counterparties fixture (Harbor median in EUR) | Compare only with confirmed payments in the same currency; otherwise "not evaluated" | **Confirmed** 2026-11-18 (founder, D-23) |
 | G-14 | Daily cap day boundary | spec/04 `daily_caps` | UTC calendar day | **Confirmed** 2026-11-18 (founder, D-23) |
 | G-15 | After the kill switch is released, do held payments resume automatically | spec/02 HELD → READY; EXE-08 | Automatically: each held payment re-runs the policy (audited); EXECUTE resumes, anything else stays held or escalates | **Confirmed** 2026-11-19 (founder, D-28) |
@@ -81,6 +81,7 @@ original documents would let me check every Proposed item below against them.
 | G-22 | The investigation agent's possible recommendations | spec/05 example shows only `approve` | approve, reject, needs_info; the recommendation never changes the decision | **Proposed** |
 | G-23 | Who may edit a counterparty's payout details in the console | INT-04 AC3 ("editable in the console"); no role named | Payments lead only (the narrowest choice; the change is audited and the next payment escalates CHANGED_DETAILS). Built this way in S1 | **Proposed** |
 | G-24 | Which user owns a case when several users have the owner role | EXC-01 "owner assignment rules"; spec/04 `owners` names a role, not a person | The user in that role with the fewest open cases; ties go to the earliest-created user | **Confirmed** 2026-11-18 (founder, D-27) |
+| G-25 | Who may resolve an agent proposal's flags before it is submitted | AGT-02 "until a human resolves each flag"; no role named | The same roles that approve exceptions (G-06): reviewer, backup owner, payments lead; the resolution needs a note and is audited. Built this way in S5 | **Proposed** |
 
 ## Assumptions (A)
 
@@ -127,6 +128,7 @@ original documents would let me check every Proposed item below against them.
 | D-26 | User payouts (`user_account_ref`) are deferred until G-10 is decided; the API returns 422 `user_payouts_unavailable` until then | 2026-11-18 | Founder answer before S1 |
 | D-27 | Approved for S3: G-06 (reviewer, backup owner and payments lead approve or reject; never the initiator), C-07 (tier = deadline class from the rule set; owners by case type, no amount bands), G-24 (owner = fewest open cases in the role) | 2026-11-18 | Founder answers before S3 |
 | D-28 | G-15 approved: when the payments lead releases the kill switch, every payment it held re-runs the policy (audited); EXECUTE resumes sending, anything else stays held or goes to the exceptions queue | 2026-11-19 | Founder answer before S4 |
+| D-29 | G-12 approved: a mandate's `max_total` counts over the mandate's whole validity window; confirmed plus in-flight payments count, released on BLOCKED, REJECTED, CANCELLED or FAILED_FINAL | 2026-11-19 | Founder answer before S5 |
 
 ### Technical decisions already implemented in M0 (no business rule involved)
 
