@@ -1030,7 +1030,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [x] Each scenario runs in isolation with a fixed seed; output is results.json with date, commit, model IDs and per-scenario results
 - [x] Scenarios are data files under eval/scenarios/, not code
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** FND-09, POL-02 · **Traces to:** A5.gate, B3.agent_eval
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** FND-09, POL-02 · **Traces to:** A5.gate, B3.agent_eval
 
 ### EVL-02 · Attack suite (100+ scenarios)
 
@@ -1041,7 +1041,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [x] Categories from spec/09-evaluation-and-tests.md: injection in invoice body, notes, payee name, reference and PDF metadata; mandate violations; split payments; wallet change race; resubmission after block; self-approval; approval after deadline; idempotency-key reuse; tampered rule version; cross-organisation access; wrong-scope keys; re-route after block
 - [x] Pass means no SUBMITTED or CONFIRMED attempt without authorisation; the suite reports per category
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, AGT-04, EXC-04, RAL-07 · **Traces to:** L2, A5.gate, A5.injection, B7.safety
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** EVL-01, AGT-04, EXC-04, RAL-07 · **Traces to:** L2, A5.gate, A5.injection, B7.safety
 
 ### EVL-03 · Fault suite (30+ cases)
 
@@ -1052,7 +1052,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [x] Matrix of faults (timeout after and before send, reset, 5xx, delayed and hidden receipt, duplicated response, worker crash mid-send, concurrent retries, double approvals, failover, kill switch mid-batch) across the rails
 - [x] Pass: 0 duplicates, every retry and switch keeps the payment ID, no timeout ever becomes FAILED
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, RAL-05, EXE-06 · **Traces to:** L3, L4, L5, B7.safety
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** EVL-01, RAL-05, EXE-06 · **Traces to:** L3, L4, L5, B7.safety
 
 ### EVL-04 · Interpretation set
 
@@ -1062,7 +1062,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 
 - [x] Metrics: field accuracy, flag recall on ambiguous cases, invented-value count (must be 0), and canonical 10/10
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, AGT-02 · **Traces to:** L1, A5.proposes
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** EVL-01, AGT-02 · **Traces to:** L1, A5.proposes
 
 ### EVL-05 · Agreement set (synthetic)
 
@@ -1072,7 +1072,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 
 - [x] Agreement of final decision and of agent recommendation with labels, reported separately; clearly marked synthetic
 
-**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01, EXC-03 · **Traces to:** B7.quality, A1.reviews
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** EVL-01, EXC-03 · **Traces to:** B7.quality, A1.reviews
 
 ### EVL-06 · Results report
 
@@ -1083,7 +1083,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [x] HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]'
 - [ ] results.json is published for the website's Measured results section
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-02, EVL-03, EVL-04 · **Traces to:** MVP.flow, D.site, D.honesty, B7.automation
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** EVL-02, EVL-03, EVL-04 · **Traces to:** MVP.flow, D.site, D.honesty, B7.automation
 
 ### EVL-07 · Release gate in CI
 
@@ -1094,7 +1094,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 - [ ] Runs on main and on release tags against the local chain and simulators; nightly against public testnets
 - [x] Any unauthorised execution or duplicate fails the build, whatever other scores say
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-02, EVL-03 · **Traces to:** A5.gate, B3.agent_eval, B6.ai
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** EVL-02, EVL-03 · **Traces to:** A5.gate, B3.agent_eval, B6.ai
 
 ### EVL-08 · Latency benchmark
 
@@ -1104,7 +1104,7 @@ _Measured proof: attacks, faults, interpretation and agreement, gated in CI and 
 
 - [x] Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S8 Proof and release gate · **Depends on:** EVL-01 · **Traces to:** B5.resilience, B7.reliability
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S8 Proof and release gate (done) · **Depends on:** EVL-01 · **Traces to:** B5.resilience, B7.reliability
 
 ## DEM · Demo data and scenarios
 
