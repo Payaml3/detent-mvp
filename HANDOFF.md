@@ -37,6 +37,12 @@ uv sync && make migrate seed
 
 Then `make lint typecheck test` (about 3 minutes; chain tests need Foundry, which is installed).
 
+## Session names
+
+Name each session `Detent · <slice> <slice name>`, for example `Detent · S8 Proof and release gate`, and
+tag it `detent` and `slice:<id>`. When a slice is done, rename its session to end in `(done)`.
+The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
+
 ## How we work (unchanged)
 
 - Read the slice and its stories: `specs/001-detent-mvp/slices.yaml`, `backlog/user-stories.md`.
