@@ -315,3 +315,28 @@ AUD-02:
   2: ["integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision"]
 CON-07:
   0: ["integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix"]
+EVL-01:
+  0: ["ci:.github/workflows/ci.yml 'release gate (detent eval)' job writes eval/out/results.json (date, commit, models, per-scenario results, seed = CRC-32 of the scenario ID)",
+      "unit/test_eval_gate.py::test_a_clean_run_passes"]
+  1: ["manual:eval/scenarios/attacks/*.yaml and eval/scenarios/faults/*.yaml are YAML data; the step vocabulary is eval/src/detent_eval/steps.py"]
+EVL-02:
+  0: ["ci:detent eval run --suite attacks: 120 scenarios in 11 categories (eval/scenarios/attacks/)"]
+  1: ["ci:eval/src/detent_eval/checks.py safety() reads the audit log, attempts, chain Transfer logs and banksim payments",
+      "unit/test_eval_gate.py::test_one_unsafe_outcome_fails_the_gate"]
+EVL-03:
+  0: ["ci:detent eval run --suite faults: 52 scenarios on local-evm, base-sepolia, banksim-fps, banksim-sepa-inst (eval/scenarios/faults/)",
+      "integration/test_eval_findings.py::test_a_send_interrupted_before_the_broadcast_was_recorded_becomes_unknown"]
+  1: ["ci:eval/src/detent_eval/checks.py counts duplicates from the rails' own records, ID changes, timeouts turned FAILED",
+      "unit/test_eval_gate.py::test_one_unsafe_outcome_fails_the_gate"]
+EVL-04:
+  0: ["ci:detent eval run --suite interpretation (30 invoices, canonical 10 runs; fixtures/invoices/)",
+      "unit/test_eval_gate.py::test_interpretation_needs_zero_invented_values_and_the_canonical_ten_of_ten"]
+EVL-05:
+  0: ["ci:detent eval run --suite agreement (eval/data/agreement-set.yaml, marked synthetic in the data, the results and the report)"]
+EVL-06:
+  0: ["ci:eval/out/report.html and report.md uploaded as the 'eval-report-<sha>' build artifact (eval/templates/)"]
+EVL-07:
+  1: ["unit/test_eval_gate.py::test_one_unsafe_outcome_fails_the_gate", "unit/test_eval_gate.py::test_a_failed_scenario_or_a_missing_suite_fails_the_gate",
+      "ci:a deliberately injected regression failed the 'release gate (detent eval)' job (see HANDOFF.md, S8)"]
+EVL-08:
+  0: ["ci:detent eval run --suite latency (rules-only and agent-path p50/p95 in results.json and the report)"]

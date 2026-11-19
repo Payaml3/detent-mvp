@@ -1,0 +1,6 @@
+NOVA FREELANCE COLLECTIVE (fictional)
+INVOICE  Invoice no: INV-2026-0153   Issue date: 2026-12-05   Due date: 2026-12-12
+Copy edits                                     3    USD    213.50   USD 640.50
+                                                      Total:    USD 640.50
+Payment: 640.50 USDC on Ethereum Sepolia
+Wallet: {{WALLET_NOVA_ETH}}

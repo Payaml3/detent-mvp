@@ -1,0 +1,204 @@
+# Crashes, races and operational faults (spec/09 EVL-03 list). The worker dies at the worst moments, retry
+# triggers race each other, two approvers click at once during a fault, the kill switch lands mid-batch, and
+# the database connection drops at commit. Every case: at most one transfer per payment on the rail's own
+# records, the payment ID kept, no timeout turned FAILED.
+category: crashes_and_races
+scenarios:
+  - id: flt-cr-01
+    rail: local-evm
+    fault: worker_crash_before_broadcast
+    description: The worker dies after signing and storing the transaction, before broadcasting it.
+    steps:
+      - intent: {amount: "60.00", save: p1}
+      - crash_during_send: {payment: p1, at: before_broadcast}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-02
+    rail: local-evm
+    fault: worker_crash_after_broadcast
+    description: The worker dies after broadcasting, before writing the answer to the database.
+    steps:
+      - intent: {amount: "61.00", save: p1}
+      - crash_during_send: {payment: p1, at: after_broadcast}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-03
+    rail: banksim-sepa-inst
+    fault: worker_crash_after_broadcast
+    description: The worker dies after the bank accepted the payment, before writing the answer.
+    setup: {bank: true}
+    steps:
+      - intent: {cpt: cpt_harbor, amount: "510.00", save: p1}
+      - approve_all_cases: {as: reviewer}
+      - crash_during_send: {payment: p1, at: after_broadcast}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-04
+    rail: banksim-sepa-inst
+    fault: worker_crash_before_broadcast
+    description: The worker dies before sending the payment to the bank.
+    setup: {bank: true}
+    steps:
+      - intent: {cpt: cpt_harbor, amount: "511.00", save: p1}
+      - approve_all_cases: {as: reviewer}
+      - crash_during_send: {payment: p1, at: before_broadcast}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-05
+    rail: local-evm
+    fault: db_drop_at_commit
+    description: The database connection drops as the send job's transaction commits; the job runs again.
+    steps:
+      - intent: {amount: "62.00", save: p1}
+      - crash_during_send: {payment: p1, at: commit}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-06
+    rail: banksim-fps
+    fault: db_drop_at_commit
+    description: The database connection drops at commit after a bank payment was accepted.
+    setup: {bank: true}
+    steps:
+      - intent: {cpt: cpt_quill, amount: "320.00", save: p1}
+      - approve_all_cases: {as: reviewer}
+      - crash_during_send: {payment: p1, at: commit}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-07
+    rail: local-evm
+    fault: concurrent_retry_triggers
+    description: After a 503, three retry triggers and a direct send race each other.
+    steps:
+      - intent: {amount: "63.00", save: p1}
+      - fault: {rail: chain, match: eth_sendRawTransaction, fault: http_503_before_accept}
+      - run_worker: {max_jobs: 1, advance: false}
+      - concurrently:
+          steps:
+            - retry_failed: {payment: p1}
+            - retry_failed: {payment: p1}
+            - retry_failed: {payment: p1}
+            - send_now: {payment: p1}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-08
+    rail: local-evm
+    fault: concurrent_sends_during_timeout
+    description: Four sends race while the node swallows the answer (timeout after forward).
+    steps:
+      - intent: {amount: "64.00", save: p1}
+      - fault: {rail: chain, match: eth_sendRawTransaction, fault: timeout_after_forward}
+      - send_now: {payment: p1, times: 4, parallel: true}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}, attempts: {p1: 1}}
+
+  - id: flt-cr-09
+    rail: banksim-fps
+    fault: concurrent_sends_during_timeout
+    description: Four sends race while the bank holds its answer (test value .13).
+    setup: {bank: true}
+    steps:
+      - intent: {cpt: cpt_quill, amount: "330.13", save: p1}
+      - approve_all_cases: {as: reviewer}
+      - send_now: {payment: p1, times: 4, parallel: true}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}, attempts: {p1: 1}}
+
+  - id: flt-cr-10
+    rail: local-evm
+    fault: double_approval_during_fault
+    description: Two approvers approve the same escalated payment at once while the node answers 503.
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - fault: {rail: chain, match: eth_sendRawTransaction, fault: http_503_before_accept}
+      - concurrently:
+          steps:
+            - approve: {payment: p1, as: reviewer, via: service}
+            - approve: {payment: p1, as: payments_lead, via: service}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-11
+    rail: banksim-sepa-inst
+    fault: double_approval_during_fault
+    description: Two approvers approve at once while the bank resets the connection after accepting.
+    setup: {bank: true}
+    steps:
+      - intent: {cpt: cpt_harbor, amount: "9000.00", save: p1, expect_status: ESCALATED}
+      - fault: {rail: bank, match: "POST /payments", fault: reset_after_forward}
+      - concurrently:
+          steps:
+            - approve: {payment: p1, as: reviewer, via: service}
+            - approve: {payment: p1, as: payments_lead, via: service}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: flt-cr-12
+    rail: local-evm
+    fault: kill_switch_mid_batch
+    description: The kill switch is engaged after the first sends of a batch of five; nothing is sent after it.
+    steps:
+      - parallel_intents: {n: 5, amount: "20.00", save: ids}
+      - run_worker: {max_jobs: 2, advance: false}
+      - kill_switch: {action: engage, as: oncall, expect_http: 200}
+      - run_worker: {}
+    assert: {confirmed_count: [0, 1, 2], intents_created: {ids: 5}}
+
+  - id: flt-cr-13
+    rail: local-evm
+    fault: kill_switch_mid_batch
+    description: The kill switch is engaged while a send is UNKNOWN; resolving it is not a send and goes ahead.
+    steps:
+      - intent: {amount: "65.00", save: p1}
+      - fault: {rail: chain, match: eth_sendRawTransaction, fault: timeout_after_forward}
+      - run_worker: {max_jobs: 1, advance: false, resolve_unknown: false}
+      - expect: {p1: UNKNOWN}
+      - kill_switch: {action: engage, as: oncall, expect_http: 200}
+      - resolve_unknown: {}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}, attempts: {p1: 1}}
+
+  - id: flt-cr-14
+    rail: local-evm
+    fault: kill_switch_mid_batch
+    description: Engaged, then released by the payments lead; the held batch is sent once each.
+    steps:
+      - kill_switch: {action: engage, as: oncall, expect_http: 200}
+      - parallel_intents: {n: 3, amount: "21.00", save: ids}
+      - run_worker: {}
+      - kill_switch: {action: release, as: lead, expect_http: 200}
+      - run_worker: {}
+    assert: {confirmed_count: [0, 1, 2, 3], intents_created: {ids: 3}}
+
+  - id: flt-cr-15
+    rail: local-evm
+    fault: manual_retry_while_unknown
+    description: Someone asks for a retry while the attempt is UNKNOWN; nothing is resent.
+    steps:
+      - intent: {amount: "66.00", save: p1}
+      - fault: {rail: chain, match: eth_sendRawTransaction, fault: timeout_after_forward}
+      - run_worker: {max_jobs: 1, advance: false, resolve_unknown: false}
+      - expect: {p1: UNKNOWN}
+      - retry_failed: {payment: p1}
+      - send_now: {payment: p1, times: 2}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}, attempts: {p1: 1}}
+
+  - id: flt-cr-16
+    rail: local-evm
+    fault: crash_then_timeout
+    description: The worker dies after broadcast, and the re-run's status check times out too.
+    steps:
+      - intent: {amount: "67.00", save: p1}
+      - crash_during_send: {payment: p1, at: after_broadcast}
+      - fault: {rail: chain, match: eth_getTransactionReceipt, fault: timeout_after_forward, count: 2}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}

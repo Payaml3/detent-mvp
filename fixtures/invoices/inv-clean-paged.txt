@@ -1,0 +1,9 @@
+BLUEFIN COMPONENTS LTD (fictional)            Page 1 of 2
+INVOICE  Invoice no: INV-2026-0156   Issue date: 2026-12-07   Due date: 2026-12-23
+Sensor modules                                10    USD    300.00   USD 3,000.00
+                                                      Total:    USD 3,000.00
+(continued)
+BLUEFIN COMPONENTS LTD (fictional)            Page 2 of 2
+Payment: 3,000.00 USDC
+Network: Base Sepolia
+Wallet: {{WALLET_BLUEFIN_BASE}}

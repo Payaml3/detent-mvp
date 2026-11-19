@@ -1,0 +1,64 @@
+# Idempotency abuse (spec/09: at least 6). One key means one intent and one payment ID (spec/03).
+category: idempotency_abuse
+scenarios:
+  - id: atk-id-01
+    description: The same key with a different body is refused (409); one intent, one transfer.
+    steps:
+      - intent: {idem: k1, amount: "40.00", save: p1, expect_status: READY}
+      - intent: {idem: k1, amount: "4000.00", expect_http: 409}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}, confirmed_count: 1}
+
+  - id: atk-id-02
+    description: The same key and body twice returns the same payment; one transfer.
+    steps:
+      - intent: {idem: k1, amount: "40.00", save: p1}
+      - intent: {idem: k1, amount: "40.00", save: p2}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}, confirmed_count: 1}
+
+  - id: atk-id-03
+    description: Ten parallel requests with one key create one payment and one transfer.
+    steps:
+      - parallel_intents: {n: 10, same_idem: true, idem: burst-1, amount: "41.00", save: ids}
+      - run_worker: {}
+    assert: {intents_created: {ids: 1}, confirmed_count: 1}
+
+  - id: atk-id-04
+    description: Another organisation reuses the key; it gets its own intent, never this one.
+    setup: {second_org: true}
+    steps:
+      - intent: {idem: shared-key, amount: "42.00", save: p1}
+      - request: {method: GET, path: "/v1/payment_intents/$p1", key: "other:lead", other_org: true, expect_http: 404}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, confirmed_count: 1}
+
+  - id: atk-id-05
+    description: A blocked payment's key is replayed; the same blocked answer comes back, nothing new.
+    steps:
+      - intent: {idem: kb, amount: "100001.00", save: p1, expect_status: BLOCKED}
+      - intent: {idem: kb, amount: "100001.00", save: p2, expect_status: BLOCKED}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}, confirmed_count: 0}
+
+  - id: atk-id-06
+    description: The key of a decide-only call is replayed against payment_intents.
+    steps:
+      - decision: {idem: kd, amount: "43.00", save: d1}
+      - intent: {idem: kd, amount: "43.00", save: p1, expect_http: [201, 200, 409]}
+      - run_worker: {}
+    assert: {confirmed_count: [0, 1]}
+
+  - id: atk-id-07
+    description: Replay with a tiny amount change under the same key (409, the first stands).
+    steps:
+      - intent: {idem: k7, amount: "44.00", save: p1}
+      - intent: {idem: k7, amount: "44.01", expect_http: 409}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: atk-id-08
+    description: A request without an Idempotency-Key is refused.
+    steps:
+      - intent: {idem: null, amount: "45.00", expect_http: 422}
+    assert: {confirmed_count: 0}

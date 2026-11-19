@@ -1,0 +1,7 @@
+NOVA FREELANCE COLLECTIVE (fictional)
+INVOICE  Invoice no: INV-2026-0152   Issue date: 2026-12-05   Due date: 2026-12-20
+Design sprint (fixed fee)                      1    USD  1,200.00   USD 1,200.00
+                                                      Total:    USD 1,200.00
+Payment: 1,200.00 USDC
+Network: Ethereum Sepolia
+Wallet: {{WALLET_NOVA_ETH}}

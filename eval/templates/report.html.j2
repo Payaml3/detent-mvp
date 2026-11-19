@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ r.brand }} evaluation results, {{ r.date }}</title>
+<style>
+:root { --bg: #fbfbf9; --fg: #1b1c1e; --muted: #5d6066; --line: #dedfe2; --ok: #1f7a4a; --bad: #b3261e; --card: #fff; }
+@media (prefers-color-scheme: dark) { :root { --bg: #141518; --fg: #e8e8ea; --muted: #a2a5ab; --line: #2d2f34; --ok: #5fc58e; --bad: #f28b82; --card: #1c1d21; } }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; }
+main { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
+h1 { font-size: 26px; margin: 0 0 4px; } h2 { font-size: 19px; margin: 36px 0 8px; }
+.caveat { border: 1px solid var(--line); background: var(--card); padding: 10px 14px; border-radius: 8px; font-weight: 600; }
+.gate { display: inline-block; padding: 2px 10px; border-radius: 99px; font-weight: 700; color: #fff; }
+.gate.pass { background: var(--ok); } .gate.fail { background: var(--bad); }
+.meta { color: var(--muted); font-size: 13px; } .meta code { font-size: 12px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 16px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.tile b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; } .tile span { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--card); }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.bad { color: var(--bad); font-weight: 600; } .ok { color: var(--ok); }
+details { margin-top: 10px; } summary { cursor: pointer; color: var(--muted); }
+p.note { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+<h1>{{ r.brand }} evaluation results, {{ r.date }}</h1>
+<p class="caveat">{{ r.caveat }}</p>
+<p>Release gate: <span class="gate {{ 'pass' if gate.passed else 'fail' }}">{{ "PASSED" if gate.passed else "FAILED" }}</span></p>
+{% if gate.reasons %}<ul>{% for reason in gate.reasons %}<li class="bad">{{ reason }}</li>{% endfor %}</ul>{% endif %}
+<p class="meta">Commit <code>{{ r.commit }}</code> · generated {{ r.generated_at }}<br>
+Networks: {{ r.networks }}<br>
+Agent answers: {{ r.agent_answers }}<br>
+Models (from settings; not called when agent answers are stand-ins): agents <code>{{ r.models.agent }}</code>, light tasks <code>{{ r.models.light }}</code>, judge <code>{{ r.models.judge }}</code><br>
+Seeds: {{ r.seeds }}</p>
+
+<div class="tiles">
+{% for value, caption in headline %}<div class="tile"><b>{{ value }}</b><span>{{ caption }}</span></div>{% endfor %}
+</div>
+
+<h2>Safety summary (all suites)</h2>
+<div class="scroll"><table><tr><th>Check</th><th class="n">Count</th></tr>
+{% for k, v in safety.items() %}<tr><td>{{ k.replace('_', ' ') }}</td><td class="n {{ 'bad' if v else 'ok' }}">{{ v }}</td></tr>{% endfor %}
+</table></div>
+
+{% if att %}
+<h2>Decision layer: attack suite</h2>
+<p>{{ att.count }} scenarios, {{ att.passed }} passed.</p>
+<div class="scroll"><table><tr><th>Category</th><th class="n">Scenarios</th><th class="n">Passed</th><th class="n">Unauthorised executions</th></tr>
+{% for cat, c in att.per_category.items() %}<tr><td>{{ cat.replace('_', ' ') }}</td><td class="n">{{ c.count }}</td><td class="n">{{ c.passed }}</td><td class="n {{ 'bad' if c.unauthorised else '' }}">{{ c.unauthorised }}</td></tr>{% endfor %}
+</table></div>
+<details><summary>Every attack scenario</summary><div class="scroll"><table><tr><th>ID</th><th>Scenario</th><th>Result</th></tr>
+{% for sc in att.scenarios %}<tr><td>{{ sc.id }}</td><td>{{ sc.description }}</td><td class="{{ 'ok' if sc.passed else 'bad' }}">{{ "pass" if sc.passed else ("UNSAFE" if not sc.safe else "fail") }}</td></tr>{% endfor %}
+</table></div></details>
+{% endif %}
+
+{% if flt %}
+<h2>Orchestration layer: fault suite</h2>
+<p>{{ flt.count }} scenarios, {{ flt.passed }} passed. Duplicates are counted from the rails' own records (the chain's transfer logs and the bank simulator's payments), not from Detent's database.</p>
+<div class="scroll"><table><tr><th>Category</th><th class="n">Scenarios</th><th class="n">Passed</th><th class="n">Duplicates</th></tr>
+{% for cat, c in flt.per_category.items() %}<tr><td>{{ cat.replace('_', ' ') }}</td><td class="n">{{ c.count }}</td><td class="n">{{ c.passed }}</td><td class="n {{ 'bad' if c.duplicates else '' }}">{{ c.duplicates }}</td></tr>{% endfor %}
+</table></div>
+<div class="scroll"><table><tr><th>Rail</th><th class="n">Scenarios</th></tr>
+{% for rail, n in flt.per_rail.items() %}<tr><td>{{ rail }}</td><td class="n">{{ n }}</td></tr>{% endfor %}
+</table></div>
+<p class="note">UNKNOWN to resolved (simulated clock): {{ flt.unknown_resolution.count }} attempts, median {{ flt.unknown_resolution.median_seconds }} s, p95 {{ flt.unknown_resolution.p95_seconds }} s.</p>
+<details><summary>Every fault scenario</summary><div class="scroll"><table><tr><th>ID</th><th>Rail</th><th>Fault</th><th>Scenario</th><th>Result</th></tr>
+{% for sc in flt.scenarios %}<tr><td>{{ sc.id }}</td><td>{{ sc.rail or "" }}</td><td>{{ sc.fault or "" }}</td><td>{{ sc.description }}</td><td class="{{ 'ok' if sc.passed else 'bad' }}">{{ "pass" if sc.passed else ("UNSAFE" if not sc.safe else "fail") }}</td></tr>{% endfor %}
+</table></div></details>
+{% endif %}
+
+{% if interp %}
+<h2>Agents: interpretation set</h2>
+<p>{{ interp.count }} labelled invoices. Agent answers: {{ interp.agent_answers }}.</p>
+<div class="scroll"><table><tr><th>Metric</th><th class="n">Result</th></tr>
+<tr><td>Field accuracy</td><td class="n">{{ pct(interp.field_accuracy) }}</td></tr>
+<tr><td>Flag recall</td><td class="n">{{ pct(interp.flag_recall) }}</td></tr>
+<tr><td>Invented values (must be 0)</td><td class="n {{ 'bad' if interp.invented_values else 'ok' }}">{{ interp.invented_values }}</td></tr>
+<tr><td>Canonical invoice</td><td class="n">{{ interp.canonical.correct }}/{{ interp.canonical.runs }} runs</td></tr>
+</table></div>
+<p class="note">With recorded stand-ins these figures show that Detent's own checks hold (a stand-in that invents a value has it removed and flagged); they do not measure a model. The live run asks the model itself.</p>
+{% endif %}
+
+{% if agr %}
+<h2>Agents: agreement set (synthetic)</h2>
+<p>{{ agr.count }} synthetic cases with hand-written labels; not real cases or real expert decisions. Agent answers: {{ agr.agent_answers }}.</p>
+<div class="scroll"><table><tr><th>Measure</th><th class="n">Result</th><th class="n">Cases</th></tr>
+<tr><td>Rules' decision agrees with the label</td><td class="n">{{ pct(agr.decision_agreement) }}</td><td class="n">{{ agr.decision_cases }}</td></tr>
+<tr><td>Investigation agent's recommendation agrees with the label</td><td class="n">{{ pct(agr.recommendation_agreement) }}</td><td class="n">{{ agr.recommendation_cases }}</td></tr>
+</table></div>
+{% endif %}
+
+{% if rec %}
+<h2>Operations layer: reconciliation</h2>
+<p>{{ rec.count }} synthetic items: {{ rec.matched }} matched ({{ rec.match_rate }}), {{ rec.breaks_found }} breaks found.
+Designed breaks found: {% for k, v in rec.designed_breaks_found.items() %}{{ k.replace('_', ' ') }} <span class="{{ 'ok' if v else 'bad' }}">{{ "yes" if v else "NO" }}</span>{{ ", " if not loop.last }}{% endfor %}.</p>
+{% endif %}
+
+{% if lat %}
+<h2>Latency</h2>
+<div class="scroll"><table><tr><th>Path</th><th class="n">Samples</th><th class="n">p50</th><th class="n">p95</th></tr>
+<tr><td>Rules only (decide, no send)</td><td class="n">{{ lat.rules_only_ms.n }}</td><td class="n">{{ lat.rules_only_ms.p50 }} ms</td><td class="n">{{ lat.rules_only_ms.p95 }} ms</td></tr>
+<tr><td>Decision plus agent investigation</td><td class="n">{{ lat.agent_path_ms.n }}</td><td class="n">{{ lat.agent_path_ms.p50 }} ms</td><td class="n">{{ lat.agent_path_ms.p95 }} ms</td></tr>
+</table></div>
+<p class="note">{{ lat.environment }}. Agent answers: {{ lat.agent_answers }}.</p>
+{% endif %}
+
+<p class="caveat">{{ r.caveat }}</p>
+</main>
+</body>
+</html>

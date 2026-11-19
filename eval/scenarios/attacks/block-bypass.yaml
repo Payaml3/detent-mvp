@@ -1,0 +1,94 @@
+# Block bypass (spec/09: at least 10). A BLOCKED payment is terminal (invariant 4): never approved,
+# retried, re-routed or resubmitted, and nothing an attacker does turns it into a transfer.
+category: block_bypass
+scenarios:
+  - id: atk-bb-01
+    description: Approve a blocked payment through the API (screening hit; no case exists).
+    steps:
+      - intent: {cpt: cpt_flagged, amount: "500.00", save: p1, expect_status: BLOCKED}
+      - approve: {payment: p1, as: reviewer, expect_http: [404, 409]}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-bb-02
+    description: Ask the execution layer to retry a blocked payment.
+    steps:
+      - intent: {cpt: cpt_flagged, amount: "500.00", save: p1, expect_status: BLOCKED}
+      - retry_failed: {payment: p1}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-bb-03
+    description: Re-route a blocked payment by creating an attempt on another rail directly.
+    steps:
+      - intent: {cpt: cpt_flagged, amount: "500.00", save: p1, expect_status: BLOCKED}
+      - create_attempt: {payment: p1, rail: eth-sepolia, expect_error: true}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-bb-04
+    description: Resubmit the blocked payment with a new idempotency key and the same body.
+    steps:
+      - intent: {amount: "100001.00", save: p1, expect_status: BLOCKED}
+      - intent: {amount: "100001.00", save: p2, expect_status: [BLOCKED, ESCALATED]}
+      - approve_all_cases: {as: reviewer}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED, p2: BLOCKED}, attempts: {p1: 0, p2: 0}}
+
+  - id: atk-bb-05
+    description: Resubmit just under the hard maximum after a block (tiny amount change) - C-05 escalates it.
+    steps:
+      - intent: {amount: "100001.00", save: p1, expect_status: BLOCKED}
+      - intent: {amount: "99999.99", save: p2, expect_status: ESCALATED, expect_reasons: [RESUBMISSION_AFTER_BLOCK]}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED, p2: ESCALATED}, attempts: {p2: 0}}
+
+  - id: atk-bb-06
+    description: Set a blocked payment to READY straight in the database (the trigger refuses).
+    steps:
+      - intent: {cpt: cpt_flagged, amount: "500.00", save: p1, expect_status: BLOCKED}
+      - tamper: {action: set_status, payment: p1, to: READY}
+      - enqueue_send: {payment: p1}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-bb-07
+    description: Ask transition() to move BLOCKED to READY (refused and audited).
+    steps:
+      - intent: {cpt: cpt_flagged, amount: "500.00", save: p1, expect_status: BLOCKED}
+      - transition: {payment: p1, to: READY, expect_error: true}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}, audit_includes: [payment.transition_refused]}
+
+  - id: atk-bb-08
+    description: Forge a send job for a blocked payment and let the worker run it.
+    steps:
+      - intent: {cpt: cpt_flagged, amount: "500.00", save: p1, expect_status: BLOCKED}
+      - enqueue_send: {payment: p1}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-bb-09
+    description: Call the send path directly on a blocked payment, three times.
+    steps:
+      - intent: {amount: "100001.00", save: p1, expect_status: BLOCKED}
+      - send_now: {payment: p1, times: 3, expect_status: BLOCKED}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-bb-10
+    description: The approval re-run blocks (KYB failed meanwhile); a second approval is then refused.
+    steps:
+      - intent: {cpt: cpt_nova, amount: "200.00", save: p1, expect_status: ESCALATED}
+      - update_counterparty: {id: cpt_nova, kyb_status: failed}
+      - approve: {payment: p1, as: reviewer, via: service, expect_status: BLOCKED}
+      - approve: {payment: p1, as: reviewer, via: service, expect_error: true}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-bb-11
+    description: Resubmit a screening-blocked payment to the same flagged wallet under another counterparty.
+    steps:
+      - intent: {cpt: cpt_flagged, amount: "500.00", save: p1, expect_status: BLOCKED}
+      - intent: {cpt: cpt_local, dest: dead, amount: "499.00", save: p2, expect_status: [BLOCKED, ESCALATED]}
+      - approve_all_cases: {as: reviewer}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED, p2: BLOCKED}, no_attempt_to: "0x000000000000000000000000000000000000dEaD"}

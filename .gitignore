@@ -33,3 +33,6 @@ chain/local.json
 
 # design-skill working files
 .taste-skill/
+
+# Evaluation output (results.json, report.html, report.md); CI keeps them as build artifacts
+eval/out/

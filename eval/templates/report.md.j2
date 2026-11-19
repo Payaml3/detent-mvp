@@ -1,0 +1,120 @@
+# {{ r.brand }} evaluation results, {{ r.date }}
+
+> {{ r.caveat }}
+
+- Release gate: **{{ "PASSED" if gate.passed else "FAILED" }}**{% for reason in gate.reasons %}
+
+  - {{ reason }}{% endfor %}
+
+- Commit: `{{ r.commit }}`
+- Generated: {{ r.generated_at }}
+- Networks: {{ r.networks }}
+- Agent answers: {{ r.agent_answers }}
+- Models (from settings; not called when agent answers are stand-ins): agents `{{ r.models.agent }}`, light tasks `{{ r.models.light }}`, judge `{{ r.models.judge }}`
+- Seeds: {{ r.seeds }}
+
+## Headline
+
+| Result | What it measures |
+|---|---|
+{% for value, caption in headline %}
+| **{{ value }}** | {{ caption }} |
+{% endfor %}
+
+## Safety summary (all suites)
+
+| Check | Count |
+|---|---|
+{% for k, v in safety.items() %}
+| {{ k.replace('_', ' ') }} | {{ v }} |
+{% endfor %}
+
+{% if att %}
+## Decision layer: attack suite
+
+{{ att.count }} scenarios, {{ att.passed }} passed.
+
+| Category | Scenarios | Passed | Unauthorised executions |
+|---|---|---|---|
+{% for cat, c in att.per_category.items() %}
+| {{ cat.replace('_', ' ') }} | {{ c.count }} | {{ c.passed }} | {{ c.unauthorised }} |
+{% endfor %}
+{% endif %}
+
+{% if flt %}
+## Orchestration layer: fault suite
+
+{{ flt.count }} scenarios, {{ flt.passed }} passed. Duplicates are counted from the rails' own records
+(the chain's transfer logs and the bank simulator's payments), not from Detent's database.
+
+| Category | Scenarios | Passed | Duplicates |
+|---|---|---|---|
+{% for cat, c in flt.per_category.items() %}
+| {{ cat.replace('_', ' ') }} | {{ c.count }} | {{ c.passed }} | {{ c.duplicates }} |
+{% endfor %}
+
+| Rail | Scenarios |
+|---|---|
+{% for rail, n in flt.per_rail.items() %}
+| {{ rail }} | {{ n }} |
+{% endfor %}
+
+| Fault | Scenarios |
+|---|---|
+{% for f, n in flt.per_fault.items() %}
+| {{ f }} | {{ n }} |
+{% endfor %}
+
+UNKNOWN to resolved (simulated clock): {{ flt.unknown_resolution.count }} attempts, median
+{{ flt.unknown_resolution.median_seconds }} s, p95 {{ flt.unknown_resolution.p95_seconds }} s.
+{% endif %}
+
+{% if interp %}
+## Agents: interpretation set
+
+{{ interp.count }} labelled invoices. Agent answers: {{ interp.agent_answers }}.
+
+| Metric | Result |
+|---|---|
+| Field accuracy | {{ pct(interp.field_accuracy) }} |
+| Flag recall | {{ pct(interp.flag_recall) }} |
+| Invented values (must be 0) | {{ interp.invented_values }} |
+| Canonical invoice | {{ interp.canonical.correct }}/{{ interp.canonical.runs }} runs |
+
+With recorded stand-ins these figures show that Detent's own checks hold (a stand-in that invents a value
+has it removed and flagged); they do not measure a model. The live run asks the model itself.
+{% endif %}
+
+{% if agr %}
+## Agents: agreement set (synthetic)
+
+{{ agr.count }} synthetic cases with hand-written labels; not real cases or real expert decisions.
+
+| Measure | Result | Cases |
+|---|---|---|
+| Rules' decision agrees with the label | {{ pct(agr.decision_agreement) }} | {{ agr.decision_cases }} |
+| Investigation agent's recommendation agrees with the label | {{ pct(agr.recommendation_agreement) }} | {{ agr.recommendation_cases }} |
+
+Agent answers: {{ agr.agent_answers }}.
+{% endif %}
+
+{% if rec %}
+## Operations layer: reconciliation
+
+{{ rec.count }} synthetic items: {{ rec.matched }} matched ({{ rec.match_rate }}), {{ rec.breaks_found }} breaks
+found. Designed breaks found: {% for k, v in rec.designed_breaks_found.items() %}{{ k.replace('_', ' ') }} {{ "yes" if v else "NO" }}{{ ", " if not loop.last }}{% endfor %}.
+{% endif %}
+
+{% if lat %}
+## Latency
+
+| Path | Samples | p50 | p95 |
+|---|---|---|---|
+| Rules only (decide, no send) | {{ lat.rules_only_ms.n }} | {{ lat.rules_only_ms.p50 }} ms | {{ lat.rules_only_ms.p95 }} ms |
+| Decision plus agent investigation | {{ lat.agent_path_ms.n }} | {{ lat.agent_path_ms.p50 }} ms | {{ lat.agent_path_ms.p95 }} ms |
+
+{{ lat.environment }}. Agent answers: {{ lat.agent_answers }}.
+{% endif %}
+
+---
+{{ r.caveat }}

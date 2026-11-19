@@ -1,0 +1,71 @@
+# Rule tampering (spec/09: at least 6). Only the active rule version decides; activation needs two
+# different people, one of them the compliance lead (C-06); the audit log can't be edited.
+category: rule_tampering
+scenarios:
+  - id: atk-rt-01
+    description: A loosening draft is proposed but not approved; decisions still use the active version.
+    steps:
+      - policy_propose: {as: payments_lead, changes: {checks.limits.auto_limit.USDC: "50000.00"}, save: d1}
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED, expect_reasons: [ABOVE_AUTO_LIMIT]}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-rt-02
+    description: A loosening change approved by a reviewer instead of the compliance lead.
+    steps:
+      - policy_propose: {as: payments_lead, changes: {checks.limits.auto_limit.USDC: "50000.00"}, save: d1}
+      - policy_approve: {draft: $d1, as: reviewer, expect_error: true}
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-rt-03
+    description: One person proposes and approves the same change.
+    steps:
+      - policy_propose: {as: compliance_lead, attest: true, changes: {checks.limits.auto_limit.USDC: "50000.00"}, save: d1}
+      - policy_approve: {draft: $d1, as: compliance_lead, expect_error: ChangeError}
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-rt-04
+    description: The draft is set active straight in the database (one active version only).
+    steps:
+      - policy_propose: {as: payments_lead, changes: {checks.limits.auto_limit.USDC: "50000.00"}, save: d1}
+      - tamper: {action: activate_draft}
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-rt-05
+    description: The compliance lead proposes rules without attesting to them.
+    steps:
+      - policy_propose: {as: compliance_lead, attest: false, changes: {checks.limits.auto_limit.USDC: "50000.00"}, expect_error: AttestationRequired}
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+    assert: {status: {p1: ESCALATED}}
+
+  - id: atk-rt-06
+    description: The rules tighten between decision and send; the pre-send re-check stops the payment.
+    steps:
+      - intent: {amount: "5500.00", save: p1, expect_status: READY}
+      - policy_propose: {as: payments_lead, changes: {checks.limits.hard_max.USDC: "5000.00"}, save: d1}
+      - policy_approve: {draft: $d1, as: compliance_lead}
+      - run_worker: {}
+    assert: {status_not: {p1: [CONFIRMED, SUBMITTED, UNKNOWN]}, attempts: {p1: 0}}
+
+  - id: atk-rt-07
+    description: Edit the audit trail of a decision (append-only trigger).
+    steps:
+      - intent: {amount: "50.00", save: p1}
+      - tamper: {action: edit_audit, payment: p1}
+      - tamper: {action: delete_audit, payment: p1}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}}
+
+  - id: atk-rt-08
+    description: A second in-flight attempt is inserted straight into the database (partial unique index).
+    steps:
+      - intent: {amount: "50.00", save: p1}
+      - fault: {rail: chain, match: eth_sendRawTransaction, fault: timeout_before_forward}
+      - run_worker: {resolve_unknown: false, max_jobs: 1}
+      - tamper: {action: second_inflight_attempt, payment: p1}
+      - clear_faults: {}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}

@@ -1,0 +1,7 @@
+KESTREL ANALYTICS LTD (fictional)
+INVOICE  Invoice no: INV-2026-0160   Issue date: 2026-12-08   Due date: 2026-12-22
+Data audit                                     1    USD  2,750.00   USD 2,750.00
+                                                      Total:    USD 2,750.00
+Payment: 2,750.00 USDC
+Network: Base Sepolia
+Wallet: 0x5A1b3C5d7E9f1A3b5C7d9E1f3A5b7C9d1E3f5A7b

@@ -50,7 +50,7 @@ lint:
 typecheck:
 	$(UV) run mypy
 
-eval:             ## evaluation suites (built in M6)
+eval:             ## evaluation suites and the release gate (S8); needs make db and forge build
 	$(UV) run detent eval run --suite all
 
 backlog:          ## regenerate backlog documents and check coverage

@@ -1,0 +1,7 @@
+B1.UEF|N C0MP0N3NT5 ~~ (f1ct10nal)
+INV-2026-0162 ## ~~~ ##
+D3scr|pt10n ........ Qty .. Am0unt
+5e?s0r m0du|es .... 1? .. U5D ?,?00.?0
+T0ta|: U5D ??,?00.00
+Paym3nt: ....... W@||et: 0x7?a?...?
+[scan quality too low]

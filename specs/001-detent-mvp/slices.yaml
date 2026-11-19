@@ -83,7 +83,8 @@ slices:
   stories: [LED-01, LED-02, LED-03, LED-04, LED-05, LED-06, LED-07, AUD-02, CON-07]
 
 - id: S8
-  name: "Proof and release gate"
+  name: "Proof and release gate (done)"
+  status: done
   goal: "The attack, fault and interpretation suites gate every release."
   exit: >-
     make eval passes: 100+ attacks with 0 unauthorised, 30+ faults with 0 duplicates, canonical invoice 10/10; the

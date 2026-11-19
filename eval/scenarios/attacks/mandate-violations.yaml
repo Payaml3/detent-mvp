@@ -1,0 +1,132 @@
+# Mandate violations (spec/09: at least 12). An agent acts only inside its signed mandate (MND-02); every
+# breach blocks, whatever the agent's key or text says. Agent intents use the agent's own mandate-bound key.
+category: mandate_violation
+scenarios:
+  - id: atk-mv-01
+    description: Payee outside the mandate's scope (Nova is not in it).
+    steps:
+      - intent: {source: agent, cpt: cpt_nova, amount: "100.00", save: p1, expect_status: BLOCKED, expect_reasons: [MANDATE_PAYEE_OUT_OF_SCOPE]}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-02
+    description: Amount over the per-payment limit (20,500 > 20,000).
+    steps:
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "20500.00", save: p1, expect_status: BLOCKED, expect_reasons: [MANDATE_AMOUNT_EXCEEDED]}
+      - approve_all_cases: {}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-03
+    description: Total over the mandate limit across approved payments (3 x 18,000 > 50,000 on different days).
+    setup: {policy_changes: {checks.daily_caps.per_counterparty.USDC: "100000.00", checks.daily_caps.platform.USDC: "100000.00"}}
+    steps:
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "18000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: reviewer, expect_status: READY}
+      - run_worker: {}
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "18000.00", save: p2, expect_status: ESCALATED}
+      - approve: {payment: p2, as: reviewer, expect_status: READY}
+      - run_worker: {}
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "18000.00", save: p3, expect_status: BLOCKED, expect_reasons: [MANDATE_TOTAL_EXCEEDED]}
+      - approve_all_cases: {}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED, p2: CONFIRMED, p3: BLOCKED}, attempts: {p3: 0}}
+
+  - id: atk-mv-04
+    description: The mandate has expired (31 days later).
+    steps:
+      - advance_clock: {days: 31}
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "100.00", save: p1, expect_status: BLOCKED, expect_reasons: [MANDATE_EXPIRED]}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-05
+    description: Revoked mid-flow - escalated, the mandate is revoked, then a reviewer approves.
+    steps:
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - mandate_revoke: {}
+      - approve: {payment: p1, as: reviewer, expect_status: BLOCKED}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-06
+    description: Revoked after approval, before the worker sends it.
+    steps:
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: reviewer, expect_status: READY}
+      - mandate_revoke: {}
+      - run_worker: {}
+    assert: {status_not: {p1: [CONFIRMED, SUBMITTED, UNKNOWN]}, attempts: {p1: 0}}
+
+  - id: atk-mv-07
+    description: Wrong network - the mandate allows only eth-sepolia; the payment is on base-sepolia.
+    setup: {mandate_scope: {networks: [eth-sepolia]}}
+    steps:
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "100.00", save: p1, expect_status: BLOCKED, expect_reasons: [MANDATE_NETWORK_OUT_OF_SCOPE]}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-08
+    description: Forged mandate - the stored scope is widened without re-signing.
+    steps:
+      - mandate_tamper: {path: scope.max_per_payment.amount, value: "1000000.00"}
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "50000.00", save: p1, expect_status: BLOCKED, expect_reasons: [MANDATE_SIGNATURE_INVALID]}
+      - approve_all_cases: {}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-09
+    description: Forged mandate - a payee is added to the stored scope without re-signing.
+    steps:
+      - mandate_tamper: {path: scope.payees, value: [cpt_bluefin, cpt_harbor, cpt_nova]}
+      - intent: {source: agent, cpt: cpt_nova, amount: "100.00", save: p1, expect_status: BLOCKED}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-10
+    description: Replayed old mandate version - the narrowed v2 is swapped for the old, validly signed v1.
+    steps:
+      - mandate_replay_old_version: {}
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "5000.00", save: p1, expect_status: BLOCKED}
+      - approve_all_cases: {}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-11
+    description: The agent's key is used for a platform-source intent (the agent posing as the platform).
+    steps:
+      - intent: {key: agent, source: platform, cpt: cpt_local, amount: "50.00", expect_http: 403, expect_code: mandate_mismatch}
+    assert: {confirmed_count: 0}
+
+  - id: atk-mv-12
+    description: The agent's key is used under a mandate it was not issued (another mandate ID).
+    steps:
+      - intent: {key: agent, source: agent, mandate_id: mnd_other_agent, cpt: cpt_bluefin, amount: "50.00", expect_http: [403, 422]}
+    assert: {confirmed_count: 0}
+
+  - id: atk-mv-13
+    description: Currency outside the mandate (EUR to Harbor, which is in scope as a payee).
+    steps:
+      - intent: {source: agent, cpt: cpt_harbor, amount: "100.00", save: p1, expect_status: BLOCKED}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-mv-14
+    description: Parallel agent intents race for the last of the mandate total.
+    setup:
+      mandate_scope: {max_total: {amount: "1000.00", currency: USDC}}
+      counterparties: [{id: cpt_bluefin, payment_count: 10}]
+    steps:
+      - parallel_intents: {n: 8, source: agent, cpt: cpt_bluefin, amount: "300.00", save: ids}
+      - approve_all_cases: {}
+      - run_worker: {}
+    assert: {max_confirmed_total: "1000.00"}
+
+  - id: atk-mv-15
+    description: The mandate is revoked, then the revocation is erased from the mandates table.
+    steps:
+      - mandate_revoke: {}
+      - tamper: {action: clear_mandate_revocation, expect_error: false}
+      - intent: {source: agent, cpt: cpt_bluefin, amount: "100.00", save: p1, expect_status: BLOCKED, expect_reasons: [MANDATE_REVOKED]}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}

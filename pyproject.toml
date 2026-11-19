@@ -9,18 +9,20 @@ dependencies = []
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api", "apps/banksim", "apps/faultproxy"]
+members = ["apps/api", "apps/banksim", "apps/faultproxy", "eval"]
 
 [tool.uv.sources]
 detent = { workspace = true }
 banksim = { workspace = true }
 faultproxy = { workspace = true }
+detent-eval = { workspace = true }
 
 [dependency-groups]
 dev = [
   "detent",
   "banksim",
   "faultproxy",
+  "detent-eval",
   "pytest>=8.3",
   "pytest-timeout>=2.3",
   "hypothesis>=6.112",
@@ -69,14 +71,21 @@ ignore = [
 [tool.mypy]
 python_version = "3.12"
 strict = true
-mypy_path = "apps/api/src"
-packages = ["detent"]
+mypy_path = "apps/api/src:eval/src"
+packages = ["detent", "detent_eval"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = ["web3.*", "eth_account.*", "eth_typing.*", "hexbytes.*"]
 follow_imports = "skip"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# The simulators are apps, not typed libraries; the eval harness only starts them. recon_helpers lives in
+# the test tree (the reconciliation suite reuses the REC tests' synthetic set).
+module = ["faultproxy.*", "banksim.*", "recon_helpers"]
+ignore_missing_imports = true
+follow_imports = "skip"
 
 # ---------------------------------------------------------------- pytest
 [tool.pytest.ini_options]

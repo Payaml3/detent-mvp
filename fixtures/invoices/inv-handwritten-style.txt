@@ -1,0 +1,7 @@
+bluefin components ltd (fictional)  -- invoice INV-2026-0163
+issued 2026-12-09, due 2026-12-30
+   precision sensor modules  x5 @ USD 350.00 =   USD 1,750.00
+                                       total: USD 1,750.00
+payment: 1,750.00 usdc -- network: base sepolia
+wallet: {{WALLET_BLUEFIN_BASE}}
+  thanks!  - J.

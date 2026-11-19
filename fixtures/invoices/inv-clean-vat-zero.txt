@@ -1,0 +1,10 @@
+BLUEFIN COMPONENTS LTD (fictional)
+VAT reg: GB000000000 (fictional)
+INVOICE  Invoice no: INV-2026-0151   Issue date: 2026-12-04   Due date: 2026-12-31
+Precision sensor modules                      20    USD    300.00   USD 6,000.00
+Express freight                                1    USD  1,250.00   USD 1,250.00
+                                                      Total:    USD 7,250.00
+VAT 0% (export)                                                         USD 0.00
+Payment: 7,250.00 USDC
+Network: Base Sepolia (testnet)
+Wallet: {{WALLET_BLUEFIN_BASE}}

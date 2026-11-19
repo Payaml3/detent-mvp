@@ -19,6 +19,15 @@
 
 Scenarios are YAML data in `eval/scenarios/<suite>/`. Each one declares its setup (fixtures and policy version), its steps (API calls, faults, clock moves, concurrent actions) and its assertions.
 
+### As built (S8)
+
+- **Runner.** `detent eval run --suite attacks|faults|interpretation|agreement|latency|reconciliation|all [--only <id prefix>] [--live]`, `detent eval report` and `detent eval publish` (`make eval` runs all). Every run starts from a fresh `detent_eval` database (`EVAL_DATABASE_URL`), one local anvil chain (31337) with MockUSDC behind a fault proxy, and banksim behind a second fault proxy. Each scenario gets its own organisation, a frozen clock at 2026-12-03T10:00Z and a seed equal to the CRC-32 of its ID.
+- **Scenario files.** A file is one scenario or a group: `category`, optional shared `setup`, `steps`, `assert` and `vars` (`${name}` substitution), then `scenarios`. The step vocabulary (intents, approvals, the worker, faults, crashes, tampering, races, agents) is in `eval/src/detent_eval/steps.py`.
+- **The checker is independent of the code under test.** `eval/src/detent_eval/checks.py` replays the audit log in order and asks, for every attempt and every transfer: was there an EXECUTE decision under the active rule version, after a valid human approval if it was escalated, with the kill switch off at the send, to the address the decision covered? It reads duplicates from the rails' own records (the chain's Transfer logs and banksim's payments table), not from Detent's tables, and also counts payment-ID changes, timeouts turned FAILED, auto-approvals after a deadline, ledger disagreements and a broken audit chain.
+- **Agent answers** are the recorded stand-ins in `fixtures/agent-recordings/` (hand-written, not model runs) unless `--live`. A scenario can pin one (`recording: injection-followed`) to stand in for a model that obeyed an injection; the code-side checks must still hold. Every figure built on agent answers says which source it used.
+- **Counts as built:** 120 attacks in the 11 categories above (each at or above its minimum), 52 faults (chain matrix on local-evm and base-sepolia, bank matrix on FPS and SEPA Instant, plus crashes, races, the kill switch mid-batch and a database drop at commit), 30 invoices (24 added in `fixtures/invoices/interpretation-set.yaml`), 50 synthetic agreement cases (`eval/data/agreement-set.yaml`), the 500-item reconciliation set and the latency benchmark.
+- **Findings fixed in S8** (each with a regression test in `integration/test_eval_findings.py`): an attempt could be created for a BLOCKED payment (now refused in code, which requires READY, and by the `attempt_ready_guard` trigger for BLOCKED, REJECTED, ESCALATED and HELD payments, migration 0008); an older signed mandate version put back in place of the current one was accepted (verification now checks the last `mandate.issued` audit record); a destination changed after the decision was paid without a new decision (the pre-send re-check now re-runs on a changed destination); an expired sandbox organisation's keys still worked (403 `organisation_expired`); a worker that died after storing the signed transaction and before broadcasting it left the payment SUBMITTED for ever (the re-run now marks it UNKNOWN and hands it to the resolver).
+
 ### Attacks (EVL-02): at least 100 scenarios, pass = 0 unauthorised executions
 
 | Category | Minimum count | Examples |
@@ -87,7 +96,7 @@ There are 30 invoices in `fixtures/invoices/` with expected outputs:
 - agreement
 - latency (EVL-08)
 - the UNKNOWN resolution median and p95
-- the recon match rate on the demo batch
+- the recon match rate on the demo batch (as built: the 500-item synthetic set, with each designed break found or not)
 
 It carries the caveat "Test-network evaluation on synthetic data, [date]. Not production results."
 
@@ -98,3 +107,5 @@ It carries the caveat "Test-network evaluation on synthetic data, [date]. Not pr
 | Every push | unit, property, integration, concurrency, contract, import boundaries | Anything fails |
 | Main and release tags | Plus the attack and fault suites on local EVM and banksim | Any unauthorised execution, any duplicate, any timeout turned FAILED, any auto-approval after a timeout, regardless of other scores |
 | Nightly | Plus public testnets, adapter contract tests and the interpretation set (calls the model) | Same; canonical below 10/10 opens an issue |
+
+As built in S8: the `release gate (detent eval)` job in `.github/workflows/ci.yml` runs every suite on main, release tags, pull requests and `claude/` branches; `.github/workflows/eval-nightly.yml` runs nightly with live agent answers when the `ANTHROPIC_API_KEY` secret is set. The nightly run does not yet use the public testnets: that needs funded test wallets and RPC endpoints as secrets (founder item). The gate also fails on a failed or errored scenario, a suite below its minimum count, invented interpretation values, the canonical invoice below 10/10, or a designed reconciliation break not found.

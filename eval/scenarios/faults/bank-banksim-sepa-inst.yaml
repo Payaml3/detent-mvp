@@ -1,0 +1,138 @@
+# Bank fault matrix on banksim (spec/06 faults, spec/06 test values .13 and .42), on the FPS (GBP) and
+# SEPA Instant (EUR) schemes. The checker reads banksim's own payments table: at most one accepted bank
+# payment per payment ID, every attempt keyed by the payment ID, no timeout turned FAILED.
+category: bank_faults
+setup: {bank: true}
+scenarios:
+  - id: flt-sepa-v13
+    rail: banksim-sepa-inst
+    fault: test_value.13
+    description: 'banksim-sepa-inst: test value .13: the bank accepts but answers too late; UNKNOWN, then confirmed.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.13', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+      attempt_statuses_seen:
+        p1: [UNKNOWN]
+  - id: flt-sepa-v42
+    rail: banksim-sepa-inst
+    fault: test_value.42
+    description: 'banksim-sepa-inst: test value .42: the bank fails it technically; only one EUR/GBP rail, so it ends FAILED_FINAL.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.42', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: FAILED_FINAL}
+      rail_transfers: {p1: 0}
+      attempts: {p1: 1}
+  - id: flt-sepa-taf
+    rail: banksim-sepa-inst
+    fault: timeout_after_forward
+    description: 'banksim-sepa-inst: the payment is forwarded but the answer is lost.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.00', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - fault: {rail: bank, match: POST /payments, fault: timeout_after_forward, count: 1}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+      attempt_statuses_seen:
+        p1: [UNKNOWN]
+  - id: flt-sepa-tbf
+    rail: banksim-sepa-inst
+    fault: timeout_before_forward
+    description: 'banksim-sepa-inst: the payment never reaches the bank; the resolver re-sends with the same idempotency key.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.00', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - fault: {rail: bank, match: POST /payments, fault: timeout_before_forward, count: 1}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+      attempt_statuses_seen:
+        p1: [UNKNOWN]
+  - id: flt-sepa-rst
+    rail: banksim-sepa-inst
+    fault: reset_after_forward
+    description: 'banksim-sepa-inst: the connection resets after the payment is forwarded.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.00', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - fault: {rail: bank, match: POST /payments, fault: reset_after_forward, count: 1}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+  - id: flt-sepa-503
+    rail: banksim-sepa-inst
+    fault: http_503_before_accept
+    description: 'banksim-sepa-inst: the bank answers 503 before accepting; one retry.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.00', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - fault: {rail: bank, match: POST /payments, fault: http_503_before_accept, count: 1}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 2}
+  - id: flt-sepa-dup
+    rail: banksim-sepa-inst
+    fault: duplicate_request
+    description: 'banksim-sepa-inst: the proxy forwards the payment twice; the bank deduplicates on the key.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.00', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - fault: {rail: bank, match: POST /payments, fault: duplicate_request, count: 1}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+  - id: flt-sepa-sts
+    rail: banksim-sepa-inst
+    fault: timeout_after_forward
+    description: 'banksim-sepa-inst: the status check times out twice before the answer comes through.'
+    steps:
+      - intent: {cpt: cpt_harbor, amount: '500.00', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - fault: {rail: bank, match: GET /payments, fault: timeout_after_forward, count: 2}
+      - run_worker: {}
+      - clear_faults: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}

@@ -1,0 +1,8 @@
+BLUEFIN COMPONENTS LTD (fictional)
+INVOICE  Invoice no: INV-2026-0157   Issue date: 2026-12-07
+Spare connectors                              50    USD     18.00   USD 900.00
+                                                      Total:    USD 900.00
+Payment: 900.00 USDC
+Network: Base Sepolia
+Wallet: {{WALLET_BLUEFIN_BASE}}
+Payment terms: on receipt

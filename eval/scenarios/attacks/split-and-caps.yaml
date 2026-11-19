@@ -1,0 +1,86 @@
+# Split payments and caps (spec/09: at least 8). Daily caps count every payment that is READY or later,
+# including ones decided at the same instant (the counters are taken under a lock).
+category: split_and_caps
+scenarios:
+  - id: atk-sc-01
+    description: 11 x 1,999 to one payee, one after another, against the 20,000 per-counterparty cap.
+    steps:
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00"}}
+      - {intent: {amount: "1999.00", save: p11, expect_status: ESCALATED, expect_reasons: [DAILY_CAP_COUNTERPARTY]}}
+      - run_worker: {}
+    assert: {max_confirmed_total: "20000.00", confirmed_count: 10}
+
+  - id: atk-sc-02
+    description: 12 parallel payouts of 1,900 at once against the 20,000 per-counterparty cap.
+    steps:
+      - parallel_intents: {n: 12, amount: "1900.00", save: ids}
+      - run_worker: {}
+    assert: {max_confirmed_total: "20000.00", confirmed_count: 10}
+
+  - id: atk-sc-03
+    description: 8 parallel payouts of 900 against a 5,000 platform cap.
+    setup: {policy_changes: {checks.daily_caps.platform.USDC: "5000.00"}}
+    steps:
+      - parallel_intents: {n: 8, amount: "900.00", save: ids}
+      - run_worker: {}
+    assert: {max_confirmed_total: "5000.00", confirmed_count: 5}
+
+  - id: atk-sc-04
+    description: Three payments just under the auto limit (3 x 9,999) against the 20,000 cap.
+    setup: {local_median: "9000.00"}
+    steps:
+      - {intent: {amount: "9999.00"}}
+      - {intent: {amount: "9999.00"}}
+      - {intent: {amount: "9999.00", save: p3, expect_status: ESCALATED}}
+      - run_worker: {}
+    assert: {max_confirmed_total: "20000.00", confirmed_count: 2}
+
+  - id: atk-sc-05
+    description: 20 parallel payouts of 1,000.01 with different keys (cap 20,000).
+    steps:
+      - parallel_intents: {n: 20, amount: "1000.01", save: ids}
+      - run_worker: {}
+    assert: {max_confirmed_total: "20000.00", confirmed_count: 19}
+
+  - id: atk-sc-06
+    description: 25 payouts of 999.99 under the travel-rule threshold (cap 20,000).
+    steps:
+      - parallel_intents: {n: 25, amount: "999.99", save: ids}
+      - run_worker: {}
+    assert: {max_confirmed_total: "20000.00", confirmed_count: 20}
+
+  - id: atk-sc-07
+    description: Splitting on the bank rail - 6 x 1,900 EUR to Harbor against the 10,000 EUR cap.
+    steps:
+      - parallel_intents: {n: 6, cpt: cpt_harbor, amount: "1900.00", save: ids}
+      - run_worker: {}
+    assert: {confirmed_count: 5}
+
+  - id: atk-sc-08
+    description: Escalated splits approved by a careless reviewer still respect the cap on re-run.
+    setup: {local_median: "100.00"}
+    steps:
+      - parallel_intents: {n: 6, amount: "4000.00", save: ids}
+      - approve_all_cases: {as: reviewer}
+      - run_worker: {}
+    assert: {max_confirmed_total: "20000.00"}
+
+  - id: atk-sc-09
+    description: A burst at the per-counterparty cap while an approval for the same payee lands.
+    steps:
+      - intent: {amount: "15000.00", save: big, expect_status: ESCALATED}
+      - concurrently:
+          steps:
+            - approve: {payment: big, as: reviewer}
+            - parallel_intents: {n: 6, amount: "1900.00"}
+      - run_worker: {}
+    assert: {max_confirmed_total: "20000.00"}

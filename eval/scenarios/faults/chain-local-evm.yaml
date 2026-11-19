@@ -1,0 +1,125 @@
+# Chain fault matrix (spec/09 EVL-03; faults from spec/06). Each fault runs on the local-evm rail and on
+# base-sepolia (both on the local anvil chain in CI; the nightly run points them at the real testnets).
+# The checker reads the chain's own Transfer logs: one transfer per payment at most, the payment ID kept,
+# no timeout ever turned FAILED, and the ledger balanced.
+category: chain_faults
+steps:
+  - intent: {cpt: cpt_local, amount: '40.00', save: p1, allow_network_switch: '${switch}'}
+  - approve_all_cases: {as: reviewer}
+  - expect: {p1: READY}
+  - fault: {rail: chain, match: '${match}', fault: '${fault}', count: '${count}'}
+  - run_worker: {}
+  - clear_faults: {}
+  - run_worker: {}
+scenarios:
+  - id: flt-local-taf
+    rail: local-evm
+    fault: timeout_after_forward
+    description: 'local-evm: the send is forwarded but the answer is lost (timeout after forward).'
+    vars: {match: eth_sendRawTransaction, fault: timeout_after_forward, count: 1, switch: false}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+      attempt_statuses_seen:
+        p1: [UNKNOWN]
+  - id: flt-local-tbf
+    rail: local-evm
+    fault: timeout_before_forward
+    description: 'local-evm: the send never reaches the node (timeout before forward); the same signed transaction is re-broadcast.'
+    vars: {match: eth_sendRawTransaction, fault: timeout_before_forward, count: 1, switch: false}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+      attempt_statuses_seen:
+        p1: [UNKNOWN]
+  - id: flt-local-rst
+    rail: local-evm
+    fault: reset_after_forward
+    description: 'local-evm: the connection resets after the send is forwarded.'
+    vars: {match: eth_sendRawTransaction, fault: reset_after_forward, count: 1, switch: false}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+      attempt_statuses_seen:
+        p1: [UNKNOWN]
+  - id: flt-local-503
+    rail: local-evm
+    fault: http_503_before_accept
+    description: 'local-evm: the node answers 503 before accepting the send; one retry.'
+    vars: {match: eth_sendRawTransaction, fault: http_503_before_accept, count: 1, switch: false}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 2}
+  - id: flt-local-503x
+    rail: local-evm
+    fault: http_503_before_accept
+    description: 'local-evm: the node answers 503 every time; retries stop at the configured maximum.'
+    vars: {match: eth_sendRawTransaction, fault: http_503_before_accept, count: -1, switch: false}
+    assert:
+      status: {p1: FAILED_FINAL}
+      rail_transfers: {p1: 0}
+      attempts: {p1: 3}
+  - id: flt-local-drc
+    rail: local-evm
+    fault: hide_receipt
+    description: 'local-evm: the receipt is hidden for three polls (delayed receipt).'
+    vars: {match: eth_getTransactionReceipt, fault: hide_receipt, count: 3, switch: false}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+  - id: flt-local-dup
+    rail: local-evm
+    fault: duplicate_request
+    description: 'local-evm: the proxy forwards the send twice (duplicate request).'
+    vars: {match: eth_sendRawTransaction, fault: duplicate_request, count: 1, switch: false}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}
+  - id: flt-local-rv0
+    rail: local-evm
+    fault: low_gas_estimate
+    description: 'local-evm: the transfer reverts on chain (receipt status 0); no network switch allowed.'
+    vars: {match: eth_estimateGas, fault: low_gas_estimate, count: 2, switch: false}
+    assert:
+      status: {p1: FAILED_FINAL}
+      rail_transfers: {p1: 0}
+      attempts: {p1: 1}
+  - id: flt-local-rvf
+    rail: local-evm
+    fault: low_gas_estimate
+    description: 'local-evm: the transfer reverts on chain (receipt status 0); failover to another rail under the same payment ID.'
+    vars: {match: eth_estimateGas, fault: low_gas_estimate, count: 4, switch: true}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 2}
+    setup:
+      extra_destinations:
+        - {cpt: cpt_local, alias: local, network: base-sepolia}
+  - id: flt-local-stuck
+    rail: local-evm
+    fault: hide_receipt
+    description: 'local-evm: the receipt never appears (stuck); a case opens after 15 minutes, nothing is resent, and the payment confirms once the receipt is visible.'
+    steps:
+      - intent: {cpt: cpt_local, amount: '40.00', save: p1}
+      - approve_all_cases: {as: reviewer}
+      - expect: {p1: READY}
+      - fault: {rail: chain, match: eth_getTransactionReceipt, fault: hide_receipt, count: -1}
+      - fault: {rail: chain, match: eth_getTransactionByHash, fault: hide_receipt, count: -1}
+      - run_worker: {resolve_unknown: false}
+      - advance_clock: {minutes: 16}
+      - resolve_unknown: {times: 2}
+      - run_worker: {resolve_unknown: false}
+      - clear_faults: {}
+      - resolve_unknown: {}
+      - run_worker: {}
+    assert:
+      status: {p1: CONFIRMED}
+      rail_transfers: {p1: 1}
+      attempts: {p1: 1}

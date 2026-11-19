@@ -1,0 +1,77 @@
+# API authorisation (spec/09: at least 8). Keys are scoped, test-only and organisation-bound; another
+# organisation's ID is indistinguishable from a missing one.
+category: api_authorisation
+scenarios:
+  - id: atk-au-01
+    description: A read-only key tries to create a payout.
+    setup: {keys: {readonly: {role: payments_lead, scopes: [read]}}}
+    steps:
+      - intent: {key: readonly, amount: "50.00", expect_http: 403}
+    assert: {confirmed_count: 0}
+
+  - id: atk-au-02
+    description: The organisation's sandbox access has expired.
+    setup: {org_expired: true}
+    steps:
+      - intent: {key: lead, amount: "50.00", expect_http: 403, expect_code: organisation_expired}
+      - run_worker: {}
+    assert: {confirmed_count: 0}
+
+  - id: atk-au-03
+    description: A revoked key.
+    setup: {keys: {old: {role: payments_lead, revoked: true}}}
+    steps:
+      - intent: {key: old, amount: "50.00", expect_http: 401}
+    assert: {confirmed_count: 0}
+
+  - id: atk-au-04
+    description: An expired key.
+    setup: {keys: {old: {role: payments_lead, expired: true}}}
+    steps:
+      - intent: {key: old, amount: "50.00", expect_http: 401}
+    assert: {confirmed_count: 0}
+
+  - id: atk-au-05
+    description: Read another organisation's payment by its ID.
+    setup: {second_org: true}
+    steps:
+      - intent: {amount: "50.00", save: p1}
+      - request: {method: GET, path: "/v1/payment_intents/$p1", key: "other:lead", other_org: true, expect_http: 404}
+      - request: {method: GET, path: "/v1/payment_intents/$p1/replay", key: "other:lead", other_org: true, expect_http: 404}
+    assert: {}
+
+  - id: atk-au-06
+    description: A live-looking key (sk_live_) is refused outright.
+    steps:
+      - request: {method: POST, path: /v1/payment_intents, key: "sk_live_0000000000000000000000000000", idem: x1, body: {kind: payout, source: platform, counterparty_id: cpt_local, destination: {kind: evm_wallet, network: local-evm, destination_id: dst_local}, amount: {amount: "50.00", currency: USDC}}, expect_http: [401, 403]}
+    assert: {confirmed_count: 0}
+
+  - id: atk-au-07
+    description: No key at all.
+    steps:
+      - request: {method: POST, path: /v1/payment_intents, key: none, idem: x1, body: {kind: payout, source: platform, counterparty_id: cpt_local, destination: {kind: evm_wallet, network: local-evm, destination_id: dst_local}, amount: {amount: "50.00", currency: USDC}}, expect_http: 401}
+    assert: {confirmed_count: 0}
+
+  - id: atk-au-08
+    description: The agent's key tries to approve a case and to release the kill switch.
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: agent, expect_http: 403}
+      - request: {method: DELETE, path: /v1/kill_switch, key: agent, expect_http: 403}
+    assert: {status: {p1: ESCALATED}}
+
+  - id: atk-au-09
+    description: Another organisation's key lists payments - it sees none of this organisation's.
+    setup: {second_org: true}
+    steps:
+      - intent: {amount: "50.00", save: p1}
+      - request: {method: GET, path: "/v1/payment_intents", key: "other:lead", other_org: true, expect_http: 200, save: listing}
+      - expect_empty: {saved: listing, field: data}
+    assert: {}
+
+  - id: atk-au-10
+    description: Pay a counterparty that belongs to another organisation.
+    setup: {second_org: true}
+    steps:
+      - request: {method: POST, path: /v1/payment_intents, key: "other:lead", other_org: true, idem: x2, body: {kind: payout, source: platform, counterparty_id: cpt_primary_only, destination: {kind: evm_wallet, network: local-evm, destination_id: dst_primary_only}, amount: {amount: "50.00", currency: USDC}}, expect_http: [404, 422]}
+    assert: {confirmed_count: 0}

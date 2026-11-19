@@ -1,0 +1,57 @@
+name: Nightly evaluation
+
+# EVL-07 nightly run. Today it runs every suite on the local chain and simulators, with live agent answers
+# when the ANTHROPIC_API_KEY secret is set (recorded stand-ins otherwise). Pointing the USDC rails at the
+# public testnets needs funded test wallets and RPC endpoints as secrets: a founder item in HANDOFF.md.
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    name: detent eval (nightly)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: detent
+          POSTGRES_PASSWORD: detent
+          POSTGRES_DB: detent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U detent" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg://detent:detent@localhost:5432/detent
+      EVAL_DATABASE_URL: postgresql+psycopg://detent:detent@localhost:5432/detent_eval
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python and dependencies
+        run: |
+          uv python install 3.12
+          uv sync --all-packages --frozen
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Build MockUSDC
+        run: cd chain && forge build
+      - name: Run every suite (live agent answers when the key is set)
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ]; then uv run detent eval run --suite all --live; else uv run detent eval run --suite all; fi
+      - name: Keep the dated report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-nightly-${{ github.run_id }}
+          path: eval/out/

@@ -1,0 +1,8 @@
+BLUEFIN COMPONENTS LTD (fictional)
+INVOICE  Invoice no: INV-2026-0155   Issue date: 2026-12-06   Due date: 2026-12-22
+Probe tips                                    60    USD     33.00   USD 1,980.00
+Bench calibration                              2    USD  1,500.00   USD 3,000.00
+                                                      Total:    USD 4,980.00
+Payment: 4,980.00 USDC
+Network: Base Sepolia
+Wallet: {{WALLET_BLUEFIN_BASE}}

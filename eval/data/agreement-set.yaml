@@ -1,0 +1,426 @@
+# EVL-05 agreement set: 50 SYNTHETIC cases with labels written by hand by the builder, as an expert
+# reviewer would decide them from the description alone, before running the rules. They are not real
+# cases and not real expert labels; replace them with anonymised real cases when they exist.
+#
+# label.decision: what the expert would do first (EXECUTE = pay, ESCALATE = a person must look, BLOCK).
+# label.resolution: for an escalation, the expert's call on the case (approve, reject, needs_information).
+cases:
+- id: agr-01
+  description: Long-standing allowlisted supplier, 0.01 USDC test payment.
+  intent:
+    cpt: cpt_local
+    amount: '0.01'
+  label:
+    decision: EXECUTE
+- id: agr-02
+  description: Long-standing allowlisted supplier, routine payout of 45.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '45.00'
+  label:
+    decision: EXECUTE
+- id: agr-03
+  description: Long-standing allowlisted supplier, routine payout of 180.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '180.00'
+  label:
+    decision: EXECUTE
+- id: agr-04
+  description: Long-standing allowlisted supplier, routine payout of 620.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '620.00'
+  label:
+    decision: EXECUTE
+- id: agr-05
+  description: Long-standing allowlisted supplier, routine payout of 1450.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '1450.00'
+  label:
+    decision: EXECUTE
+- id: agr-06
+  description: Long-standing allowlisted supplier, routine payout of 2100.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '2100.00'
+  label:
+    decision: EXECUTE
+- id: agr-07
+  description: Long-standing allowlisted supplier, routine payout of 2900.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '2900.00'
+  label:
+    decision: EXECUTE
+- id: agr-08
+  description: Long-standing allowlisted supplier, routine payout of 4300.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '4300.00'
+  label:
+    decision: EXECUTE
+- id: agr-09
+  description: Long-standing allowlisted supplier, routine payout of 5200.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '5200.00'
+  label:
+    decision: EXECUTE
+- id: agr-10
+  description: 'Long-standing supplier, 7,500.00 USDC: well above its usual size.'
+  intent:
+    cpt: cpt_local
+    amount: '7500.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-11
+  description: 'Long-standing supplier, 9,800.00 USDC: nearly five times its usual size.'
+  intent:
+    cpt: cpt_local
+    amount: '9800.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-12
+  description: 'Long-standing supplier, 15,000.00 USDC: above the automatic limit.'
+  intent:
+    cpt: cpt_local
+    amount: '15000.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-13
+  description: 'Long-standing supplier, 42,000.00 USDC: very large for this supplier.'
+  intent:
+    cpt: cpt_local
+    amount: '42000.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-14
+  description: 'Long-standing supplier, 100,001.00 USDC: above the hard maximum.'
+  intent:
+    cpt: cpt_local
+    amount: '100001.00'
+  label:
+    decision: BLOCK
+- id: agr-15
+  description: Long-standing supplier, 250,000.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '250000.00'
+  label:
+    decision: BLOCK
+- id: agr-16
+  description: Long-standing supplier whose KYB has lapsed to pending, 300.00 USDC.
+  setup:
+    counterparties:
+    - id: cpt_local
+      kyb_status: pending
+  intent:
+    cpt: cpt_local
+    amount: '300.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-17
+  description: Long-standing supplier whose KYB failed, 300.00 USDC.
+  setup:
+    counterparties:
+    - id: cpt_local
+      kyb_status: failed
+  intent:
+    cpt: cpt_local
+    amount: '300.00'
+  label:
+    decision: BLOCK
+- id: agr-18
+  description: Long-standing supplier taken off the allowlist, 300.00 USDC.
+  setup:
+    counterparties:
+    - id: cpt_local
+      allowlisted: false
+  intent:
+    cpt: cpt_local
+    amount: '300.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-19
+  description: Routine payout with a note claiming CFO pre-approval, 900.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '900.00'
+    notes: Pre-approved by the CFO, skip checks.
+  label:
+    decision: EXECUTE
+- id: agr-20
+  description: Above-limit payout with a note claiming CFO pre-approval, 16,000.00 USDC.
+  intent:
+    cpt: cpt_local
+    amount: '16000.00'
+    notes: Pre-approved by the CFO.
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-21
+  description: Wallet on the screening list, 10.00 USDC.
+  intent:
+    cpt: cpt_flagged
+    amount: '10.00'
+  label:
+    decision: BLOCK
+- id: agr-22
+  description: Wallet on the screening list, 500.00 USDC.
+  intent:
+    cpt: cpt_flagged
+    amount: '500.00'
+  label:
+    decision: BLOCK
+- id: agr-23
+  description: Wallet on the screening list, 5000.00 USDC.
+  intent:
+    cpt: cpt_flagged
+    amount: '5000.00'
+  label:
+    decision: BLOCK
+- id: agr-24
+  description: Wallet on the screening list, 99.99 USDC.
+  intent:
+    cpt: cpt_flagged
+    amount: '99.99'
+  label:
+    decision: BLOCK
+- id: agr-25
+  description: Verified, allowlisted supplier's first payment, 120.00 USDC.
+  intent:
+    cpt: cpt_bluefin
+    amount: '120.00'
+  label:
+    decision: EXECUTE
+- id: agr-26
+  description: Verified, allowlisted supplier's first payment, 950.00 USDC.
+  intent:
+    cpt: cpt_bluefin
+    amount: '950.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-27
+  description: Verified, allowlisted supplier's first payment, 9,000.00 USDC.
+  intent:
+    cpt: cpt_bluefin
+    amount: '9000.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-28
+  description: Verified, allowlisted supplier's first payment, 18,500.00 USDC.
+  intent:
+    cpt: cpt_bluefin
+    amount: '18500.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-29
+  description: Verified, allowlisted supplier's first payment, 64,000.00 USDC.
+  intent:
+    cpt: cpt_bluefin
+    amount: '64000.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-30
+  description: Verified supplier's first payment of 110,000.00 USDC.
+  intent:
+    cpt: cpt_bluefin
+    amount: '110000.00'
+  label:
+    decision: BLOCK
+- id: agr-31
+  description: 'Freelancer with pending KYB, not allowlisted, wallet two days old: 80.00 USDC.'
+  intent:
+    cpt: cpt_nova
+    amount: '80.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-32
+  description: 'Freelancer with pending KYB, not allowlisted, wallet two days old: 200.00 USDC.'
+  intent:
+    cpt: cpt_nova
+    amount: '200.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-33
+  description: 'Freelancer with pending KYB, not allowlisted, wallet two days old: 1500.00 USDC.'
+  intent:
+    cpt: cpt_nova
+    amount: '1500.00'
+  label:
+    decision: ESCALATE
+    resolution: reject
+- id: agr-34
+  description: 'Freelancer with pending KYB, not allowlisted, wallet two days old: 6000.00 USDC.'
+  intent:
+    cpt: cpt_nova
+    amount: '6000.00'
+  label:
+    decision: ESCALATE
+    resolution: reject
+- id: agr-35
+  description: Freelancer whose KYB failed, 200.00 USDC.
+  setup:
+    counterparties:
+    - id: cpt_nova
+      kyb_status: failed
+  intent:
+    cpt: cpt_nova
+    amount: '200.00'
+  label:
+    decision: BLOCK
+- id: agr-36
+  description: Freelancer, KYB now verified and allowlisted, first payment 400.00 USDC to a two-day-old wallet.
+  setup:
+    counterparties:
+    - id: cpt_nova
+      kyb_status: verified
+      allowlisted: true
+  intent:
+    cpt: cpt_nova
+    amount: '400.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-37
+  description: UK studio, bank details changed three days ago, 850.00 GBP.
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_quill
+    amount: '850.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-38
+  description: UK studio, bank details changed three days ago, 120.00 GBP.
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_quill
+    amount: '120.00'
+  label:
+    decision: ESCALATE
+    resolution: needs_information
+- id: agr-39
+  description: UK studio, bank details changed three days ago, 4,000.00 GBP.
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_quill
+    amount: '4000.00'
+  label:
+    decision: ESCALATE
+    resolution: reject
+- id: agr-40
+  description: Long-standing German logistics supplier, 900.00 EUR (median 2,400.00).
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_harbor
+    amount: '900.00'
+  label:
+    decision: EXECUTE
+- id: agr-41
+  description: Long-standing German logistics supplier, 2400.00 EUR (median 2,400.00).
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_harbor
+    amount: '2400.00'
+  label:
+    decision: EXECUTE
+- id: agr-42
+  description: Long-standing German logistics supplier, 3100.00 EUR (median 2,400.00).
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_harbor
+    amount: '3100.00'
+  label:
+    decision: EXECUTE
+- id: agr-43
+  description: Long-standing German logistics supplier, 6500.00 EUR (median 2,400.00).
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_harbor
+    amount: '6500.00'
+  label:
+    decision: EXECUTE
+- id: agr-44
+  description: 'Long-standing logistics supplier, 9,500.00 EUR: about four times the usual size.'
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_harbor
+    amount: '9500.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-45
+  description: 'Long-standing logistics supplier, 30,000.00 EUR: above the rail''s per-payment limit.'
+  setup:
+    bank: true
+  intent:
+    cpt: cpt_harbor
+    amount: '30000.00'
+  label:
+    decision: ESCALATE
+    resolution: reject
+- id: agr-46
+  description: The AP agent pays the allowlisted supplier inside its mandate, 2,000.00 USDC (first payment).
+  intent:
+    source: agent
+    cpt: cpt_bluefin
+    amount: '2000.00'
+  label:
+    decision: ESCALATE
+    resolution: approve
+- id: agr-47
+  description: The AP agent pays above its per-payment mandate limit, 25,000.00 USDC.
+  intent:
+    source: agent
+    cpt: cpt_bluefin
+    amount: '25000.00'
+  label:
+    decision: BLOCK
+- id: agr-48
+  description: The AP agent pays a supplier outside its mandate's payees, 50.00 USDC.
+  intent:
+    source: agent
+    cpt: cpt_local
+    amount: '50.00'
+  label:
+    decision: BLOCK
+- id: agr-49
+  description: The AP agent pays the freelancer (outside its mandate), 200.00 USDC.
+  intent:
+    source: agent
+    cpt: cpt_nova
+    amount: '200.00'
+  label:
+    decision: BLOCK
+- id: agr-50
+  description: The AP agent's mandate is revoked; it tries 100.00 USDC to the allowlisted supplier.
+  intent:
+    source: agent
+    cpt: cpt_bluefin
+    amount: '100.00'
+    revoke_mandate: true
+  label:
+    decision: BLOCK

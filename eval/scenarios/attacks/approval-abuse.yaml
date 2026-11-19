@@ -1,0 +1,111 @@
+# Approval abuse (spec/09: at least 10). Approval re-runs policy, the approver is never the initiator
+# (invariant 8), a timeout never becomes an approval (invariant 7), and after the deadline only the
+# case's current owner or the payments lead may approve (G-05, D-30).
+category: approval_abuse
+scenarios:
+  - id: atk-aa-01
+    description: Self-approval - the payments lead who created the payment approves it.
+    steps:
+      - intent: {key: lead, amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: lead, expect_http: [403, 409]}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-aa-02
+    description: Self-approval through a second key the initiator holds with only the approve scope.
+    setup: {keys: {lead_approver: {role: payments_lead, scopes: ["exceptions:approve"]}}}
+    steps:
+      - intent: {key: lead, amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: lead_approver, expect_http: [403, 409]}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-aa-03
+    description: Approval after the deadline by a non-owner (the original reviewer, after backup takeover).
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - advance_clock: {hours: 3}
+      - sweep_deadlines: {}
+      - approve: {payment: p1, as: reviewer, expect_http: 403}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-aa-04
+    description: Double approval - the second approval of the same case is refused; one transfer.
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: reviewer, expect_http: 200, expect_status: READY}
+      - approve: {payment: p1, as: backup_owner, expect_http: [404, 409]}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: atk-aa-05
+    description: Two reviewers approve the same case at the same instant.
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - concurrently:
+          steps:
+            - approve: {payment: p1, as: reviewer}
+            - approve: {payment: p1, as: backup_owner}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: atk-aa-06
+    description: Approval of a case whose policy now blocks (hard maximum lowered by a two-person change).
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - policy_propose: {as: payments_lead, changes: {checks.limits.hard_max.USDC: "12000.00"}, save: d1}
+      - policy_approve: {draft: $d1, as: compliance_lead}
+      - approve: {payment: p1, as: reviewer, expect_http: 200, expect_status: BLOCKED}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}
+
+  - id: atk-aa-07
+    description: The on-call engineer tries to approve (not an approver role).
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: oncall, expect_http: 403}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-aa-08
+    description: The compliance lead tries to approve a payout case (not an approver role).
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: compliance_lead, expect_http: 403}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-aa-09
+    description: Approval with a blank reason.
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: reviewer, reason: "   ", expect_http: 422}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-aa-10
+    description: Approval with a key that lacks the exceptions:approve scope.
+    setup: {keys: {reviewer_read: {role: reviewer, scopes: [read]}}}
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: reviewer_read, expect_http: 403}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-aa-11
+    description: Nobody answers for three days; sweeps run; the payment is never approved by the clock.
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - advance_clock: {hours: 3}
+      - sweep_deadlines: {}
+      - advance_clock: {days: 3}
+      - sweep_deadlines: {}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}, audit_includes: [case.overdue]}
+
+  - id: atk-aa-12
+    description: Approve another organisation's case by its ID.
+    setup: {second_org: true}
+    steps:
+      - intent: {amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - save_case: {payment: p1, save: c1}
+      - request: {method: POST, path: "/v1/exceptions/$c1/approve", key: "other:reviewer", other_org: true, body: {reason: "looks fine"}, expect_http: 404}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}

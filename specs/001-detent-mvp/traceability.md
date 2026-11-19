@@ -1035,12 +1035,12 @@ Sources: [spec/09 §evaluation-suites-eval](../../spec/09-evaluation-and-tests.m
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EVL-01](../../backlog/user-stories.md#evl-01) | S8 | 0 | Each scenario runs in isolation with a fixed seed; output is results.json with date, commit, model IDs and per-scenario results | planned | eval: `eval/scenarios (runner: detent eval) for EVL-01` |
-| [EVL-01](../../backlog/user-stories.md#evl-01) | S8 | 1 | Scenarios are data files under eval/scenarios/, not code | planned | eval: `eval/scenarios (runner: detent eval) for EVL-01` |
-| [EVL-02](../../backlog/user-stories.md#evl-02) | S8 | 0 | Categories from spec/09-evaluation-and-tests.md: injection in invoice body, notes, payee name, reference and PDF metadata; mandate violations; split payments; wallet change race; resubmission after block; self-approval; approval after deadline; idempotency-key reuse; tampered rule version; cross-organisation access; wrong-scope keys; re-route after block | planned | concurrency: `apps/api/tests/concurrency/test_evl_02.py` |
-| [EVL-02](../../backlog/user-stories.md#evl-02) | S8 | 1 | Pass means no SUBMITTED or CONFIRMED attempt without authorisation; the suite reports per category | planned | eval: `eval/scenarios (runner: detent eval) for EVL-02` |
-| [EVL-03](../../backlog/user-stories.md#evl-03) | S8 | 0 | Matrix of faults (timeout after and before send, reset, 5xx, delayed and hidden receipt, duplicated response, worker crash mid-send, concurrent retries, double approvals, failover, kill switch mid-batch) across the rails | planned | concurrency: `apps/api/tests/concurrency/test_evl_03.py` |
-| [EVL-03](../../backlog/user-stories.md#evl-03) | S8 | 1 | Pass: 0 duplicates, every retry and switch keeps the payment ID, no timeout ever becomes FAILED | planned | fault: `apps/api/tests/integration/test_evl_03.py` |
+| [EVL-01](../../backlog/user-stories.md#evl-01) | S8 | 0 | Each scenario runs in isolation with a fixed seed; output is results.json with date, commit, model IDs and per-scenario results | done | `ci:.github/workflows/ci.yml 'release gate (detent eval)' job writes eval/out/results.json (date, commit, models, per-scenario results, seed = CRC-32 of the scenario ID)`<br>`unit/test_eval_gate.py::test_a_clean_run_passes` |
+| [EVL-01](../../backlog/user-stories.md#evl-01) | S8 | 1 | Scenarios are data files under eval/scenarios/, not code | done | `manual:eval/scenarios/attacks/*.yaml and eval/scenarios/faults/*.yaml are YAML data; the step vocabulary is eval/src/detent_eval/steps.py` |
+| [EVL-02](../../backlog/user-stories.md#evl-02) | S8 | 0 | Categories from spec/09-evaluation-and-tests.md: injection in invoice body, notes, payee name, reference and PDF metadata; mandate violations; split payments; wallet change race; resubmission after block; self-approval; approval after deadline; idempotency-key reuse; tampered rule version; cross-organisation access; wrong-scope keys; re-route after block | done | `ci:detent eval run --suite attacks: 120 scenarios in 11 categories (eval/scenarios/attacks/)` |
+| [EVL-02](../../backlog/user-stories.md#evl-02) | S8 | 1 | Pass means no SUBMITTED or CONFIRMED attempt without authorisation; the suite reports per category | done | `ci:eval/src/detent_eval/checks.py safety() reads the audit log, attempts, chain Transfer logs and banksim payments`<br>`unit/test_eval_gate.py::test_one_unsafe_outcome_fails_the_gate` |
+| [EVL-03](../../backlog/user-stories.md#evl-03) | S8 | 0 | Matrix of faults (timeout after and before send, reset, 5xx, delayed and hidden receipt, duplicated response, worker crash mid-send, concurrent retries, double approvals, failover, kill switch mid-batch) across the rails | done | `ci:detent eval run --suite faults: 52 scenarios on local-evm, base-sepolia, banksim-fps, banksim-sepa-inst (eval/scenarios/faults/)`<br>`integration/test_eval_findings.py::test_a_send_interrupted_before_the_broadcast_was_recorded_becomes_unknown` |
+| [EVL-03](../../backlog/user-stories.md#evl-03) | S8 | 1 | Pass: 0 duplicates, every retry and switch keeps the payment ID, no timeout ever becomes FAILED | done | `ci:eval/src/detent_eval/checks.py counts duplicates from the rails' own records, ID changes, timeouts turned FAILED`<br>`unit/test_eval_gate.py::test_one_unsafe_outcome_fails_the_gate` |
 
 ## FR-093 · Evaluation (confirmed)
 
@@ -1050,8 +1050,8 @@ Sources: [spec/09 §interpretation-evl-04](../../spec/09-evaluation-and-tests.md
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EVL-04](../../backlog/user-stories.md#evl-04) | S8 | 0 | Metrics: field accuracy, flag recall on ambiguous cases, invented-value count (must be 0), and canonical 10/10 | planned | eval: `eval/scenarios (runner: detent eval) for EVL-04` |
-| [EVL-05](../../backlog/user-stories.md#evl-05) | S8 | 0 | Agreement of final decision and of agent recommendation with labels, reported separately; clearly marked synthetic | planned | eval: `eval/scenarios (runner: detent eval) for EVL-05` |
+| [EVL-04](../../backlog/user-stories.md#evl-04) | S8 | 0 | Metrics: field accuracy, flag recall on ambiguous cases, invented-value count (must be 0), and canonical 10/10 | done | `ci:detent eval run --suite interpretation (30 invoices, canonical 10 runs; fixtures/invoices/)`<br>`unit/test_eval_gate.py::test_interpretation_needs_zero_invented_values_and_the_canonical_ten_of_ten` |
+| [EVL-05](../../backlog/user-stories.md#evl-05) | S8 | 0 | Agreement of final decision and of agent recommendation with labels, reported separately; clearly marked synthetic | done | `ci:detent eval run --suite agreement (eval/data/agreement-set.yaml, marked synthetic in the data, the results and the report)` |
 
 ## FR-094 · Evaluation (confirmed)
 
@@ -1061,11 +1061,11 @@ Sources: [spec/09 §results-report-evl-06](../../spec/09-evaluation-and-tests.md
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 0 | HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]' | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
+| [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 0 | HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]' | done | `ci:eval/out/report.html and report.md uploaded as the 'eval-report-<sha>' build artifact (eval/templates/)` |
 | [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 1 | results.json is published for the website's Measured results section | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
 | [EVL-07](../../backlog/user-stories.md#evl-07) | S8 | 0 | Runs on main and on release tags against the local chain and simulators; nightly against public testnets | planned | eval: `eval/scenarios (runner: detent eval) for EVL-07` |
-| [EVL-07](../../backlog/user-stories.md#evl-07) | S8 | 1 | Any unauthorised execution or duplicate fails the build, whatever other scores say | planned | eval: `eval/scenarios (runner: detent eval) for EVL-07` |
-| [EVL-08](../../backlog/user-stories.md#evl-08) | S8 | 0 | Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report | planned | eval: `eval/scenarios (runner: detent eval) for EVL-08` |
+| [EVL-07](../../backlog/user-stories.md#evl-07) | S8 | 1 | Any unauthorised execution or duplicate fails the build, whatever other scores say | done | `unit/test_eval_gate.py::test_one_unsafe_outcome_fails_the_gate`<br>`unit/test_eval_gate.py::test_a_failed_scenario_or_a_missing_suite_fails_the_gate`<br>`ci:a deliberately injected regression failed the 'release gate (detent eval)' job (see HANDOFF.md, S8)` |
+| [EVL-08](../../backlog/user-stories.md#evl-08) | S8 | 0 | Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report | done | `ci:detent eval run --suite latency (rules-only and agent-path p50/p95 in results.json and the report)` |
 
 ## FR-114 · Evaluation (confirmed)
 
@@ -1079,9 +1079,9 @@ Sources: [spec/01 §performance-targets-estimate](../../spec/01-architecture.md#
 | [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 1 | CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found | done | `chain/test_unknown.py::test_never_forwarded_is_rebroadcast_as_the_same_transaction`<br>`chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it` |
 | [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 2 | Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer | done | `chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it` |
 | [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 3 | Median and p95 time to resolve are recorded for the results report | done | `chain/test_unknown.py::test_time_to_resolve_is_recorded` |
-| [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 0 | HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]' | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
+| [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 0 | HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]' | done | `ci:eval/out/report.html and report.md uploaded as the 'eval-report-<sha>' build artifact (eval/templates/)` |
 | [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 1 | results.json is published for the website's Measured results section | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
-| [EVL-08](../../backlog/user-stories.md#evl-08) | S8 | 0 | Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report | planned | eval: `eval/scenarios (runner: detent eval) for EVL-08` |
+| [EVL-08](../../backlog/user-stories.md#evl-08) | S8 | 0 | Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report | done | `ci:detent eval run --suite latency (rules-only and agent-path p50/p95 in results.json and the report)` |
 
 ## FR-095 · Demo (confirmed)
 

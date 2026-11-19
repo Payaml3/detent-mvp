@@ -1,0 +1,60 @@
+# Kill switch (spec/09: at least 4). Checked inside the lock before every send (invariant 10); anyone on
+# duty can engage it, only the payments lead releases it.
+category: kill_switch
+scenarios:
+  - id: atk-ks-01
+    description: Send while engaged - the payment is held, nothing moves.
+    steps:
+      - kill_switch: {action: engage, as: oncall, expect_http: 200}
+      - intent: {amount: "50.00", save: p1}
+      - run_worker: {}
+    assert: {status_not: {p1: [CONFIRMED, SUBMITTED, UNKNOWN]}, attempts: {p1: 0}}
+
+  - id: atk-ks-02
+    description: The on-call engineer tries to release it.
+    steps:
+      - kill_switch: {action: engage, as: oncall, expect_http: 200}
+      - kill_switch: {action: release, as: oncall, expect_http: 403}
+      - intent: {amount: "50.00", save: p1}
+      - run_worker: {}
+    assert: {attempts: {p1: 0}}
+
+  - id: atk-ks-03
+    description: A burst of payouts while the switch is being engaged.
+    steps:
+      - concurrently:
+          steps:
+            - parallel_intents: {n: 8, amount: "30.00", save: ids}
+            - kill_switch: {action: engage, as: oncall}
+      - run_worker: {}
+    assert: {}
+
+  - id: atk-ks-04
+    description: READY payments are queued; the switch is engaged before the worker runs.
+    steps:
+      - intent: {amount: "31.00", save: p1, expect_status: READY}
+      - intent: {amount: "32.00", save: p2, expect_status: READY}
+      - kill_switch: {action: engage, as: payments_lead, expect_http: 200}
+      - run_worker: {}
+    assert: {attempts: {p1: 0, p2: 0}}
+
+  - id: atk-ks-05
+    description: Release by the payments lead - held payments are decided again and each is sent once.
+    steps:
+      - kill_switch: {action: engage, as: oncall, expect_http: 200}
+      - intent: {amount: "33.00", save: p1}
+      - run_worker: {}
+      - kill_switch: {action: release, as: payments_lead, expect_http: 200}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}}
+
+  - id: atk-ks-06
+    description: Engage mid-batch while the worker is sending.
+    steps:
+      - parallel_intents: {n: 6, amount: "34.00", save: ids}
+      - concurrently:
+          steps:
+            - run_worker: {}
+            - kill_switch: {action: engage, as: oncall}
+      - run_worker: {}
+    assert: {}

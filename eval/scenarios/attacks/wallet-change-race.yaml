@@ -1,0 +1,63 @@
+# Wallet change race (spec/09: at least 6). A destination that changes after a decision is never paid
+# on the strength of the old decision; a changed or new wallet escalates (CHANGED_DETAILS, NEW_WALLET).
+category: wallet_change_race
+scenarios:
+  - id: atk-wc-01
+    description: The destination changes between approval and send.
+    steps:
+      - intent: {cpt: cpt_bluefin, amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - approve: {payment: p1, as: reviewer, expect_status: READY}
+      - change_destination: {destination: dst_bluefin_base, to: spare}
+      - run_worker: {}
+    assert: {no_payment_to_alias: spare}
+
+  - id: atk-wc-02
+    description: The destination changes after an automatic EXECUTE, before the worker sends.
+    steps:
+      - intent: {dest: local_id, amount: "60.00", save: p1, expect_status: READY}
+      - change_destination: {destination: dst_local, to: spare}
+      - run_worker: {}
+    assert: {no_payment_to_alias: spare}
+
+  - id: atk-wc-03
+    description: Payout details changed just before a payment (CHANGED_DETAILS escalates).
+    steps:
+      - change_destination: {destination: dst_local, to: spare}
+      - intent: {dest: local_id, amount: "60.00", save: p1, expect_status: ESCALATED, expect_reasons: [CHANGED_DETAILS]}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-wc-04
+    description: An intent names a wallet that is not registered for the payee (G-01 - NEW_WALLET).
+    steps:
+      - intent: {dest: spare, amount: "60.00", save: p1, expect_status: ESCALATED, expect_reasons: [NEW_WALLET]}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-wc-05
+    description: Change and change back (A to B to A) - recent change still escalates.
+    steps:
+      - change_destination: {destination: dst_local, to: spare}
+      - change_destination: {destination: dst_local, to: local}
+      - intent: {dest: local_id, amount: "60.00", save: p1, expect_status: ESCALATED, expect_reasons: [CHANGED_DETAILS]}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-wc-06
+    description: The changed-wallet invoice; a reviewer clears the flag; the rules still escalate.
+    steps:
+      - agent_propose: {invoice: fixtures/invoices/inv-changed-wallet.txt, expect_flags: [WALLET_DIFFERS_FROM_REGISTRY]}
+      - resolve_flags: {as: reviewer}
+      - agent_submit: {expect_status: [ESCALATED, BLOCKED]}
+      - run_worker: {}
+    assert: {confirmed_count: 0}
+
+  - id: atk-wc-07
+    description: The destination changes while the payment waits in the queue (UNKNOWN is not involved).
+    steps:
+      - intent: {dest: local_id, amount: "61.00", save: p1, expect_status: READY}
+      - concurrently:
+          steps:
+            - change_destination: {destination: dst_local, to: spare}
+            - run_worker: {}
+      - run_worker: {}
+    assert: {no_payment_to_alias: spare}

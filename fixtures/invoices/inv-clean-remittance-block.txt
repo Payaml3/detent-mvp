@@ -1,0 +1,9 @@
+BLUEFIN COMPONENTS LTD (fictional)
+INVOICE  Invoice no: INV-2026-0154   Issue date: 2026-12-06   Due date: 2026-12-21
+Sensor arrays, batch Q4                       40    USD    300.00   USD 12,000.00
+                                                      Total:    USD 12,000.00
+---- Remittance advice ----
+Payment: 12,000.00 USDC
+Network: Base Sepolia
+Wallet: {{WALLET_BLUEFIN_BASE}}
+Quote: INV-2026-0154

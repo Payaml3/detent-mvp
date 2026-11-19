@@ -1,0 +1,5 @@
+BLUEFIN COMPONENTS LTD (fictional)
+INVOICE  Invoice no: INV-2026-0150   Issue date: 2026-12-04   Due date: 2026-12-18
+Sensor housings                                8    USD    300.00   USD 2,400.00
+                                                      Total:    USD 2,400.00
+Payment: 2,400.00 USDC   Network: Base Sepolia   Wallet: {{WALLET_BLUEFIN_BASE}}   Reference: INV-2026-0150
