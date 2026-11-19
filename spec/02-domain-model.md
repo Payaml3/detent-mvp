@@ -101,6 +101,8 @@ CREATE UNIQUE INDEX one_open_case ON exception_cases (payment_id)
 
 Audit and ledger tables get `BEFORE UPDATE OR DELETE` triggers that raise an error.
 
+As built (S8, migration 0008): the `attempt_ready_guard` trigger refuses an attempt INSERT for a payment that is BLOCKED, REJECTED, ESCALATED or HELD, so a payment the rules did not authorise can never get an attempt, whoever writes the row. `create_attempt` is stricter: it requires READY under the payment's row lock.
+
 ## Entities
 
 | Table | Key fields | Notes |

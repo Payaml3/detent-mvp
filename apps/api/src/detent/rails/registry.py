@@ -130,6 +130,7 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
             fee_flat_minor=int(b.fee_flat_minor),
             fee_bps=int(b.fee_bps),
             expected_seconds=int(b.est_seconds),
+            timeout_seconds=settings.rail_timeout_seconds,
         )
     for r in rows:
         url, key = keys.get(r.id, (None, None))
@@ -143,6 +144,7 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
             signer=LocalKeySigner(key),
             confirmations=int(r.confirmations),
             explorer_tx_url=r.explorer_tx_url,
+            timeout_seconds=settings.rail_timeout_seconds,
         )
     return out
 

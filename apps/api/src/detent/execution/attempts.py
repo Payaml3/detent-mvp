@@ -42,6 +42,13 @@ def rail_idempotency_key(payment_id: str, rail_id: str, *, first_rail_id: str) -
 
 
 def create_attempt(conn: Connection, clock: Clock, *, org_id: str, payment_id: str, rail_id: str) -> Attempt:
+    status = conn.execute(
+        text("SELECT status FROM payment_intents WHERE org_id=:o AND id=:p FOR UPDATE"),
+        {"o": org_id, "p": payment_id},
+    ).scalar_one_or_none()
+    if status != "READY":
+        # S8 (atk-bb-03): only a payment authorised to send gets an attempt; migration 0008 backs this up.
+        raise AttemptNotAllowed(f"payment {payment_id} is {status}; an attempt needs a READY payment")
     rows = conn.execute(
         text(
             "SELECT attempt_no, rail_id, status FROM attempts WHERE org_id=:o AND payment_id=:p "

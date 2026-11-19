@@ -15,7 +15,7 @@ from detent.clock import Clock
 from detent.domain.money import Currency, Money
 from detent.domain.states import Status
 from detent.execution import nonces
-from detent.execution.send import apply_rail_status, send_payment
+from detent.execution.send import apply_rail_status, recover_interrupted_send, send_payment
 from detent.intents.service import SEND_JOB
 from detent.policy.screening import MockScreening
 from detent.rails.base import AttemptView, RailAdapter
@@ -42,6 +42,11 @@ def _adapters(ctx: JobContext) -> dict[str, RailAdapter]:
 def send_job(ctx: JobContext) -> None:
     assert ctx.engine is not None
     pid = str(ctx.job.payload["payment_id"])
+    if (
+        ctx.job.attempts > 1
+        and recover_interrupted_send(ctx.engine, ctx.clock, org_id=ctx.job.org_id, payment_id=pid) is not None
+    ):
+        return  # the worker died mid-send last time: UNKNOWN now, and the resolver takes it from here
     st = send_payment(
         ctx.engine,
         ctx.clock,

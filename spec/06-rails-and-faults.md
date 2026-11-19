@@ -97,6 +97,9 @@ on attempt UNKNOWN:
   Bank: status by idempotency key: SETTLED -> CONFIRMED; FAILED -> FAILED(class); NOT_FOUND after rail's
         stated acceptance window -> FAILED(TECHNICAL_FINAL); else keep UNKNOWN
   after unknown_stuck_after (default 15 min): open case UNKNOWN_STUCK (owner payments lead)
+  interrupted send (S8): a send job that runs again finds the payment SUBMITTED with no rail.submitted
+     event for its in-flight attempt (the worker died between storing the signed transaction and recording
+     the broadcast) -> attempt and payment UNKNOWN, resolver scheduled; the rules above then decide
      options: keep waiting | approve cancel-by-replacement (EVM only: same nonce, 0-value self-transfer,
      higher fee). The outcome is still read from the chain: whichever tx lands decides CONFIRMED or FAILED.
 ```

@@ -73,6 +73,7 @@ class Settings(BaseSettings):
     usdc_address_eth_sepolia: str = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
 
     banksim_url: str = "http://localhost:8100"
+    rail_timeout_seconds: float = 10.0  # how long an adapter waits for a rail's answer before UNKNOWN
     faultproxy_url: str = "http://localhost:8200"
     email_provider: str = "outbox"
     sales_inbox: str | None = None

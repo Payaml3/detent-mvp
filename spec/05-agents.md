@@ -141,4 +141,6 @@ The output also carries a rationale with `evidence_ids`. A fix is applied by cod
 }
 ```
 
+**As built (S8):** a valid signature is not enough on its own. The `mandate.issued` audit event records the version and the signature of every issued document, and verification refuses (`MANDATE_SIGNATURE_INVALID`) a stored document that is not the last one issued, so an older, validly signed version put back in the table is not accepted (found by the mandate-replay attack). Revocation is also read from the audit log, so clearing `revoked_at` in the table does not revive a mandate.
+
 The signature is HMAC-SHA256 over the canonical JSON (sorted keys, no whitespace) without the `signature` field. The signing key is the platform's mandate key, held in settings for the prototype. Later this maps to AP2-style signed mandates (roadmap v3); the scope fields above are chosen so the mapping is direct.

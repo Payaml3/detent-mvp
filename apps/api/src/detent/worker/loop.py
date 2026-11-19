@@ -23,8 +23,9 @@ def default_worker_id() -> str:
 
 
 class Worker:
-    def __init__(self, rt: Runtime, worker_id: str | None = None) -> None:
+    def __init__(self, rt: Runtime, worker_id: str | None = None, *, org_id: str | None = None) -> None:
         self.rt = rt
+        self.org_id = org_id  # None: every organisation (production); set: one (evaluation runs)
         self.worker_id = worker_id or rt.settings.worker_id or default_worker_id()
         self.lease = timedelta(seconds=rt.settings.worker_lease_seconds)
         self.stop = threading.Event()
@@ -40,7 +41,7 @@ class Worker:
 
     def run_one(self) -> bool:
         """Claim and run one due job. Returns False when nothing was due."""
-        job = queue.claim(self.rt.engine, self.rt.clock, self.worker_id, self.lease)
+        job = queue.claim(self.rt.engine, self.rt.clock, self.worker_id, self.lease, org_id=self.org_id)
         if job is None:
             return False
         fields = {"job_id": job.id, "job_kind": job.kind, "attempt": job.attempts, "org_id": job.org_id}

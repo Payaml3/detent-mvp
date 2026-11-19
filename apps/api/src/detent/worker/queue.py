@@ -35,6 +35,7 @@ CLAIM_SQL = text(
         SELECT id FROM jobs
         WHERE done_at IS NULL AND dead_at IS NULL AND run_at <= :now
           AND (locked_until IS NULL OR locked_until < :now)
+          AND (CAST(:org AS TEXT) IS NULL OR org_id = :org)
         ORDER BY run_at, id
         FOR UPDATE SKIP LOCKED
         LIMIT 1
@@ -101,12 +102,16 @@ def enqueue(
     return str(row) if row else None
 
 
-def claim(engine: Engine, clock: Clock, worker_id: str, lease: timedelta) -> Job | None:
+def claim(
+    engine: Engine, clock: Clock, worker_id: str, lease: timedelta, *, org_id: str | None = None
+) -> Job | None:
+    """Claim the next due job. ``org_id`` limits the claim to one organisation (the evaluation runner
+    runs each scenario's jobs in its own organisation only)."""
     now = clock.now()
     with engine.begin() as conn:
         row = (
             conn.execution_options(cross_org="worker claims the next due job from any organisation")
-            .execute(CLAIM_SQL, {"worker": worker_id, "until": now + lease, "now": now})
+            .execute(CLAIM_SQL, {"worker": worker_id, "until": now + lease, "now": now, "org": org_id})
             .one_or_none()
         )
     if row is None:

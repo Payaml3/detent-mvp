@@ -8,7 +8,7 @@ detent audit verify      verify an organisation's hash-chained audit log (AUD-01
 detent keys create       issue an sk_test_ API key to a named user (G-08)
 detent agent record      run the instruction agent on an invoice with the Claude API and save the response
                          as a recording (replaces the hand-written stand-ins; EVL-04)
-detent eval run ...      evaluation suites (built in M6)
+detent eval run ...      evaluation suites and the release gate (eval/, S8)
 """
 
 from __future__ import annotations
@@ -172,12 +172,19 @@ def cmd_agent_record(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_eval(_: argparse.Namespace) -> int:
-    print(
-        "detent eval: not built yet (EVL-01, milestone M6). Failing so CI can't pass by accident.",
-        file=sys.stderr,
-    )
-    return 1
+def cmd_eval(argv: list[str]) -> int:
+    """``detent eval run|report|publish ...``: the evaluation runner lives in ``eval/`` (detent-eval)."""
+    import importlib
+
+    try:
+        runner = importlib.import_module("detent_eval.runner")
+    except ImportError:
+        print(
+            "detent eval: the detent-eval package is not installed (uv sync --all-packages)", file=sys.stderr
+        )
+        return 1
+    rc: int = runner.main(argv)
+    return rc
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -205,10 +212,10 @@ def main(argv: list[str] | None = None) -> int:
     ag.add_argument("--org", default=None)
     ag.add_argument("--mandate", default="mnd_demo_ap_agent")
     ag.set_defaults(fn=cmd_agent_record)
-    e = sub.add_parser("eval")
-    e.add_argument("action", nargs="?", default="run")
-    e.add_argument("--suite", default="all")
-    e.set_defaults(fn=cmd_eval)
+    sub.add_parser("eval", help="evaluation suites: detent eval run --suite all (see eval/)", add_help=False)
+    argv = sys.argv[1:] if argv is None else argv
+    if argv and argv[0] == "eval":
+        return cmd_eval(argv[1:])
     args = p.parse_args(argv)
     rc: int = args.fn(args)
     return rc

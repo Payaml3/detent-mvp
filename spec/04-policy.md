@@ -84,6 +84,7 @@ A re-run evaluates every check again with the active rule version. Without a rul
 - **A new reason**, or changed evidence behind an approved one (for example, the destination changed after approval), escalates again and opens a new case.
 - **Any BLOCK still blocks.** An approval never covers a BLOCK.
 - The pre-send re-check in the execution layer applies the same rule with the same `approved_reasons`.
+- **As built (S8):** the pre-send re-check runs when the decision is older than `max_decision_age_seconds`, when the active rule version changed, **or when the destination's address or masked account differs from the one in the last decision's inputs** (found by the wallet-change race attacks; before S8 a destination edited after the decision was paid on the old decision).
 
 ## Travel-rule data (travel_rule check)
 

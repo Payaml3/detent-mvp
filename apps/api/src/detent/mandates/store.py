@@ -78,9 +78,12 @@ def issue_mandate(
         subject_id=doc["mandate_id"],
         payload={
             "agent_id": doc["agent"]["agent_id"],
+            "version": int(doc["version"]),
             "scope": doc["scope"],
             "valid_from": doc["valid_from"],
             "expires_at": doc["expires_at"],
+            # The MAC (not a key): verify() checks the stored document is the one issued last (S8).
+            "signature": doc["signature"]["value"],
         },
     )
     return str(doc["mandate_id"])
@@ -124,6 +127,29 @@ def load_document(
     return {**r.payload, "signature": sig}, r.revoked_at
 
 
+def _issued_record(conn: Connection, org_id: str, mandate_id: str) -> dict[str, Any] | None:
+    """The last ``mandate.issued`` audit event's payload (the append-only, hash-chained record)."""
+    p = conn.execute(
+        text(
+            "SELECT payload FROM audit_events WHERE org_id=:o AND kind='mandate.issued' AND subject_id=:m "
+            "ORDER BY seq DESC LIMIT 1"
+        ),
+        {"o": org_id, "m": mandate_id},
+    ).scalar_one_or_none()
+    return dict(p) if p is not None else None
+
+
+def _revoked_in_audit(conn: Connection, org_id: str, mandate_id: str) -> bool:
+    last = conn.execute(
+        text(
+            "SELECT kind FROM audit_events WHERE org_id=:o AND kind IN ('mandate.issued','mandate.revoked') "
+            "AND subject_id=:m ORDER BY seq DESC LIMIT 1"
+        ),
+        {"o": org_id, "m": mandate_id},
+    ).scalar_one_or_none()
+    return last == "mandate.revoked"
+
+
 def _block(mandate_id: str, reason: str, **evidence: Any) -> MandateFacts:
     return MandateFacts(mandate_id, False, reason, {"mandate_id": mandate_id, **evidence})
 
@@ -132,7 +158,7 @@ def _iso(v: str) -> datetime:
     return datetime.fromisoformat(v.replace("Z", "+00:00"))
 
 
-def verify(  # noqa: PLR0911 - one return per MND-02 reason
+def verify(  # noqa: PLR0911, PLR0912 - one return per MND-02 reason
     conn: Connection,
     *,
     org_id: str,
@@ -152,6 +178,15 @@ def verify(  # noqa: PLR0911 - one return per MND-02 reason
     doc, revoked_at = loaded
     if not verify_signature(doc, key) or doc.get("principal", {}).get("org_id") != org_id:
         return _block(mandate_id, "MANDATE_SIGNATURE_INVALID")
+    issued = _issued_record(conn, org_id, mandate_id)
+    if issued is not None and (
+        issued.get("version", doc.get("version")) != doc.get("version")
+        or issued.get("signature", doc["signature"].get("value")) != doc["signature"].get("value")
+    ):
+        # A validly signed but older (or otherwise replaced) document: only the last issued one counts.
+        return _block(mandate_id, "MANDATE_SIGNATURE_INVALID", note="not the last issued version")
+    if revoked_at is None and _revoked_in_audit(conn, org_id, mandate_id):
+        revoked_at = now  # the audit log says it was revoked, even if the row was edited since
     if revoked_at is not None:
         return _block(mandate_id, "MANDATE_REVOKED", revoked_at=revoked_at.isoformat())
     if not (_iso(doc["valid_from"]) <= now <= _iso(doc["expires_at"])):

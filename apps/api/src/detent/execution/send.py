@@ -119,11 +119,15 @@ def _check_prefund(conn: Connection, org_id: str, rail_id: str, amount: Money, d
 def _maybe_rerun(
     conn: Connection, clock: Clock, org_id: str, p: Any, screening: Screening, mandate_key: SecretStr | None
 ) -> str | None:
-    """Re-run the policy when the decision is stale or the rule version changed. Returns a non-EXECUTE
-    outcome, or None to carry on."""
+    """Re-run the policy when the decision is stale, the rule version changed, or the destination's
+    details changed after the decision (S8: the wallet-change race). Returns a non-EXECUTE outcome, or None
+    to carry on."""
     last = conn.execute(
         text(
-            "SELECT decided_at, policy_version_id FROM decisions WHERE org_id=:o AND payment_id=:p "
+            "SELECT decided_at, policy_version_id, "
+            "inputs_snapshot->'facts'->'destination'->>'address' AS address, "
+            "inputs_snapshot->'facts'->'destination'->>'account_masked' AS account_masked "
+            "FROM decisions WHERE org_id=:o AND payment_id=:p "
             "ORDER BY decided_at DESC, id DESC LIMIT 1"
         ),
         {"o": org_id, "p": p.id},
@@ -139,6 +143,10 @@ def _maybe_rerun(
         reasons.append("decision_stale")
     if last.policy_version_id != policy.id:
         reasons.append("rule_version_changed")
+    if (last.address or "").lower() != (p.address or "").lower() or (last.account_masked or "") != (
+        p.account_masked or ""
+    ):
+        reasons.append("destination_changed")
     if not reasons:
         return None
     result, _ = reevaluate(
@@ -423,6 +431,62 @@ def apply_rail_status(
                 conn, clock, org_id, view, RailError(st.failure_class, "rail reported failure", st.evidence)
             )
         return Status(cur)
+
+
+def recover_interrupted_send(engine: Engine, clock: Clock, *, org_id: str, payment_id: str) -> Status | None:
+    """A send job that runs again after its worker died (EXE-03, found by the S8 fault suite).
+
+    If the payment is SUBMITTED but no ``rail.submitted`` event was recorded for its in-flight attempt,
+    the worker died between storing the signed transaction and recording the broadcast: it may or may
+    not have reached the rail. That is UNKNOWN (invariant 3), never FAILED: the resolver then looks for
+    it and, only if the rail has nothing, re-broadcasts the same signed transaction (same hash, same
+    nonce) or re-sends with the same idempotency key. Returns the new status, or None if nothing to do.
+    """
+    with transaction(engine) as conn:
+        row = conn.execute(
+            text(
+                "SELECT a.id, a.attempt_no, a.rail_id, a.idempotency_key, a.nonce, a.raw_tx, a.tx_hash, "
+                "p.amount_minor, p.currency, d.address FROM payment_intents p JOIN attempts a "
+                "ON a.org_id = p.org_id AND a.payment_id = p.id AND a.status = 'SUBMITTED' "
+                "LEFT JOIN destinations d ON d.org_id = p.org_id AND d.id = p.destination_id "
+                "WHERE p.org_id=:o AND p.id=:p AND p.status='SUBMITTED' FOR UPDATE OF p"
+            ),
+            {"o": org_id, "p": payment_id},
+        ).one_or_none()
+        if row is None:
+            return None
+        recorded = conn.execute(
+            text(
+                "SELECT 1 FROM audit_events WHERE org_id=:o AND subject_id=:p AND kind='rail.submitted' "
+                "AND payload->>'attempt_id' = :a"
+            ),
+            {"o": org_id, "p": payment_id, "a": row.id},
+        ).first()
+        if recorded is not None:
+            return None
+        view = AttemptView(
+            row.id,
+            payment_id,
+            row.attempt_no,
+            row.rail_id,
+            row.idempotency_key,
+            Money(int(row.amount_minor), Currency(row.currency)),
+            row.address,
+            row.nonce,
+            row.raw_tx,
+            row.tx_hash,
+        )
+        return _record_failure(
+            conn,
+            clock,
+            org_id,
+            view,
+            RailError(
+                FailureClass.TIMEOUT,
+                "the worker stopped before the broadcast was recorded",
+                {"reason": "worker_restarted"},
+            ),
+        )
 
 
 def send_payment(  # noqa: PLR0911 - each return is a distinct outcome
