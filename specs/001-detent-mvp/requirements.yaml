@@ -168,7 +168,7 @@ requirements:
 - {id: FR-057, area: Execution, layer: orchestration, status: confirmed, stories: [EXE-08],
    src: ["inv:10", "story:EXE-08"],
    text: "The kill switch stops all sends (checked inside the lock), holds pending payments, lets UNKNOWN attempts keep resolving, shows a red banner, is audited, and only the payments lead releases it."}
-- {id: FR-058, area: Execution, layer: orchestration, status: proposed, decision: [G-15], stories: [EXE-08],
+- {id: FR-058, area: Execution, layer: orchestration, status: confirmed, decision: [G-15, D-28], stories: [EXE-08],
    src: ["spec/02#payment-state-machine"],
    text: "On release of the kill switch each held payment re-runs the policy automatically; EXECUTE resumes, anything else stays held or escalates."}
 - {id: FR-059, area: Execution, layer: orchestration, status: confirmed, decision: [C-09], stories: [EXE-09],

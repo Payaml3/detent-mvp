@@ -116,18 +116,18 @@ EXE-04,EXE Exactly-once execution,Nonce manager,"As a builder, I want nonces all
 - Concurrent sends from one wallet get consecutive nonces (concurrency test)",Must,0.5,S2 An EXECUTE decision is sent exactly once (done),"EXE-02, RAL-02","A2.Execute, A2b.custody"
 EXE-05,EXE Exactly-once execution,A timeout becomes UNKNOWN,"As a payments lead, I want a send whose outcome is unclear marked UNKNOWN, never FAILED, so that a stuck transaction that later confirms is never paid a second time.","- A timeout, dropped connection or 5xx after the request may have reached the rail -> attempt and payment UNKNOWN
 - While UNKNOWN, no new attempt can be created (database and code)
-- Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED",Must,0.25,S4 Never paid twice,EXE-02,"A2b.unknown, A2b.states, L4"
+- Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED",Must,0.25,S4 Never paid twice (done),EXE-02,"A2b.unknown, A2b.states, L4"
 EXE-06,EXE Exactly-once execution,UNKNOWN resolver,"As a payments lead, I want UNKNOWN payments resolved from the rail's own evidence, with a human decision if they stay stuck, so that we learn the real outcome quickly and never guess.","- The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule
 - CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found
 - Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer
-- Median and p95 time to resolve are recorded for the results report",Must,1.0,S4 Never paid twice,"EXE-05, FND-06, EXC-01","A2b.unknown, B7.unknown"
+- Median and p95 time to resolve are recorded for the results report",Must,1.0,S4 Never paid twice (done),"EXE-05, FND-06, EXC-01","A2b.unknown, B7.unknown"
 EXE-07,EXE Exactly-once execution,Deterministic retry policy,"As a compliance lead, I want retries decided by configured rules in the execution layer only, so that the AI never decides to retry and a rejection is never retried.","- Retry config lists retryable error codes, maximum attempts and backoff
 - Only `TECHNICAL_RETRYABLE` failures retry; `REJECTED_BY_RAIL` and any BLOCK never do
-- Every retry keeps the payment ID and is audited with the rule that allowed it",Must,0.5,S4 Never paid twice,EXE-02,"A2b.no_agent_retry, A6.retry_rule, A2b.rule"
+- Every retry keeps the payment ID and is audited with the rule that allowed it",Must,0.5,S4 Never paid twice (done),EXE-02,"A2b.no_agent_retry, A6.retry_rule, A2b.rule"
 EXE-08,EXE Exactly-once execution,Kill switch,"As a payments lead, I want a kill switch that I or Detent's on-call engineer can pull, and that only I can release, so that we can stop all sending at once during an incident.","- Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send
 - Pending payments stay held; UNKNOWN attempts keep resolving read-only
 - Release requires the client's payments lead, even if on-call engaged it
-- A red banner shows on every console page while engaged; every change is audited",Must,0.5,S4 Never paid twice,"EXE-03, FND-04","B3.kill_switch, A2.Execute, L4"
+- A red banner shows on every console page while engaged; every change is audited",Must,0.5,S4 Never paid twice (done),"EXE-03, FND-04","B3.kill_switch, A2.Execute, L4"
 EXE-09,EXE Exactly-once execution,"Shadow, Assist and Auto modes","As a payments lead, I want a mode setting per platform, so that we can adopt step by step under signed gates.","- Shadow: decisions recorded, nothing sent. Assist: EXECUTE decisions wait for a human 'Send' click. Auto: EXECUTE decisions send automatically
 - Changing mode needs the payments lead and the compliance lead; each change is audited
 - Orchestrate is shown as routing being enabled when 2 or more rails are connected",Must,0.5,S6 Operations around escalations,"EXE-03, FND-04","A3.shadow, A3.assist, A3.auto, A3.orchestrate, B6.wrong_decision, B3.mode_gates"
@@ -140,20 +140,20 @@ RAL-02,"RAL Rails, routing and faults",Base Sepolia USDC adapter,"As a demo view
 - Confirmation threshold configurable; explorer link stored on the attempt
 - Contract tests pass on the local chain and nightly on Base Sepolia",Must,0.75,S2 An EXECUTE decision is sent exactly once (done),"RAL-01, FND-09","A2.Connect, A2b.custody, A7.prototype"
 RAL-03,"RAL Rails, routing and faults",Ethereum Sepolia USDC adapter,"As a demo viewer, I want the same transfers on Ethereum Sepolia, so that routing has a real second network to choose.","- Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold
-- Contract tests pass",Must,0.25,S4 Never paid twice,RAL-02,A2.Connect
+- Contract tests pass",Must,0.25,S4 Never paid twice (done),RAL-02,A2.Connect
 RAL-04,"RAL Rails, routing and faults",Simulated instant bank rail,"As a demo viewer, I want a mock instant bank rail with its own fees, limits, cut-off times and failure rate, so that routing and reconciliation span stablecoin and fiat.","- A separate FastAPI sub-app with GBP and EUR, per-payment and daily limits, cut-off times, a configurable failure rate and idempotency by key
 - Status endpoint and asynchronous settlement callback; daily statement endpoint (used by LED-07)
-- Deterministic test values: amounts ending .13 time out then settle; .42 fail technically",Must,0.75,S4 Never paid twice,RAL-01,"A2.Connect, A7.prototype"
+- Deterministic test values: amounts ending .13 time out then settle; .42 fail technically",Must,0.75,S4 Never paid twice (done),RAL-01,"A2.Connect, A7.prototype"
 RAL-05,"RAL Rails, routing and faults",Fault-injection proxy,"As a builder, I want a proxy in front of chain RPC and the bank rail that injects named faults, so that the exactly-once claims are demonstrated, not asserted.","- Faults: timeout after forwarding, timeout before forwarding, connection reset, 5xx, delayed receipt, hidden receipt for N polls (stuck), duplicated response
 - Fault chosen per attempt by scenario config in tests and sandbox; disabled in demo mode unless a scenario requests it
-- Each injected fault is logged with the attempt ID",Must,0.75,S4 Never paid twice,"RAL-02, RAL-04","L3, L4, A2b.unknown"
+- Each injected fault is logged with the attempt ID",Must,0.75,S4 Never paid twice (done),"RAL-02, RAL-04","L3, L4, A2b.unknown"
 RAL-06,"RAL Rails, routing and faults",Routing engine,"As a payments lead, I want the best eligible rail chosen by cost, speed, success rate and liquidity, with the reason stored, so that payouts cost less and fail less, and I can see why a rail was chosen.","- Routing runs only after an EXECUTE decision; a BLOCK never reaches routing
 - Eligibility first (currency, network constraint from intent or mandate, limits, cut-off, health, liquidity), then a weighted score from config
-- The decision stores each candidate's score and the reason for the winner",Must,0.5,S4 Never paid twice,"RAL-01, POL-02","A2.Route, A3.orchestrate, A1.cost"
+- The decision stores each candidate's score and the reason for the winner",Must,0.5,S4 Never paid twice (done),"RAL-01, POL-02","A2.Route, A3.orchestrate, A1.cost"
 RAL-07,"RAL Rails, routing and faults",Failover on technical failure only,"As a compliance lead, I want failover to another rail only after a definitive technical failure and only when the intent allows a network switch, so that a rejection is never re-routed and failover can't pay twice.","- Failover needs the previous attempt definitively FAILED with a technical code; never from UNKNOWN
 - Never after BLOCK or REJECTED_BY_RAIL
 - Network switches need `allow_network_switch` on the intent or mandate, or a human approval
-- The new attempt keeps the payment ID",Must,0.5,S4 Never paid twice,"RAL-06, EXE-07","A2.Route, A6.block_final, L5, A1.cost"
+- The new attempt keeps the payment ID",Must,0.5,S4 Never paid twice (done),"RAL-06, EXE-07","A2.Route, A6.block_final, L5, A1.cost"
 RAL-08,"RAL Rails, routing and faults",Rail health and circuit breaker,"As a payments lead, I want each rail's success rate, latency, balance and limit usage, and unhealthy rails taken out of routing, so that payments avoid a failing rail automatically.","- Rolling success rate and p95 latency per rail; balance and pre-funded limit usage
 - Circuit opens after the configured failure count and closes after a successful probe",Should,0.5,L After launch (Should and Could),RAL-06,"A2.Connect, B3.adapters"
 RAL-09,"RAL Rails, routing and faults",Rail connection flow (mock),"As a payments lead, I want to connect a rail through a mock authorisation screen or by entering scoped API keys, so that onboarding looks like the real thing and we keep our own rail accounts.","- Mock OAuth-style consent screen and a scoped-key form; credentials encrypted at rest and never shown again
@@ -221,7 +221,7 @@ CON-05,CON Back-office console,Invoice drop and agent proposal screen,"As a demo
 CON-06,CON Back-office console,Policy and mandates screens,"As a compliance lead, I want to read, diff, propose and approve rule versions, and to manage mandates, so that rule ownership is visible and practical.","- Active version, history and diff; propose and approve per POL-07
 - Mandates list with scope, usage against limits, expiry and revoke",Must,0.5,S6 Operations around escalations,"POL-07, MND-03","B3.rule_changes, A2.Mandate"
 CON-07,CON Back-office console,Reconciliation screen,"As a payments lead, I want the latest run's match rate and breaks with proposed fixes, so that I can approve fixes in minutes.","- Run history, match rate, breaks with proposed fix and approve button",Must,0.25,"S7 One ledger, deposits credited once, reconciliation, replay",LED-06,"A2.Reconcile, L7"
-CON-08,CON Back-office console,Rails screen,"As a payments lead, I want connected rails with balance, limits and recent results, so that I can see where money is going.","- Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts",Must,0.25,S4 Never paid twice,"CON-01, RAL-06",A2.Connect
+CON-08,CON Back-office console,Rails screen,"As a payments lead, I want connected rails with balance, limits and recent results, so that I can see where money is going.","- Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts",Must,0.25,S4 Never paid twice (done),"CON-01, RAL-06",A2.Connect
 CON-09,CON Back-office console,Demo scenario runner,"As a founder, I want one-click scenarios and a reset, so that every demo runs the same way in under 10 minutes.","- Scenarios: the $18,500 invoice; forced timeout to UNKNOWN then CONFIRMED with no resend; 20-payment batch with deposits and one designed break; an attack sample; reset demo data
 - Each scenario is scripted, idempotent and uses the controllable clock",Must,0.75,S9 Demo-ready prototype in the EU,"CON-05, LED-06, EVL-01","MVP.flow, MVP.scenarios"
 CON-10,CON Back-office console,Settings screen,"As a payments lead, I want to see and set mode, fail-safe, deadlines and routing weights, so that the operating choices are explicit.",- Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype,Should,0.25,L After launch (Should and Could),EXE-09,"B5.failsafe, A3.gates"

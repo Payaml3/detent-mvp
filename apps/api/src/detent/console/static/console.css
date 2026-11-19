@@ -60,3 +60,4 @@ label.inline input { display: inline; width: auto; }
 .card + .card { margin-top: 16px; }
 .timeline { padding-left: 20px; }
 section.card, details.card { margin-bottom: 16px; }
+button.danger { border-color: #c62828; color: #c62828; }

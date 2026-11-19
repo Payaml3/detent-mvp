@@ -39,7 +39,11 @@ from detent.intents.service import reevaluate, release_counters
 from detent.intents.transition import transition
 from detent.policy.screening import Screening
 from detent.policy.store import active_policy
-from detent.rails.base import AttemptView, IntentView, NonceRail, RailAdapter, RailError
+from detent.rails.base import AttemptView, NonceRail, RailAdapter, RailError
+from detent.routing.engine import route, store_route
+from detent.worker.queue import enqueue
+
+RESOLVE_JOB = "payment.resolve_unknown"
 
 log = logging.getLogger("detent.execution")
 ACTOR = Actor.system("execution")
@@ -55,6 +59,10 @@ class _Hold(Exception):
 
 def _hold(conn: Connection, clock: Clock, org_id: str, pid: str, h: _Hold) -> Status:
     transition(conn, clock, org_id=org_id, payment_id=pid, to=Status.HELD, actor=ACTOR, reason=h.reason)
+    conn.execute(
+        text("UPDATE payment_intents SET held_reason=:r WHERE org_id=:o AND id=:p"),
+        {"r": h.reason, "o": org_id, "p": pid},
+    )
     append(
         conn,
         clock,
@@ -132,6 +140,22 @@ def _maybe_rerun(conn: Connection, clock: Clock, org_id: str, p: Any, screening:
     return None if result.outcome == "EXECUTE" else result.outcome
 
 
+def _free_nonce(conn: Connection, org_id: str, pid: str, rail_id: str, address: str) -> int | None:
+    """EXE-07: a retry after TECHNICAL_RETRYABLE reuses the nonce of the transaction that never reached the
+    chain, so the wallet has no gap. Any other nonce comes from the nonce manager."""
+    return conn.execute(
+        text(
+            "SELECT a.nonce FROM attempts a WHERE a.org_id=:o AND a.payment_id=:p AND a.rail_id=:r "
+            "AND a.from_address=:f AND a.status='FAILED' AND a.failure_class='TECHNICAL_RETRYABLE' "
+            "AND a.nonce IS NOT NULL AND NOT EXISTS (SELECT 1 FROM attempts b WHERE b.org_id=a.org_id "
+            "AND b.rail_id=a.rail_id AND b.from_address=a.from_address AND b.nonce=a.nonce AND b.id<>a.id "
+            "AND NOT (b.status='FAILED' AND b.failure_class='TECHNICAL_RETRYABLE')) "
+            "ORDER BY a.attempt_no DESC LIMIT 1"
+        ),
+        {"o": org_id, "p": pid, "r": rail_id, "f": address.lower()},
+    ).scalar_one_or_none()
+
+
 def _prepare(
     conn: Connection,
     clock: Clock,
@@ -144,7 +168,9 @@ def _prepare(
         text(
             "SELECT p.id, p.status, p.awaiting_send_click, p.source, p.counterparty_id, p.amount_minor, "
             "p.currency, "
-            "p.network_constraint, p.created_at, d.address FROM payment_intents p LEFT JOIN destinations d "
+            "p.network_constraint, p.allow_network_switch, p.created_at, d.address, d.account_masked "
+            "FROM payment_intents p "
+            "LEFT JOIN destinations d "
             "ON d.org_id = p.org_id AND d.id = p.destination_id WHERE p.org_id=:o AND p.id=:p FOR UPDATE OF p"
         ),
         {"o": org_id, "p": pid},
@@ -165,7 +191,7 @@ def _prepare(
                 actor=ACTOR,
                 reason="pre-send policy re-check BLOCK",
             )
-            release_counters(conn, org_id, p.counterparty_id, amount, p.created_at.date().isoformat())
+            release_counters(conn, org_id, pid)
             return Status.BLOCKED, None
         if rerun is not None:
             raise _Hold("POLICY_RECHECK_ESCALATE")
@@ -176,13 +202,13 @@ def _prepare(
             raise _Hold("KILL_SWITCH_ENGAGED")
         if p.source == "agent":
             raise _Hold("MANDATE_NOT_VERIFIABLE", {"note": "mandate verification arrives with MND-02 (S5)"})
-        rail_id = p.network_constraint
-        adapter = adapters.get(rail_id)
-        if adapter is None:
-            raise _Hold("NO_RAIL_AVAILABLE", {"rail": rail_id})
-        elig = adapter.eligible(IntentView(pid, amount, rail_id, p.address))
-        if not elig.eligible:
-            raise _Hold(elig.reason or "RAIL_NOT_ELIGIBLE", {"rail": rail_id})
+        rt = route(conn, adapters, org_id=org_id, payment=p, day=clock.now().date().isoformat())
+        store_route(conn, org_id, pid, rt)
+        if rt.chosen is None:
+            raise _Hold("NO_RAIL_AVAILABLE", {"route": rt.to_json()})
+        rail_id = rt.chosen.rail
+        adapter = adapters[rail_id]
+        dest_address = rt.chosen.destination_address
         # Reservations (pre-funded room, attempt, nonce) roll back together if anything below holds.
         with conn.begin_nested():
             _check_prefund(conn, org_id, rail_id, amount, clock.now().date().isoformat())
@@ -194,7 +220,7 @@ def _prepare(
                 rail_id=rail_id,
                 idempotency_key=att.idempotency_key,
                 amount=amount,
-                destination_address=p.address,
+                destination_address=dest_address,
                 nonce=None,
                 raw_tx=None,
                 tx_hash=None,
@@ -203,7 +229,9 @@ def _prepare(
             if hasattr(adapter, "prepare"):
                 nr: NonceRail = adapter  # type: ignore[assignment]
                 try:
-                    nonce = nonces.assign(conn, org_id, nr)
+                    nonce = _free_nonce(conn, org_id, pid, rail_id, nr.from_address)
+                    if nonce is None:
+                        nonce = nonces.assign(conn, org_id, nr)
                 except nonces.WalletRefused as exc:
                     raise _Hold("NONCE_MISMATCH", {"detail": str(exc)}) from exc
                 try:
@@ -270,6 +298,21 @@ def _record_failure(conn: Connection, clock: Clock, org_id: str, view: AttemptVi
             to=Status.UNKNOWN,
             actor=ACTOR,
             reason="no answer from the rail; outcome unknown",
+        )
+        conn.execute(
+            text("UPDATE attempts SET unknown_at=:t WHERE org_id=:o AND id=:a"),
+            {"t": clock.now(), "o": org_id, "a": view.attempt_id},
+        )
+        enqueue(
+            conn,
+            clock,
+            org_id=org_id,
+            kind=RESOLVE_JOB,
+            payment_id=view.payment_id,
+            dedupe_key=f"{view.attempt_id}:0",
+            payload={"payment_id": view.payment_id, "step": 0},
+            run_at=clock.now() + timedelta(seconds=5),
+            max_attempts=3,
         )
         return Status.UNKNOWN
     mark_attempt(
@@ -352,7 +395,7 @@ def send_payment(  # noqa: PLR0911 - each return is a distinct outcome
             status, view = _prepare(conn, clock, adapters, org_id, payment_id, screening)
     except Exception as exc:
         # Fail closed: an unexpected error before anything was broadcast holds the payment.
-        log.exception("pre-send failed; holding the payment", extra={"payment_id": payment_id})
+        log.exception("pre-send failed; holding the payment", extra={"for_payment": payment_id})
         with transaction(engine) as conn:
             cur = conn.execute(
                 text("SELECT status FROM payment_intents WHERE org_id=:o AND id=:p FOR UPDATE"),
@@ -370,7 +413,8 @@ def send_payment(  # noqa: PLR0911 - each return is a distinct outcome
         adapter.submit(view)
     except RailError as exc:
         with transaction(engine) as conn:
-            return _record_failure(conn, clock, org_id, view, exc)
+            st = _record_failure(conn, clock, org_id, view, exc)
+        return _follow_up(engine, clock, adapters, org_id, payment_id, st)
     except Exception as exc:  # an unclassified error after we tried to send: it may have reached the rail
         with transaction(engine) as conn:
             return _record_failure(
@@ -387,6 +431,23 @@ def send_payment(  # noqa: PLR0911 - each return is a distinct outcome
             payload={"attempt_id": view.attempt_id, "rail": view.rail_id, "tx_hash": view.tx_hash},
         )
     try:
-        return apply_rail_status(engine, clock, adapter, org_id, view)
+        st = apply_rail_status(engine, clock, adapter, org_id, view)
     except RailError:
         return Status.SUBMITTED  # the confirmation poller asks again
+    return _follow_up(engine, clock, adapters, org_id, payment_id, st)
+
+
+def _follow_up(
+    engine: Engine,
+    clock: Clock,
+    adapters: Mapping[str, RailAdapter],
+    org_id: str,
+    payment_id: str,
+    st: Status,
+) -> Status:
+    """A definitive failure goes straight to the retry and failover rules (EXE-07, RAL-07)."""
+    if st is not Status.FAILED:
+        return st
+    from detent.execution.retry import after_failure
+
+    return after_failure(engine, clock, adapters, org_id=org_id, payment_id=payment_id)

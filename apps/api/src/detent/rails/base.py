@@ -63,6 +63,17 @@ class StatusResult:
 
 
 @dataclass(frozen=True, slots=True)
+class Resolved:
+    """What a rail can say about an UNKNOWN attempt. ``rebroadcast`` asks the caller to send the stored
+    signed transaction again (it never reached the rail)."""
+
+    state: Literal["CONFIRMED", "FAILED", "UNKNOWN"]
+    evidence: dict[str, Any] = field(default_factory=dict)
+    failure_class: FailureClass | None = None
+    rebroadcast: bool = False
+
+
+@dataclass(frozen=True, slots=True)
 class Health:
     ok: bool
     balance: Money | None

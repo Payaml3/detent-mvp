@@ -469,11 +469,11 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] A timeout, dropped connection or 5xx after the request may have reached the rail -> attempt and payment UNKNOWN
-- [ ] While UNKNOWN, no new attempt can be created (database and code)
-- [ ] Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED
+- [x] A timeout, dropped connection or 5xx after the request may have reached the rail -> attempt and payment UNKNOWN
+- [x] While UNKNOWN, no new attempt can be created (database and code)
+- [x] Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-02 · **Traces to:** A2b.unknown, A2b.states, L4
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** EXE-02 · **Traces to:** A2b.unknown, A2b.states, L4
 
 ### EXE-06 · UNKNOWN resolver
 
@@ -481,12 +481,12 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule
-- [ ] CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found
-- [ ] Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer
-- [ ] Median and p95 time to resolve are recorded for the results report
+- [x] The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule
+- [x] CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found
+- [x] Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer
+- [x] Median and p95 time to resolve are recorded for the results report
 
-**Priority:** Must · **Estimate:** 1 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-05, FND-06, EXC-01 · **Traces to:** A2b.unknown, B7.unknown
+**Priority:** Must · **Estimate:** 1 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** EXE-05, FND-06, EXC-01 · **Traces to:** A2b.unknown, B7.unknown
 
 ### EXE-07 · Deterministic retry policy
 
@@ -494,11 +494,11 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] Retry config lists retryable error codes, maximum attempts and backoff
-- [ ] Only `TECHNICAL_RETRYABLE` failures retry; `REJECTED_BY_RAIL` and any BLOCK never do
-- [ ] Every retry keeps the payment ID and is audited with the rule that allowed it
+- [x] Retry config lists retryable error codes, maximum attempts and backoff
+- [x] Only `TECHNICAL_RETRYABLE` failures retry; `REJECTED_BY_RAIL` and any BLOCK never do
+- [x] Every retry keeps the payment ID and is audited with the rule that allowed it
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-02 · **Traces to:** A2b.no_agent_retry, A6.retry_rule, A2b.rule
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** EXE-02 · **Traces to:** A2b.no_agent_retry, A6.retry_rule, A2b.rule
 
 ### EXE-08 · Kill switch
 
@@ -506,12 +506,12 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send
-- [ ] Pending payments stay held; UNKNOWN attempts keep resolving read-only
-- [ ] Release requires the client's payments lead, even if on-call engaged it
-- [ ] A red banner shows on every console page while engaged; every change is audited
+- [x] Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send
+- [x] Pending payments stay held; UNKNOWN attempts keep resolving read-only
+- [x] Release requires the client's payments lead, even if on-call engaged it
+- [x] A red banner shows on every console page while engaged; every change is audited
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** EXE-03, FND-04 · **Traces to:** B3.kill_switch, A2.Execute, L4
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** EXE-03, FND-04 · **Traces to:** B3.kill_switch, A2.Execute, L4
 
 ### EXE-09 · Shadow, Assist and Auto modes
 
@@ -570,10 +570,10 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold
+- [x] Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold
 - [ ] Contract tests pass
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-02 · **Traces to:** A2.Connect
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** RAL-02 · **Traces to:** A2.Connect
 
 ### RAL-04 · Simulated instant bank rail
 
@@ -581,11 +581,11 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] A separate FastAPI sub-app with GBP and EUR, per-payment and daily limits, cut-off times, a configurable failure rate and idempotency by key
-- [ ] Status endpoint and asynchronous settlement callback; daily statement endpoint (used by LED-07)
-- [ ] Deterministic test values: amounts ending .13 time out then settle; .42 fail technically
+- [x] A separate FastAPI sub-app with GBP and EUR, per-payment and daily limits, cut-off times, a configurable failure rate and idempotency by key
+- [x] Status endpoint and asynchronous settlement callback; daily statement endpoint (used by LED-07)
+- [x] Deterministic test values: amounts ending .13 time out then settle; .42 fail technically
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-01 · **Traces to:** A2.Connect, A7.prototype
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** RAL-01 · **Traces to:** A2.Connect, A7.prototype
 
 ### RAL-05 · Fault-injection proxy
 
@@ -593,11 +593,11 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Faults: timeout after forwarding, timeout before forwarding, connection reset, 5xx, delayed receipt, hidden receipt for N polls (stuck), duplicated response
-- [ ] Fault chosen per attempt by scenario config in tests and sandbox; disabled in demo mode unless a scenario requests it
-- [ ] Each injected fault is logged with the attempt ID
+- [x] Faults: timeout after forwarding, timeout before forwarding, connection reset, 5xx, delayed receipt, hidden receipt for N polls (stuck), duplicated response
+- [x] Fault chosen per attempt by scenario config in tests and sandbox; disabled in demo mode unless a scenario requests it
+- [x] Each injected fault is logged with the attempt ID
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-02, RAL-04 · **Traces to:** L3, L4, A2b.unknown
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** RAL-02, RAL-04 · **Traces to:** L3, L4, A2b.unknown
 
 ### RAL-06 · Routing engine
 
@@ -605,11 +605,11 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Routing runs only after an EXECUTE decision; a BLOCK never reaches routing
-- [ ] Eligibility first (currency, network constraint from intent or mandate, limits, cut-off, health, liquidity), then a weighted score from config
-- [ ] The decision stores each candidate's score and the reason for the winner
+- [x] Routing runs only after an EXECUTE decision; a BLOCK never reaches routing
+- [x] Eligibility first (currency, network constraint from intent or mandate, limits, cut-off, health, liquidity), then a weighted score from config
+- [x] The decision stores each candidate's score and the reason for the winner
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-01, POL-02 · **Traces to:** A2.Route, A3.orchestrate, A1.cost
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** RAL-01, POL-02 · **Traces to:** A2.Route, A3.orchestrate, A1.cost
 
 ### RAL-07 · Failover on technical failure only
 
@@ -617,12 +617,12 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Failover needs the previous attempt definitively FAILED with a technical code; never from UNKNOWN
-- [ ] Never after BLOCK or REJECTED_BY_RAIL
+- [x] Failover needs the previous attempt definitively FAILED with a technical code; never from UNKNOWN
+- [x] Never after BLOCK or REJECTED_BY_RAIL
 - [ ] Network switches need `allow_network_switch` on the intent or mandate, or a human approval
-- [ ] The new attempt keeps the payment ID
+- [x] The new attempt keeps the payment ID
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice · **Depends on:** RAL-06, EXE-07 · **Traces to:** A2.Route, A6.block_final, L5, A1.cost
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** RAL-06, EXE-07 · **Traces to:** A2.Route, A6.block_final, L5, A1.cost
 
 ### RAL-08 · Rail health and circuit breaker
 
@@ -992,9 +992,9 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts
+- [x] Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice · **Depends on:** CON-01, RAL-06 · **Traces to:** A2.Connect
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** CON-01, RAL-06 · **Traces to:** A2.Connect
 
 ### CON-09 · Demo scenario runner
 

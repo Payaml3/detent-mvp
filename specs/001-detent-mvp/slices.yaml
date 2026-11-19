@@ -43,7 +43,8 @@ slices:
   stories: [POL-05, POL-06, EXC-01, EXC-02, EXC-04, EXC-05, EXC-07, CON-01, CON-03, CON-04]
 
 - id: S4
-  name: "Never paid twice"
+  name: "Never paid twice (done)"
+  status: done
   goal: "Timeouts, retries, failover, the kill switch, the second chain and the bank simulator."
   exit: >-
     On the local chain and banksim: a forced timeout becomes UNKNOWN and then CONFIRMED with one transfer; a reverted

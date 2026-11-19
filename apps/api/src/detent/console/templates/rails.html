@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Rails{% endblock %}
+{% block main %}
+<h1>Rails</h1>
+<p class="muted">Test networks and the simulated bank rail only. Routing scores each eligible rail by cost, speed, success rate and liquidity.</p>
+{% for x in rails %}{% set r = x.row %}
+<section class="card">
+  <h2>{{ r.id }} <span class="muted small">{{ r.kind }}{% if r.chain_id %} · chain {{ r.chain_id }}{% endif %}</span></h2>
+  <dl class="facts">
+    <dt>Network or scheme</dt><dd>{{ r.network }}</dd>
+    <dt>Currency</dt><dd>{{ r.currency }}</dd>
+    <dt>Enabled</dt><dd>{{ 'yes' if r.enabled else 'no' }}</dd>
+    <dt>Balance</dt><dd>{{ x.balance or 'Balance unavailable: no adapter or the rail did not answer' }}</dd>
+    <dt>Pre-funded limit today</dt><dd>{{ x.usage or 'no pre-funded limit' }}</dd>
+    {% if x.per_payment %}<dt>Per-payment limit</dt><dd>{{ x.per_payment }}</dd>{% endif %}
+  </dl>
+  <h3>Last 20 attempts</h3>
+  <table>
+    <thead><tr><th>Attempt</th><th>Payment</th><th>Status</th><th>Failure class</th><th>Transaction or key</th><th>Created</th></tr></thead>
+    <tbody>
+    {% for a in x.attempts %}<tr><td class="mono">{{ a.id }}</td><td class="mono"><a href="/console/payments/{{ a.payment_id }}">{{ a.payment_id }}</a></td>
+      <td>{{ a.status }}</td><td>{{ a.failure_class or '' }}</td>
+      <td class="mono">{% if a.explorer_url %}<a href="{{ a.explorer_url }}" rel="noopener">{{ a.tx_hash }}</a>{% else %}{{ a.tx_hash or '' }}{% endif %}</td>
+      <td>{{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+    {% else %}<tr><td colspan="6" class="muted">No attempts yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+{% endblock %}

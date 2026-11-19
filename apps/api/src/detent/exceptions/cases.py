@@ -112,11 +112,15 @@ def open_case(
     case_type: str = "payout",
 ) -> str:
     now = clock.now()
-    if case_type == "payout" and "ABOVE_AUTO_LIMIT" in reasons:
+    if case_type == "unknown_stuck":
+        tier, deadline_key = 1, "unknown_stuck"  # C-07
+    elif case_type == "payout" and "ABOVE_AUTO_LIMIT" in reasons:
         tier, deadline_key = 1, "payout_above_auto_limit"
     else:
         tier, deadline_key = 2, "payout_other"
-    deadline = now + parse_duration(rules.deadlines.get(deadline_key, "PT4H"))
+    deadline = now + parse_duration(
+        rules.deadlines.get(deadline_key, "PT30M" if case_type == "unknown_stuck" else "PT4H")
+    )
     rule = next((o for o in rules.owners if o.match.get("type") == case_type), None)
     owner = _pick_owner(conn, org_id, rule.owner_role) if rule else None
     backup = _pick_owner(conn, org_id, rule.backup_role) if rule else None
@@ -358,6 +362,7 @@ def approve(
             p.counterparty_id,
             Money(int(p.amount_minor), Currency(p.currency)),
             clock.now().date().isoformat(),
+            pid,
         )
         transition(
             conn,

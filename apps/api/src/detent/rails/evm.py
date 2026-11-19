@@ -23,6 +23,7 @@ from detent.rails.base import (
     Prepared,
     Quote,
     RailError,
+    Resolved,
     StatusResult,
     SubmitResult,
 )
@@ -82,6 +83,9 @@ class EvmAdapter:
         self.explorer_tx_url = explorer_tx_url
         self.expected_seconds = expected_seconds
         self._signer = signer
+        self._rpc_url = rpc_url
+        self._timeout = timeout_seconds
+        self._http = requests.Session()
         self._w3 = Web3(
             Web3.HTTPProvider(
                 rpc_url, request_kwargs={"timeout": timeout_seconds}, exception_retry_configuration=None
@@ -174,19 +178,93 @@ class EvmAdapter:
     def submit(self, attempt: AttemptView) -> SubmitResult:
         if not attempt.raw_tx or not attempt.tx_hash:
             raise RailError(FailureClass.TECHNICAL_FINAL, "attempt has no signed transaction")
+        self._broadcast(attempt.raw_tx, attempt.tx_hash, attempt.attempt_id)
+        return SubmitResult(attempt.tx_hash)
+
+    def _broadcast(self, raw_tx: str, tx_hash: str, attempt_id: str) -> None:
+        """eth_sendRawTransaction, sent directly so the attempt ID travels with it (fault logs, RAL-05)."""
+        body: dict[str, Any] = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "eth_sendRawTransaction",
+            "params": [raw_tx],
+        }
         try:
-            self._w3.eth.send_raw_transaction(attempt.raw_tx)
+            r = self._http.post(
+                self._rpc_url, json=body, timeout=self._timeout, headers={"X-Detent-Attempt": attempt_id}
+            )
         except requests.exceptions.RequestException as exc:
             raise RailError(classify(exc), f"broadcast: {type(exc).__name__}") from exc
-        except Exception as exc:
+        if r.status_code == 503:
+            # Spec/06: 503 before acceptance means the rail never took it.
+            raise RailError(FailureClass.TECHNICAL_RETRYABLE, "broadcast: 503 before acceptance")
+        if r.status_code >= 500:
+            raise RailError(FailureClass.TIMEOUT, f"broadcast: HTTP {r.status_code}; outcome unknown")
+        try:
+            answer = r.json()
+        except ValueError as exc:
+            raise RailError(FailureClass.TIMEOUT, "broadcast: unreadable answer; outcome unknown") from exc
+        if "error" in answer:
             # The node answered with an RPC error. If it already knows this exact transaction, it is sent.
-            if self._knows(attempt.tx_hash):
-                return SubmitResult(attempt.tx_hash)
+            if self._knows(tx_hash):
+                return
             raise RailError(
-                FailureClass.TECHNICAL_RETRYABLE,
-                f"broadcast rejected: {type(exc).__name__}: {str(exc)[:200]}",
-            ) from exc
-        return SubmitResult(attempt.tx_hash)
+                FailureClass.TECHNICAL_RETRYABLE, f"broadcast rejected: {str(answer['error'])[:200]}"
+            )
+
+    def resolve(self, attempt: AttemptView) -> Resolved:  # noqa: PLR0911 - one return per rule in spec/06
+        """EXE-06 for an UNKNOWN attempt (spec/06 UNKNOWN resolution). Reads only, except that a transaction
+        the node has never seen is re-broadcast: the same signed bytes, never a new transaction."""
+        assert attempt.tx_hash
+        assert attempt.nonce is not None
+        try:
+            st = self.status(attempt)
+        except RailError:
+            return Resolved("UNKNOWN", {"note": "rail did not answer"})
+        if st.state in ("CONFIRMED", "FAILED"):
+            return Resolved(st.state, st.evidence, st.failure_class)
+        if st.state == "PENDING":
+            return Resolved("UNKNOWN", {"note": "transaction known to the node, not yet confirmed"})
+        # NOT_FOUND: the node has never seen our transaction.
+        try:
+            latest = int(self._w3.eth.get_transaction_count(self.from_address, "latest"))
+            pending = int(self._w3.eth.get_transaction_count(self.from_address, "pending"))
+        except Exception:
+            return Resolved("UNKNOWN", {"note": "rail did not answer"})
+        if latest > attempt.nonce:
+            return Resolved(
+                "FAILED",
+                {
+                    "tx_hash": attempt.tx_hash,
+                    "nonce": attempt.nonce,
+                    "latest_nonce": latest,
+                    "note": "nonce consumed by another transaction",
+                },
+                FailureClass.TECHNICAL_FINAL,
+            )
+        if pending <= attempt.nonce and attempt.raw_tx:
+            return Resolved("UNKNOWN", {"note": "never reached the node"}, rebroadcast=True)
+        return Resolved("UNKNOWN", {"note": "waiting"})
+
+    def sign_replacement(self, attempt: AttemptView, gas_price_multiplier: int = 2) -> tuple[str, str]:
+        """Cancel-by-replacement (EXE-06): a zero-value transfer to ourselves with the same nonce and a higher
+        fee. Signed here and stored by the caller before ``broadcast_raw``; whichever transaction lands
+        decides the outcome, read from the chain."""
+        assert attempt.nonce is not None
+        price = int(self._w3.eth.gas_price) * gas_price_multiplier
+        tx = {
+            "from": self.from_address,
+            "to": self.from_address,
+            "value": 0,
+            "nonce": attempt.nonce,
+            "gas": 21000,
+            "gasPrice": price,
+            "chainId": self.chain_id,
+        }
+        return self._signer.sign(tx)
+
+    def broadcast_raw(self, raw_tx: str, tx_hash: str, attempt_id: str) -> None:
+        self._broadcast(raw_tx, tx_hash, attempt_id)
 
     def _knows(self, tx_hash: str) -> bool:
         try:

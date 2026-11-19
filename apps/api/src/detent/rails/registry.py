@@ -32,15 +32,29 @@ def install_rail(
     confirmations: int = 1,
     prefunded_daily_limit: Money | None = None,
     weights: dict[str, Any] | None = None,
+    base_url: str | None = None,
+    per_payment_limit: Money | None = None,
+    daily_limit: Money | None = None,
+    fee_flat_minor: int = 0,
+    fee_bps: int = 0,
+    est_fee_minor: int = 0,
+    est_seconds: int = 1,
 ) -> None:
     conn.execute(
         text(
             "INSERT INTO rails (id, org_id, kind, network, chain_id, currency, enabled, weights, "
-            "prefunded_daily_limit_minor, token_address, from_address, confirmations, explorer_tx_url) "
-            "VALUES (:id, :o, :k, :n, :c, :cur, true, CAST(:w AS jsonb), :lim, :tok, :frm, :conf, :exp) "
+            "prefunded_daily_limit_minor, token_address, from_address, confirmations, explorer_tx_url, "
+            "base_url, "
+            "per_payment_limit_minor, daily_limit_minor, fee_flat_minor, fee_bps, est_fee_minor, "
+            "est_seconds) "
+            "VALUES (:id, :o, :k, :n, :c, :cur, true, CAST(:w AS jsonb), :lim, :tok, :frm, :conf, :exp, "
+            ":url, "
+            ":ppl, :dl, :ff, :fb, :ef, :es) "
             "ON CONFLICT (org_id, id) DO UPDATE SET token_address = EXCLUDED.token_address, "
             "from_address = EXCLUDED.from_address, confirmations = EXCLUDED.confirmations, "
-            "prefunded_daily_limit_minor = EXCLUDED.prefunded_daily_limit_minor"
+            "prefunded_daily_limit_minor = EXCLUDED.prefunded_daily_limit_minor, base_url = "
+            "EXCLUDED.base_url, "
+            "est_fee_minor = EXCLUDED.est_fee_minor, est_seconds = EXCLUDED.est_seconds"
         ),
         {
             "id": rail_id,
@@ -55,6 +69,13 @@ def install_rail(
             "frm": from_address.lower() if from_address else None,
             "conf": confirmations,
             "exp": EXPLORERS.get(rail_id),
+            "url": base_url,
+            "ppl": per_payment_limit.amount_minor if per_payment_limit else None,
+            "dl": daily_limit.amount_minor if daily_limit else None,
+            "ff": fee_flat_minor,
+            "fb": fee_bps,
+            "ef": est_fee_minor,
+            "es": est_seconds,
         },
     )
 
@@ -87,6 +108,28 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
             ),
             {"o": org_id},
         ).all()
+    with engine.connect() as conn:
+        bank_rows = conn.execute(
+            text(
+                "SELECT id, currency, network, per_payment_limit_minor, fee_flat_minor, fee_bps, "
+                "est_seconds, base_url "
+                "FROM rails WHERE org_id=:o AND enabled AND kind='banksim'"
+            ),
+            {"o": org_id},
+        ).all()
+    from detent.rails.banksim import BankAdapter
+
+    for b in bank_rows:
+        out[b.id] = BankAdapter(
+            rail_id=b.id,
+            base_url=b.base_url or settings.banksim_url,
+            scheme="fps" if b.id == "banksim-fps" else "sepa_inst",
+            currency=b.currency,
+            per_payment_limit_minor=b.per_payment_limit_minor,
+            fee_flat_minor=int(b.fee_flat_minor),
+            fee_bps=int(b.fee_bps),
+            expected_seconds=int(b.est_seconds),
+        )
     for r in rows:
         url, key = keys.get(r.id, (None, None))
         if not url or key is None or not r.token_address:
@@ -115,9 +158,11 @@ def seed_rails(conn: Connection, org_id: str, settings: Settings) -> list[str]:
     }
     installed = []
     for r in data["rails"]:
-        if r.get("sandbox_only"):
+        if r.get("sandbox_only") or r["id"] == "local-evm-b":  # local-evm-b exists only for failover tests
             continue
         lim = r.get("prefunded_daily_limit")
+        fee = r.get("fee") or {}
+        ppl, dl = r.get("per_payment_limit"), r.get("daily_limit")
         install_rail(
             conn,
             org_id,
@@ -130,6 +175,12 @@ def seed_rails(conn: Connection, org_id: str, settings: Settings) -> list[str]:
             confirmations=int(r.get("confirmations", 1)),
             prefunded_daily_limit=Money.parse(lim, r["currency"]) if lim else None,
             weights=data.get("routing_weights"),
+            per_payment_limit=Money.parse(ppl, r["currency"]) if ppl else None,
+            daily_limit=Money.parse(dl, r["currency"]) if dl else None,
+            fee_flat_minor=int(fee.get("flat_minor", 0)),
+            fee_bps=int(fee.get("bps", 0)),
+            est_fee_minor=int(r.get("est_fee_minor", fee.get("flat_minor", 0))),
+            est_seconds=int(r.get("est_seconds", 1)),
         )
         installed.append(r["id"])
     return installed

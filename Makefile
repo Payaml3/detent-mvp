@@ -33,7 +33,7 @@ dev:              ## api + worker + banksim + faultproxy (Ctrl-C stops all)
 	trap 'kill 0' EXIT; \
 	$(UV) run detent api --port 8000 & \
 	$(UV) run detent worker & \
-	$(UV) run uvicorn banksim.app:app --port 8100 & \
+	$(UV) run uvicorn banksim.app:create_app --factory --port 8100 & \
 	$(UV) run uvicorn faultproxy.app:app --port 8200 & \
 	wait
 

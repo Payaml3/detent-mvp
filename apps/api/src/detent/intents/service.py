@@ -24,7 +24,7 @@ from detent.clock import Clock
 from detent.db.engine import transaction
 from detent.domain.ids import Prefix, new_id
 from detent.domain.money import Currency, Money, MoneyError
-from detent.domain.states import IN_FLIGHT, Status
+from detent.domain.states import Status
 from detent.intents.registry import counterparty_stats
 from detent.intents.transition import transition
 from detent.policy.engine import CheckResult, Evaluation, evaluate
@@ -266,7 +266,10 @@ def read_counters(
     return used[0], used[1]
 
 
-def add_to_counters(conn: Connection, org_id: str, cpt: str, amount: Money, day: str) -> None:
+def add_to_counters(
+    conn: Connection, org_id: str, cpt: str, amount: Money, day: str, payment_id: str
+) -> None:
+    """The payment becomes in flight: its amount counts against today's caps until it is released."""
     for scope in _scopes(cpt, amount.currency):
         conn.execute(
             text(
@@ -275,19 +278,38 @@ def add_to_counters(conn: Connection, org_id: str, cpt: str, amount: Money, day:
             ),
             {"a": amount.amount_minor, "o": org_id, "s": scope, "p": day},
         )
+    conn.execute(
+        text("UPDATE payment_intents SET counted_on=:d WHERE org_id=:o AND id=:p"),
+        {"d": day, "o": org_id, "p": payment_id},
+    )
 
 
-def release_counters(conn: Connection, org_id: str, cpt: str, amount: Money, day: str) -> None:
-    """Spec/04: an amount stops counting when its payment is BLOCKED, REJECTED, CANCELLED or FAILED_FINAL."""
-    for scope in _scopes(cpt, amount.currency):
+def release_counters(conn: Connection, org_id: str, payment_id: str) -> None:
+    """Spec/04: an amount stops counting when its payment is BLOCKED, REJECTED, CANCELLED or FAILED_FINAL.
+    Only a payment that was counted is released, on the day it was counted."""
+    p = conn.execute(
+        text(
+            "SELECT counterparty_id, amount_minor, currency, counted_on FROM payment_intents "
+            "WHERE org_id=:o AND id=:p FOR UPDATE"
+        ),
+        {"o": org_id, "p": payment_id},
+    ).one()
+    if p.counted_on is None:
+        return
+    amount = Money(int(p.amount_minor), Currency(p.currency))
+    for scope in _scopes(p.counterparty_id, amount.currency):
         conn.execute(
             text(
                 "UPDATE counters SET amount_minor = greatest(amount_minor - :a, 0), count = greatest(count "
                 "- 1, 0) "
                 "WHERE org_id=:o AND scope=:s AND period=:p"
             ),
-            {"a": amount.amount_minor, "o": org_id, "s": scope, "p": day},
+            {"a": amount.amount_minor, "o": org_id, "s": scope, "p": p.counted_on},
         )
+    conn.execute(
+        text("UPDATE payment_intents SET counted_on=NULL WHERE org_id=:o AND id=:p"),
+        {"o": org_id, "p": payment_id},
+    )
 
 
 def find_recent_block(
@@ -845,7 +867,7 @@ def reevaluate(
     p = conn.execute(
         text(
             "SELECT source, counterparty_id, destination_id, amount_minor, currency, network_constraint, "
-            "travel_rule, status FROM payment_intents WHERE org_id=:o AND id=:p"
+            "travel_rule, status, counted_on FROM payment_intents WHERE org_id=:o AND id=:p"
         ),
         {"o": org_id, "p": payment_id},
     ).one()
@@ -854,7 +876,7 @@ def reevaluate(
     amount = Money(int(p.amount_minor), Currency(p.currency))
     cp = load_counterparty(conn, org_id, p.counterparty_id)
     dest = load_destination_by_id(conn, org_id, p.destination_id)
-    in_flight = p.status in {s.value for s in IN_FLIGHT}
+    in_flight = p.counted_on is not None  # its own amount is already in today's counters
     facts = build_facts(
         conn,
         clock,
@@ -967,7 +989,7 @@ def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tu
         system_unavailable=result.system_unavailable,
     )
     if status is Status.READY:
-        add_to_counters(conn, c.org_id, cpt, amount, day)  # in-flight from now (spec/04 Counters)
+        add_to_counters(conn, c.org_id, cpt, amount, day, pid)  # in flight from now (spec/04 Counters)
     return _record(
         conn,
         clock,

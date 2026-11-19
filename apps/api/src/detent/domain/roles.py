@@ -37,6 +37,8 @@ PERMISSIONS: dict[str, frozenset[Role]] = {
     "demo.clock.advance": frozenset(Role),
     # INT-04: editing payout details. Payments lead only (G-23, Proposed: the narrowest safe choice).
     "counterparty.edit": frozenset({R.PAYMENTS_LEAD}),
+    # EXE-06: the UNKNOWN_STUCK case goes to the payments lead (spec/04 owners).
+    "unknown.cancel_by_replacement": frozenset({R.PAYMENTS_LEAD}),
 }
 
 

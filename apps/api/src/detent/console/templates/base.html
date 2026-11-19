@@ -15,6 +15,11 @@
     <a class="brand" href="/console/">{{ brand }} <span>payment controls</span></a>
     <div class="status">
       <span class="ks {{ 'on' if kill_switch_engaged else 'off' }}">Kill switch: {{ 'engaged' if kill_switch_engaged else 'off' }}</span>
+      {% if user %}
+      <form method="post" action="/console/kill_switch/{{ 'release' if kill_switch_engaged else 'engage' }}">
+        <button class="{{ '' if kill_switch_engaged else 'danger' }}" title="{{ 'Payments lead only' if kill_switch_engaged else 'Stops all sending; holds pending payments' }}">{{ 'Release' if kill_switch_engaged else 'Engage kill switch' }}</button>
+      </form>
+      {% endif %}
       {% if demo_mode %}
       <form class="clock" method="post" action="/console/clock/advance">
         <span class="mono" title="Demo clock">{{ now.strftime('%Y-%m-%d %H:%M') }} UTC</span>

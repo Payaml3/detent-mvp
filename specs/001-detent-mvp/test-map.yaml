@@ -177,3 +177,45 @@ CON-01:
   2: ["integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording"]
 CON-04:
   0: ["integration/test_console_review.py::test_exceptions_queue_filters_and_countdown", "integration/test_console_review.py::test_console_approve_requires_reason_and_permission"]
+EXE-05:
+  0: ["chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed", "integration/test_banksim.py::test_amount_ending_13_times_out_then_settles_once"]
+  1: ["chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed", "integration/test_attempts.py::test_one_attempt_in_flight"]
+  2: ["chain/test_unknown.py::test_unknown_never_fails_without_evidence", "chain/test_unknown.py::test_delayed_receipt_stays_unknown_without_resending"]
+EXE-06:
+  0: ["chain/test_unknown.py::test_a_timeout_schedules_the_resolver", "unit/test_s4_config.py::test_resolver_polls_on_the_spec_06_schedule",
+      "integration/test_banksim.py::test_amount_ending_13_times_out_then_settles_once"]
+  1: ["chain/test_unknown.py::test_never_forwarded_is_rebroadcast_as_the_same_transaction", "chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it"]
+  2: ["chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it"]
+  3: ["chain/test_unknown.py::test_time_to_resolve_is_recorded"]
+EXE-07:
+  0: ["chain/test_retry_failover.py::test_retryable_failure_retries_with_the_same_nonce", "chain/test_retry_failover.py::test_retries_are_bounded_and_end_final"]
+  1: ["integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted", "chain/test_retry_failover.py::test_a_block_never_reaches_routing"]
+  2: ["chain/test_retry_failover.py::test_retryable_failure_retries_with_the_same_nonce"]
+EXE-08:
+  0: ["chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it", "chain/test_kill_switch.py::test_api_engage_and_release",
+      "chain/test_send_once.py::test_kill_switch_holds_before_sending"]
+  1: ["chain/test_kill_switch.py::test_unknown_keeps_resolving_read_only", "chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it"]
+  2: ["chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it", "chain/test_kill_switch.py::test_api_engage_and_release"]
+  3: ["chain/test_kill_switch.py::test_console_banner_and_buttons", "chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it"]
+RAL-03:
+  0: ["unit/test_s4_config.py::test_eth_sepolia_has_its_own_fee_profile_and_threshold"]
+RAL-04:
+  0: ["integration/test_banksim.py::test_contract", "integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted"]
+  1: ["integration/test_banksim.py::test_settlement_callback", "integration/test_banksim.py::test_detent_sends_a_euro_payout_on_the_bank_rail"]
+  2: ["integration/test_banksim.py::test_amount_ending_13_times_out_then_settles_once", "integration/test_banksim.py::test_amount_ending_42_fails_technically_and_ends_final"]
+RAL-05:
+  0: ["chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed", "chain/test_unknown.py::test_never_forwarded_is_rebroadcast_as_the_same_transaction",
+      "chain/test_unknown.py::test_delayed_receipt_stays_unknown_without_resending", "chain/test_retry_failover.py::test_retryable_failure_retries_with_the_same_nonce",
+      "integration/test_banksim.py::test_duplicate_requests_create_one_bank_payment"]
+  1: ["unit/test_s4_config.py::test_faults_are_refused_in_demo_mode_unless_the_scenario_runner_asks"]
+  2: ["chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed"]
+RAL-06:
+  0: ["chain/test_retry_failover.py::test_a_block_never_reaches_routing"]
+  1: ["chain/test_retry_failover.py::test_route_is_stored_with_every_candidate", "chain/test_send_once.py::test_prefunded_daily_limit_holds"]
+  2: ["chain/test_retry_failover.py::test_route_is_stored_with_every_candidate"]
+RAL-07:
+  0: ["chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id", "chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it"]
+  1: ["integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted", "chain/test_retry_failover.py::test_a_block_never_reaches_routing"]
+  3: ["chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id"]
+CON-08:
+  0: ["integration/test_console_rails.py::test_rails_screen"]

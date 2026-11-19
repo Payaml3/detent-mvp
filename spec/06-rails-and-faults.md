@@ -42,6 +42,7 @@ class RailAdapter(Protocol):
 | Bank simulator, SEPA Instant-style | `banksim-sepa-inst` | EUR | Instant | Same app, second scheme |
 | Simulated chain (sandbox) | `simchain` | USDC | Instant | Default for sandbox organisations |
 | Local chain (tests) | `local-evm` | MockUSDC | anvil, automine | CI and fault suite |
+| Second local chain (tests) | `local-evm-b` | MockUSDC | anvil, automine | Failover tests only; never seeded into the demo (S4) |
 
 **Bank simulator behaviour (RAL-04):**
 - fees: flat plus percentage, per scheme
@@ -99,6 +100,8 @@ on attempt UNKNOWN:
 ```
 
 ## Fault injection (RAL-05)
+
+As built in S4: scenarios are posted to the proxy's `/__faults` endpoint (`match` is a JSON-RPC method or `"<HTTP method> <path prefix>"`, `count` is how many matching calls, `-1` until cleared, and an optional `attempt` limits it to one attempt's `X-Detent-Attempt` header). Delayed and stuck receipts are `hide_receipt` with a count; a genuine on-chain revert is produced by `low_gas_estimate` (the transfer runs out of gas, status 0, nothing moves); `duplicate_request` forwards a request twice. Demo mode refuses scenarios unless the scenario runner sends `X-Detent-Scenario-Runner: 1`.
 
 `apps/faultproxy` sits between adapters and RPC or bank endpoints. Scenarios are selected by the `X-Detent-Fault` header (tests) or by sandbox scenario config. They are never active in demo mode unless the scenario runner sets them.
 

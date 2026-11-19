@@ -43,6 +43,7 @@ def _migrate(url: str) -> None:
     with raw.begin() as conn:
         conn.execute(text("DROP SCHEMA IF EXISTS detent CASCADE"))
         conn.execute(text("DROP SCHEMA IF EXISTS testsupport CASCADE"))
+        conn.execute(text("DROP SCHEMA IF EXISTS banksim CASCADE"))  # the bank simulator's own tables
     raw.dispose()
     cfg = Config(str(REPO_ROOT / "apps" / "api" / "alembic.ini"))
     cfg.attributes["database_url"] = url
@@ -184,6 +185,23 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
 @pytest.fixture(scope="module")
 def chain() -> Iterator[Any]:
     """A local anvil chain with MockUSDC, one per test module (S2 onwards)."""
+    import socket
+
+    from detent import devchain
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = int(s.getsockname()[1])
+    proc = devchain.start_anvil(port)
+    try:
+        yield devchain.deploy(f"http://127.0.0.1:{port}")
+    finally:
+        proc.terminate()
+
+
+@pytest.fixture(scope="module")
+def chain_b() -> Iterator[Any]:
+    """A second local chain, for failover between two rails (S4)."""
     import socket
 
     from detent import devchain

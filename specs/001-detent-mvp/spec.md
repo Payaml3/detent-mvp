@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 90 requirements confirmed; 13 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 91 requirements confirmed; 12 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -354,7 +354,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-055**: The UNKNOWN resolver polls on a schedule and resolves only on definitive rail evidence; when the node never saw the transaction it re-broadcasts the same signed transaction; after the stuck threshold a case opens for the payments lead.
 - **FR-056**: Only the execution layer retries, only on TECHNICAL_RETRYABLE, by configured attempts and backoff, keeping the payment ID.
 - **FR-057**: The kill switch stops all sends (checked inside the lock), holds pending payments, lets UNKNOWN attempts keep resolving, shows a red banner, is audited, and only the payments lead releases it.
-- **FR-058**: On release of the kill switch each held payment re-runs the policy automatically; EXECUTE resumes, anything else stays held or escalates. *(proposed: G-15)*
+- **FR-058**: On release of the kill switch each held payment re-runs the policy automatically; EXECUTE resumes, anything else stays held or escalates.
 - **FR-059**: Shadow records decisions and sends nothing; Assist waits for a human Send click on EXECUTE; Auto sends automatically; a mode change needs the payments lead and the compliance lead and is audited.
 - **FR-060**: The mode is read inside the send lock; in Assist the Send click needs an approver role and cannot be made by the initiator. *(proposed: G-09, G-16)*
 - **FR-061**: An invariant monitor detects unauthorised executions, wrong credits and duplicates, engages the kill switch and opens a Sev 1 incident.

@@ -212,3 +212,34 @@ def reject_exception(
     request: Request, case_id: str, body: ResolutionIn, principal: Annotated[Principal, Depends(authenticate)]
 ) -> JSONResponse:
     return _resolve_case(request, case_id, body, principal, "reject")
+
+
+# --------------------------------------------------------------------------------- kill switch (EXE-08)
+def _kill_switch(request: Request, principal: Principal, engage_it: bool) -> JSONResponse:
+    from detent.execution.kill_switch import engage, is_engaged, release
+
+    require(principal, "admin")
+    rt = request.app.state.runtime
+    actor = Actor(principal.user_id, principal.role)
+    try:
+        if engage_it:
+            engage(rt.engine, rt.clock, org_id=principal.org_id, actor=actor)
+        else:
+            release(rt.engine, rt.clock, org_id=principal.org_id, actor=actor)
+    except PermissionError as exc:
+        return error_response(403, "permission", "insufficient_role", str(exc), request_id=_rid())
+    return JSONResponse({"engaged": is_engaged(rt.engine, principal.org_id)})
+
+
+@router.post("/kill_switch")
+def engage_kill_switch(
+    request: Request, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    return _kill_switch(request, principal, True)
+
+
+@router.delete("/kill_switch")
+def release_kill_switch(
+    request: Request, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    return _kill_switch(request, principal, False)

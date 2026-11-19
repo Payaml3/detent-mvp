@@ -71,7 +71,7 @@ original documents would let me check every Proposed item below against them.
 | G-12 | Mandate `max_total` period | spec/05 mandate scope | The mandate's whole validity window; counts confirmed plus in-flight; released on FAILED_FINAL, CANCELLED, BLOCKED, REJECTED | **Proposed** |
 | G-13 | Above-norm with history in another currency | POL-05; counterparties fixture (Harbor median in EUR) | Compare only with confirmed payments in the same currency; otherwise "not evaluated" | **Confirmed** 2026-11-18 (founder, D-23) |
 | G-14 | Daily cap day boundary | spec/04 `daily_caps` | UTC calendar day | **Confirmed** 2026-11-18 (founder, D-23) |
-| G-15 | After the kill switch is released, do held payments resume automatically | spec/02 HELD → READY; EXE-08 | Automatically: each held payment re-runs the policy (audited); EXECUTE resumes, anything else stays held or escalates | **Proposed** |
+| G-15 | After the kill switch is released, do held payments resume automatically | spec/02 HELD → READY; EXE-08 | Automatically: each held payment re-runs the policy (audited); EXECUTE resumes, anything else stays held or escalates | **Confirmed** 2026-11-19 (founder, D-28) |
 | G-16 | Mode change while payments are READY | EXE-09 | The mode is read inside the send lock: a payment READY under Auto waits for a Send click if the mode is now Assist | **Proposed** |
 | G-17 | Who may cancel, and until when | spec/02 CANCELLED transitions; INT-05 | Platform via API (`intents:create`) or payments lead in the console; only before SUBMITTED | **Proposed** |
 | G-18 | Data in a new sandbox organisation (which payees exist) | SBX, DSH-01 | Seed the fictional counterparties and test values on creation | **Proposed** |
@@ -126,6 +126,7 @@ original documents would let me check every Proposed item below against them.
 | D-25 | The travel-rule threshold is per currency: 1,000.00 USDC, 1,000.00 GBP and 1,000.00 EUR (`travel_rule.threshold` is a currency map) | 2026-11-18 | Founder answers before S1 |
 | D-26 | User payouts (`user_account_ref`) are deferred until G-10 is decided; the API returns 422 `user_payouts_unavailable` until then | 2026-11-18 | Founder answer before S1 |
 | D-27 | Approved for S3: G-06 (reviewer, backup owner and payments lead approve or reject; never the initiator), C-07 (tier = deadline class from the rule set; owners by case type, no amount bands), G-24 (owner = fewest open cases in the role) | 2026-11-18 | Founder answers before S3 |
+| D-28 | G-15 approved: when the payments lead releases the kill switch, every payment it held re-runs the policy (audited); EXECUTE resumes sending, anything else stays held or goes to the exceptions queue | 2026-11-19 | Founder answer before S4 |
 
 ### Technical decisions already implemented in M0 (no business rule involved)
 

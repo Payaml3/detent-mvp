@@ -98,8 +98,13 @@ def confirm_job(ctx: JobContext) -> None:
         a.raw_tx,
         a.tx_hash,
     )
-    if apply_rail_status(ctx.engine, ctx.clock, adapter, org, view) is Status.SUBMITTED:
+    st = apply_rail_status(ctx.engine, ctx.clock, adapter, org, view)
+    if st is Status.SUBMITTED:
         raise StillPending(pid)
+    if st is Status.FAILED:
+        from detent.execution.retry import after_failure
+
+        after_failure(ctx.engine, ctx.clock, _adapters(ctx), org_id=org, payment_id=pid)
 
 
 def reconcile_all(engine: Engine, clock: Clock, settings: Settings) -> list[nonces.NonceProblem]:
@@ -126,3 +131,27 @@ def reconcile_all(engine: Engine, clock: Clock, settings: Settings) -> list[nonc
             extra={"rail": p.rail_id, "address": p.address, "stored": p.stored, "chain": p.chain},
         )
     return problems
+
+
+@handler("payment.resolve_unknown")
+def resolve_job(ctx: JobContext) -> None:
+    """EXE-06: poll an UNKNOWN payment on the spec/06 schedule (+5 s, +15 s, +30 s, +60 s, then every 2 "
+    "min)."""
+    from detent.execution.resolver import next_poll_delay, resolve_unknown
+
+    assert ctx.engine is not None
+    pid = str(ctx.job.payload["payment_id"])
+    step = int(ctx.job.payload.get("step", 0))
+    st = resolve_unknown(ctx.engine, ctx.clock, _adapters(ctx), org_id=ctx.job.org_id, payment_id=pid)
+    if st is Status.UNKNOWN:
+        enqueue(
+            ctx.conn,
+            ctx.clock,
+            org_id=ctx.job.org_id,
+            kind="payment.resolve_unknown",
+            payment_id=pid,
+            dedupe_key=f"{pid}:resolve:{step + 1}",
+            payload={"payment_id": pid, "step": step + 1},
+            run_at=ctx.clock.now() + next_poll_delay(step + 1),
+            max_attempts=3,
+        )

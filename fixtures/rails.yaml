@@ -7,3 +7,4 @@ rails:
   - {id: banksim-sepa-inst, kind: banksim, scheme: sepa_inst, currency: EUR, fee: {flat_minor: 25, bps: 5}, per_payment_limit: "25000.00", daily_limit: "100000.00", failure_rate: 0.0, est_seconds: 8}
   - {id: simchain, kind: simchain, currency: USDC, est_fee_minor: 0, est_seconds: 1, sandbox_only: true}
   - {id: local-evm, kind: evm, chain_id: 31337, currency: USDC, confirmations: 1, est_fee_minor: 0, est_seconds: 1, test_only: true}
+  - {id: local-evm-b, kind: evm, chain_id: 31337, currency: USDC, confirmations: 1, est_fee_minor: 1000, est_seconds: 2, test_only: true}   # second local chain, for failover tests

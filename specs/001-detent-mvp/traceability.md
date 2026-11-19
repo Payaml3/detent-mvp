@@ -590,9 +590,9 @@ Sources: [Invariant 3](../../CLAUDE.md#non-negotiable-invariants); [spec/06 §ad
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-05](../../backlog/user-stories.md#exe-05) | S4 | 0 | A timeout, dropped connection or 5xx after the request may have reached the rail -> attempt and payment UNKNOWN | planned | fault: `apps/api/tests/integration/test_exe_05.py` |
-| [EXE-05](../../backlog/user-stories.md#exe-05) | S4 | 1 | While UNKNOWN, no new attempt can be created (database and code) | planned | integration: `apps/api/tests/integration/test_exe_05.py` |
-| [EXE-05](../../backlog/user-stories.md#exe-05) | S4 | 2 | Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED | planned | integration: `apps/api/tests/integration/test_exe_05.py` |
+| [EXE-05](../../backlog/user-stories.md#exe-05) | S4 | 0 | A timeout, dropped connection or 5xx after the request may have reached the rail -> attempt and payment UNKNOWN | done | `chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed`<br>`integration/test_banksim.py::test_amount_ending_13_times_out_then_settles_once` |
+| [EXE-05](../../backlog/user-stories.md#exe-05) | S4 | 1 | While UNKNOWN, no new attempt can be created (database and code) | done | `chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed`<br>`integration/test_attempts.py::test_one_attempt_in_flight` |
+| [EXE-05](../../backlog/user-stories.md#exe-05) | S4 | 2 | Only a definitive rail answer moves UNKNOWN to CONFIRMED or FAILED | done | `chain/test_unknown.py::test_unknown_never_fails_without_evidence`<br>`chain/test_unknown.py::test_delayed_receipt_stays_unknown_without_resending` |
 
 ## FR-055 · Execution (confirmed)
 
@@ -602,10 +602,10 @@ Sources: [spec/06 §unknown-resolution-exe-06](../../spec/06-rails-and-faults.md
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 0 | The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 1 | CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 2 | Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 3 | Median and p95 time to resolve are recorded for the results report | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 0 | The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule | done | `chain/test_unknown.py::test_a_timeout_schedules_the_resolver`<br>`unit/test_s4_config.py::test_resolver_polls_on_the_spec_06_schedule`<br>`integration/test_banksim.py::test_amount_ending_13_times_out_then_settles_once` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 1 | CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found | done | `chain/test_unknown.py::test_never_forwarded_is_rebroadcast_as_the_same_transaction`<br>`chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 2 | Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer | done | `chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 3 | Median and p95 time to resolve are recorded for the results report | done | `chain/test_unknown.py::test_time_to_resolve_is_recorded` |
 
 ## FR-056 · Execution (confirmed)
 
@@ -615,9 +615,9 @@ Sources: [Invariant 6](../../CLAUDE.md#non-negotiable-invariants); [fixtures/pol
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-07](../../backlog/user-stories.md#exe-07) | S4 | 0 | Retry config lists retryable error codes, maximum attempts and backoff | planned | integration: `apps/api/tests/integration/test_exe_07.py` |
-| [EXE-07](../../backlog/user-stories.md#exe-07) | S4 | 1 | Only `TECHNICAL_RETRYABLE` failures retry; `REJECTED_BY_RAIL` and any BLOCK never do | planned | integration: `apps/api/tests/integration/test_exe_07.py` |
-| [EXE-07](../../backlog/user-stories.md#exe-07) | S4 | 2 | Every retry keeps the payment ID and is audited with the rule that allowed it | planned | integration: `apps/api/tests/integration/test_exe_07.py` |
+| [EXE-07](../../backlog/user-stories.md#exe-07) | S4 | 0 | Retry config lists retryable error codes, maximum attempts and backoff | done | `chain/test_retry_failover.py::test_retryable_failure_retries_with_the_same_nonce`<br>`chain/test_retry_failover.py::test_retries_are_bounded_and_end_final` |
+| [EXE-07](../../backlog/user-stories.md#exe-07) | S4 | 1 | Only `TECHNICAL_RETRYABLE` failures retry; `REJECTED_BY_RAIL` and any BLOCK never do | done | `integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted`<br>`chain/test_retry_failover.py::test_a_block_never_reaches_routing` |
+| [EXE-07](../../backlog/user-stories.md#exe-07) | S4 | 2 | Every retry keeps the payment ID and is audited with the rule that allowed it | done | `chain/test_retry_failover.py::test_retryable_failure_retries_with_the_same_nonce` |
 
 ## FR-057 · Execution (confirmed)
 
@@ -627,12 +627,12 @@ Sources: [Invariant 10](../../CLAUDE.md#non-negotiable-invariants); [EXE-08 crit
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 0 | Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 1 | Pending payments stay held; UNKNOWN attempts keep resolving read-only | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 2 | Release requires the client's payments lead, even if on-call engaged it | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 3 | A red banner shows on every console page while engaged; every change is audited | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 0 | Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send | done | `chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it`<br>`chain/test_kill_switch.py::test_api_engage_and_release`<br>`chain/test_send_once.py::test_kill_switch_holds_before_sending` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 1 | Pending payments stay held; UNKNOWN attempts keep resolving read-only | done | `chain/test_kill_switch.py::test_unknown_keeps_resolving_read_only`<br>`chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 2 | Release requires the client's payments lead, even if on-call engaged it | done | `chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it`<br>`chain/test_kill_switch.py::test_api_engage_and_release` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 3 | A red banner shows on every console page while engaged; every change is audited | done | `chain/test_kill_switch.py::test_console_banner_and_buttons`<br>`chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it` |
 
-## FR-058 · Execution (proposed)
+## FR-058 · Execution (confirmed)
 
 On release of the kill switch each held payment re-runs the policy automatically; EXECUTE resumes, anything else stays held or escalates.
 
@@ -640,10 +640,10 @@ Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 0 | Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 1 | Pending payments stay held; UNKNOWN attempts keep resolving read-only | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 2 | Release requires the client's payments lead, even if on-call engaged it | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
-| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 3 | A red banner shows on every console page while engaged; every change is audited | planned | integration: `apps/api/tests/integration/test_exe_08.py` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 0 | Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send | done | `chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it`<br>`chain/test_kill_switch.py::test_api_engage_and_release`<br>`chain/test_send_once.py::test_kill_switch_holds_before_sending` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 1 | Pending payments stay held; UNKNOWN attempts keep resolving read-only | done | `chain/test_kill_switch.py::test_unknown_keeps_resolving_read_only`<br>`chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 2 | Release requires the client's payments lead, even if on-call engaged it | done | `chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it`<br>`chain/test_kill_switch.py::test_api_engage_and_release` |
+| [EXE-08](../../backlog/user-stories.md#exe-08) | S4 | 3 | A red banner shows on every console page while engaged; every change is audited | done | `chain/test_kill_switch.py::test_console_banner_and_buttons`<br>`chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it` |
 
 ## FR-059 · Execution (confirmed)
 
@@ -703,7 +703,7 @@ Sources: [spec/06 §rails-in-the-mvp](../../spec/06-rails-and-faults.md#rails-in
 | [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 0 | ERC-20 transfer via web3.py signed with a test key from settings; gas estimated and checked | done | `chain/test_rail_contract.py::test_prepare_submit_status`<br>`chain/test_rail_contract.py::test_adapter_refuses_a_non_test_chain`<br>`chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms` |
 | [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 1 | Confirmation threshold configurable; explorer link stored on the attempt | done | `chain/test_rail_contract.py::test_explorer_link`<br>`chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms` |
 | [RAL-02](../../backlog/user-stories.md#ral-02) | S2 | 2 | Contract tests pass on the local chain and nightly on Base Sepolia | planned | contract: `apps/api/tests/integration/test_ral_02.py` |
-| [RAL-03](../../backlog/user-stories.md#ral-03) | S4 | 0 | Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold | planned | contract: `apps/api/tests/integration/test_ral_03.py` |
+| [RAL-03](../../backlog/user-stories.md#ral-03) | S4 | 0 | Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold | done | `unit/test_s4_config.py::test_eth_sepolia_has_its_own_fee_profile_and_threshold` |
 | [RAL-03](../../backlog/user-stories.md#ral-03) | S4 | 1 | Contract tests pass | planned | contract: `apps/api/tests/integration/test_ral_03.py` |
 
 ## FR-064 · Rails (confirmed)
@@ -714,9 +714,9 @@ Sources: [spec/06 §rails-in-the-mvp](../../spec/06-rails-and-faults.md#rails-in
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-04](../../backlog/user-stories.md#ral-04) | S4 | 0 | A separate FastAPI sub-app with GBP and EUR, per-payment and daily limits, cut-off times, a configurable failure rate and idempotency by key | planned | contract: `apps/api/tests/integration/test_ral_04.py` |
-| [RAL-04](../../backlog/user-stories.md#ral-04) | S4 | 1 | Status endpoint and asynchronous settlement callback; daily statement endpoint (used by LED-07) | planned | contract: `apps/api/tests/integration/test_ral_04.py` |
-| [RAL-04](../../backlog/user-stories.md#ral-04) | S4 | 2 | Deterministic test values: amounts ending .13 time out then settle; .42 fail technically | planned | property: `apps/api/tests/property/test_ral_04.py` |
+| [RAL-04](../../backlog/user-stories.md#ral-04) | S4 | 0 | A separate FastAPI sub-app with GBP and EUR, per-payment and daily limits, cut-off times, a configurable failure rate and idempotency by key | done | `integration/test_banksim.py::test_contract`<br>`integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted` |
+| [RAL-04](../../backlog/user-stories.md#ral-04) | S4 | 1 | Status endpoint and asynchronous settlement callback; daily statement endpoint (used by LED-07) | done | `integration/test_banksim.py::test_settlement_callback`<br>`integration/test_banksim.py::test_detent_sends_a_euro_payout_on_the_bank_rail` |
+| [RAL-04](../../backlog/user-stories.md#ral-04) | S4 | 2 | Deterministic test values: amounts ending .13 time out then settle; .42 fail technically | done | `integration/test_banksim.py::test_amount_ending_13_times_out_then_settles_once`<br>`integration/test_banksim.py::test_amount_ending_42_fails_technically_and_ends_final` |
 
 ## FR-065 · Rails (confirmed)
 
@@ -726,9 +726,9 @@ Sources: [spec/06 §fault-injection-ral-05](../../spec/06-rails-and-faults.md#fa
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-05](../../backlog/user-stories.md#ral-05) | S4 | 0 | Faults: timeout after forwarding, timeout before forwarding, connection reset, 5xx, delayed receipt, hidden receipt for N polls (stuck), duplicated response | planned | fault: `apps/api/tests/integration/test_ral_05.py` |
-| [RAL-05](../../backlog/user-stories.md#ral-05) | S4 | 1 | Fault chosen per attempt by scenario config in tests and sandbox; disabled in demo mode unless a scenario requests it | planned | fault: `apps/api/tests/integration/test_ral_05.py` |
-| [RAL-05](../../backlog/user-stories.md#ral-05) | S4 | 2 | Each injected fault is logged with the attempt ID | planned | fault: `apps/api/tests/integration/test_ral_05.py` |
+| [RAL-05](../../backlog/user-stories.md#ral-05) | S4 | 0 | Faults: timeout after forwarding, timeout before forwarding, connection reset, 5xx, delayed receipt, hidden receipt for N polls (stuck), duplicated response | done | `chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed`<br>`chain/test_unknown.py::test_never_forwarded_is_rebroadcast_as_the_same_transaction`<br>`chain/test_unknown.py::test_delayed_receipt_stays_unknown_without_resending`<br>`chain/test_retry_failover.py::test_retryable_failure_retries_with_the_same_nonce`<br>`integration/test_banksim.py::test_duplicate_requests_create_one_bank_payment` |
+| [RAL-05](../../backlog/user-stories.md#ral-05) | S4 | 1 | Fault chosen per attempt by scenario config in tests and sandbox; disabled in demo mode unless a scenario requests it | done | `unit/test_s4_config.py::test_faults_are_refused_in_demo_mode_unless_the_scenario_runner_asks` |
+| [RAL-05](../../backlog/user-stories.md#ral-05) | S4 | 2 | Each injected fault is logged with the attempt ID | done | `chain/test_unknown.py::test_no_answer_after_forwarding_is_unknown_then_confirmed` |
 
 ## FR-066 · Rails (confirmed)
 
@@ -738,9 +738,9 @@ Sources: [spec/06 §routing-ral-06](../../spec/06-rails-and-faults.md#routing-ra
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-06](../../backlog/user-stories.md#ral-06) | S4 | 0 | Routing runs only after an EXECUTE decision; a BLOCK never reaches routing | planned | contract: `apps/api/tests/integration/test_ral_06.py` |
-| [RAL-06](../../backlog/user-stories.md#ral-06) | S4 | 1 | Eligibility first (currency, network constraint from intent or mandate, limits, cut-off, health, liquidity), then a weighted score from config | planned | contract: `apps/api/tests/integration/test_ral_06.py` |
-| [RAL-06](../../backlog/user-stories.md#ral-06) | S4 | 2 | The decision stores each candidate's score and the reason for the winner | planned | contract: `apps/api/tests/integration/test_ral_06.py` |
+| [RAL-06](../../backlog/user-stories.md#ral-06) | S4 | 0 | Routing runs only after an EXECUTE decision; a BLOCK never reaches routing | done | `chain/test_retry_failover.py::test_a_block_never_reaches_routing` |
+| [RAL-06](../../backlog/user-stories.md#ral-06) | S4 | 1 | Eligibility first (currency, network constraint from intent or mandate, limits, cut-off, health, liquidity), then a weighted score from config | done | `chain/test_retry_failover.py::test_route_is_stored_with_every_candidate`<br>`chain/test_send_once.py::test_prefunded_daily_limit_holds` |
+| [RAL-06](../../backlog/user-stories.md#ral-06) | S4 | 2 | The decision stores each candidate's score and the reason for the winner | done | `chain/test_retry_failover.py::test_route_is_stored_with_every_candidate` |
 
 ## FR-067 · Rails (confirmed)
 
@@ -750,10 +750,10 @@ Sources: [spec/06 §failover-ral-07](../../spec/06-rails-and-faults.md#failover-
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-07](../../backlog/user-stories.md#ral-07) | S4 | 0 | Failover needs the previous attempt definitively FAILED with a technical code; never from UNKNOWN | planned | contract: `apps/api/tests/integration/test_ral_07.py` |
-| [RAL-07](../../backlog/user-stories.md#ral-07) | S4 | 1 | Never after BLOCK or REJECTED_BY_RAIL | planned | contract: `apps/api/tests/integration/test_ral_07.py` |
+| [RAL-07](../../backlog/user-stories.md#ral-07) | S4 | 0 | Failover needs the previous attempt definitively FAILED with a technical code; never from UNKNOWN | done | `chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id`<br>`chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it` |
+| [RAL-07](../../backlog/user-stories.md#ral-07) | S4 | 1 | Never after BLOCK or REJECTED_BY_RAIL | done | `integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted`<br>`chain/test_retry_failover.py::test_a_block_never_reaches_routing` |
 | [RAL-07](../../backlog/user-stories.md#ral-07) | S4 | 2 | Network switches need `allow_network_switch` on the intent or mandate, or a human approval | planned | contract: `apps/api/tests/integration/test_ral_07.py` |
-| [RAL-07](../../backlog/user-stories.md#ral-07) | S4 | 3 | The new attempt keeps the payment ID | planned | contract: `apps/api/tests/integration/test_ral_07.py` |
+| [RAL-07](../../backlog/user-stories.md#ral-07) | S4 | 3 | The new attempt keeps the payment ID | done | `chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id` |
 
 ## FR-068 · Rails (confirmed)
 
@@ -1024,7 +1024,7 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 0 | Active version, history and diff; propose and approve per POL-07 | planned | console: `apps/api/tests/integration/test_con_06.py` |
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 1 | Mandates list with scope, usage against limits, expiry and revoke | planned | console: `apps/api/tests/integration/test_con_06.py` |
 | [CON-07](../../backlog/user-stories.md#con-07) | S7 | 0 | Run history, match rate, breaks with proposed fix and approve button | planned | console: `apps/api/tests/integration/test_con_07.py` |
-| [CON-08](../../backlog/user-stories.md#con-08) | S4 | 0 | Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts | planned | console: `apps/api/tests/integration/test_con_08.py` |
+| [CON-08](../../backlog/user-stories.md#con-08) | S4 | 0 | Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts | done | `integration/test_console_rails.py::test_rails_screen` |
 | [CON-10](../../backlog/user-stories.md#con-10) | L | 0 | Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype | planned | console: `apps/api/tests/integration/test_con_10.py` |
 
 ## FR-092 · Evaluation (confirmed)
@@ -1075,10 +1075,10 @@ Sources: [spec/01 §performance-targets-estimate](../../spec/01-architecture.md#
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 0 | The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 1 | CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 2 | Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
-| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 3 | Median and p95 time to resolve are recorded for the results report | planned | integration: `apps/api/tests/integration/test_exe_06.py` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 0 | The worker polls by transaction hash (chain) or idempotency key (bank) on a backoff schedule | done | `chain/test_unknown.py::test_a_timeout_schedules_the_resolver`<br>`unit/test_s4_config.py::test_resolver_polls_on_the_spec_06_schedule`<br>`integration/test_banksim.py::test_amount_ending_13_times_out_then_settles_once` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 1 | CONFIRMED needs receipt status 1 and the rail's confirmation threshold; FAILED needs receipt status 0, the nonce consumed by another transaction, or the rail's definitive not-found | done | `chain/test_unknown.py::test_never_forwarded_is_rebroadcast_as_the_same_transaction`<br>`chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 2 | Still UNKNOWN after the threshold -> an `UNKNOWN_STUCK` exception to the payments lead, with two options: keep waiting, or approve a cancel-by-replacement (same nonce, zero value) carried out by the execution layer | done | `chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it` |
+| [EXE-06](../../backlog/user-stories.md#exe-06) | S4 | 3 | Median and p95 time to resolve are recorded for the results report | done | `chain/test_unknown.py::test_time_to_resolve_is_recorded` |
 | [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 0 | HTML and Markdown with metrics, per-category tables and the caveat 'test-network evaluation on synthetic data, [date]' | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
 | [EVL-06](../../backlog/user-stories.md#evl-06) | S8 | 1 | results.json is published for the website's Measured results section | planned | eval: `eval/scenarios (runner: detent eval) for EVL-06` |
 | [EVL-08](../../backlog/user-stories.md#evl-08) | S8 | 0 | Benchmark reports p50 and p95 for rules-only and agent paths; included in the results report | planned | eval: `eval/scenarios (runner: detent eval) for EVL-08` |

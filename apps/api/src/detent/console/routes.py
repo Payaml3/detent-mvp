@@ -240,7 +240,6 @@ def edit_destination(
 # ---------------------------------------------------------------------------------- S3: review loop
 SECTIONS_NOT_BUILT = {
     "reconciliation": ("Reconciliation", "Matching deposits and payouts across rails (LED-06, slice S6)."),
-    "rails": ("Rails", "Rail health, routing weights and circuits (RAL-06, RAL-08)."),
     "policy": ("Policy", "Rule versions, diffs and two-person approval (POL-07, slice S6)."),
     "mandates": ("Mandates", "Signed agent mandates and revocation (MND-01 to MND-03, slice S5)."),
     "audit": ("Audit", "Searchable audit log, replay and evidence export (AUD-02, AUD-03)."),
@@ -516,6 +515,92 @@ def outbox(
             {"o": user.org_id},
         ).all()
     return page(request, rt, "outbox.html", user, messages=msgs)
+
+
+@router.post("/kill_switch/engage")
+def console_engage(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("kill_switch.engage")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.execution.kill_switch import engage
+
+    engage(rt.engine, rt.clock, org_id=user.org_id, actor=Actor(user.id, user.role.value))
+    return RedirectResponse(request.headers.get("referer") or "/console/", status_code=303)
+
+
+@router.post("/kill_switch/release")
+def console_release(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("kill_switch.release")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.execution.kill_switch import release
+
+    release(rt.engine, rt.clock, org_id=user.org_id, actor=Actor(user.id, user.role.value))
+    return RedirectResponse(request.headers.get("referer") or "/console/", status_code=303)
+
+
+@router.get("/rails", response_class=HTMLResponse)
+def rails_screen(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    """CON-08: per rail, the network or currency, balance, pre-funded limit usage and the last 20 attempts."""
+    from detent.domain.money import Currency, Money
+    from detent.rails.registry import build_adapters
+
+    day = rt.clock.now().date().isoformat()
+    try:
+        adapters = build_adapters(rt.settings, rt.engine, user.org_id)
+    except Exception:  # an unreachable RPC must not take the screen down
+        adapters = {}
+    with rt.engine.connect() as conn:
+        rows = conn.execute(
+            text("SELECT * FROM rails WHERE org_id=:o ORDER BY kind, id"), {"o": user.org_id}
+        ).all()
+        rails = []
+        for r in rows:
+            used = (
+                conn.execute(
+                    text("SELECT amount_minor FROM counters WHERE org_id=:o AND scope=:s AND period=:d"),
+                    {"o": user.org_id, "s": f"prefund:{r.id}", "d": day},
+                ).scalar_one_or_none()
+                or 0
+            )
+            usage = None
+            if r.prefunded_daily_limit_minor:
+                lim = Money(int(r.prefunded_daily_limit_minor), Currency(r.currency))
+                pct = int(used) * 100 // int(r.prefunded_daily_limit_minor)
+                spent = Money(int(used), Currency(r.currency)).to_decimal_str()
+                usage = f"{spent} of {lim.to_decimal_str()} {r.currency} ({pct}%)"
+            attempts = conn.execute(
+                text(
+                    "SELECT a.id, a.payment_id, a.status, a.failure_class, a.tx_hash, a.explorer_url, "
+                    "a.created_at "
+                    "FROM attempts a WHERE a.org_id=:o AND a.rail_id=:r ORDER BY a.created_at DESC, a.id "
+                    "DESC LIMIT 20"
+                ),
+                {"o": user.org_id, "r": r.id},
+            ).all()
+            balance = None
+            a = adapters.get(r.id)
+            if a is not None:
+                try:
+                    h = a.health()
+                    balance = str(h.balance) if h.balance is not None else ("reachable" if h.ok else None)
+                except Exception:
+                    balance = None
+            ppl = (
+                str(Money(int(r.per_payment_limit_minor), Currency(r.currency)))
+                if r.per_payment_limit_minor is not None
+                else None
+            )
+            rails.append(
+                {"row": r, "usage": usage, "attempts": attempts, "balance": balance, "per_payment": ppl}
+            )
+    return page(request, rt, "rails.html", user, rails=rails)
 
 
 @router.get("/{section}", response_class=HTMLResponse)
