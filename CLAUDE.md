@@ -2,6 +2,8 @@
 
 Read this file at the start of every session. It's the project's standing instructions.
 
+**Then read `HANDOFF.md`:** where the build is, which branch to start from, the next slice and the open founder items. We work one slice per session in this one repository; update `HANDOFF.md` at the end of each slice.
+
 ## What we are building
 
 Detent (working name) is **agentic payment controls** for UK and EU platforms that hold user balances: one layer that decides, orchestrates and operates every deposit and payout, under the platform's own rules. It sits **beside** the platform's payment rails, starting with rails that can't be reversed: stablecoins and instant bank payouts.
