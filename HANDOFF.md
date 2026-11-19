@@ -24,13 +24,15 @@ Progress: `make spec` reports criteria done with evidence (199/308 after S7).
 git fetch origin s7 && git checkout -b s8 origin/s7   # or the latest slice branch
 ```
 
-Local database (cloud containers have no Docker; use the local cluster):
+The cloud environment `detent-mvp` has a setup script that starts Postgres, creates the `detent` role
+and the `detent` and `detent_test` databases, runs `uv sync`, migrates and seeds. If a session was not
+built fresh (a resumed container), run the same steps by hand (there is no Docker in cloud containers):
 
 ```
 pg_ctlcluster 16 main start
-su postgres -c "psql -c \"CREATE ROLE detent LOGIN SUPERUSER PASSWORD 'detent'\""   # first time only
+su postgres -c "psql -c \"CREATE ROLE detent LOGIN SUPERUSER PASSWORD 'detent'\""   # if missing
 su postgres -c "createdb -O detent detent"; su postgres -c "createdb -O detent detent_test"
-make migrate seed
+uv sync && make migrate seed
 ```
 
 Then `make lint typecheck test` (about 3 minutes; chain tests need Foundry, which is installed).
