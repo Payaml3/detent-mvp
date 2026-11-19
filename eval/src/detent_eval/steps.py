@@ -588,12 +588,25 @@ def crash_during_send(env: Env, a: dict[str, Any]) -> dict[str, Any]:
     def crashing(settings: Any, engine: Any, org_id: str) -> Any:
         return {k: Crashing(v) for k, v in real(settings, engine, org_id).items()}
 
+    from detent.execution import jobs as jobs_mod
+    from detent.worker import registry as job_registry
+    from detent.worker.registry import JobContext
+
     w = worker(env)
-    job = queue.claim(env.engine, env.clock, "eval-crashing", w.lease, org_id=env.org_id)
+    # Jobs due at the same instant are claimed in id order, which is random within one clock tick: run
+    # any other due job (a case investigation, say) normally until the payment's send job comes up.
+    for _ in range(20):
+        job = queue.claim(env.engine, env.clock, "eval-crashing", w.lease, org_id=env.org_id)
+        if job is None or (job.payment_id == pid and job.kind == "payment.send"):
+            break
+        fn = job_registry.get(job.kind)
+        if fn is None:
+            raise StepFailed(f"no handler for job kind {job.kind!r}")
+        with env.engine.begin() as conn:
+            fn(JobContext(conn, env.clock, job, "eval-crashing", env.engine, env.settings))
+            queue.mark_done(conn, env.clock, job, "eval-crashing")
     if job is None or job.payment_id != pid:
         raise StepFailed(f"no send job for {pid} to crash (got {job})")
-    from detent.execution import jobs as jobs_mod
-    from detent.worker.registry import JobContext
 
     if when != "commit":
         setattr(jobs_mod, "build_adapters", crashing)  # noqa: B010 - swapped back in finally
