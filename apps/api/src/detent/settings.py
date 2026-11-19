@@ -85,6 +85,10 @@ class Settings(BaseSettings):
     worker_lease_seconds: int = 60
     # EXC-06: how often the worker checks for overdue cases (domain time still comes from the Clock).
     deadline_sweep_seconds: float = 30.0
+    # LED-04: how often the worker runs the deposit watchers.
+    deposit_watch_seconds: float = 10.0
+    # LED-06: how often the worker runs reconciliation for every organisation with a ledger.
+    reconciliation_seconds: float = 3600.0
     worker_max_attempts: int = 8
     # Extra handler modules, for tests only (rejected outside APP_ENV=test).
     worker_extra_handler_modules: Annotated[tuple[str, ...], NoDecode] = ()

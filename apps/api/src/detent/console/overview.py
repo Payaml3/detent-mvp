@@ -1,7 +1,7 @@
 """The overview numbers (CON-02): today's decisions, automation share, UNKNOWN age, cases, rails, events.
 
-Read-only queries, all scoped to one organisation. The match rate needs reconciliation (slice S7), so
-until then it is reported as not available rather than as a number.
+Read-only queries, all scoped to one organisation. The match rate is the latest reconciliation run's;
+before the first run it is reported as not available rather than as a number.
 """
 
 from __future__ import annotations
@@ -18,6 +18,25 @@ from detent.execution.modes import current_mode, orchestrate_status, pending_mod
 def _age(seconds: int) -> str:
     h, m = seconds // 3600, (seconds % 3600) // 60
     return f"{h}h {m}m" if h else f"{m}m {seconds % 60}s"
+
+
+def _match_rate(conn: Connection, org_id: str) -> dict[str, Any] | None:
+    """The latest reconciliation run's match rate (LED-06), in basis points."""
+    r = conn.execute(
+        text(
+            "SELECT stats, finished_at FROM recon_runs WHERE org_id=:o AND finished_at IS NOT NULL "
+            "ORDER BY started_at DESC, id DESC LIMIT 1"
+        ),
+        {"o": org_id},
+    ).one_or_none()
+    if r is None:
+        return None
+    bps = int(r.stats.get("match_rate_bps", 0))
+    return {
+        "text": f"{bps // 100}.{bps % 100:02d}%",
+        "breaks": int(r.stats.get("breaks", 0)),
+        "at": r.finished_at,
+    }
 
 
 def overview_stats(conn: Connection, org_id: str, now: datetime) -> dict[str, Any]:
@@ -112,7 +131,7 @@ def overview_stats(conn: Connection, org_id: str, now: datetime) -> dict[str, An
         "open_cases": int(cases[0]),
         "overdue_cases": int(cases[1]),
         "approved_by_timeout": approved_by_timeout(conn, org_id),
-        "match_rate": None,  # reconciliation arrives in slice S7
+        "match_rate": _match_rate(conn, org_id),
         "rails": rails,
         "orchestrate": orchestrate_status(conn, org_id),
         "mode": current_mode(conn, org_id),

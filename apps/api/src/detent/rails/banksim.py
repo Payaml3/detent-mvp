@@ -19,6 +19,7 @@ from detent.rails.base import (
     Eligibility,
     Health,
     IntentView,
+    ObservedTransfer,
     Quote,
     RailError,
     Resolved,
@@ -41,8 +42,10 @@ class BankAdapter:
         fee_bps: int = 0,
         timeout_seconds: float = 10.0,
         expected_seconds: int = 5,
+        receiving_account: str | None = None,
     ) -> None:
         self.rail_id = rail_id
+        self.receiving_account = receiving_account
         self.scheme = scheme
         self.currency = Currency(currency)
         self.per_payment_limit_minor = per_payment_limit_minor
@@ -81,6 +84,8 @@ class BankAdapter:
             "account": attempt.destination_address or "",
             "reference": attempt.payment_id,
         }
+        if self.receiving_account:
+            body["debtor"] = self.receiving_account  # the organisation's account at the simulated bank
         try:
             r = self._http.post(
                 f"{self._url}/payments",
@@ -149,3 +154,44 @@ class BankAdapter:
         except requests.exceptions.RequestException as exc:
             return Health(False, None, {"error": type(exc).__name__})
         return Health(ok, None, {"scheme": self.scheme})
+
+    # ------------------------------------------------------------------------------ watching (LED-04)
+    def _acct(self) -> dict[str, str]:
+        """The organisation's receiving account at the simulated bank (one per organisation)."""
+        return {"account": self.receiving_account} if self.receiving_account else {}
+
+    def inbound(self, after: int) -> tuple[list[ObservedTransfer], int]:
+        """Inbound credits after the cursor; returns them and the new cursor."""
+        r = self._http.get(
+            f"{self._url}/inbound",
+            params={"scheme": self.scheme, "after": str(after), **self._acct()},
+            timeout=self._timeout,
+        )
+        r.raise_for_status()
+        rows = r.json()["data"]
+        out = [
+            ObservedTransfer(
+                external_id=str(x["id"]),
+                tx_hash=str(x["id"]),
+                log_index=0,
+                direction="in",
+                from_party=str(x["payer"]),
+                to_party=str(x["reference"]),
+                amount_minor=int(x["amount_minor"]),
+                block_number=None,
+                confirmations=1,  # a bank credit is final when the bank reports it
+                occurred_at=str(x["received_at"]),
+            )
+            for x in rows
+        ]
+        return out, max([after, *(int(x["seq"]) for x in rows)])
+
+    def statement(self, day: str, fmt: str = "json") -> Any:
+        """The day's statement for this scheme (LED-07): JSON or CSV text."""
+        r = self._http.get(
+            f"{self._url}/statements/{day}",
+            params={"scheme": self.scheme, "format": fmt, **self._acct()},
+            timeout=self._timeout,
+        )
+        r.raise_for_status()
+        return r.text if fmt == "csv" else r.json()

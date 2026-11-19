@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Reconciliation{% endblock %}
+{% block main %}
+<h1>Reconciliation</h1>
+<p class="lead">Every settled payout and credited deposit in the ledger is matched against the chain or the bank statement, and every rail record against the ledger. A break gets a fix proposed by the reconciliation agent; nothing changes until the payments lead approves it, and then only as a new ledger entry.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form method="post" action="/console/reconciliation/run"><button class="primary">Run now</button></form>
+{% if latest %}
+<div class="stats">
+  <div class="stat" data-stat="rate"><b>{{ latest.match_rate_bps // 100 }}.{{ '%02d' % (latest.match_rate_bps % 100) }}%</b><span>Matched in the latest run</span></div>
+  <div class="stat"><b>{{ latest.matched }} / {{ latest.counted }}</b><span>Items matched</span></div>
+  <div class="stat"><b>{{ latest.breaks }}</b><span>Breaks</span></div>
+  <div class="stat"><b>{{ latest.pending }}</b><span>Pending evidence (statement not imported yet)</span></div>
+</div>
+{% else %}<p class="muted">No run yet.</p>{% endif %}
+
+<h2>Open breaks</h2>
+{% for b in open_breaks %}
+<section class="card" data-break="{{ b.id }}">
+  <h3>{{ b.kind.replace('_', ' ') }} <span class="mono small">{{ b.subject_key }}</span></h3>
+  <p>Proposed fix: <strong>{{ b.proposed_fix.action.replace('_', ' ') if b.proposed_fix else 'none yet' }}</strong>{% if b.proposed_fix and b.proposed_fix.target %} <span class="mono">{{ b.proposed_fix.target }}</span>{% endif %}
+    {% if b.rationale and b.rationale.confidence is not none %}· confidence {{ (b.rationale.confidence * 100)|round|int }}%{% endif %}
+    {% if b.rationale and b.rationale.source == 'recording' %}<span class="muted small">· recorded response (offline stand-in, not a live model call)</span>{% endif %}
+    {% if b.case_id %} · <a href="/console/exceptions/{{ b.case_id }}">case</a>{% endif %}</p>
+  {% if b.rationale %}<ul>{% for c in b.rationale.claims %}<li>{{ c.text }} {% for e in c.evidence_ids %}<span class="mono small">[{{ e }}]</span> {% endfor %}</li>{% endfor %}</ul>
+  {% for f in b.rationale.flags %}<p class="note small">{{ f.code }}: {{ f.detail }}</p>{% endfor %}{% endif %}
+  <details><summary class="small">Break record</summary><pre class="yaml">{{ b.subject|tojson(indent=1) }}</pre></details>
+  {% if can_fix %}
+  <form method="post" action="/console/reconciliation/breaks/{{ b.id }}/approve">
+    <label>Reason (required)<input name="reason" required maxlength="500"></label>
+    {% if b.proposed_fix and b.proposed_fix.action != 'needs_investigation' %}<button class="primary">Approve fix</button>{% endif %}
+    <button formaction="/console/reconciliation/breaks/{{ b.id }}/reject">Reject</button>
+  </form>
+  {% else %}<p class="muted small">Only the payments lead approves a fix.</p>{% endif %}
+</section>
+{% else %}<p class="muted">No open breaks.</p>{% endfor %}
+
+<h2>Run history</h2>
+<table>
+  <thead><tr><th>Run</th><th>Finished (UTC)</th><th class="num">Matched</th><th class="num">Counted</th><th class="num">Breaks</th><th class="num">Pending</th><th class="num">Rate</th></tr></thead>
+  <tbody>{% for r in runs %}<tr><td class="mono">{{ r.id }}</td><td>{{ (r.finished_at or '')[:19] }}</td><td class="num">{{ r.matched }}</td><td class="num">{{ r.counted }}</td><td class="num">{{ r.breaks }}</td><td class="num">{{ r.pending }}</td><td class="num">{{ r.match_rate_bps // 100 }}.{{ '%02d' % (r.match_rate_bps % 100) }}%</td></tr>
+  {% else %}<tr><td colspan="7" class="muted">No runs yet.</td></tr>{% endfor %}</tbody>
+</table>
+{% if decided %}
+<h2>Decided breaks</h2>
+<table><thead><tr><th>Break</th><th>Fix</th><th>Status</th><th>By</th><th>Reason</th></tr></thead>
+<tbody>{% for b in decided %}<tr><td class="mono small">{{ b.subject_key }}</td><td>{{ b.proposed_fix.action if b.proposed_fix else '' }}</td><td>{{ b.status }}</td><td class="mono">{{ b.approved_by or '' }}</td><td>{{ b.decision_reason or '' }}</td></tr>{% endfor %}</tbody></table>
+{% endif %}
+{% endblock %}

@@ -87,7 +87,7 @@ def test_overview_counts_and_polls(
     ):
         chunk = part.split(f'data-stat="{stat}"', 1)[1][:120]
         assert f">{value}<" in chunk, (stat, chunk)
-    assert "Match rate: reconciliation arrives in slice S7" in part
+    assert "Match rate: no reconciliation run yet" in part
     assert "case.overdue" in part  # recent events
     assert "Mode: <strong>auto</strong>" in part
     assert c.get("/static/htmx-2.0.4.min.js").status_code == 200

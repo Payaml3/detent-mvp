@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Case {{ case.id }}{% endblock %}
+{% block main %}
+<h1>{{ case.type|capitalize }} case <span class="mono">{{ case.id }}</span></h1>
+<p>{{ case.status }} · owner {{ case.owner_name or 'none' }}{% if case.backup_name %} (backup {{ case.backup_name }}){% endif %} · {{ countdown }} · reasons: {{ case.reasons|join(', ') }}</p>
+{% if inb %}
+<section class="card" data-section="raw-facts">
+  <h2>Raw facts: the inbound transfer</h2>
+  <dl class="facts">
+    <dt>Rail</dt><dd>{{ inb.rail_id }} ({{ inb.network }})</dd>
+    <dt>Amount</dt><dd>{{ inb.amount_minor }} minor units of {{ inb.currency }}</dd>
+    <dt>From</dt><dd class="mono">{{ inb.from_address }}</dd>
+    <dt>To</dt><dd class="mono">{{ inb.to_address }}</dd>
+    <dt>Transaction</dt><dd class="mono">{{ inb.tx_hash }}{% if inb.block_number %} · block {{ inb.block_number }}{% endif %}</dd>
+    <dt>Status</dt><dd>{{ inb.status }}{% if inb.status == 'SUSPENSE' %}: held in suspense, not credited{% endif %}</dd>
+  </dl>
+  {% if inb.decision %}<h3>Deposit checks</h3><ul>{% for c in inb.decision.checks %}<li>{{ c.check }}: {{ c.result }}{% if c.reason %} <strong>{{ c.reason }}</strong>{% endif %}{% if c.evidence %} <span class="mono small">{{ c.evidence }}</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
+</section>
+{% endif %}
+<section class="card">
+  <h2>Resolution</h2>
+  <p>A {{ case.type }} case is resolved by approving a reconciliation fix, never by a timeout.</p>
+  {% for b in breaks %}<p>Break <span class="mono">{{ b.id }}</span> ({{ b.kind }}): {{ b.status }}{% if b.proposed_fix %} · proposed {{ b.proposed_fix.action }}{% if b.proposed_fix.target %} {{ b.proposed_fix.target }}{% endif %}{% endif %}</p>
+  {% else %}<p class="muted">No reconciliation break yet: the next run proposes a fix.</p>{% endfor %}
+  <p><a href="/console/reconciliation">Go to reconciliation</a></p>
+</section>
+{% endblock %}

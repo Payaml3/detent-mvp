@@ -1036,6 +1036,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Reconcile, A1.evidence]
   ms: S7
+  done: [0, 1, 2]
 - id: LED-02
   epic: LED
   title: Payout postings
@@ -1050,6 +1051,7 @@ stories:
   deps: [LED-01, EXE-02]
   trace: [A2.Reconcile]
   ms: S7
+  done: [0, 1]
 - id: LED-03
   epic: LED
   title: Deposit intents
@@ -1064,6 +1066,7 @@ stories:
   deps: [LED-01]
   trace: [A1.deposits, A2.Reconcile]
   ms: S7
+  done: [0, 1]
 - id: LED-04
   epic: LED
   title: Deposit watchers
@@ -1078,6 +1081,7 @@ stories:
   deps: [LED-03, FND-06, RAL-02]
   trace: [A1.deposits]
   ms: S7
+  done: [0, 1]
 - id: LED-05
   epic: LED
   title: Deposit decision and credit-once
@@ -1094,6 +1098,7 @@ stories:
   deps: [LED-04, POL-03, EXC-01]
   trace: [A1.deposits, A2.Reconcile, L7]
   ms: S7
+  done: [0, 1, 2, 3]
 - id: LED-06
   epic: LED
   title: Reconciliation run with proposed fixes
@@ -1111,6 +1116,7 @@ stories:
   deps: [LED-02, LED-05, LED-07, EXC-01]
   trace: [A2.Reconcile, L7, B7.recon]
   ms: S7
+  done: [0, 1, 2, 3]
 - id: LED-07
   epic: LED
   title: Bank statement import
@@ -1124,6 +1130,7 @@ stories:
   deps: [RAL-04]
   trace: [A2.Reconcile]
   ms: S7
+  done: [0]
 - id: LED-08
   epic: LED
   title: Usage metering
@@ -1170,6 +1177,7 @@ stories:
   deps: [AUD-01, AGT-05, POL-02]
   trace: [A2.Prove, L8, B3.incident]
   ms: S7
+  done: [0, 1, 2]
 - id: AUD-03
   epic: AUD
   title: Evidence export
@@ -1215,7 +1223,7 @@ stories:
   deps: [CON-01]
   trace: [B7.automation, B7.exceptions, B7.unknown]
   ms: S6
-  done: [1]
+  done: [0, 1]
 - id: CON-03
   epic: CON
   title: Payments list and detail
@@ -1286,6 +1294,7 @@ stories:
   deps: [LED-06]
   trace: [A2.Reconcile, L7]
   ms: S7
+  done: [0]
 - id: CON-08
   epic: CON
   title: Rails screen

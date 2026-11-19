@@ -783,11 +783,11 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] Journal entries with balanced postings; accounts for user balances, platform operating, rail clearing per rail, fees and suspense
-- [ ] Entries are append-only; corrections are new entries
-- [ ] Every posting references a payment, deposit or adjustment ID
+- [x] Journal entries with balanced postings; accounts for user balances, platform operating, rail clearing per rail, fees and suspense
+- [x] Entries are append-only; corrections are new entries
+- [x] Every posting references a payment, deposit or adjustment ID
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** FND-03 · **Traces to:** A2.Reconcile, A1.evidence
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** FND-03 · **Traces to:** A2.Reconcile, A1.evidence
 
 ### LED-02 · Payout postings
 
@@ -795,10 +795,10 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] SUBMITTED reserves; CONFIRMED settles and posts actual fees; final FAILED reverses the reservation; UNKNOWN keeps the reservation
-- [ ] Ledger and payment status agree after every fault-suite case
+- [x] SUBMITTED reserves; CONFIRMED settles and posts actual fees; final FAILED reverses the reservation; UNKNOWN keeps the reservation
+- [x] Ledger and payment status agree after every fault-suite case
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-01, EXE-02 · **Traces to:** A2.Reconcile
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** LED-01, EXE-02 · **Traces to:** A2.Reconcile
 
 ### LED-03 · Deposit intents
 
@@ -806,10 +806,10 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] POST /v1/deposit_intents returns deposit instructions: a per-account test address, or a bank reference for the simulated rail
-- [ ] Idempotent like payment intents
+- [x] POST /v1/deposit_intents returns deposit instructions: a per-account test address, or a bank reference for the simulated rail
+- [x] Idempotent like payment intents
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-01 · **Traces to:** A1.deposits, A2.Reconcile
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** LED-01 · **Traces to:** A1.deposits, A2.Reconcile
 
 ### LED-04 · Deposit watchers
 
@@ -817,10 +817,10 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] Reads ERC-20 Transfer logs to watched addresses, and bank-rail inbound credits
-- [ ] Unique on (rail, transaction hash, log index); restarting the watcher never duplicates
+- [x] Reads ERC-20 Transfer logs to watched addresses, and bank-rail inbound credits
+- [x] Unique on (rail, transaction hash, log index); restarting the watcher never duplicates
 
-**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-03, FND-06, RAL-02 · **Traces to:** A1.deposits
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** LED-03, FND-06, RAL-02 · **Traces to:** A1.deposits
 
 ### LED-05 · Deposit decision and credit-once
 
@@ -828,12 +828,12 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] Match on address or reference, token, network and amount within tolerance
-- [ ] Policy checks the sender (screening) and the token and network match
-- [ ] Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer
-- [ ] Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions
+- [x] Match on address or reference, token, network and amount within tolerance
+- [x] Policy checks the sender (screening) and the token and network match
+- [x] Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer
+- [x] Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-04, POL-03, EXC-01 · **Traces to:** A1.deposits, A2.Reconcile, L7
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** LED-04, POL-03, EXC-01 · **Traces to:** A1.deposits, A2.Reconcile, L7
 
 ### LED-06 · Reconciliation run with proposed fixes
 
@@ -841,13 +841,13 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] Matches ledger postings to chain transfers and bank statements for payouts and deposits; reports the match rate
-- [ ] Each break becomes an exception with a fix drafted by the reconciliation agent (for example, credit account X, or return to sender)
-- [ ] A fix is applied only after human approval, as a new adjustment entry
-- [ ] On a generated set of 500 synthetic deposits and payouts with 3 designed breaks, automatic matching is 99% or more and each break gets a proposed fix
+- [x] Matches ledger postings to chain transfers and bank statements for payouts and deposits; reports the match rate
+- [x] Each break becomes an exception with a fix drafted by the reconciliation agent (for example, credit account X, or return to sender)
+- [x] A fix is applied only after human approval, as a new adjustment entry
+- [x] On a generated set of 500 synthetic deposits and payouts with 3 designed breaks, automatic matching is 99% or more and each break gets a proposed fix
 - [ ] The demo batch (20 payouts, 8 deposits) shows exactly one designed break, dep-07
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-02, LED-05, LED-07, EXC-01 · **Traces to:** A2.Reconcile, L7, B7.recon
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** LED-02, LED-05, LED-07, EXC-01 · **Traces to:** A2.Reconcile, L7, B7.recon
 
 ### LED-07 · Bank statement import
 
@@ -855,9 +855,9 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] Pulls the statement endpoint (JSON or CSV), idempotent per statement date
+- [x] Pulls the statement endpoint (JSON or CSV), idempotent per statement date
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** RAL-04 · **Traces to:** A2.Reconcile
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** RAL-04 · **Traces to:** A2.Reconcile
 
 ### LED-08 · Usage metering
 
@@ -891,11 +891,11 @@ _Every step is recorded append-only and any payment can be replayed and exported
 
 **Acceptance criteria**
 
-- [ ] Console button and GET /v1/payment_intents/{id}/replay
-- [ ] Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert
-- [ ] Every payment in the demo data replays successfully (test)
+- [x] Console button and GET /v1/payment_intents/{id}/replay
+- [x] Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert
+- [x] Every payment in the demo data replays successfully (test)
 
-**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** AUD-01, AGT-05, POL-02 · **Traces to:** A2.Prove, L8, B3.incident
+**Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** AUD-01, AGT-05, POL-02 · **Traces to:** A2.Prove, L8, B3.incident
 
 ### AUD-03 · Evidence export
 
@@ -929,7 +929,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events
+- [x] Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events
 - [x] Refreshes by htmx polling
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S6 Operations around escalations (done) · **Depends on:** CON-01 · **Traces to:** B7.automation, B7.exceptions, B7.unknown
@@ -982,9 +982,9 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Run history, match rate, breaks with proposed fix and approve button
+- [x] Run history, match rate, breaks with proposed fix and approve button
 
-**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay · **Depends on:** LED-06 · **Traces to:** A2.Reconcile, L7
+**Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** LED-06 · **Traces to:** A2.Reconcile, L7
 
 ### CON-08 · Rails screen
 

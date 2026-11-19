@@ -29,6 +29,10 @@ class Worker:
         self.lease = timedelta(seconds=rt.settings.worker_lease_seconds)
         self.stop = threading.Event()
         self._last_sweep: float | None = None
+        # Deposit watching and reconciliation first run one interval after start-up, so a fresh worker
+        # sends and confirms payments straight away.
+        self._last_watch: float | None = time.monotonic()
+        self._last_recon: float | None = time.monotonic()
         importlib.import_module("detent.execution.jobs")  # payment.send, payment.confirm
         importlib.import_module("detent.exceptions.investigation_job")  # case.investigate (EXC-03)
         for mod in rt.settings.worker_extra_handler_modules:
@@ -75,6 +79,11 @@ class Worker:
         """Scheduled work between jobs: the deadline sweeper (EXC-06). Returns the cases it moved."""
         from detent.exceptions.deadlines import sweep_all
 
+        try:
+            self.watch_deposits(force=force)
+            self.reconcile(force=force)
+        except Exception:
+            log.exception("deposit watching or reconciliation failed")  # never stops the sweeper or job loop
         mono = time.monotonic()  # scheduling cadence only; the sweep itself reads the Clock
         recent = (
             self._last_sweep is not None and mono - self._last_sweep < self.rt.settings.deadline_sweep_seconds
@@ -88,6 +97,28 @@ class Worker:
                 "overdue cases held and reassigned", extra={"cases": sum(len(v) for v in moved.values())}
             )
         return moved
+
+    def watch_deposits(self, *, force: bool = False) -> dict[str, int]:
+        """LED-04: deposit watchers and the credit-once step, on their own cadence."""
+        from detent.ledger.watchers import watch_all
+
+        mono = time.monotonic()
+        last = self._last_watch
+        if not force and last is not None and mono - last < self.rt.settings.deposit_watch_seconds:
+            return {}
+        self._last_watch = mono
+        return watch_all(self.rt.engine, self.rt.clock, self.rt.settings)
+
+    def reconcile(self, *, force: bool = False) -> dict[str, str]:
+        """LED-06: the scheduled reconciliation run."""
+        from detent.reconciliation.run import run_all
+
+        mono = time.monotonic()
+        last = self._last_recon
+        if not force and last is not None and mono - last < self.rt.settings.reconciliation_seconds:
+            return {}
+        self._last_recon = mono
+        return run_all(self.rt.engine, self.rt.clock, self.rt.settings)
 
     def run(self) -> None:
         log.info("worker started", extra={"worker_id": self.worker_id, "handlers": registry.kinds()})

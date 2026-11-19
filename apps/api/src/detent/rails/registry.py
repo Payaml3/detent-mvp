@@ -122,6 +122,7 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
     for b in bank_rows:
         out[b.id] = BankAdapter(
             rail_id=b.id,
+            receiving_account=org_id,
             base_url=b.base_url or settings.banksim_url,
             scheme="fps" if b.id == "banksim-fps" else "sepa_inst",
             currency=b.currency,

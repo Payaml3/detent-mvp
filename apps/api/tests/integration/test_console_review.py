@@ -78,8 +78,8 @@ def test_every_page_has_the_banner_nav_and_honest_wording(setup) -> None:  # typ
 
 def test_unbuilt_sections_say_so(setup) -> None:  # type: ignore[no-untyped-def]
     c, *_ = setup
-    html = c.get("/console/reconciliation").text
-    assert c.get("/console/reconciliation").status_code == 200 and "not built yet" in html.lower()
+    html = c.get("/console/audit").text
+    assert c.get("/console/audit").status_code == 200 and "not built yet" in html.lower()
 
 
 def test_payments_list_and_detail(setup) -> None:  # type: ignore[no-untyped-def]
@@ -92,7 +92,7 @@ def test_payments_list_and_detail(setup) -> None:  # type: ignore[no-untyped-def
     assert "FIRST_PAYMENT" in det and "ABOVE_AUTO_LIMIT" in det
     assert "Attempts" in det and "Ledger postings" in det and "Timeline" in det and "Route" in det
     assert "payment.received" in det and "decision.made" in det
-    assert re.search(r"<button[^>]*disabled[^>]*>\s*Replay", det)  # replay arrives with AUD-02
+    assert f'href="/console/payments/{pid}/replay"' in det  # AUD-02
     assert c.get("/console/payments/pay_nope").status_code == 404
 
 

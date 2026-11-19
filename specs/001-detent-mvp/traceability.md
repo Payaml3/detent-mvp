@@ -657,7 +657,7 @@ Sources: [EXE-09 criteria](../../backlog/user-stories.md#exe-09); [spec/00 §pro
 | [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 1 | Changing mode needs the payments lead and the compliance lead; each change is audited | done | `integration/test_modes.py::test_mode_change_needs_both_leads_as_two_people`<br>`integration/test_console_operations.py::test_settings_mode_change_needs_both_leads` |
 | [EXE-09](../../backlog/user-stories.md#exe-09) | S6 | 2 | Orchestrate is shown as routing being enabled when 2 or more rails are connected | done | `integration/test_modes.py::test_orchestrate_means_routing_with_two_or_more_rails` |
 
-## FR-060 · Execution (proposed)
+## FR-060 · Execution (confirmed)
 
 The mode is read inside the send lock; in Assist the Send click needs an approver role and cannot be made by the initiator.
 
@@ -792,7 +792,7 @@ Sources: [spec/04 §rule-set-format](../../spec/04-policy.md#rule-set-format); [
 | [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 1 | Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions) | planned | integration: `apps/api/tests/integration/test_exc_01.py` |
 | [EXC-01](../../backlog/user-stories.md#exc-01) | S3 | 2 | Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited | done | `integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline`<br>`integration/test_cases.py::test_approval_reruns_policy_and_proceeds` |
 
-## FR-071 · Exceptions (proposed)
+## FR-071 · Exceptions (confirmed)
 
 A case's tier is its deadline class from the rule set; business days are Monday to Friday UTC without holidays.
 
@@ -909,11 +909,11 @@ Sources: [spec/02 §ledger-accounts-and-postings](../../spec/02-domain-model.md#
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [LED-01](../../backlog/user-stories.md#led-01) | S7 | 0 | Journal entries with balanced postings; accounts for user balances, platform operating, rail clearing per rail, fees and suspense | planned | integration: `apps/api/tests/integration/test_led_01.py` |
-| [LED-01](../../backlog/user-stories.md#led-01) | S7 | 1 | Entries are append-only; corrections are new entries | planned | integration: `apps/api/tests/integration/test_led_01.py` |
-| [LED-01](../../backlog/user-stories.md#led-01) | S7 | 2 | Every posting references a payment, deposit or adjustment ID | planned | integration: `apps/api/tests/integration/test_led_01.py` |
-| [LED-02](../../backlog/user-stories.md#led-02) | S7 | 0 | SUBMITTED reserves; CONFIRMED settles and posts actual fees; final FAILED reverses the reservation; UNKNOWN keeps the reservation | planned | integration: `apps/api/tests/integration/test_led_02.py` |
-| [LED-02](../../backlog/user-stories.md#led-02) | S7 | 1 | Ledger and payment status agree after every fault-suite case | planned | fault: `apps/api/tests/integration/test_led_02.py` |
+| [LED-01](../../backlog/user-stories.md#led-01) | S7 | 0 | Journal entries with balanced postings; accounts for user balances, platform operating, rail clearing per rail, fees and suspense | done | `integration/test_ledger.py::test_post_refuses_unbalanced_or_unreferenced`<br>`integration/test_ledger.py::test_database_refuses_an_unbalanced_entry_at_commit`<br>`integration/test_ledger.py::test_confirmed_payout_reserves_then_settles_with_the_actual_fee` |
+| [LED-01](../../backlog/user-stories.md#led-01) | S7 | 1 | Entries are append-only; corrections are new entries | done | `integration/test_ledger.py::test_entries_are_append_only`<br>`integration/test_schema.py::test_ledger_rows_cannot_be_edited`<br>`integration/test_reconciliation.py::test_fixes_apply_only_after_approval_as_new_entries` |
+| [LED-01](../../backlog/user-stories.md#led-01) | S7 | 2 | Every posting references a payment, deposit or adjustment ID | done | `integration/test_ledger.py::test_database_refuses_an_unbalanced_entry_at_commit`<br>`integration/test_ledger.py::test_post_refuses_unbalanced_or_unreferenced` |
+| [LED-02](../../backlog/user-stories.md#led-02) | S7 | 0 | SUBMITTED reserves; CONFIRMED settles and posts actual fees; final FAILED reverses the reservation; UNKNOWN keeps the reservation | done | `integration/test_ledger.py::test_confirmed_payout_reserves_then_settles_with_the_actual_fee`<br>`integration/test_ledger.py::test_technical_failure_retries_under_one_reservation`<br>`integration/test_ledger.py::test_unknown_keeps_the_reservation` |
+| [LED-02](../../backlog/user-stories.md#led-02) | S7 | 1 | Ledger and payment status agree after every fault-suite case | done | `conftest.py::ledger_agrees_after_money_tests`<br>`ci:autouse check after every test in tests/chain (retry, failover, UNKNOWN, send-once faults), test_banksim.py, test_ledger.py and test_deposits.py` |
 
 ## FR-081 · Ledger (confirmed)
 
@@ -923,16 +923,16 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints); [LED-05 criteria
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [LED-03](../../backlog/user-stories.md#led-03) | S7 | 0 | POST /v1/deposit_intents returns deposit instructions: a per-account test address, or a bank reference for the simulated rail | planned | integration: `apps/api/tests/integration/test_led_03.py` |
-| [LED-03](../../backlog/user-stories.md#led-03) | S7 | 1 | Idempotent like payment intents | planned | integration: `apps/api/tests/integration/test_led_03.py` |
-| [LED-04](../../backlog/user-stories.md#led-04) | S7 | 0 | Reads ERC-20 Transfer logs to watched addresses, and bank-rail inbound credits | planned | integration: `apps/api/tests/integration/test_led_04.py` |
-| [LED-04](../../backlog/user-stories.md#led-04) | S7 | 1 | Unique on (rail, transaction hash, log index); restarting the watcher never duplicates | planned | integration: `apps/api/tests/integration/test_led_04.py` |
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 0 | Match on address or reference, token, network and amount within tolerance | planned | integration: `apps/api/tests/integration/test_led_05.py` |
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 1 | Policy checks the sender (screening) and the token and network match | planned | integration: `apps/api/tests/integration/test_led_05.py` |
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 2 | Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer | planned | integration: `apps/api/tests/integration/test_led_05.py` |
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 3 | Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions | planned | integration: `apps/api/tests/integration/test_led_05.py` |
+| [LED-03](../../backlog/user-stories.md#led-03) | S7 | 0 | POST /v1/deposit_intents returns deposit instructions: a per-account test address, or a bank reference for the simulated rail | done | `integration/test_deposits.py::test_deposit_intent_gives_a_bank_reference_and_is_idempotent`<br>`integration/test_deposits.py::test_chain_deposit_address_is_per_account_and_stable`<br>`chain/test_deposits_chain.py::test_chain_deposit_is_seen_once_and_credited_once` |
+| [LED-03](../../backlog/user-stories.md#led-03) | S7 | 1 | Idempotent like payment intents | done | `integration/test_deposits.py::test_deposit_intent_gives_a_bank_reference_and_is_idempotent` |
+| [LED-04](../../backlog/user-stories.md#led-04) | S7 | 0 | Reads ERC-20 Transfer logs to watched addresses, and bank-rail inbound credits | done | `chain/test_deposits_chain.py::test_chain_deposit_is_seen_once_and_credited_once`<br>`chain/test_deposits_chain.py::test_outbound_payouts_are_recorded_for_reconciliation`<br>`integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts`<br>`integration/test_deposits.py::test_the_worker_watches_and_credits` |
+| [LED-04](../../backlog/user-stories.md#led-04) | S7 | 1 | Unique on (rail, transaction hash, log index); restarting the watcher never duplicates | done | `integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts`<br>`chain/test_deposits_chain.py::test_chain_deposit_is_seen_once_and_credited_once`<br>`integration/test_deposits.py::test_another_organisations_bank_credits_are_not_seen` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 0 | Match on address or reference, token, network and amount within tolerance | done | `integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts`<br>`integration/test_deposits.py::test_tolerance_is_a_per_organisation_setting` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 1 | Policy checks the sender (screening) and the token and network match | done | `integration/test_deposits.py::test_each_mismatch_goes_to_suspense_and_opens_a_deposit_exception`<br>`chain/test_deposits_chain.py::test_flagged_sender_is_held_in_suspense` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 2 | Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer | done | `integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts`<br>`chain/test_demo_batch_recon.py::test_demo_batch_credits_once_and_dep07_is_the_only_break` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 3 | Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions | done | `integration/test_deposits.py::test_each_mismatch_goes_to_suspense_and_opens_a_deposit_exception`<br>`integration/test_deposits.py::test_expired_intent_is_never_silently_credited`<br>`integration/test_deposits.py::test_business_days_skip_weekends` |
 
-## FR-082 · Ledger (proposed)
+## FR-082 · Ledger (confirmed)
 
 Deposit amount tolerance is a per-organisation setting, default 0 (exact).
 
@@ -940,10 +940,10 @@ Sources: [LED-05 criteria](../../backlog/user-stories.md#led-05)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 0 | Match on address or reference, token, network and amount within tolerance | planned | integration: `apps/api/tests/integration/test_led_05.py` |
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 1 | Policy checks the sender (screening) and the token and network match | planned | integration: `apps/api/tests/integration/test_led_05.py` |
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 2 | Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer | planned | integration: `apps/api/tests/integration/test_led_05.py` |
-| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 3 | Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions | planned | integration: `apps/api/tests/integration/test_led_05.py` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 0 | Match on address or reference, token, network and amount within tolerance | done | `integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts`<br>`integration/test_deposits.py::test_tolerance_is_a_per_organisation_setting` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 1 | Policy checks the sender (screening) and the token and network match | done | `integration/test_deposits.py::test_each_mismatch_goes_to_suspense_and_opens_a_deposit_exception`<br>`chain/test_deposits_chain.py::test_flagged_sender_is_held_in_suspense` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 2 | Credit only after the confirmation threshold; a unique constraint allows one credit per inbound transfer | done | `integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts`<br>`chain/test_demo_batch_recon.py::test_demo_batch_credits_once_and_dep07_is_the_only_break` |
+| [LED-05](../../backlog/user-stories.md#led-05) | S7 | 3 | Mismatches (wrong network or token, amount mismatch, no intent, flagged sender) open deposit exceptions | done | `integration/test_deposits.py::test_each_mismatch_goes_to_suspense_and_opens_a_deposit_exception`<br>`integration/test_deposits.py::test_expired_intent_is_never_silently_credited`<br>`integration/test_deposits.py::test_business_days_skip_weekends` |
 
 ## FR-083 · Ledger (confirmed)
 
@@ -953,12 +953,12 @@ Sources: [LED-06 criteria](../../backlog/user-stories.md#led-06); [spec/05 §rec
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 0 | Matches ledger postings to chain transfers and bank statements for payouts and deposits; reports the match rate | planned | integration: `apps/api/tests/integration/test_led_06.py` |
-| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 1 | Each break becomes an exception with a fix drafted by the reconciliation agent (for example, credit account X, or return to sender) | planned | integration: `apps/api/tests/integration/test_led_06.py` |
-| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 2 | A fix is applied only after human approval, as a new adjustment entry | planned | integration: `apps/api/tests/integration/test_led_06.py` |
-| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 3 | On a generated set of 500 synthetic deposits and payouts with 3 designed breaks, automatic matching is 99% or more and each break gets a proposed fix | planned | integration: `apps/api/tests/integration/test_led_06.py` |
+| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 0 | Matches ledger postings to chain transfers and bank statements for payouts and deposits; reports the match rate | done | `integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix`<br>`integration/test_reconciliation.py::test_real_bank_payout_reconciles_against_the_imported_statement`<br>`chain/test_demo_batch_recon.py::test_demo_batch_credits_once_and_dep07_is_the_only_break` |
+| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 1 | Each break becomes an exception with a fix drafted by the reconciliation agent (for example, credit account X, or return to sender) | done | `integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix` |
+| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 2 | A fix is applied only after human approval, as a new adjustment entry | done | `integration/test_reconciliation.py::test_fixes_apply_only_after_approval_as_new_entries`<br>`integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix` |
+| [LED-06](../../backlog/user-stories.md#led-06) | S7 | 3 | On a generated set of 500 synthetic deposits and payouts with 3 designed breaks, automatic matching is 99% or more and each break gets a proposed fix | done | `integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix` |
 | [LED-06](../../backlog/user-stories.md#led-06) | S7 | 4 | The demo batch (20 payouts, 8 deposits) shows exactly one designed break, dep-07 | planned | integration: `apps/api/tests/integration/test_led_06.py` |
-| [LED-07](../../backlog/user-stories.md#led-07) | S7 | 0 | Pulls the statement endpoint (JSON or CSV), idempotent per statement date | planned | integration: `apps/api/tests/integration/test_led_07.py` |
+| [LED-07](../../backlog/user-stories.md#led-07) | S7 | 0 | Pulls the statement endpoint (JSON or CSV), idempotent per statement date | done | `integration/test_reconciliation.py::test_statement_import_is_idempotent_per_date_json_and_csv` |
 
 ## FR-084 · Ledger (confirmed)
 
@@ -990,9 +990,9 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints); [AUD-02 criteria
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 0 | Console button and GET /v1/payment_intents/{id}/replay | planned | integration: `apps/api/tests/integration/test_aud_02.py` |
-| [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 1 | Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert | planned | integration: `apps/api/tests/integration/test_aud_02.py` |
-| [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 2 | Every payment in the demo data replays successfully (test) | planned | integration: `apps/api/tests/integration/test_aud_02.py` |
+| [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 0 | Console button and GET /v1/payment_intents/{id}/replay | done | `integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision`<br>`integration/test_console_ledger.py::test_payment_detail_has_replay_and_postings` |
+| [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 1 | Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert | done | `integration/test_replay.py::test_a_mismatch_raises_an_alert`<br>`integration/test_replay.py::test_decisions_cannot_be_edited`<br>`integration/test_agent_submit.py::test_agent_payment_replays_from_stored_output_without_a_model` |
+| [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 2 | Every payment in the demo data replays successfully (test) | done | `integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision` |
 | [AUD-03](../../backlog/user-stories.md#aud-03) | L | 0 | JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result | planned | integration: `apps/api/tests/integration/test_aud_03.py` |
 
 ## FR-090 · Console (confirmed)
@@ -1015,7 +1015,7 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [CON-02](../../backlog/user-stories.md#con-02) | S6 | 0 | Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events | planned | console: `apps/api/tests/integration/test_con_02.py` |
+| [CON-02](../../backlog/user-stories.md#con-02) | S6 | 0 | Counts by decision and status; share decided without a human; oldest UNKNOWN age; open and overdue cases; match rate; rail health; recent events | done | `integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix`<br>`integration/test_console_operations.py::test_overview_counts_and_polls` |
 | [CON-02](../../backlog/user-stories.md#con-02) | S6 | 1 | Refreshes by htmx polling | done | `integration/test_console_operations.py::test_overview_counts_and_polls` |
 | [CON-03](../../backlog/user-stories.md#con-03) | S3 | 0 | Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button | planned | console: `apps/api/tests/integration/test_con_03.py` |
 | [CON-04](../../backlog/user-stories.md#con-04) | S3 | 0 | Filters by owner, tier and overdue; countdown to deadline; case page follows EXC-02; approve and reject with a required reason | done | `integration/test_console_review.py::test_exceptions_queue_filters_and_countdown`<br>`integration/test_console_review.py::test_console_approve_requires_reason_and_permission` |
@@ -1023,7 +1023,7 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 | [CON-05](../../backlog/user-stories.md#con-05) | S5 | 1 | 'Submit as agent' calls the public API with the agent's key and shows the decision | done | `integration/test_agent_submit.py::test_console_invoice_drop_and_submit` |
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 0 | Active version, history and diff; propose and approve per POL-07 | done | `integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation`<br>`integration/test_console_operations.py::test_reviewer_sees_policy_but_cannot_propose` |
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 1 | Mandates list with scope, usage against limits, expiry and revoke | done | `integration/test_console_operations.py::test_mandates_screen_shows_scope_usage_expiry_and_revoke`<br>`integration/test_mandates.py::test_revoke_by_api_and_console` |
-| [CON-07](../../backlog/user-stories.md#con-07) | S7 | 0 | Run history, match rate, breaks with proposed fix and approve button | planned | console: `apps/api/tests/integration/test_con_07.py` |
+| [CON-07](../../backlog/user-stories.md#con-07) | S7 | 0 | Run history, match rate, breaks with proposed fix and approve button | done | `integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix` |
 | [CON-08](../../backlog/user-stories.md#con-08) | S4 | 0 | Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts | done | `integration/test_console_rails.py::test_rails_screen` |
 | [CON-10](../../backlog/user-stories.md#con-10) | L | 0 | Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype | planned | console: `apps/api/tests/integration/test_con_10.py` |
 

@@ -117,6 +117,8 @@ The console shows this below the raw facts, collapsed (EXC-02).
 
 The output also carries a rationale with `evidence_ids`. A fix is applied by code only after human approval.
 
+**As built in S7:** code finds the candidates (open deposit intents of the same currency whose expected amount fits, or the intent whose bank reference a statement line carries) and gives them to the agent as evidence records. `match_to` must name a candidate intent and `credit_account` a candidate account; any other target becomes `needs_investigation` with the flag `FIX_TARGET_NOT_A_CANDIDATE`. Uncited rationale claims are removed (`UNCITED_CLAIMS_REMOVED`). Only the payments lead approves; the fix becomes an adjustment entry whose `adjustment_of` is the break, and the break's case resolves in the same transaction. `return_to_sender` books the amount to `rail_clearing:{rail}:refund_due` and tells the payments lead in the outbox: the prototype does not send refunds automatically. Until an API key is configured, the worker serves hand-written stand-in answers (`fixtures/agent-recordings/reconciliation`), labelled as such.
+
 ## Mandates (MND-01 to MND-03)
 
 ```json

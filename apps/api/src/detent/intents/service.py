@@ -444,10 +444,11 @@ def payment_view(
         ).all()
         postings = conn.execute(
             text(
-                "SELECT ps.account_id, ps.direction, ps.amount_minor, ps.currency, ps.journal_id FROM "
-                "postings ps "
+                "SELECT ps.account_id, ps.direction, ps.amount_minor, ps.currency, ps.journal_id, j.kind, "
+                "a.kind AS account_kind, a.ref FROM postings ps "
                 "JOIN journal_entries j ON j.org_id = ps.org_id AND j.id = ps.journal_id "
-                "WHERE ps.org_id=:o AND j.payment_id=:p ORDER BY ps.id"
+                "JOIN accounts a ON a.org_id = ps.org_id AND a.id = ps.account_id "
+                "WHERE ps.org_id=:o AND j.payment_id=:p ORDER BY j.created_at, ps.id"
             ),
             {"o": org_id, "p": payment_id},
         ).all()
@@ -469,7 +470,9 @@ def payment_view(
             ],
             postings=[
                 {
-                    "account": x.account_id,
+                    "account": f"{x.account_kind}:{x.ref}",
+                    "account_id": x.account_id,
+                    "entry": x.kind,
                     "direction": x.direction,
                     "journal_id": x.journal_id,
                     "amount": Money(int(x.amount_minor), Currency(x.currency)).to_api(),

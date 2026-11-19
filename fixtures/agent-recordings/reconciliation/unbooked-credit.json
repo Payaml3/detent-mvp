@@ -1,0 +1,13 @@
+{
+  "_provenance": "HAND-WRITTEN STAND-IN for a model response, used by tests and offline demos. It is NOT a recording of a real model run: the build environment had no Anthropic API key. Candidates are found by code; the stand-in picks the first one.",
+  "match": "break_type: rail_record_unbooked",
+  "usage": {"input_tokens": 1300, "output_tokens": 160},
+  "output": {
+    "proposed_fix": {"action": "credit_account", "target": "{{TOP_ACCOUNT}}"},
+    "rationale": [
+      {"text": "The bank statement shows an inbound credit that the ledger never booked.", "evidence_ids": ["{{BREAK_EVIDENCE}}"]},
+      {"text": "Its payment reference belongs to this account's deposit intent.", "evidence_ids": ["{{TOP_EVIDENCE}}"]}
+    ],
+    "confidence": 0.7
+  }
+}

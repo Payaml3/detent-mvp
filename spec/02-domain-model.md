@@ -152,3 +152,12 @@ Audit and ledger tables get `BEFORE UPDATE OR DELETE` triggers that raise an err
 | Approved fix | suspense | user_balance:{account}, or a refund payout |
 
 The UNKNOWN status keeps the reservation in `rail_clearing:pending`.
+
+As built in S7 (LED-01, LED-02, LED-05, LED-06):
+
+- Clearing accounts are per rail: `rail_clearing` with ref `{rail}:pending`, `{rail}:settled`, `{rail}:inbound` and `{rail}:refund_due`. Fees post to `fees:{rail}` from the rail's configured flat fee and basis points.
+- One reservation per payment: a retry or failover under the same payment ID adds nothing. CANCELLED, BLOCKED or REJECTED after a reservation also reverse it. Settle and reverse entries name the reservation in `adjustment_of`.
+- Every entry is balanced per currency at commit (a deferred constraint trigger) and must reference a payment, a deposit or an adjustment (CHECK). Entries and postings stay append-only.
+- Deposit entries use the inbound transfer's ID as `deposit_id`. A deposit that fails its checks goes to `suspense` and opens a `deposit` case whose `deposit_id` is the inbound transfer ID. A reconciliation case uses the break's subject key there.
+- `decisions` are frozen after insert except `route` (trigger), because replay compares against them (AUD-02).
+- New tables: `rail_records` (one row per chain transfer or bank statement line, unique per rail and external ID), `bank_statements` (one import per rail and date), `watch_cursors` (each watcher's position). `deposit_intents` gains `expires_at` and `rail_id`; `organisations` gains `deposit_tolerance_minor` (G-11, default 0) and `deposit_intent_days` (G-21, default 7).

@@ -174,7 +174,7 @@ requirements:
 - {id: FR-059, area: Execution, layer: orchestration, status: confirmed, decision: [C-09], stories: [EXE-09],
    src: ["story:EXE-09", "spec/00#product-principles"],
    text: "Shadow records decisions and sends nothing; Assist waits for a human Send click on EXECUTE; Auto sends automatically; a mode change needs the payments lead and the compliance lead and is audited."}
-- {id: FR-060, area: Execution, layer: orchestration, status: proposed, decision: [G-09, G-16], stories: [EXE-09],
+- {id: FR-060, area: Execution, layer: orchestration, status: confirmed, decision: [G-09, G-16], stories: [EXE-09],
    src: ["spec/02#payment-state-machine", "spec/03#endpoints"],
    text: "The mode is read inside the send lock; in Assist the Send click needs an approver role and cannot be made by the initiator."}
 - {id: FR-061, area: Execution, layer: operations, status: confirmed, stories: [EXE-10],
@@ -209,7 +209,7 @@ requirements:
 - {id: FR-070, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-01],
    src: ["spec/04#rule-set-format", "story:EXC-01"],
    text: "Every escalation opens a case with an owner, a backup owner and a deadline from the rule set; statuses OPEN, HELD_OVERDUE, RESOLVED; one open case per payment; every change audited."}
-- {id: FR-071, area: Exceptions, layer: operations, status: proposed, decision: [C-07, G-03], stories: [EXC-01],
+- {id: FR-071, area: Exceptions, layer: operations, status: confirmed, decision: [C-07, G-03], stories: [EXC-01],
    src: ["story:EXC-01", "spec/04#rule-set-format"],
    text: "A case's tier is its deadline class from the rule set; business days are Monday to Friday UTC without holidays."}
 - {id: FR-072, area: Exceptions, layer: operations, status: confirmed, stories: [EXC-02],
@@ -242,7 +242,7 @@ requirements:
 - {id: FR-081, area: Ledger, layer: operations, status: confirmed, stories: [LED-03, LED-04, LED-05],
    src: ["spec/03#endpoints", "story:LED-05", "spec/04#checks"],
    text: "Deposit intents give instructions; watchers record inbound transfers; deposits are matched and checked (token, network, sender screening, amount) and credited once, after the confirmation threshold; mismatches open deposit exceptions."}
-- {id: FR-082, area: Ledger, layer: operations, status: proposed, decision: [G-11], stories: [LED-05],
+- {id: FR-082, area: Ledger, layer: operations, status: confirmed, decision: [G-11], stories: [LED-05],
    src: ["story:LED-05"],
    text: "Deposit amount tolerance is a per-organisation setting, default 0 (exact)."}
 - {id: FR-083, area: Ledger, layer: operations, status: confirmed, stories: [LED-06, LED-07],

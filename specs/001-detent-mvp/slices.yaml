@@ -73,7 +73,8 @@ slices:
   stories: [EXC-03, EXC-06, POL-07, EXE-09, CON-02, CON-06]
 
 - id: S7
-  name: "One ledger, deposits credited once, reconciliation, replay"
+  name: "One ledger, deposits credited once, reconciliation, replay (done)"
+  status: done
   goal: "Operations layer complete for money in and out."
   exit: >-
     The demo deposits credit once each (the duplicate notification included); reconciliation reaches 99% or more on

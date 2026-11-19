@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Replay {{ r.payment_id }}{% endblock %}
+{% block main %}
+<h1>Replay <span class="mono">{{ r.payment_id }}</span></h1>
+<p>{% if r.match %}<strong class="ok">Reproduced.</strong> Every recorded decision comes out the same from its stored inputs and rule version.{% else %}<strong class="attention">Mismatch.</strong> An incident was opened and the audit log records it.{% endif %}
+  No model was called. · <a href="/console/payments/{{ r.payment_id }}">Back to the payment</a></p>
+{% for s in r.steps %}
+<section class="card" data-step="{{ loop.index }}">
+  <h2>Decision {{ loop.index }}: recorded {{ s.recorded.outcome }}{% if s.replayed %} · replayed {{ s.replayed.outcome }}{% endif %} {% if s.match %}<span class="ok">match</span>{% else %}<span class="attention">mismatch</span>{% endif %}</h2>
+  <p class="small"><span class="mono">{{ s.decision_id }}</span> · rule version {{ s.rule_version }} · {{ s.decided_at }}{% if s.note %} · {{ s.note }}{% endif %}</p>
+  <table>
+    <thead><tr><th>Check</th><th>Recorded</th><th>Replayed</th></tr></thead>
+    <tbody>{% for c in s.recorded.checks %}{% set rc = s.replayed.checks[loop.index0] if s.replayed and s.replayed.checks|length > loop.index0 else none %}
+      <tr class="{{ '' if rc == c else 'r-block' }}"><td>{{ c.check }}</td><td>{{ c.result }}{% if c.reason %} {{ c.reason }}{% endif %}</td><td>{% if rc %}{{ rc.result }}{% if rc.reason %} {{ rc.reason }}{% endif %}{% endif %}</td></tr>{% endfor %}</tbody>
+  </table>
+</section>
+{% endfor %}
+{% if r.agent %}
+<section class="card" data-section="agent">
+  <h2>Agent output (stored)</h2>
+  <p class="small">{{ 'Recorded response (offline stand-in, not a live model call)' if r.agent.source == 'recording' else r.agent.model }} · <span class="mono">{{ r.agent.agent_call_id }}</span> · read from storage; no model was called.</p>
+  <dl class="facts">{% for k, v in r.agent.proposal.items() %}<dt>{{ k }}</dt><dd class="mono">{{ v.value }}</dd>{% endfor %}</dl>
+</section>
+{% endif %}
+{% endblock %}

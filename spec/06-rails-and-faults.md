@@ -49,7 +49,9 @@ class RailAdapter(Protocol):
 - per-payment and daily limits
 - cut-off windows (configurable; off by default)
 - failure rate (configurable; 0 in demo mode)
-- `POST /payments` (idempotent), `GET /payments/{key}`, `GET /statements/{date}`
+- `POST /payments` (idempotent), `GET /payments/{key}`, `GET /statements/{date}` (JSON, or CSV with `?format=csv`; filter with `scheme` and `account`)
+- `POST /inbound` simulates a payer paying in with a reference (tests and the demo use it; a real bank pushes this), and `GET /inbound?scheme=&after=&account=` lists inbound credits for the deposit watcher (LED-04)
+- Each organisation has its own receiving account at the simulator (its organisation ID): outgoing payments carry it as `debtor` and inbound credits as `account`, so organisations sharing one simulator never see each other's money
 - a settlement webhook to Detent
 
 The test values apply.

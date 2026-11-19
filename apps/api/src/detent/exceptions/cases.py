@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from pydantic import SecretStr
@@ -57,6 +57,12 @@ class NotPermitted(CaseError):
     status, code = 403, "insufficient_role"
 
 
+class ResolveViaReconciliation(CaseError):
+    """A deposit or reconciliation case is resolved by approving its proposed fix (LED-06)."""
+
+    status, code = 409, "resolve_via_reconciliation"
+
+
 class SelfApproval(CaseError):
     status, code = 403, "self_approval_forbidden"
 
@@ -79,6 +85,25 @@ def parse_duration(value: str) -> timedelta:
     if not m or not (m.group("h") or m.group("m")):
         raise ValueError(f"unsupported deadline duration {value!r}")
     return timedelta(hours=int(m.group("h") or 0), minutes=int(m.group("m") or 0))
+
+
+def add_business_days(start: datetime, days: int) -> datetime:
+    """G-03: business days are Monday to Friday, UTC, with no public holidays in the MVP."""
+    t = start
+    left = days
+    while left > 0:
+        t += timedelta(days=1)
+        if t.weekday() < 5:
+            left -= 1
+    return t
+
+
+def deadline_after(start: datetime, value: str) -> datetime:
+    """``PT2H`` style durations, or ``P{n}BD`` business days (G-03)."""
+    m = re.match(r"^P(\d+)BD$", value)
+    if m:
+        return add_business_days(start, int(m.group(1)))
+    return start + parse_duration(value)
 
 
 def _pick_owner(conn: Connection, org_id: str, role: str) -> str | None:
@@ -273,6 +298,8 @@ def _lock(
         raise NotPermitted(
             "after the deadline only the case's current owner or the payments lead may approve"
         )
+    if case.payment_id is None:
+        raise ResolveViaReconciliation(case_id)
     pay = conn.execute(
         text("SELECT id, status, initiated_by FROM payment_intents WHERE org_id=:o AND id=:p FOR UPDATE"),
         {"o": org_id, "p": case.payment_id},
@@ -432,3 +459,98 @@ def reject(
             reason=f"rejected: {why}",
         )
         return Resolution(case.id, case.payment_id, Status.REJECTED.value)
+
+
+def open_deposit_case(
+    conn: Connection,
+    clock: Clock,
+    *,
+    org_id: str,
+    inbound_id: str,
+    reasons: list[str],
+    rules: RuleSet,
+    case_type: str = "deposit",
+) -> str:
+    """LED-05: a deposit that can't be credited (or a reconciliation break, LED-06) opens a case.
+
+    ``deposit_id`` holds the inbound transfer's ID. The deadline is ``deadlines.deposit_exception``
+    (P1BD: one business day, G-03). Deposit cases are resolved by approving a reconciliation fix,
+    never by a timeout: the sweeper treats them like payout cases.
+    """
+    existing = conn.execute(
+        text(
+            "SELECT id FROM exception_cases WHERE org_id=:o AND deposit_id=:d AND status IN "
+            "('OPEN','HELD_OVERDUE')"
+        ),
+        {"o": org_id, "d": inbound_id},
+    ).scalar_one_or_none()
+    if existing:
+        return str(existing)
+    now = clock.now()
+    deadline = deadline_after(now, rules.deadlines.get("deposit_exception", "P1BD"))
+    rule = next((o for o in rules.owners if o.match.get("type") == case_type), None)
+    owner = _pick_owner(conn, org_id, rule.owner_role) if rule else None
+    backup = _pick_owner(conn, org_id, rule.backup_role) if rule else None
+    if owner is None:
+        owner = _pick_owner(conn, org_id, Role.PAYMENTS_LEAD.value)
+    case_id = new_id(Prefix.EXC, now)
+    conn.execute(
+        text(
+            "INSERT INTO exception_cases (id, org_id, deposit_id, type, tier, reasons, owner_id, "
+            "backup_owner_id, "
+            "deadline_at, deadline_seconds, status, created_at) VALUES (:id, :o, :d, :t, 2, :r, "
+            ":own, :bk, :dl, "
+            ":secs, 'OPEN', :now)"
+        ),
+        {
+            "id": case_id,
+            "o": org_id,
+            "d": inbound_id,
+            "t": case_type,
+            "r": reasons,
+            "own": owner,
+            "bk": backup,
+            "dl": deadline,
+            "secs": int((deadline - now).total_seconds()),
+            "now": now,
+        },
+    )
+    _case_event(
+        conn,
+        clock,
+        org_id,
+        case_id,
+        "opened",
+        Actor.system("exceptions"),
+        {"deposit_id": inbound_id, "reasons": reasons},
+    )
+    append(
+        conn,
+        clock,
+        org_id=org_id,
+        actor=Actor.system("exceptions"),
+        kind="case.opened",
+        subject_id=case_id,
+        payload={
+            "deposit_id": inbound_id,
+            "reasons": reasons,
+            "type": case_type,
+            "owner": owner,
+            "deadline_at": deadline.isoformat(),
+        },
+    )
+    if owner:
+        _outbox(
+            conn,
+            clock,
+            org_id,
+            recipient=_email(conn, org_id, owner),
+            template="case.assigned",
+            body=(
+                f"You own {case_type} case {case_id} for inbound transfer {inbound_id}. "
+                f"Reasons: {', '.join(reasons)}. "
+                f"Deadline: {deadline.isoformat()}. The money is held in suspense; nothing is "
+                "credited without a decision."
+            ),
+        )
+    return case_id

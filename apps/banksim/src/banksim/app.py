@@ -6,7 +6,10 @@ Two schemes: Faster Payments-style (``fps``, GBP) and SEPA Instant-style (``sepa
   the same key with a different body is 409. Per-payment and daily limits reject (422 REJECTED);
   inside a cut-off window the rail is unavailable (503, nothing accepted).
 - ``GET /payments/{key}``: ACCEPTED, SETTLED, FAILED or REJECTED; 404 when the rail never saw the key.
-- ``GET /statements/{YYYY-MM-DD}``: the day's settled payments (LED-07 reconciles against it).
+- ``GET /statements/{YYYY-MM-DD}``: the day's settled payments and inbound credits, as JSON or, with
+  ``?format=csv``, as CSV (LED-07 reconciles against it).
+- ``POST /inbound``: simulate a payer sending money in with a reference (tests and the demo use it;
+  a real bank would push this). ``GET /inbound?scheme=&after=<seq>`` lists inbound credits (LED-04).
 - Settlement is asynchronous after ``settle_seconds``; a callback is POSTed to ``callback_url`` if set.
 
 Deterministic test values (SBX-01): an amount ending in .13 is accepted but its first answer is held
@@ -46,6 +49,7 @@ CREATE TABLE IF NOT EXISTS banksim.payments (
     currency     TEXT NOT NULL,
     account      TEXT NOT NULL,
     reference    TEXT,
+    debtor       TEXT NOT NULL DEFAULT '',
     fee_minor    BIGINT NOT NULL,
     status       TEXT NOT NULL CHECK (status IN ('ACCEPTED','SETTLED','FAILED','REJECTED')),
     reason       TEXT,
@@ -53,6 +57,20 @@ CREATE TABLE IF NOT EXISTS banksim.payments (
     settle_at    TIMESTAMPTZ,
     settled_at   TIMESTAMPTZ
 );
+CREATE TABLE IF NOT EXISTS banksim.inbound (
+    id           TEXT PRIMARY KEY,
+    seq          BIGSERIAL UNIQUE,
+    scheme       TEXT NOT NULL,
+    amount_minor BIGINT NOT NULL CHECK (amount_minor > 0),
+    currency     TEXT NOT NULL,
+    reference    TEXT NOT NULL,
+    payer        TEXT NOT NULL,
+    account      TEXT NOT NULL DEFAULT '',
+    received_at  TIMESTAMPTZ NOT NULL
+);
+-- Columns added after a schema may already exist locally.
+ALTER TABLE banksim.payments ADD COLUMN IF NOT EXISTS debtor TEXT NOT NULL DEFAULT '';
+ALTER TABLE banksim.inbound ADD COLUMN IF NOT EXISTS account TEXT NOT NULL DEFAULT '';
 """
 
 
@@ -204,9 +222,9 @@ def create_app(database_url: str | None = None, config: Config | None = None) ->
             conn.execute(
                 text(
                     "INSERT INTO banksim.payments (key, body_hash, scheme, amount_minor, currency, "
-                    "account, reference, "
+                    "account, reference, debtor, "
                     "fee_minor, status, reason, created_at, settle_at) VALUES (:k, :h, :s, :a, :c, :acct, "
-                    ":ref, :fee, "
+                    ":ref, :debtor, :fee, "
                     ":st, :r, :t, CASE WHEN :st = 'ACCEPTED' THEN :t + make_interval(secs => :delay) END) "
                     "ON CONFLICT (key) DO NOTHING"
                 ),
@@ -218,6 +236,7 @@ def create_app(database_url: str | None = None, config: Config | None = None) ->
                     "c": body.get("currency"),
                     "acct": str(body.get("account", "")),
                     "ref": body.get("reference"),
+                    "debtor": str(body.get("debtor", "")),
                     "fee": fee,
                     "st": status,
                     "r": reason,
@@ -248,17 +267,104 @@ def create_app(database_url: str | None = None, config: Config | None = None) ->
             return JSONResponse({"key": key, "status": "NOT_FOUND"}, status_code=404)
         return JSONResponse(_row(r))
 
-    @app.get("/statements/{day}")
-    def statement(day: date) -> dict[str, Any]:
+    def _inbound_row(r: Any) -> dict[str, Any]:
+        return {
+            "id": r.id,
+            "seq": int(r.seq),
+            "scheme": r.scheme,
+            "amount_minor": int(r.amount_minor),
+            "currency": r.currency,
+            "reference": r.reference,
+            "payer": r.payer,
+            "account": r.account,
+            "received_at": r.received_at.isoformat(),
+        }
+
+    @app.post("/inbound")
+    async def inbound_credit(request: Request) -> JSONResponse:
+        b = await request.json()
+        scheme = str(b.get("scheme", ""))
+        if scheme not in SCHEMES:
+            return JSONResponse({"error": "unknown scheme"}, status_code=422)
+        amount = b.get("amount_minor")
+        if not isinstance(amount, int) or isinstance(amount, bool) or amount <= 0:
+            return JSONResponse({"error": "amount_minor must be a positive integer"}, status_code=422)
+        iid = str(
+            b.get("id") or f"bin_{hashlib.sha256(json.dumps(b, sort_keys=True).encode()).hexdigest()[:16]}"
+        )
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "INSERT INTO banksim.inbound (id, scheme, amount_minor, currency, reference, "
+                    "payer, account, "
+                    "received_at) VALUES (:i, :s, :a, :c, :r, :p, :acc, now()) ON CONFLICT (id) DO NOTHING"
+                ),
+                {
+                    "i": iid,
+                    "s": scheme,
+                    "a": amount,
+                    "c": SCHEMES[scheme],
+                    "r": str(b.get("reference", "")),
+                    "p": str(b.get("payer", "unknown payer (fictional)")),
+                    "acc": str(b.get("account", "")),
+                },
+            )
+            r = conn.execute(text("SELECT * FROM banksim.inbound WHERE id=:i"), {"i": iid}).one()
+        return JSONResponse(_inbound_row(r), status_code=201)
+
+    @app.get("/inbound")
+    def list_inbound(scheme: str, after: int = 0, account: str | None = None) -> dict[str, Any]:
+        with engine.connect() as conn:
+            rows = conn.execute(
+                text(
+                    "SELECT * FROM banksim.inbound WHERE scheme=:s AND seq > :a "
+                    "AND (CAST(:acc AS text) IS NULL OR account = :acc) ORDER BY seq LIMIT 500"
+                ),
+                {"s": scheme, "a": after, "acc": account},
+            ).all()
+        return {"data": [_inbound_row(r) for r in rows]}
+
+    @app.get("/statements/{day}", response_model=None)
+    def statement(
+        day: date, scheme: str | None = None, format: str = "json", account: str | None = None
+    ) -> Any:
         settle_due()
         with engine.connect() as conn:
             rows = conn.execute(
                 text(
-                    "SELECT * FROM banksim.payments WHERE status='SETTLED' AND settled_at::date = :d ORDER "
-                    "BY settled_at"
+                    "SELECT * FROM banksim.payments WHERE status='SETTLED' AND settled_at::date = :d "
+                    "AND (CAST(:s AS text) IS NULL OR scheme = :s) "
+                    "AND (CAST(:acc AS text) IS NULL OR debtor = :acc) ORDER BY settled_at"
                 ),
-                {"d": day},
+                {"d": day, "s": scheme, "acc": account},
             ).all()
-        return {"date": day.isoformat(), "payments": [_row(r) for r in rows]}
+            inbound = conn.execute(
+                text(
+                    "SELECT * FROM banksim.inbound WHERE received_at::date = :d "
+                    "AND (CAST(:s AS text) IS NULL OR scheme = :s) "
+                    "AND (CAST(:acc AS text) IS NULL OR account = :acc) ORDER BY seq"
+                ),
+                {"d": day, "s": scheme, "acc": account},
+            ).all()
+        if format == "csv":
+            lines = ["line_id,direction,scheme,amount_minor,currency,reference,party,at"]
+            lines += [
+                f"{r.key},out,{r.scheme},{int(r.amount_minor)},{r.currency},{r.reference or ''},"
+                f"{r.account.replace(',', ' ')},{r.settled_at.isoformat()}"
+                for r in rows
+            ]
+            lines += [
+                f"{r.id},in,{r.scheme},{int(r.amount_minor)},{r.currency},{r.reference.replace(',', ' ')},"
+                f"{r.payer.replace(',', ' ')},{r.received_at.isoformat()}"
+                for r in inbound
+            ]
+            from fastapi.responses import PlainTextResponse
+
+            return PlainTextResponse("\n".join(lines) + "\n", media_type="text/csv")
+        return {
+            "date": day.isoformat(),
+            "payments": [_row(r) for r in rows],
+            "inbound": [_inbound_row(r) for r in inbound],
+        }
 
     return app

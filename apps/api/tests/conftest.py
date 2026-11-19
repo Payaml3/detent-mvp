@@ -84,8 +84,12 @@ class OrgFixture:
     users: dict[Role, str]
 
 
+CREATED_ORGS: list[str] = []
+
+
 def make_org(engine: Engine, clock: FrozenClock, kind: str = "test") -> OrgFixture:
     org_id = f"org_t{secrets.token_hex(6)}"
+    CREATED_ORGS.append(org_id)
     users: dict[Role, str] = {}
     with engine.begin() as conn:
         conn.execute(
@@ -214,3 +218,32 @@ def chain_b() -> Iterator[Any]:
         yield devchain.deploy(f"http://127.0.0.1:{port}")
     finally:
         proc.terminate()
+
+
+@pytest.fixture
+def bank() -> Iterator[str]:
+    """A banksim server on a free port (the simulated bank rail), with generous limits."""
+    from bank_helpers import big
+    from banksim.app import create_app as bank_app
+    from servers import serve
+
+    with serve(bank_app(TEST_DB_URL, big())) as url:
+        yield url
+
+
+@pytest.fixture(autouse=True)
+def ledger_agrees_after_money_tests(request: pytest.FixtureRequest) -> Iterator[None]:
+    """LED-02: after every test that moves money (the chain and bank fault suites and the ledger tests),
+    the ledger nets to zero and agrees with each payment's status."""
+    before = len(CREATED_ORGS)
+    yield
+    path = str(request.node.fspath)
+    money = "/chain/" in path or "test_banksim" in path or "test_ledger" in path or "test_deposits" in path
+    if not money or "engine" not in request.fixturenames:
+        return
+    from detent.ledger.checks import disagreements
+
+    eng = request.getfixturevalue("engine")
+    with eng.connect() as conn:
+        problems = [p for org in CREATED_ORGS[before:] for p in disagreements(conn, org)]
+    assert problems == [], problems

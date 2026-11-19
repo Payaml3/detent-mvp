@@ -213,3 +213,15 @@ def test_console_flagged_invoice_shows_flags_and_blocks_submit(
     assert "MULTIPLE_WALLETS" in html and "Resolve each flag before submitting" in html
     pid = r.headers["location"].rsplit("/", 1)[1]
     assert client.post(f"/console/invoices/{pid}/submit", follow_redirects=False).status_code == 409
+
+
+def test_agent_payment_replays_from_stored_output_without_a_model(
+    agent_key: str, engine: Engine, clock: FrozenClock, d: DecisionOrg, client: TestClient
+) -> None:  # AUD-02
+    p = propose(engine, clock, d, "inv-canonical-18500-usdc.txt")
+    pid = submit_proposal(engine, clock, client, agent_key=agent_key, org_id=d.id, proposal_id=p.id).json()[
+        "id"
+    ]
+    r = client.get(f"/v1/payment_intents/{pid}/replay", headers=d.auth()).json()
+    assert r["match"] is True and r["model_called"] is False
+    assert r["agent"]["agent_call_id"] == p.id and r["agent"]["proposal"]["amount"]["value"] == "18500.00"

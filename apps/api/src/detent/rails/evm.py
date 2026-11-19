@@ -20,6 +20,7 @@ from detent.rails.base import (
     Eligibility,
     Health,
     IntentView,
+    ObservedTransfer,
     Prepared,
     Quote,
     RailError,
@@ -303,3 +304,57 @@ class EvmAdapter:
         except Exception as exc:
             return Health(False, None, {"error": type(exc).__name__})
         return Health(True, self._usdc(bal), {"native_wei": str(native), "from": self.from_address})
+
+    # ------------------------------------------------------------------------------ watching (LED-04)
+    TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+
+    def head_block(self) -> int:
+        return int(self._w3.eth.block_number)
+
+    def transfers(
+        self, from_block: int, to_block: int, *, to_addresses: list[str], from_addresses: list[str]
+    ) -> list[ObservedTransfer]:
+        """Token Transfer logs into the watched deposit addresses and out of our sending wallets."""
+
+        def topic(addr: str) -> str:
+            return "0x" + "0" * 24 + addr.lower().removeprefix("0x")
+
+        head = self.head_block()
+        out: list[ObservedTransfer] = []
+        for direction, addrs, pos in (("in", to_addresses, 2), ("out", from_addresses, 1)):
+            if not addrs:
+                continue
+            topics: list[Any] = [self.TRANSFER_TOPIC, None, None]
+            topics[pos] = [topic(a) for a in addrs]
+            logs = self._w3.eth.get_logs(
+                {
+                    "address": self._token.address,
+                    "fromBlock": from_block,
+                    "toBlock": to_block,
+                    "topics": topics,
+                }
+            )
+            for lg in logs:
+                t = [h.hex() if hasattr(h, "hex") else str(h) for h in lg["topics"]]
+                frm = "0x" + t[1][-40:]
+                to = "0x" + t[2][-40:]
+                data = lg["data"]
+                amount = int(data.hex() if hasattr(data, "hex") else data, 16)
+                tx = lg["transactionHash"]
+                txh = tx.hex() if hasattr(tx, "hex") else str(tx)
+                txh = txh if txh.startswith("0x") else "0x" + txh
+                blk = int(lg["blockNumber"])
+                out.append(
+                    ObservedTransfer(
+                        external_id=f"{txh}:{int(lg['logIndex'])}",
+                        tx_hash=txh,
+                        log_index=int(lg["logIndex"]),
+                        direction=direction,
+                        from_party=frm,
+                        to_party=to,
+                        amount_minor=amount,
+                        block_number=blk,
+                        confirmations=head - blk + 1,
+                    )
+                )
+        return out

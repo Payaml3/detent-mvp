@@ -279,7 +279,39 @@ EXC-06:
   0: ["integration/test_deadlines.py::test_overdue_case_is_held_counterparty_told_and_backup_owner_takes_over", "integration/test_deadlines.py::test_second_miss_goes_to_the_payments_lead_and_the_payment_stays_held", "integration/test_deadlines.py::test_sweeping_twice_is_a_no_op", "integration/test_deadlines.py::test_the_worker_runs_the_sweeper", "integration/test_deadlines.py::test_after_the_deadline_only_the_current_owner_or_payments_lead_may_approve"]
   1: ["integration/test_deadlines.py::test_overdue_without_a_human_decision_is_never_approved_across_orgs", "integration/test_console_operations.py::test_overview_counts_and_polls"]
 CON-02:
+  0: ["integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix", "integration/test_console_operations.py::test_overview_counts_and_polls"]
   1: ["integration/test_console_operations.py::test_overview_counts_and_polls"]
 CON-06:
   0: ["integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation", "integration/test_console_operations.py::test_reviewer_sees_policy_but_cannot_propose"]
   1: ["integration/test_console_operations.py::test_mandates_screen_shows_scope_usage_expiry_and_revoke", "integration/test_mandates.py::test_revoke_by_api_and_console"]
+LED-01:
+  0: ["integration/test_ledger.py::test_post_refuses_unbalanced_or_unreferenced", "integration/test_ledger.py::test_database_refuses_an_unbalanced_entry_at_commit", "integration/test_ledger.py::test_confirmed_payout_reserves_then_settles_with_the_actual_fee"]
+  1: ["integration/test_ledger.py::test_entries_are_append_only", "integration/test_schema.py::test_ledger_rows_cannot_be_edited", "integration/test_reconciliation.py::test_fixes_apply_only_after_approval_as_new_entries"]
+  2: ["integration/test_ledger.py::test_database_refuses_an_unbalanced_entry_at_commit", "integration/test_ledger.py::test_post_refuses_unbalanced_or_unreferenced"]
+LED-02:
+  0: ["integration/test_ledger.py::test_confirmed_payout_reserves_then_settles_with_the_actual_fee", "integration/test_ledger.py::test_technical_failure_retries_under_one_reservation", "integration/test_ledger.py::test_unknown_keeps_the_reservation"]
+  1: ["conftest.py::ledger_agrees_after_money_tests", "ci:autouse check after every test in tests/chain (retry, failover, UNKNOWN, send-once faults), test_banksim.py, test_ledger.py and test_deposits.py"]
+LED-03:
+  0: ["integration/test_deposits.py::test_deposit_intent_gives_a_bank_reference_and_is_idempotent", "integration/test_deposits.py::test_chain_deposit_address_is_per_account_and_stable", "chain/test_deposits_chain.py::test_chain_deposit_is_seen_once_and_credited_once"]
+  1: ["integration/test_deposits.py::test_deposit_intent_gives_a_bank_reference_and_is_idempotent"]
+LED-04:
+  0: ["chain/test_deposits_chain.py::test_chain_deposit_is_seen_once_and_credited_once", "chain/test_deposits_chain.py::test_outbound_payouts_are_recorded_for_reconciliation", "integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts", "integration/test_deposits.py::test_the_worker_watches_and_credits"]
+  1: ["integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts", "chain/test_deposits_chain.py::test_chain_deposit_is_seen_once_and_credited_once", "integration/test_deposits.py::test_another_organisations_bank_credits_are_not_seen"]
+LED-05:
+  0: ["integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts", "integration/test_deposits.py::test_tolerance_is_a_per_organisation_setting"]
+  1: ["integration/test_deposits.py::test_each_mismatch_goes_to_suspense_and_opens_a_deposit_exception", "chain/test_deposits_chain.py::test_flagged_sender_is_held_in_suspense"]
+  2: ["integration/test_deposits.py::test_deposit_is_credited_once_even_with_duplicate_notifications_and_restarts", "chain/test_demo_batch_recon.py::test_demo_batch_credits_once_and_dep07_is_the_only_break"]
+  3: ["integration/test_deposits.py::test_each_mismatch_goes_to_suspense_and_opens_a_deposit_exception", "integration/test_deposits.py::test_expired_intent_is_never_silently_credited", "integration/test_deposits.py::test_business_days_skip_weekends"]
+LED-06:
+  0: ["integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix", "integration/test_reconciliation.py::test_real_bank_payout_reconciles_against_the_imported_statement", "chain/test_demo_batch_recon.py::test_demo_batch_credits_once_and_dep07_is_the_only_break"]
+  1: ["integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix"]
+  2: ["integration/test_reconciliation.py::test_fixes_apply_only_after_approval_as_new_entries", "integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix"]
+  3: ["integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix"]
+LED-07:
+  0: ["integration/test_reconciliation.py::test_statement_import_is_idempotent_per_date_json_and_csv"]
+AUD-02:
+  0: ["integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision", "integration/test_console_ledger.py::test_payment_detail_has_replay_and_postings"]
+  1: ["integration/test_replay.py::test_a_mismatch_raises_an_alert", "integration/test_replay.py::test_decisions_cannot_be_edited", "integration/test_agent_submit.py::test_agent_payment_replays_from_stored_output_without_a_model"]
+  2: ["integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision"]
+CON-07:
+  0: ["integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix"]

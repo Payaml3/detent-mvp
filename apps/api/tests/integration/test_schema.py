@@ -292,7 +292,10 @@ def test_ledger_rows_cannot_be_edited(engine: Engine, org: OrgFixture, clock: Fr
     j = f"jrn_{org.id[4:]}"
     with engine.begin() as c:
         c.execute(
-            text("INSERT INTO journal_entries (id, org_id, kind, created_at) VALUES (:j, :o, 'test', :n)"),
+            text(
+                "INSERT INTO journal_entries (id, org_id, kind, payment_id, created_at) "
+                "VALUES (:j, :o, 'test', 'pay_test', :n)"
+            ),
             {"j": j, "o": org.id, "n": clock.now()},
         )
     with pytest.raises(DBAPIError, match="append-only"), engine.begin() as c:

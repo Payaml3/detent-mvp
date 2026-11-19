@@ -258,7 +258,6 @@ def edit_destination(
 
 # ---------------------------------------------------------------------------------- S3: review loop
 SECTIONS_NOT_BUILT = {
-    "reconciliation": ("Reconciliation", "Matching deposits and payouts across rails (LED-06, slice S6)."),
     "audit": ("Audit", "Searchable audit log, replay and evidence export (AUD-02, AUD-03)."),
     "evaluation": ("Evaluation", "Release-gate suites and the results report (EVL, slice S8)."),
 }
@@ -481,6 +480,31 @@ def _raw_facts(conn: Any, org_id: str, case: Any) -> dict[str, Any]:
     }
 
 
+def _deposit_case_page(request: Request, rt: Runtime, user: ActingUser, conn: Any, case: Any) -> HTMLResponse:
+    """LED-05/LED-06: a deposit or reconciliation case. It is resolved by approving its fix."""
+    inb = conn.execute(
+        text("SELECT * FROM inbound_transfers WHERE org_id=:o AND id=:i"),
+        {"o": user.org_id, "i": case.deposit_id},
+    ).one_or_none()
+    brk = conn.execute(
+        text(
+            "SELECT id, kind, status, proposed_fix FROM recon_breaks WHERE org_id=:o AND case_id=:c "
+            "ORDER BY created_at DESC"
+        ),
+        {"o": user.org_id, "c": case.id},
+    ).all()
+    return page(
+        request,
+        rt,
+        "deposit_case.html",
+        user,
+        case=case,
+        inb=inb,
+        breaks=brk,
+        countdown=_countdown(case.deadline_at, rt.clock.now()),
+    )
+
+
 @router.get("/exceptions/{case_id}", response_class=HTMLResponse)
 def case_page(
     request: Request,
@@ -503,6 +527,8 @@ def case_page(
         ).one_or_none()
         if case is None:
             raise HTTPException(status_code=404)
+        if case.payment_id is None:
+            return _deposit_case_page(request, rt, user, conn, case)
         facts = _raw_facts(conn, user.org_id, case)
         from detent.agents.investigation import latest_investigation
 
@@ -1182,6 +1208,118 @@ def console_withdraw_mode(
     except ModeError as exc:
         return _settings_redirect(exc)
     return _settings_redirect()
+
+
+# ------------------------------------------------------------------------------ CON-07 reconciliation
+@router.get("/reconciliation", response_class=HTMLResponse)
+def reconciliation_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    from detent.domain.roles import allowed
+    from detent.reconciliation.run import latest_runs, list_breaks
+
+    with rt.engine.connect() as conn:
+        runs = latest_runs(conn, user.org_id)
+        breaks = list_breaks(conn, user.org_id)
+    return page(
+        request,
+        rt,
+        "reconciliation.html",
+        user,
+        runs=runs,
+        latest=runs[0] if runs else None,
+        open_breaks=[b for b in breaks if b["status"] == "OPEN"],
+        decided=[b for b in breaks if b["status"] != "OPEN"][:20],
+        can_fix=allowed("recon.approve_fix", user.role),
+        error=request.query_params.get("error"),
+    )
+
+
+def _recon_redirect(exc: Exception | None = None) -> RedirectResponse:
+    from urllib.parse import quote
+
+    return RedirectResponse(
+        "/console/reconciliation" + (f"?error={quote(str(exc)[:300])}" if exc else ""), status_code=303
+    )
+
+
+@router.post("/reconciliation/run")
+def console_run_reconciliation(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    from detent.reconciliation.run import run_for
+
+    run_for(rt.engine, rt.clock, rt.settings, user.org_id)
+    return _recon_redirect()
+
+
+@router.post("/reconciliation/breaks/{break_id}/approve")
+def console_approve_fix(
+    request: Request,
+    break_id: str,
+    reason: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("recon.approve_fix")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.reconciliation.fixes import FixError, approve_fix
+
+    try:
+        approve_fix(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            break_id=break_id,
+            actor=Actor(user.id, user.role.value),
+            reason=reason,
+        )
+    except FixError as exc:
+        return _recon_redirect(exc)
+    return _recon_redirect()
+
+
+@router.post("/reconciliation/breaks/{break_id}/reject")
+def console_reject_fix(
+    request: Request,
+    break_id: str,
+    reason: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("recon.approve_fix")),  # noqa: B008
+) -> RedirectResponse:
+    from detent.reconciliation.fixes import FixError, reject_fix
+
+    try:
+        reject_fix(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            break_id=break_id,
+            actor=Actor(user.id, user.role.value),
+            reason=reason,
+        )
+    except FixError as exc:
+        return _recon_redirect(exc)
+    return _recon_redirect()
+
+
+# ------------------------------------------------------------------------------------- AUD-02 replay
+@router.get("/payments/{payment_id}/replay", response_class=HTMLResponse)
+def payment_replay(
+    request: Request,
+    payment_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    from detent.audit.replay import NotReplayable, replay_payment
+
+    try:
+        r = replay_payment(rt.engine, rt.clock, org_id=user.org_id, payment_id=payment_id)
+    except NotReplayable as exc:
+        raise HTTPException(status_code=404) from exc
+    return page(request, rt, "replay.html", user, r=r)
 
 
 @router.get("/{section}", response_class=HTMLResponse)

@@ -4,7 +4,7 @@
 <h1>Payment <span class="mono">{{ p.id }}</span></h1>
 <p><span class="st st-{{ p.status|lower }}">{{ p.status }}</span> · {{ p.amount.amount }} {{ p.amount.currency }} · {{ p.source }}{% if p.reference %} · {{ p.reference }}{% endif %}
   {% if p.exception %} · <a href="/console/exceptions/{{ p.exception.id }}">Open case</a>{% endif %}
-  <button disabled title="Replay arrives with AUD-02">Replay</button></p>
+  <a class="button" href="/console/payments/{{ p.id }}/replay" title="Re-evaluate every recorded decision from its stored inputs; no model is called">Replay</a></p>
 {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
 {% if p.status == 'READY' and p.awaiting_send_click %}
 <section class="card" data-section="send">
@@ -50,8 +50,8 @@
 
 <h2>Ledger postings</h2>
 {% if p.postings %}
-<table><tbody>{% for x in p.postings %}<tr><td class="mono">{{ x.account }}</td><td>{{ x.direction }}</td><td class="num">{{ x.amount.amount }} {{ x.amount.currency }}</td></tr>{% endfor %}</tbody></table>
-{% else %}<p class="muted">No postings. The ledger arrives with LED-01.</p>{% endif %}
+<table><thead><tr><th>Entry</th><th>Account</th><th>Side</th><th class="num">Amount</th></tr></thead><tbody>{% for x in p.postings %}<tr><td class="mono">{{ x.entry }}</td><td class="mono">{{ x.account }}</td><td>{{ x.direction }}</td><td class="num">{{ x.amount.amount }} {{ x.amount.currency }}</td></tr>{% endfor %}</tbody></table>
+{% else %}<p class="muted">No postings: money is reserved when the payment is submitted.</p>{% endif %}
 
 <h2>Timeline</h2>
 <ol class="timeline">

@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 95 requirements confirmed; 8 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 98 requirements confirmed; 5 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -356,7 +356,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-057**: The kill switch stops all sends (checked inside the lock), holds pending payments, lets UNKNOWN attempts keep resolving, shows a red banner, is audited, and only the payments lead releases it.
 - **FR-058**: On release of the kill switch each held payment re-runs the policy automatically; EXECUTE resumes, anything else stays held or escalates.
 - **FR-059**: Shadow records decisions and sends nothing; Assist waits for a human Send click on EXECUTE; Auto sends automatically; a mode change needs the payments lead and the compliance lead and is audited.
-- **FR-060**: The mode is read inside the send lock; in Assist the Send click needs an approver role and cannot be made by the initiator. *(proposed: G-09, G-16)*
+- **FR-060**: The mode is read inside the send lock; in Assist the Send click needs an approver role and cannot be made by the initiator.
 - **FR-061**: An invariant monitor detects unauthorised executions, wrong credits and duplicates, engages the kill switch and opens a Sev 1 incident.
 
 **Rails**
@@ -373,7 +373,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 **Exceptions**
 
 - **FR-070**: Every escalation opens a case with an owner, a backup owner and a deadline from the rule set; statuses OPEN, HELD_OVERDUE, RESOLVED; one open case per payment; every change audited.
-- **FR-071**: A case's tier is its deadline class from the rule set; business days are Monday to Friday UTC without holidays. *(proposed: C-07, G-03)*
+- **FR-071**: A case's tier is its deadline class from the rule set; business days are Monday to Friday UTC without holidays.
 - **FR-072**: The case shows raw facts first (registered payee, full address, first seen, last changed, amount against median, rule hits, mandate scope); agent content is collapsed and visually separate.
 - **FR-073**: An investigation agent runs asynchronously with read-only tools; every claim cites evidence IDs or is removed; the case is usable before it finishes.
 - **FR-074**: Approve or reject needs a reason; approve re-runs the policy; reject is terminal; the approver is never the initiator.
@@ -387,7 +387,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 
 - **FR-080**: One append-only double-entry ledger records payouts as specified; every journal balances; UNKNOWN keeps the reservation pending; corrections are new entries.
 - **FR-081**: Deposit intents give instructions; watchers record inbound transfers; deposits are matched and checked (token, network, sender screening, amount) and credited once, after the confirmation threshold; mismatches open deposit exceptions.
-- **FR-082**: Deposit amount tolerance is a per-organisation setting, default 0 (exact). *(proposed: G-11)*
+- **FR-082**: Deposit amount tolerance is a per-organisation setting, default 0 (exact).
 - **FR-083**: Reconciliation matches ledger postings with chain transfers and bank statements, reports the match rate (99% or more on the 500-item set), and each break gets a fix from a fixed set applied only after human approval.
 - **FR-084**: (Could) Usage is metered from the ledger against quotas.
 

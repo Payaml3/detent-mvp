@@ -148,3 +148,14 @@ def setup_chain_org(
         confirmations=1,
     )
     return ChainOrg(d, chain, sender, payee, adapter, {"local-evm": adapter})
+
+
+def send_usdc(chain: devchain.LocalChain, frm: str, to: str, minor: int) -> None:
+    web3 = w3(chain)
+    token = usdc(chain)
+    web3.eth.wait_for_transaction_receipt(
+        token.functions.mint(frm, minor).transact({"from": chain.accounts[0]})
+    )
+    web3.provider.make_request("anvil_impersonateAccount", [frm])  # type: ignore[arg-type]
+    web3.provider.make_request("anvil_setBalance", [frm, hex(10**18)])  # type: ignore[arg-type]
+    web3.eth.wait_for_transaction_receipt(token.functions.transfer(to, minor).transact({"from": frm}))

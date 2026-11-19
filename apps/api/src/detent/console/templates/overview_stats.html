@@ -10,7 +10,7 @@
   <div class="stat" data-stat="open"><b>{{ s.open_cases }}</b><span>Open cases</span></div>
   <div class="stat" data-stat="overdue"><b class="{{ 'attention' if s.overdue_cases else '' }}">{{ s.overdue_cases }}</b><span>Overdue cases (held, never auto-approved)</span></div>
   <div class="stat" data-stat="timeout"><b>{{ s.approved_by_timeout }}</b><span>Approved by timeout (always 0)</span></div>
-  <div class="stat" data-stat="match"><b>–</b><span>Match rate: reconciliation arrives in slice S7</span></div>
+  <div class="stat" data-stat="match"><b>{{ s.match_rate.text if s.match_rate else '–' }}</b><span>{% if s.match_rate %}<a href="/console/reconciliation">Reconciliation match rate</a> · {{ s.match_rate.breaks }} open break{{ '' if s.match_rate.breaks == 1 else 's' }}{% else %}Match rate: no reconciliation run yet{% endif %}</span></div>
 </div>
 {% if s.by_status %}<p class="small">Today by status: {% for k, v in s.by_status.items() %}<span class="st st-{{ k|lower }}">{{ k }}</span> {{ v }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
 <h2>Rail health</h2>

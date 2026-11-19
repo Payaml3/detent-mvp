@@ -15,6 +15,7 @@ from detent.api.errors import ErrorType, error_response
 from detent.audit.log import Actor
 from detent.exceptions.cases import CaseError, approve, reject
 from detent.intents.service import IntentRequest, payment_view, submit_intent
+from detent.ledger.deposits import DepositRequest
 from detent.logging import request_id_var
 
 router = APIRouter(prefix="/v1")
@@ -371,3 +372,96 @@ def send_payment_intent(
         from detent.intents.service import payment_view
 
         return JSONResponse(payment_view(conn, principal.org_id, payment_id))
+
+
+# ------------------------------------------------------------------------------- deposits (LED-03)
+@router.post("/deposit_intents", status_code=201)
+def create_deposit_intent_api(
+    request: Request,
+    body: DepositRequest,
+    principal: Annotated[Principal, Depends(authenticate)],
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key", max_length=255)] = None,
+) -> JSONResponse:
+    from detent.ledger.deposits import DepositError, create_deposit_intent
+
+    require(principal, "intents:create")
+    if not idempotency_key:
+        raise MissingIdempotencyKey()
+    rt = request.app.state.runtime
+    try:
+        code, out = create_deposit_intent(
+            rt.engine,
+            rt.clock,
+            org_id=principal.org_id,
+            actor_id=principal.user_id,
+            idempotency_key=idempotency_key,
+            request=body,
+        )
+    except DepositError as exc:
+        if exc.status == 409:
+            return error_response(409, "conflict", exc.code, str(exc), request_id=_rid())
+        return error_response(422, "invalid_request", exc.code, str(exc), request_id=_rid(), param=exc.param)
+    return JSONResponse(out, status_code=code)
+
+
+@router.get("/deposit_intents/{deposit_id}")
+def get_deposit_intent_api(
+    request: Request, deposit_id: str, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    from detent.ledger.deposits import view
+
+    require(principal, "read")
+    with request.app.state.runtime.engine.connect() as conn:
+        v = view(conn, principal.org_id, deposit_id)
+    if v is None:
+        return error_response(
+            404, "not_found", "not_found", "No such deposit intent.", request_id=_rid(), param="id"
+        )
+    return JSONResponse(v)
+
+
+# ------------------------------------------------------------------------------ reconciliation (LED-06)
+@router.get("/reconciliation/runs")
+def reconciliation_runs(
+    request: Request, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    from detent.reconciliation.run import latest_runs
+
+    require(principal, "read")
+    with request.app.state.runtime.engine.connect() as conn:
+        return JSONResponse(
+            {"data": latest_runs(conn, principal.org_id), "has_more": False, "next_cursor": None}
+        )
+
+
+@router.get("/reconciliation/breaks")
+def reconciliation_breaks(
+    request: Request, principal: Annotated[Principal, Depends(authenticate)], status: str | None = None
+) -> JSONResponse:
+    from detent.reconciliation.run import list_breaks
+
+    require(principal, "read")
+    with request.app.state.runtime.engine.connect() as conn:
+        return JSONResponse(
+            {"data": list_breaks(conn, principal.org_id, status), "has_more": False, "next_cursor": None}
+        )
+
+
+# ------------------------------------------------------------------------------------- replay (AUD-02)
+@router.get("/payment_intents/{payment_id}/replay")
+def replay_payment_intent(
+    request: Request, payment_id: str, principal: Annotated[Principal, Depends(authenticate)]
+) -> JSONResponse:
+    """Re-evaluate every recorded decision from its stored inputs and rule version. Never calls a model."""
+    from detent.audit.replay import NotReplayable, replay_payment
+
+    require(principal, "read")
+    rt = request.app.state.runtime
+    try:
+        return JSONResponse(
+            replay_payment(rt.engine, rt.clock, org_id=principal.org_id, payment_id=payment_id)
+        )
+    except NotReplayable:
+        return error_response(
+            404, "not_found", "not_found", "No such payment intent.", request_id=_rid(), param="id"
+        )

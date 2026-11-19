@@ -46,7 +46,7 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | S4 Never paid twice (done) | 10 | 5.25 | 5.25 |
 | S5 An AI agent proposes the $18,500 invoice inside a mandate (done) | 11 | 4.5 | 4.75 |
 | S6 Operations around escalations (done) | 6 | 3.75 | 3.75 |
-| S7 One ledger, deposits credited once, reconciliation, replay | 9 | 5 | 5 |
+| S7 One ledger, deposits credited once, reconciliation, replay (done) | 9 | 5 | 5 |
 | S8 Proof and release gate | 8 | 4.25 | 4.75 |
 | S9 Demo-ready prototype in the EU | 6 | 2.25 | 2.25 |
 | P1 Public sandbox API and webhooks | 11 | 5 | 5.25 |

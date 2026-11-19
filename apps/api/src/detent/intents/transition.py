@@ -3,7 +3,8 @@
 It locks the payment row (``SELECT ... FOR UPDATE``), checks the move against
 ``detent.domain.states.ALLOWED``, updates the row and writes the audit event, all in the caller's
 transaction. The database trigger independently refuses any change out of a terminal state.
-EXE-01 (slice S2) builds attempts on top of this function.
+EXE-01 (slice S2) builds attempts on top of this function. Since S7 it also writes the payout's
+ledger entry (LED-02) in the same transaction.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ from sqlalchemy import Connection, Engine, text
 from detent.audit.log import Actor, append
 from detent.clock import Clock
 from detent.domain.states import InvalidTransition, Status, check_transition
+from detent.ledger.payouts import on_status
 
 
 class PaymentNotFound(LookupError):
@@ -100,4 +102,6 @@ def transition(
         subject_id=payment_id,
         payload={"from": old.value, "to": to.value, "reason": reason},
     )
+    # LED-02: the ledger entry for this change is written in the same transaction.
+    on_status(conn, clock, org_id=org_id, payment_id=payment_id, new_status=to.value)
     return old

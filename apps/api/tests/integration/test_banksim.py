@@ -3,25 +3,19 @@
 from __future__ import annotations
 
 import time
-from collections.abc import Iterator
-from dataclasses import dataclass
 from datetime import UTC, datetime
 
 import httpx
 import pytest
+from bank_helpers import big, pay, resolve_or_confirm, send, setup_bank_org
 from banksim.app import Config, SchemeConfig
 from banksim.app import create_app as bank_app
 from conftest import TEST_DB_URL
-from decision_helpers import DecisionOrg, payout, setup_decision_org
 from detent.clock import FrozenClock
 from detent.domain.money import Money
 from detent.execution.resolver import resolve_unknown
-from detent.execution.send import send_payment
-from detent.intents.service import IntentRequest, submit_intent
-from detent.policy.screening import MockScreening
 from detent.rails.banksim import BankAdapter
 from detent.rails.base import AttemptView, IntentView
-from detent.rails.registry import install_rail
 from fastapi import FastAPI, Request
 from faultproxy.app import create_app as proxy_app
 from servers import fault, serve
@@ -30,76 +24,6 @@ from sqlalchemy import Engine, text
 pytestmark = pytest.mark.db
 
 HARBOR = {"destination_id": "dst_harbor_iban", "kind": "bank_account", "network": "banksim-sepa-inst"}
-
-
-@dataclass
-class BankOrg:
-    d: DecisionOrg
-    bank: str
-    adapter: BankAdapter
-
-    @property
-    def id(self) -> str:
-        return self.d.id
-
-
-def big() -> Config:
-    s = SchemeConfig(
-        per_payment_limit_minor=10_000_000_00, daily_limit_minor=10_000_000_00, fee_flat_minor=25, fee_bps=5
-    )
-    return Config(schemes={"fps": s, "sepa_inst": s}, hold_seconds=2.0)
-
-
-@pytest.fixture
-def bank() -> Iterator[str]:
-    with serve(bank_app(TEST_DB_URL.replace("+psycopg", "+psycopg"), big())) as url:
-        yield url
-
-
-def setup_bank_org(engine: Engine, clock: FrozenClock, url: str, *, timeout: float = 1.0) -> BankOrg:
-    d = setup_decision_org(engine, clock)
-    with engine.begin() as c:
-        install_rail(
-            c, d.id, rail_id="banksim-sepa-inst", kind="banksim", network="banksim-sepa-inst", currency="EUR"
-        )
-    a = BankAdapter(
-        rail_id="banksim-sepa-inst",
-        base_url=url,
-        scheme="sepa_inst",
-        currency="EUR",
-        per_payment_limit_minor=25_000_00,
-        fee_flat_minor=25,
-        fee_bps=5,
-        timeout_seconds=timeout,
-    )
-    return BankOrg(d, url, a)
-
-
-def pay(engine: Engine, clock: FrozenClock, bo: BankOrg, amount: str) -> str:
-    req = IntentRequest.model_validate(payout("cpt_harbor", amount, "EUR", HARBOR))
-    code, body = submit_intent(
-        engine,
-        clock,
-        org_id=bo.id,
-        actor_id="usr_api",
-        idempotency_key=f"k{amount}{time.time()}",
-        request=req,
-        decision_only=False,
-        screening=MockScreening.from_fixture(),
-    )
-    assert code == 201 and body["status"] == "READY", body
-    return str(body["id"])
-
-
-def send(engine: Engine, clock: FrozenClock, bo: BankOrg, pid: str) -> str:
-    return send_payment(
-        engine,
-        clock,
-        {"banksim-sepa-inst": bo.adapter},
-        org_id=bo.id,
-        payment_id=pid,
-        screening=MockScreening.from_fixture(),
-    ).value
 
 
 def bank_payments(url: str) -> list[dict[str, object]]:
@@ -161,36 +85,6 @@ def test_detent_sends_a_euro_payout_on_the_bank_rail(engine: Engine, clock: Froz
     assert st == "CONFIRMED"
     [p] = [p for p in bank_payments(bank) if p["key"] == pid]
     assert p["amount_minor"] == 200000 and p["account"] == "DE89 **** **** 3000"
-
-
-def resolve_or_confirm(engine: Engine, clock: FrozenClock, bo: BankOrg, pid: str) -> str:
-    from detent.execution.send import apply_rail_status
-
-    with engine.connect() as c:
-        a = c.execute(
-            text(
-                "SELECT a.*, p.amount_minor FROM attempts a JOIN payment_intents p ON p.org_id=a.org_id "
-                "AND p.id=a.payment_id WHERE a.org_id=:o AND a.payment_id=:p ORDER BY attempt_no DESC LIMIT 1"
-            ),
-            {"o": bo.id, "p": pid},
-        ).one()
-    v = AttemptView(
-        a.id,
-        pid,
-        a.attempt_no,
-        a.rail_id,
-        a.idempotency_key,
-        Money(int(a.amount_minor), "EUR"),  # type: ignore[arg-type]
-        "DE89 **** **** 3000",
-        None,
-        None,
-        None,
-    )
-    if a.status == "UNKNOWN":
-        return resolve_unknown(
-            engine, clock, {"banksim-sepa-inst": bo.adapter}, org_id=bo.id, payment_id=pid
-        ).value
-    return apply_rail_status(engine, clock, bo.adapter, bo.id, v).value
 
 
 def test_amount_ending_13_times_out_then_settles_once(engine: Engine, clock: FrozenClock, bank: str) -> None:

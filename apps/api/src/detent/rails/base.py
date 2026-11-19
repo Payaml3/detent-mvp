@@ -118,3 +118,22 @@ class NonceRail(RailAdapter, Protocol):
     def pending_nonce(self) -> int: ...
     def prepare(self, attempt: AttemptView, nonce: int) -> Prepared: ...
     def explorer_url(self, tx_hash: str) -> str | None: ...
+
+
+@dataclass(frozen=True, slots=True)
+class ObservedTransfer:
+    """One money movement a watcher saw on a rail (LED-04): a token Transfer log or a bank inbound credit.
+
+    ``external_id`` is unique per rail: ``{tx_hash}:{log_index}`` on a chain, the bank's own ID otherwise.
+    """
+
+    external_id: str
+    tx_hash: str
+    log_index: int
+    direction: str  # "in" (to a watched deposit address or reference) or "out" (from our sending wallet)
+    from_party: str
+    to_party: str
+    amount_minor: int
+    block_number: int | None
+    confirmations: int
+    occurred_at: str | None = None

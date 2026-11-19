@@ -1,0 +1,10 @@
+{
+  "_provenance": "HAND-WRITTEN STAND-IN for a model response, used by tests and offline demos. It is NOT a recording of a real model run: the build environment had no Anthropic API key. Candidates are found by code; the stand-in picks the first one.",
+  "match": "break_type: unallocated_inbound; candidates: 0",
+  "usage": {"input_tokens": 1200, "output_tokens": 150},
+  "output": {
+    "proposed_fix": {"action": "return_to_sender", "target": null},
+    "rationale": [{"text": "No open deposit intent expects this amount, so the money should go back to the sender.", "evidence_ids": ["{{BREAK_EVIDENCE}}"]}],
+    "confidence": 0.6
+  }
+}
