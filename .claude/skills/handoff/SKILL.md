@@ -23,7 +23,9 @@ When unsure, use the full handoff.
 1. In the chat, 3 lines: `Done: … / Pending: … / Next: <next story group or task>`.
 2. Change no files beyond the work itself. Touch `HANDOFF.md` only if the next step changed: one line in
    the "Now" row of "Where we are" (add the row if missing), found with `grep -n "| Now" HANDOFF.md`.
-3. Commit and push the branch. No PR update text, no status edit. Then the "Next session" block below.
+3. If the work changed `slices.yaml`, `backlog/stories.yaml`, `specs/001-detent-mvp/decisions.md` or
+   `founder/status.md`, run `make roadmap` and commit `founder/roadmap.md` (CI checks it is current).
+4. Commit and push the branch. No PR update text, no status edit. Then the "Next session" block below.
 
 ## Full handoff
 
@@ -42,6 +44,8 @@ When unsure, use the full handoff.
    - `founder/status.md`: priorities, risks, founder items, "Last updated".
    - Decisions approved in this session: `record-decision` skill (`D-` specs register, `B-` business).
    - Slice done: `status: done` in `specs/001-detent-mvp/slices.yaml`, then `make backlog spec`.
+   - Always run `make roadmap-page` and commit `founder/roadmap.md`; then publish `build/roadmap.html` to the
+     roadmap Artifact URL in `HANDOFF.md` (pass it as `url`, never create a new one).
 3. Slice done: propose the next slice's story groups (3 to 6 related stories that share files) under
    "Next slice" in `HANDOFF.md`, one line each: `Group 1: STORY-IDs (why grouped) · Model: <strongest | mid-tier>`.
    Use the "Model choice" table in `CLAUDE.md`.

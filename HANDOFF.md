@@ -56,8 +56,10 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
   founder (AskUserQuestion), then record the answer as a new `D-` row and mark the item Confirmed.
 - Test first. Never weaken a test; tightening an old placeholder test is fine and is said in the commit.
 - Finish: tick `done:` in `backlog/stories.yaml`, add evidence to `specs/001-detent-mvp/test-map.yaml`,
-  mark the slice `status: done` in `slices.yaml`, run `make backlog spec`, update specs, commit with the
+  mark the slice `status: done` in `slices.yaml`, run `make backlog spec roadmap-page`, update specs, commit with the
   story IDs, push the slice branch, check CI, then update this file.
+- Refresh the founder's phone roadmap: publish `build/roadmap.html` (from `make roadmap-page`) to the existing
+  Artifact https://claude.ai/artifact/THq22MAqSJrDauRH39oWAe (pass it as `url`; never create a new one).
 - Report to the founder: what was built, test evidence, screenshots of new screens, gaps, open items.
 
 ## What S8 built

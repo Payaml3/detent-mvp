@@ -60,6 +60,7 @@ Edit only the changed lines of `founder/status.md` (found with `grep -n`): "Last
 risks, founder items, "This week's focus" (always **Proposed**). Then:
 
 ```
+make roadmap-page          # founder/roadmap.md picks up the status changes
 make governance
 git commit -am "Weekly review <yyyy-mm-dd>"
 git push -u origin review/<yyyy-mm-dd>
@@ -67,3 +68,6 @@ gh api repos/Payaml3/detent-mvp/pulls -f title="Weekly review <yyyy-mm-dd>" -f h
 ```
 
 **Never merge it.** The founder reviews and merges.
+
+Publish `build/roadmap.html` to the roadmap Artifact URL in `HANDOFF.md` (pass it as `url`; never create a new one),
+so the founder's phone view shows this week's state.
