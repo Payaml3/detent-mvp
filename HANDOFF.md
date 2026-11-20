@@ -84,7 +84,7 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
 
 ## What S9 built (code; the slice exit needs the live run)
 
-- **Demo generations (CON-09 reset, G-26 Proposed):** `detent/demo/generations.py`, migration 0009
+- **Demo generations (CON-09 reset, G-26 Confirmed: D-36):** `detent/demo/generations.py`, migration 0009
   (`demo_generations`, append-only). Reset seeds a fresh fictional organisation (`org_demo_g2`, ...); the console,
   the demo clock and the agent's key follow the newest one; the old one keeps everything and has its kill switch
   engaged. Refused while an attempt is in flight; payments lead only. Later generations suffix user IDs
