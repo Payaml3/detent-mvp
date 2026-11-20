@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec roadmap roadmap-page site site-dev site-test denylist governance secrets check
+.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec roadmap roadmap-page site site-dev site-test denylist governance agents secrets check
 
 setup:            ## install dependencies and pre-commit hooks
 	$(UV) sync --all-packages
@@ -67,6 +67,9 @@ site-test:        ## site logic tests, build, then honesty/structure/SEO checks 
 
 spec:             ## regenerate specs/001-detent-mvp inventory, traceability and tasks; check coverage
 	$(UV) run python tools/build_spec.py
+
+agents:           ## rebuild .claude/agents (Claude Code roles) from .codex/agents
+	$(UV) run python tools/sync_claude_agents.py
 
 roadmap:          ## regenerate founder/roadmap.md (and roadmap.json) from slices, stories, decisions and founder/status.md
 	$(UV) run python tools/build_roadmap_page.py
