@@ -1,13 +1,15 @@
 """Build the backlog documents from backlog/stories.yaml and backlog/model-items.yaml.
 
 Usage: python tools/build_backlog.py
-Writes: backlog/user-stories.md, backlog/epics.md, backlog/traceability.md, backlog/backlog.csv
+Writes: backlog/user-stories.md, backlog/epics.md, backlog/traceability.md, backlog/backlog.csv,
+        founder/slices.json (the JSON copy the solo-to-scale views read; never hand-edited)
 Fails (exit 1) if: a story traces to an unknown code, an mvp/partly item has no story,
 a dependency is unknown, a dependency sits in a later milestone, or there is a dependency cycle.
 """
 from __future__ import annotations
 
 import csv
+import json
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -149,6 +151,16 @@ def main() -> int:
                         f"As a {s['as']}, I want {s['want']}, so that {s['so']}.",
                         "\n".join(f"- {a}" for a in s["ac"]), s["pri"], s["est"],
                         f"{s['ms']} {MS_NAMES[s['ms']]}", ", ".join(s["deps"]), ", ".join(s["trace"])])
+
+    # ---------- founder/slices.json (solo-to-scale views; schema in tools/_s2s.py) ----------
+    slices_json = {
+        "epics": {k: {"name": e["name"], "goal": e["goal"]} for k, e in epics.items()},
+        "slices": [{k: sl.get(k, "") for k in ("id", "name", "status", "goal", "exit")} for sl in _SLICES],
+        "stories": [{"id": s["id"], "epic": s["epic"], "slice": s["ms"], "criteria": len(s["ac"]),
+                     "done": len(s.get("done", []))} for s in stories],
+    }
+    (ROOT / "founder" / "slices.json").write_text(
+        json.dumps(slices_json, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
 
     print(f"OK: {len(stories)} stories, {sum(s['est'] for s in stories):g} days; "
           f"Must {len(must)} stories, {sum(s['est'] for s in must):g} days")

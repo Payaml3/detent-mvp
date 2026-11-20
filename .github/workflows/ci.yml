@@ -64,7 +64,7 @@ jobs:
       - name: Backlog documents are up to date
         run: |
           uv run python tools/build_backlog.py
-          git diff --exit-code -- backlog/
+          git diff --exit-code -- backlog/ founder/slices.json
 
   eval:
     # EVL-07 release gate: the attack and fault suites (and the agent, reconciliation and latency suites) on
