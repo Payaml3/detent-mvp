@@ -36,6 +36,8 @@ def test_fixture_counterparties_are_seeded(engine: Engine, clock: FrozenClock) -
         "cpt_quill": "verified",
         "cpt_nova": "pending",
         "cpt_flagged": "verified",
+        "cpt_lumen": "verified",  # S9 demo batch (DEM-03)
+        "cpt_kestrel": "verified",
     }
     assert clock.now() - q.first_seen_at == timedelta(
         days=200

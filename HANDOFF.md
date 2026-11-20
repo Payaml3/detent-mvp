@@ -3,7 +3,7 @@
 One repository, one session per slice. A new session reads `CLAUDE.md`, then this file, and then only
 the specs and code the slice needs. At the end of the slice, update this file and push it with the slice.
 
-Last updated: 2026-11-19, after slice S8.
+Last updated: 2026-11-20, S9 code built (branch `claude/project-thread-rbgh7v`); the live deploy and testnet run wait on the founder.
 
 ## Where we are
 
@@ -11,12 +11,12 @@ Last updated: 2026-11-19, after slice S8.
 |---|---|---|
 | S0 to S7 (prototype engine: decide, send once, review, never twice, agent + mandates, operations, ledger, deposits, reconciliation, replay) | done | `main` |
 | S8 Proof and release gate | done | `main` |
-| **S9 Demo-ready prototype in the EU** | **next** | branch from `main` |
+| **S9 Demo-ready prototype in the EU** | **code built; deploy and live testnet run pending** | `claude/project-thread-rbgh7v` (one PR into `main`) |
 | P1 Sandbox API and webhooks, P2 Dashboard, P3 Docs and SDKs, P4 Website launch | todo | |
 | L After launch (Should and Could) | todo | |
 
 `main` holds S0 to S8. Each new slice branches from `main` and comes back as one pull request into `main`.
-Progress: `make spec` reports criteria done with evidence (210/308 after S8).
+Progress: `make spec` reports criteria done with evidence (219/308 after the S9 build).
 
 ## Start a session
 
@@ -82,13 +82,49 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
   `eval/tools/make_interpretation_set.py`) and their hand-written stand-ins; 50 synthetic agreement cases
   (`eval/data/agreement-set.yaml`).
 
-## Next slice: S9 Demo-ready prototype in the EU
+## What S9 built (code; the slice exit needs the live run)
 
-Read `specs/001-detent-mvp/slices.yaml` (S9) and its stories. `make eval` must keep passing.
+- **Demo generations (CON-09 reset, G-26 Proposed):** `detent/demo/generations.py`, migration 0009
+  (`demo_generations`, append-only). Reset seeds a fresh fictional organisation (`org_demo_g2`, ...); the console,
+  the demo clock and the agent's key follow the newest one; the old one keeps everything and has its kill switch
+  engaged. Refused while an attempt is in flight; payments lead only. Later generations suffix user IDs
+  (`usr_pl_demo_g2`); each gets its own agent key, derived from `AGENT_API_KEY`.
+- **Scenario runner (CON-09):** `detent/demo/scenarios.py`, the console **Demo** screen and `detent demo run <id>`:
+  `invoice_18500`, `forced_timeout`, `batch_20`, `close_day`, `attack_sample`, `reset`. Once per generation
+  (recorded as `demo.scenario_run`). The runner never sends a payout or approves; it plays the payers and arms
+  faults (fault proxy: new `body_contains` filter and `GET /__faults`; `FAULTPROXY_DEMO_MODE=1`).
+- **Batch (DEM-03, D-32):** p07 to p20 now pay two new fictional counterparties, `cpt_lumen` (both chains) and
+  `cpt_kestrel` (Faster Payments). Deposits need `DEMO_PAYER_PRIVATE_KEY_BASE/ETH`.
+- **`detent demo check` (DEM-04):** `detent/demo/wallets.py`; needs come from the fixtures.
+- **FND-07:** `/healthz` reports database, `base-sepolia`, `eth-sepolia` (both must be ok in demo mode) and the
+  regions; the footer states `HOSTING_REGION` and `DATABASE_REGION`; `render.yaml` (Frankfurt) plus Neon EU.
+- **spec/11 rewritten** to the built screens (DEM-05); spec/07 and spec/10 have "As built (S9)" notes.
+- **Two product gaps found and fixed:** seeded EVM rails had no `from_address`, so the watcher never recorded the
+  demo's own payouts and every chain payout would have been a reconciliation break (`seed_rails` now sets it);
+  the bank statement day now comes from the bank simulator's own business date (`/healthz` `business_date`).
+- **Evidence:** `chain/test_demo_scenarios.py` is a full local rehearsal (two anvil chains standing in for the
+  Sepolias, banksim, fault proxy, the real worker): $18,500 escalates, is approved, times out to UNKNOWN and is
+  confirmed with one transaction; the batch gives 17 CONFIRMED, 2 ESCALATED, 1 BLOCKED (no attempt), p08 fails
+  over Base to Ethereum under one ID, close the day gives 24 of 25 matched with one break (dep-07), and a rerun
+  changes nothing. `integration/test_demo_generations.py`, `unit/test_demo_wallets.py`.
+
+## Next: finish S9 (live), then P1
+
+- **S9 live run** (needs the founder items below): deploy `render.yaml`, set the secrets, `detent demo check`,
+  then run spec/11 on Base Sepolia and Ethereum Sepolia and fix any mismatch in spec/11; then mark S9 done
+  (FND-07 criterion 0 and the slice exit). · Model: mid-tier
+- Group 1 of P1, after S9: see `specs/001-detent-mvp/slices.yaml` (P1). · Model: strongest (API and webhooks touch money paths)
 
 ## Open founder items
 
-- `INDEPENDENCE_DENYLIST` CI secret (the OPS-02 check fails closed until it is set).
+- **S9 live run:** a Render account (Frankfurt) and a Neon project in an EU region; the plans (Render's free plan
+  covers the web service only; the worker and the two private services need a paid instance type: Proposed);
+  the secrets in `render.yaml`; funded test wallets (four: sender and payer on each chain).
+- **G-27 Confirmed (D-33):** the live demo pays in its own labelled test token (tUSDC). Before the live run, per
+  network: `detent demo token deploy --network <n>`, set `USDC_ADDRESS_*` to the printed address, then
+  `detent demo token fund --network <n>`; gas comes from a faucet.
+- C-10 Confirmed (D-35): the match line counts money-moving items only (24 of 25; 26 of 27 with both escalations
+  approved, now tested). C-13 Confirmed (D-34): prototype first; decide on the portal (P1 to P4) after the first demos.
 - `ANTHROPIC_API_KEY` (also as a GitHub secret for the nightly eval): every agent answer is a labelled
   hand-written stand-in until real runs are recorded (AGT-01 10/10, EVL-04). The interpretation and
   agreement figures measure Detent's checks, not a model, until then.
@@ -96,8 +132,8 @@ Read `specs/001-detent-mvp/slices.yaml` (S9) and its stories. `make eval` must k
   `apps/site/src/data/results.json` from a passing full run (EVL-06 criterion 1 stays open until then).
 - Nightly eval against public testnets needs funded test wallets and RPC endpoints as secrets (EVL-07 criterion 0).
 - A funded test wallet for Base Sepolia and Ethereum Sepolia (RAL-02, RAL-03, S9).
-- User payouts are deferred (founder, before S1): demo batch p07 to p20 can't run, so LED-06 AC4 stays open.
-- C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open.
+- User payouts are deferred (founder, before S1); the demo batch now pays counterparties instead (D-32).
+- C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open.
 - Booking URL, inbox, final name and domain (`BRAND_NAME`), legal review of the site.
 - Delete the stale remote branch `s3-unknown-resolved` (the proxy refused).
 - Delete the merged branches (all are in `main`): `m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`.
@@ -112,6 +148,9 @@ Read `specs/001-detent-mvp/slices.yaml` (S9) and its stories. `make eval` must k
 - Return-to-sender books a refund as due; sending the refund payout is not automated.
 - A bank deposit is "pending" in reconciliation until that day's statement is imported.
 - Flaky under load: `test_banksim.py::test_contract` (passes on rerun).
+- The Evaluation console screen is still "not built"; spec/11 shows the release-gate report file instead.
+- The seeded `local-evm` rail also appears in the deployed demo's Rails screen (no adapter there, so unused).
+- dep-08's "duplicate notification" on a chain is a re-scan of the same block by the demo runner.
 
 ## Business context
 

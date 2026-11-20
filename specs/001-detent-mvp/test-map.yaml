@@ -340,3 +340,18 @@ EVL-07:
       "ci:a deliberately injected regression failed the 'release gate (detent eval)' job (see HANDOFF.md, S8)"]
 EVL-08:
   0: ["ci:detent eval run --suite latency (rules-only and agent-path p50/p95 in results.json and the report)"]
+FND-07:
+  1: ["integration/test_demo_generations.py::test_healthz_reports_database_and_both_chain_rpcs", "integration/test_demo_generations.py::test_healthz_in_demo_mode_needs_both_chains"]
+  2: ["integration/test_demo_generations.py::test_console_reset_switches_to_the_new_generation"]
+CON-09:
+  0: ["chain/test_demo_scenarios.py::test_canonical_invoice_then_forced_timeout_pays_once", "chain/test_demo_scenarios.py::test_batch_moves_money_on_three_rails_with_one_break", "chain/test_demo_scenarios.py::test_attack_sample_is_refused", "integration/test_demo_generations.py::test_reset_starts_a_new_generation_and_deletes_nothing"]
+  1: ["integration/test_demo_generations.py::test_console_runs_a_scenario_once_per_generation", "chain/test_demo_scenarios.py::test_batch_moves_money_on_three_rails_with_one_break"]
+DEM-01:
+  0: ["integration/test_demo_generations.py::test_seed_is_fictional_and_idempotent"]
+  1: ["integration/test_demo_generations.py::test_seed_is_fictional_and_idempotent", "integration/test_demo_generations.py::test_reset_starts_a_new_generation_and_deletes_nothing"]
+DEM-03:
+  0: ["chain/test_demo_scenarios.py::test_batch_moves_money_on_three_rails_with_one_break", "chain/test_demo_scenarios.py::test_match_line_counts_approved_escalations"]
+DEM-04:
+  0: ["unit/test_demo_wallets.py::test_low_balances_ask_for_a_top_up_with_faucets", "unit/test_demo_wallets.py::test_unconfigured_wallets_say_what_to_set", "chain/test_demo_token.py::test_deploys_on_the_sepolia_and_funds_both_wallets"]
+DEM-05:
+  0: ["unit/test_demo_wallets.py::test_demo_script_matches_the_runner_and_ends_with_the_ask"]

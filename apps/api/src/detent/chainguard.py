@@ -67,3 +67,25 @@ def check_rpc_endpoints(settings: Settings, timeout: float = 3.0) -> list[RpcChe
             )
         out.append(RpcCheck(rail_id, True, True, actual))
     return out
+
+
+DEMO_CHAINS = {"base-sepolia": 84532, "eth-sepolia": 11155111}
+
+
+def rpc_health(settings: Settings, timeout: float = 2.0) -> dict[str, str]:
+    """FND-07 ``/healthz``: each demo chain's RPC as ``ok``, ``not_configured``, ``unreachable`` or
+    ``wrong_chain`` (the endpoint reports a chain ID other than the rail's test network)."""
+    urls = _rpc_urls(settings)
+    out: dict[str, str] = {}
+    for rail_id, chain_id in DEMO_CHAINS.items():
+        url = urls.get(rail_id)
+        if not url:
+            out[rail_id] = "not_configured"
+            continue
+        try:
+            actual = rpc_chain_id(url, timeout)
+        except (httpx.HTTPError, KeyError, ValueError):
+            out[rail_id] = "unreachable"
+            continue
+        out[rail_id] = "ok" if actual == chain_id else "wrong_chain"
+    return out

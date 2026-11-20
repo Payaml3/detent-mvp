@@ -8,6 +8,10 @@ detent audit verify      verify an organisation's hash-chained audit log (AUD-01
 detent keys create       issue an sk_test_ API key to a named user (G-08)
 detent agent record      run the instruction agent on an invoice with the Claude API and save the response
                          as a recording (replaces the hand-written stand-ins; EVL-04)
+detent demo check        test-wallet balances per wallet and chain, and what to top up (DEM-04)
+detent demo run <id>     run one demo scenario in the current generation (CON-09); --list shows them
+detent demo reset        start a new demo data generation; nothing is deleted (CON-09)
+detent demo token deploy|fund --network <n>   the demo's own labelled test token (D-33)
 detent eval run ...      evaluation suites and the release gate (eval/, S8)
 """
 
@@ -187,6 +191,66 @@ def cmd_eval(argv: list[str]) -> int:
     return rc
 
 
+def cmd_demo_check(_: argparse.Namespace) -> int:
+    from detent.demo.wallets import check_wallets, render
+
+    lines = check_wallets(_load_settings())
+    print(render(lines))
+    return 0 if all(w.ok for w in lines) else 1
+
+
+def cmd_demo_token(args: argparse.Namespace) -> int:
+    from detent.demo.token import ENV_NAME, TokenError, deploy_token, fund
+
+    settings = _load_settings()
+    try:
+        if args.step == "deploy":
+            address = deploy_token(settings, args.network)
+            print(
+                f"deployed the demo token (tUSDC, a test stand-in, not USDC) on {args.network} at {address}"
+            )
+            print(
+                f"set {ENV_NAME[args.network]}={address}, "
+                f"then run: detent demo token fund --network {args.network}"
+            )
+            return 0
+        minted = fund(settings, args.network, runs=args.runs)
+    except TokenError as exc:
+        print(f"detent demo token: {exc}", file=sys.stderr)
+        return 1
+    if not minted:
+        print(f"{args.network}: both wallets already hold enough for {args.runs} run(s)")
+    for m in minted:
+        print(
+            f"{args.network}: minted {m.cents // 100:,}.{m.cents % 100:02d} tUSDC "
+            f"to the {m.role} ({m.address})"
+        )
+    return 0
+
+
+def cmd_demo_run(args: argparse.Namespace) -> int:
+    from detent.audit.log import Actor
+    from detent.demo.generations import active_demo_org, demo_user_id
+    from detent.demo.scenarios import SCENARIOS, ScenarioError, run_scenario
+    from detent.runtime import build_runtime
+
+    if args.list or not args.scenario:
+        for sc in SCENARIOS.values():
+            print(f"{sc.id:<15} minute {sc.minute:<8} {sc.title}: {sc.what}")
+        return 0
+    settings = _load_settings()
+    rt = build_runtime(settings)
+    org = active_demo_org(rt.engine, settings)
+    actor = Actor(demo_user_id("usr_pl", org), "payments_lead")  # the CLI acts as the payments lead
+    try:
+        result = run_scenario(rt, org, args.scenario, actor)
+    except ScenarioError as exc:
+        print(f"detent demo: {exc}", file=sys.stderr)
+        return 1
+    print(("(already ran in this generation)\n" if result.repeated else "") + "\n".join(result.lines))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="detent", description="Detent agentic payment controls (prototype)")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -212,6 +276,22 @@ def main(argv: list[str] | None = None) -> int:
     ag.add_argument("--org", default=None)
     ag.add_argument("--mandate", default="mnd_demo_ap_agent")
     ag.set_defaults(fn=cmd_agent_record)
+    dm = sub.add_parser("demo").add_subparsers(dest="demo_cmd", required=True)
+    dm.add_parser("check").set_defaults(fn=cmd_demo_check)
+    dr = dm.add_parser("run")
+    dr.add_argument("scenario", nargs="?")
+    dr.add_argument("--list", action="store_true")
+    dr.set_defaults(fn=cmd_demo_run)
+    tk = dm.add_parser("token").add_subparsers(dest="step", required=True)
+    for name in ("deploy", "fund"):
+        tp = tk.add_parser(name)
+        tp.add_argument("--network", required=True, choices=["base-sepolia", "eth-sepolia"])
+        if name == "fund":
+            tp.add_argument("--runs", type=int, default=3)
+        tp.set_defaults(fn=cmd_demo_token)
+    dm.add_parser("reset").set_defaults(
+        fn=lambda a: cmd_demo_run(argparse.Namespace(list=False, scenario="reset"))
+    )
     sub.add_parser("eval", help="evaluation suites: detent eval run --suite all (see eval/)", add_help=False)
     argv = sys.argv[1:] if argv is None else argv
     if argv and argv[0] == "eval":

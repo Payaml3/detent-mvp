@@ -89,8 +89,8 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 **Acceptance criteria**
 
 - [ ] Web service and worker deploy from main; database is Neon in an EU region
-- [ ] `/healthz` checks the database and both chain RPCs and reports each
-- [ ] spec/10-security-and-deploy.md records the regions; the console footer states them
+- [x] `/healthz` checks the database and both chain RPCs and reports each
+- [x] spec/10-security-and-deploy.md records the regions; the console footer states them
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** FND-06 · **Traces to:** B5.hosting, B4.infra, A5.data
 
@@ -1002,8 +1002,8 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Scenarios: the $18,500 invoice; forced timeout to UNKNOWN then CONFIRMED with no resend; 20-payment batch with deposits and one designed break; an attack sample; reset demo data
-- [ ] Each scenario is scripted, idempotent and uses the controllable clock
+- [x] Scenarios: the $18,500 invoice; forced timeout to UNKNOWN then CONFIRMED with no resend; 20-payment batch with deposits and one designed break; an attack sample; reset demo data
+- [x] Each scenario is scripted, idempotent and uses the controllable clock
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** CON-05, LED-06, EVL-01 · **Traces to:** MVP.flow, MVP.scenarios
 
@@ -1116,8 +1116,8 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [ ] Names are invented and labelled fictional; no real client, partner or former-employer names
-- [ ] Seed is idempotent and resettable
+- [x] Names are invented and labelled fictional; no real client, partner or former-employer names
+- [x] Seed is idempotent and resettable
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** INT-04, POL-01, MND-01 · **Traces to:** B1.independence, B6.former_employer, MVP.flow
 
@@ -1137,7 +1137,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [ ] Covers all three rails, at least one escalation, one block and exactly one reconciliation break
+- [x] Covers all three rails, at least one escalation, one block and exactly one reconciliation break
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** LED-06 · **Traces to:** MVP.flow, L7
 
@@ -1147,7 +1147,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [ ] `detent demo check` prints USDC and gas balances per wallet and chain with faucet instructions
+- [x] `detent demo check` prints USDC and gas balances per wallet and chain with faucet instructions
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** RAL-03 · **Traces to:** A7.prototype
 
@@ -1157,7 +1157,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [ ] spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask
+- [x] spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** CON-09 · **Traces to:** MVP.flow, B3.lead_shadow
 

@@ -24,6 +24,10 @@ ETH_SEPOLIA_RPC_URL=...
 ALLOWED_CHAIN_IDS=84532,11155111,31337
 TEST_WALLET_PRIVATE_KEY_BASE=...     # testnet only, never mainnet funds
 TEST_WALLET_PRIVATE_KEY_ETH=...
+DEMO_PAYER_PRIVATE_KEY_BASE=...      # S9: the fictional payer that sends the demo batch's deposits (testnet only)
+DEMO_PAYER_PRIVATE_KEY_ETH=...
+HOSTING_REGION=...                   # FND-07: stated in the console footer and /healthz
+DATABASE_REGION=...
 USDC_ADDRESS_BASE_SEPOLIA=0x036CbD53842c5426634e7929541eC2318f3dCF7e
 USDC_ADDRESS_ETH_SEPOLIA=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
 BANKSIM_URL=http://localhost:8100
@@ -32,7 +36,7 @@ EMAIL_PROVIDER=outbox                # outbox | <provider>
 SALES_INBOX=...
 ```
 
-The two testnet USDC contract addresses were checked against Circle's "USDC on Test Networks" page on 17 Nov 2026 (https://developers.circle.com/docs/usdc-on-testnet). Re-check them if a transfer fails. Startup fails if a configured chain ID is not in `ALLOWED_CHAIN_IDS`.
+The two testnet USDC contract addresses were checked against Circle's "USDC on Test Networks" page on 17 Nov 2026 (https://developers.circle.com/docs/usdc-on-testnet). Re-check them if a transfer fails. The live demo instead sets both to its own test token (D-33): `detent demo token deploy --network <n>` deploys `chain/src/MockUSDC.sol` ("Detent Demo USD (test stand-in, not USDC)", symbol `tUSDC`) from the sending wallet and prints the address to set. The contract reverts on any chain but 31337, 84532 and 11155111, and only its deployer can mint. Startup fails if a configured chain ID is not in `ALLOWED_CHAIN_IDS`.
 
 ## Security controls in the MVP
 
@@ -61,9 +65,28 @@ The two testnet USDC contract addresses were checked against Circle's "USDC on T
 
 Recheck free-tier limits and prices when you deploy; they change.
 
+### As built (S9, FND-07)
+
+- **Blueprint:** `render.yaml` at the repository root. Four services, all in Render's **Frankfurt (EU Central)**
+  region: the web service (API and console, `/healthz` as its health check), the worker, and two private
+  services, the bank simulator and the fault proxy. The fault proxy runs with `FAULTPROXY_DEMO_MODE=1`, so only
+  the scenario runner can arm a fault, and it is private, so it is not reachable from the internet.
+- **Database:** Neon Postgres in an EU region (AWS Europe (Frankfurt) `eu-central-1` is the intended one), set
+  as `DATABASE_URL`. Migrations and the idempotent seed run in the web service's build.
+- **Regions are stated, not assumed:** `HOSTING_REGION` and `DATABASE_REGION` appear in the console footer
+  and in `/healthz` (`regions`). Defaults say "local machine (not deployed)".
+- **`/healthz`** reports `database` and each demo chain RPC (`base-sepolia`, `eth-sepolia`) as `ok`,
+  `not_configured`, `unreachable` or `wrong_chain` (the endpoint reports another chain ID). In `APP_ENV=demo`
+  both chains must be `ok`; elsewhere an unconfigured chain does not fail the check.
+- **Proposed (founder):** the plans. Render's free plan covers the web service only; the worker and the two
+  private services need a paid instance type. Not deployed yet: deploying needs the founder's Render and Neon
+  accounts, the secrets, and funded test wallets (`detent demo check`).
+
 ## Runbooks (write as the features land)
 
-- **Fund test wallets:** `detent demo check`, then Circle's faucet (20 test USDC per address per chain every 2 hours, as of Nov 2026; check), plus a gas faucet for each chain.
+- **Fund test wallets:** `detent demo check` (DEM-04) prints each demo wallet's test USDC and gas against what one
+  full demo run needs (from the fixtures), and what to top up. `detent demo token fund --network <n> [--runs 3]`
+  mints the demo token (D-33) to the sending wallet and the payer up to that many runs; gas still comes from a faucet for each chain.
 - **Kill switch:** engage from the Overview or `POST /v1/kill_switch`; release by the payments lead only.
 - **Sev 1:** triggered by the invariant monitor. Kill switch on, incident opened, notification within 1 hour (outbox), replay the affected payments, root cause within 5 days.
 - **Restore (OPS-03):** use the provider's point-in-time restore to a new branch, run `detent audit verify` and switch the URL. Target under 1 hour.

@@ -54,6 +54,27 @@ counterparties:
     history: {payment_count: 0}
     destinations:
       - {id: dst_flagged, kind: evm_wallet, network: base-sepolia, address: "0x000000000000000000000000000000000000dEaD", first_seen_days_ago: 90, last_changed_days_ago: 90}
+  # S9 demo batch (DEM-03): established payees that the rules let through, so the batch moves money on
+  # every rail. Both are invented (founder choice 2026-11-20: counterparty payouts in place of user payouts).
+  - id: cpt_lumen
+    contact_email: "payables@lumen.example.invalid"   # fictional; outbox only (G-02)
+    name: "Lumen Data Services BV (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: NL
+    history: {payment_count: 30, median_amount: {amount: "90.00", currency: USDC}}
+    destinations:
+      - {id: dst_lumen_base, kind: evm_wallet, network: base-sepolia, address: "{{WALLET_LUMEN_BASE}}", first_seen_days_ago: 180, last_changed_days_ago: 180}
+      - {id: dst_lumen_eth, kind: evm_wallet, network: eth-sepolia, address: "{{WALLET_LUMEN_ETH}}", first_seen_days_ago: 180, last_changed_days_ago: 180}
+  - id: cpt_kestrel
+    contact_email: "payables@kestrel.example.invalid"   # fictional; outbox only (G-02)
+    name: "Kestrel Print Ltd (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: GB
+    history: {payment_count: 40, median_amount: {amount: "300.00", currency: GBP}}
+    destinations:
+      - {id: dst_kestrel_acct, kind: bank_account, network: banksim-fps, sort_code_masked: "**-**-07", first_seen_days_ago: 400, last_changed_days_ago: 400}
 user_accounts:   # platform end-user balances for deposits and user payouts
   - {account_ref: "acct_u1001", name: "User 1001 (fictional)", currency: USDC}
   - {account_ref: "acct_u1002", name: "User 1002 (fictional)", currency: USDC}

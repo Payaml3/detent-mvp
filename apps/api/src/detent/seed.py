@@ -54,17 +54,22 @@ def ensure_org(conn: Connection, rt: Runtime, org_id: str, name: str, **kw: Any)
     return created is not None
 
 
-def seed_demo(rt: Runtime, fixture: Path = FIXTURE) -> dict[str, int]:
+def seed_demo(rt: Runtime, fixture: Path = FIXTURE, *, org_id: str | None = None) -> dict[str, int]:
+    """Seed the fictional demo platform. ``org_id`` seeds another organisation from the same fixtures (a
+    later demo generation, CON-09 reset); its user IDs carry the organisation's suffix (DEM-01)."""
+    from detent.demo.generations import demo_user_id
+
     data = yaml.safe_load(fixture.read_text())
     plat = data["platform"]
-    org_id = plat["org_id"]
+    org_id = org_id or plat["org_id"]
     users_added = 0
     with transaction(rt.engine) as conn:
         orgs_added = int(
             ensure_org(conn, rt, org_id, plat["name"], mode=plat["mode"], fail_safe=plat["fail_safe"])
         )
         orgs_added += int(ensure_org(conn, rt, OPERATOR_ORG, "Detent operator (internal)", kind="demo"))
-        for u in data["users"]:
+        for fixture_user in data["users"]:
+            u = {**fixture_user, "id": demo_user_id(fixture_user["id"], org_id)}
             added = conn.execute(
                 text(
                     "INSERT INTO users (id, org_id, email, display_name, role, created_at) "
@@ -114,6 +119,7 @@ def _seed_agent(conn: Connection, rt: Runtime, org_id: str) -> None:
     """The demo accounts-payable agent: its signed mandate and its own key (S5). Needs the mandate signing
     key and, for the key, the API pepper and AGENT_API_KEY; without them the agent is simply not set up."""
     from detent.api.auth import issue_key
+    from detent.demo.generations import agent_key_for, demo_user_id
     from detent.mandates.store import fixture_mandate, issue_mandate
 
     s = rt.settings
@@ -131,10 +137,11 @@ def _seed_agent(conn: Connection, rt: Runtime, org_id: str) -> None:
             s.mandate_signing_key_demo,
             actor=Actor.system("seed"),
         )
-    if s.agent_api_key is not None and s.api_key_pepper is not None:
+    agent_key = agent_key_for(s, org_id)
+    if agent_key is not None and s.api_key_pepper is not None:
         from detent.api.auth import hash_key
 
-        h = hash_key(s.agent_api_key.get_secret_value(), s.api_key_pepper.get_secret_value())
+        h = hash_key(agent_key.get_secret_value(), s.api_key_pepper.get_secret_value())
         known = conn.execute(
             text("SELECT 1 FROM api_keys WHERE org_id=:o AND hash=:h"), {"o": org_id, "h": h}
         ).first()
@@ -143,9 +150,9 @@ def _seed_agent(conn: Connection, rt: Runtime, org_id: str) -> None:
                 conn,
                 rt.clock,
                 org_id,
-                "usr_pl",
+                demo_user_id("usr_pl", org_id),
                 ["intents:create"],
                 s.api_key_pepper.get_secret_value(),
                 mandate_id="mnd_demo_ap_agent",
-                key=s.agent_api_key.get_secret_value(),
+                key=agent_key.get_secret_value(),
             )

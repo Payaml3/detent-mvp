@@ -69,6 +69,10 @@ class Settings(BaseSettings):
     test_wallet_private_key_base: SecretStr | None = None
     test_wallet_private_key_eth: SecretStr | None = None
     test_wallet_private_key_local: SecretStr | None = None  # local anvil only (S2)
+    # S9 demo: the fictional payer wallets that send the batch's deposits (test networks only; DEM-03).
+    demo_payer_private_key_base: SecretStr | None = None
+    demo_payer_private_key_eth: SecretStr | None = None
+    demo_payer_private_key_local: SecretStr | None = None
     usdc_address_base_sepolia: str = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
     usdc_address_eth_sepolia: str = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
 
@@ -77,6 +81,10 @@ class Settings(BaseSettings):
     faultproxy_url: str = "http://localhost:8200"
     email_provider: str = "outbox"
     sales_inbox: str | None = None
+
+    # FND-07: where this instance and its database run, as stated in the console footer and /healthz.
+    hosting_region: str = "local machine (not deployed)"
+    database_region: str = "local machine (not deployed)"
 
     log_level: str = "INFO"
     log_json: bool = True

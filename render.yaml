@@ -1,0 +1,71 @@
+# FND-07: the demo instance in the EU (Render Blueprint). Region: Frankfurt (EU Central). Database: Neon
+# Postgres in an EU region (create it in the Neon console, e.g. AWS Europe (Frankfurt) eu-central-1, and set
+# DATABASE_URL here; Render's own Postgres is not used). Test networks and test keys only (invariant 14).
+#
+# Proposed (founder to confirm, not deployed yet): service plans. Render's free plan covers web services
+# only; the worker and the two private helpers need a paid instance type. Recheck prices before deploying.
+# Every secret is `sync: false`: set it in the Render dashboard, never in this file.
+services:
+  - type: web
+    name: detent-demo
+    runtime: python
+    region: frankfurt
+    plan: free                      # sleeps after ~15 idle minutes: open it 2 minutes before a demo
+    branch: main
+    buildCommand: pip install uv && uv sync --frozen --all-packages && uv run alembic -c apps/api/alembic.ini upgrade head && uv run detent seed
+    startCommand: uv run detent api --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars: &demo_env
+      - {key: APP_ENV, value: demo}
+      - {key: PYTHON_VERSION, value: "3.12.7"}
+      - {key: HOSTING_REGION, value: "Render Frankfurt (EU Central)"}
+      - {key: DATABASE_REGION, value: "Neon, AWS Europe (Frankfurt) eu-central-1"}
+      - {key: AGENT_LLM, value: auto}            # recorded stand-ins until ANTHROPIC_API_KEY is set
+      - {key: BANKSIM_URL, value: "http://detent-banksim:10000"}
+      - {key: FAULTPROXY_URL, value: "http://detent-faultproxy:10000"}
+      - {key: BASE_SEPOLIA_RPC_URL, value: "http://detent-faultproxy:10000"}   # faults only via the runner
+      - {key: DATABASE_URL, sync: false}
+      - {key: DEMO_PASSWORD, sync: false}
+      - {key: SESSION_SECRET, sync: false}
+      - {key: API_KEY_PEPPER, sync: false}
+      - {key: CREDENTIALS_ENCRYPTION_KEY, sync: false}
+      - {key: MANDATE_SIGNING_KEY_DEMO, sync: false}
+      - {key: AGENT_API_KEY, sync: false}
+      - {key: ANTHROPIC_API_KEY, sync: false}
+      - {key: ETH_SEPOLIA_RPC_URL, sync: false}
+      - {key: TEST_WALLET_PRIVATE_KEY_BASE, sync: false}
+      - {key: TEST_WALLET_PRIVATE_KEY_ETH, sync: false}
+      - {key: DEMO_PAYER_PRIVATE_KEY_BASE, sync: false}
+      - {key: DEMO_PAYER_PRIVATE_KEY_ETH, sync: false}
+  - type: worker
+    name: detent-worker
+    runtime: python
+    region: frankfurt
+    plan: starter                   # Proposed: background workers are not on the free plan
+    branch: main
+    buildCommand: pip install uv && uv sync --frozen --all-packages
+    startCommand: uv run detent worker
+    envVars: *demo_env
+  - type: pserv                     # private: reachable only from the services above
+    name: detent-banksim
+    runtime: python
+    region: frankfurt
+    plan: starter
+    branch: main
+    buildCommand: pip install uv && uv sync --frozen --all-packages
+    startCommand: uv run uvicorn banksim.app:create_app --factory --host 0.0.0.0 --port 10000
+    envVars:
+      - {key: PYTHON_VERSION, value: "3.12.7"}
+      - {key: DATABASE_URL, sync: false}       # the same Neon database; banksim keeps its own schema
+  - type: pserv
+    name: detent-faultproxy
+    runtime: python
+    region: frankfurt
+    plan: starter
+    branch: main
+    buildCommand: pip install uv && uv sync --frozen --all-packages
+    startCommand: uv run uvicorn faultproxy.app:app --host 0.0.0.0 --port 10000
+    envVars:
+      - {key: PYTHON_VERSION, value: "3.12.7"}
+      - {key: FAULTPROXY_DEMO_MODE, value: "1"}
+      - {key: FAULTPROXY_UPSTREAM, sync: false}  # the real Base Sepolia RPC endpoint

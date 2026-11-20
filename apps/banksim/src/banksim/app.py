@@ -171,7 +171,13 @@ def create_app(database_url: str | None = None, config: Config | None = None) ->
 
     @app.get("/healthz")
     def healthz() -> dict[str, Any]:
-        return {"status": "ok", "schemes": list(SCHEMES), "simulated": True}
+        # business_date: the simulated bank's own day, which its statements are cut by (S9 close the day)
+        return {
+            "status": "ok",
+            "schemes": list(SCHEMES),
+            "simulated": True,
+            "business_date": _now().date().isoformat(),
+        }
 
     @app.post("/payments")
     async def create(

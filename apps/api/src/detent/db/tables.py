@@ -114,6 +114,17 @@ demo_clock = Table(
     Column("offset_seconds", BigInteger, nullable=False),
 )
 
+# CON-09: each "reset demo data" starts a new generation (a fresh fictional organisation); append-only.
+demo_generations = Table(
+    "demo_generations",
+    metadata,
+    Column("base_org_id", Text, primary_key=True),
+    Column("generation", Integer, primary_key=True),
+    Column("org_id", Text, nullable=False, unique=True),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("created_by", Text, nullable=False),
+)
+
 # Every table in the detent schema (from the migrations). The org-scope guard watches these.
 ALL_TABLE_NAMES: frozenset[str] = frozenset(
     {
@@ -124,6 +135,6 @@ ALL_TABLE_NAMES: frozenset[str] = frozenset(
         "recon_breaks", "agent_calls", "audit_events", "audit_heads", "outbox", "webhook_endpoints",
         "webhook_events", "webhook_deliveries", "request_logs", "idempotency_records", "jobs",
         "incidents", "invites", "leads", "demo_clock", "wallet_nonces", "mode_changes", "watch_cursors",
-        "rail_records", "bank_statements",
+        "rail_records", "bank_statements", "demo_generations",
     }
 )  # fmt: skip

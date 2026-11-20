@@ -11,7 +11,9 @@ Scenarios (``POST /__faults``)::
     {"match": "POST /payments", "fault": "duplicate_request", "count": 1}
 
 ``match`` is a JSON-RPC method, or ``"<HTTP method> <path prefix>"``. ``count`` -1 means until cleared.
-An optional ``attempt`` limits the scenario to requests carrying that ``X-Detent-Attempt`` header.
+An optional ``attempt`` limits the scenario to requests carrying that ``X-Detent-Attempt`` header, and an
+optional ``body_contains`` to requests whose body contains that text, ignoring case (the demo batch uses it
+to revert only the transfer of 75.42 USDC: ``"body_contains": "047ed160"``, S9).
 Every injected fault is logged with the attempt ID (``GET /__faults/log``).
 
 Faults:
@@ -59,6 +61,7 @@ class Scenario:
     fault: str
     count: int = 1
     attempt: str | None = None
+    body_contains: str | None = None
 
 
 @dataclass
@@ -69,10 +72,16 @@ class State:
     log: list[dict[str, Any]] = field(default_factory=list)
     lock: threading.Lock = field(default_factory=threading.Lock)
 
-    def take(self, keys: list[str], attempt: str | None) -> Scenario | None:
+    def take(self, keys: list[str], attempt: str | None, body: bytes = b"") -> Scenario | None:
+        text = body.decode("utf-8", errors="replace").lower()
         with self.lock:
             for s in self.scenarios:
-                if s.match in keys and (s.attempt is None or s.attempt == attempt) and s.count != 0:
+                if (
+                    s.match in keys
+                    and (s.attempt is None or s.attempt == attempt)
+                    and (s.body_contains is None or s.body_contains.lower() in text)
+                    and s.count != 0
+                ):
                     if s.count > 0:
                         s.count -= 1
                     return s
@@ -116,9 +125,29 @@ def create_app(upstream: str | None = None, *, hold_seconds: float = 5.0, demo_m
             return JSONResponse({"error": f"unknown fault {body.get('fault')!r}"}, status_code=422)
         with state.lock:
             state.scenarios.append(
-                Scenario(body["match"], body["fault"], int(body.get("count", 1)), body.get("attempt"))
+                Scenario(
+                    body["match"],
+                    body["fault"],
+                    int(body.get("count", 1)),
+                    body.get("attempt"),
+                    body.get("body_contains"),
+                )
             )
         return JSONResponse({"ok": True}, status_code=201)
+
+    @app.get("/__faults")
+    def armed() -> list[dict[str, Any]]:
+        with state.lock:
+            return [
+                {
+                    "match": s.match,
+                    "fault": s.fault,
+                    "count": s.count,
+                    "attempt": s.attempt,
+                    "body_contains": s.body_contains,
+                }
+                for s in state.scenarios
+            ]
 
     @app.delete("/__faults")
     def clear() -> dict[str, bool]:
@@ -150,7 +179,7 @@ def create_app(upstream: str | None = None, *, hold_seconds: float = 5.0, demo_m
         body = await request.body()
         attempt = request.headers.get("x-detent-attempt")
         keys = _keys(request.method, "/" + path, body)
-        s = state.take(keys, attempt)
+        s = state.take(keys, attempt, body)
         if s is None:
             return passthrough(await forward(request, body))
         entry = {"fault": s.fault, "match": s.match, "attempt": attempt, "at": time.time()}
@@ -190,4 +219,5 @@ def create_app(upstream: str | None = None, *, hold_seconds: float = 5.0, demo_m
     return app
 
 
-app = create_app()
+# FAULTPROXY_DEMO_MODE=1 (the deployed demo, S9): only the scenario runner may arm faults.
+app = create_app(demo_mode=os.environ.get("FAULTPROXY_DEMO_MODE") == "1")

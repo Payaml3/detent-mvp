@@ -44,15 +44,19 @@ def _bin(name: str) -> str:
     return path
 
 
+SOURCE = CHAIN_DIR / "src" / "MockUSDC.sol"
+
+
 def build_contracts() -> None:
-    if ARTIFACT.exists():
+    if ARTIFACT.exists() and ARTIFACT.stat().st_mtime >= SOURCE.stat().st_mtime:
         return
     subprocess.run([_bin("forge"), "build", "--root", str(CHAIN_DIR)], check=True)  # noqa: S603
 
 
-def start_anvil(port: int = 8545) -> subprocess.Popen[bytes]:
+def start_anvil(port: int = 8545, chain_id: int = LOCAL_CHAIN_ID) -> subprocess.Popen[bytes]:
+    """Start anvil. Tests may pass a test-network chain ID (84532, 11155111) to rehearse a testnet deploy."""
     proc = subprocess.Popen(  # noqa: S603
-        [_bin("anvil"), "--port", str(port), "--chain-id", str(LOCAL_CHAIN_ID), "--silent"],
+        [_bin("anvil"), "--port", str(port), "--chain-id", str(chain_id), "--silent"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
     )

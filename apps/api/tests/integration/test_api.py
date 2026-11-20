@@ -15,7 +15,12 @@ pytestmark = pytest.mark.db
 def test_healthz_reports_database(client: TestClient) -> None:
     r = client.get("/healthz")
     assert r.status_code == 200
-    assert r.json()["checks"] == {"database": "ok"}
+    # FND-07 (S9): the database and both demo chain RPCs are each reported; unconfigured chains don't fail it.
+    assert r.json()["checks"] == {
+        "database": "ok",
+        "base-sepolia": "not_configured",
+        "eth-sepolia": "not_configured",
+    }
 
 
 def test_every_response_has_a_request_id(client: TestClient) -> None:

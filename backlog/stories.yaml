@@ -140,6 +140,7 @@ stories:
   deps: [FND-06]
   trace: [B5.hosting, B4.infra, A5.data]
   ms: S9
+  done: [1, 2]
 - id: FND-08
   epic: FND
   title: Structured logs and request IDs
@@ -1323,6 +1324,7 @@ stories:
   deps: [CON-05, LED-06, EVL-01]
   trace: [MVP.flow, MVP.scenarios]
   ms: S9
+  done: [0, 1]
 - id: CON-10
   epic: CON
   title: Settings screen
@@ -1471,6 +1473,7 @@ stories:
   deps: [INT-04, POL-01, MND-01]
   trace: [B1.independence, B6.former_employer, MVP.flow]
   ms: S9
+  done: [0, 1]
 - id: DEM-02
   epic: DEM
   title: Canonical invoice and variants
@@ -1498,6 +1501,7 @@ stories:
   deps: [LED-06]
   trace: [MVP.flow, L7]
   ms: S9
+  done: [0]
 - id: DEM-04
   epic: DEM
   title: Wallet funding runbook and check
@@ -1511,6 +1515,7 @@ stories:
   deps: [RAL-03]
   trace: [A7.prototype]
   ms: S9
+  done: [0]
 - id: DEM-05
   epic: DEM
   title: Demo script
@@ -1524,6 +1529,7 @@ stories:
   deps: [CON-09]
   trace: [MVP.flow, B3.lead_shadow]
   ms: S9
+  done: [0]
 - id: DEM-06
   epic: DEM
   title: Scenario packs per platform type
