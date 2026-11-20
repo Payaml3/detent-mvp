@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec site site-dev site-test denylist secrets check
+.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec site site-dev site-test denylist governance secrets check
 
 setup:            ## install dependencies and pre-commit hooks
 	$(UV) sync --all-packages
@@ -70,5 +70,9 @@ spec:             ## regenerate specs/001-detent-mvp inventory, traceability and
 
 denylist:         ## OPS-02 independence check; needs DENYLIST in the environment
 	$(UV) run python tools/check_denylist.py .
+
+governance:       ## operating-protocol checks (registers, HANDOFF on slice done) and the hook/tool tests
+	$(UV) run python tools/check_governance.py
+	$(UV) run pytest tools/tests -q -p no:cacheprovider
 
 check: lint typecheck test

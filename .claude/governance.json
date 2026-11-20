@@ -1,0 +1,1 @@
+{"warn_pct": 60, "handoff_pct": 75, "warn_tokens": 100000, "handoff_tokens": 140000, "context_window_tokens": null}
