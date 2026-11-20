@@ -48,6 +48,9 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
 
 ## How we work (unchanged)
 
+- One session per story group: 3 to 6 related stories that share files. Aim to finish well before the warn
+  limit, about 100k tokens.
+- A slice can take several sessions.
 - Read the slice and its stories: `specs/001-detent-mvp/slices.yaml`, `backlog/user-stories.md`.
 - Before building on a rule marked **Proposed** or **Open** in `specs/001-detent-mvp/decisions.md`, ask the
   founder (AskUserQuestion), then record the answer as a new `D-` row and mark the item Confirmed.

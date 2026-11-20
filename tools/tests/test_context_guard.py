@@ -81,7 +81,10 @@ def test_handoff_fires_once_after_warn(project: Path) -> None:
     assert "Finish the current step" in (_context(_run(project, PROMPT)) or "")
     _set_state(project, 76.0, 152_000, fired=["warn"])
     text = _context(_run(project, PROMPT)) or ""
-    assert text.startswith("Context at 76% (152,000 tokens). Stop new work. Run the handoff skill now")
+    assert text == (
+        "Context at 76% (152,000 tokens). Stop new work. Run the handoff skill (full mode if mid-slice), "
+        "then tell the founder to start a new session."
+    )
     assert _context(_run(project, PROMPT)) is None
 
 

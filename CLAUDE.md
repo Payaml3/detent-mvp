@@ -12,6 +12,16 @@ Skills: `handoff` (close a session or slice), `record-decision`, `weekly-review`
 The context guard (`.claude/hooks/`, limits in `.claude/governance.json`) warns, then asks for a handoff.
 New content starts as Proposed, Assumption or Open; only the founder makes anything Approved.
 
+## Model choice
+
+| Work | Model |
+|---|---|
+| Architecture, security, and money-path slices or stories (POL, EXE, RAL, EXC, LED, MND, AGT, invariants) | strongest available |
+| Routine stories, docs, website copy, tests for already-built code, reviews, handoffs | mid-tier |
+| Weekly review early stop, formatting, renames | smallest that works |
+
+A session can't switch its own model, so recommend the model in every "Next session" line.
+
 ## What we are building
 
 Detent (working name) is **agentic payment controls** for UK and EU platforms that hold user balances: one layer that decides, orchestrates and operates every deposit and payout, under the platform's own rules. It sits **beside** the platform's payment rails, starting with rails that can't be reversed: stablecoins and instant bank payouts.

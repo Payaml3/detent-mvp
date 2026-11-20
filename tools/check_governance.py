@@ -4,6 +4,8 @@ Fails if, between the base branch and HEAD:
   1. a slice is newly marked `status: done` in slices.yaml but HANDOFF.md did not change;
   2. a commit message or a changed Markdown file cites a D-xx or B-xx ID that no register defines;
   3. any register row has a status other than Approved, Proposed, Assumption, Open or Confirmed.
+  4. the protocol's marker line appears in any tracked file other than founder/operating-protocol.md
+     (the protocol lives in one place).
 Warns (does not fail) if founder/status.md "Last updated" is more than 14 days old.
 
 Python 3.12, standard library only.
@@ -26,6 +28,9 @@ ALLOWED = {"Approved", "Proposed", "Assumption", "Open", "Confirmed"}
 ROW_ID = re.compile(r"^[A-Z]-\d+$")
 CITED = re.compile(r"\b([DB]-\d{2,})\b")
 STALE_DAYS = 14
+PROTOCOL = "founder/operating-protocol.md"
+# Built from parts so this file doesn't contain the marker itself.
+PROTOCOL_MARKER = " → ".join(["Define", "Analyse", "Decide"])
 
 
 def git(root: Path, *args: str) -> str | None:
@@ -115,6 +120,19 @@ def check(root: Path, base_ref: str, today: dt.date) -> tuple[list[str], list[st
         for where, text in sources:
             for rid in sorted(set(CITED.findall(text)) - known):
                 errors.append(f"{where}: cites {rid}, which no register defines")
+
+    for name in (git(root, "ls-files") or "").splitlines():
+        if name == PROTOCOL:
+            continue
+        path = root / name
+        try:
+            if path.stat().st_size > 2_000_000:
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        if PROTOCOL_MARKER in text:
+            errors.append(f"{name}: restates the protocol ('{PROTOCOL_MARKER}'); point to {PROTOCOL} instead")
 
     status_path = root / STATUS_FILE
     if status_path.exists():

@@ -20,7 +20,7 @@ WARN = (
     "and keep answers short."
 )
 HANDOFF = (
-    "Context at {pct}% ({tokens} tokens). Stop new work. Run the handoff skill now, "
+    "Context at {pct}% ({tokens} tokens). Stop new work. Run the handoff skill (full mode if mid-slice), "
     "then tell the founder to start a new session."
 )
 

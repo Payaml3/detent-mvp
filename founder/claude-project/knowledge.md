@@ -6,10 +6,11 @@ Nothing else: the project reads the rest on demand, or a Claude Code session doe
 **Refresh after each slice** (re-sync or re-upload these files), because Project knowledge does not
 synchronise with the repository on its own.
 
-1. `CLAUDE.md`
-2. `HANDOFF.md`
-3. `founder/status.md`
-4. `founder/decisions.md`
-5. `specs/001-detent-mvp/decisions.md`
-6. `spec/product-definition.md`
-7. `founder/business-context.md`
+1. `founder/operating-protocol.md`
+2. `CLAUDE.md`
+3. `HANDOFF.md`
+4. `founder/status.md`
+5. `founder/decisions.md`
+6. `specs/001-detent-mvp/decisions.md`
+7. `spec/product-definition.md`
+8. `founder/business-context.md`
