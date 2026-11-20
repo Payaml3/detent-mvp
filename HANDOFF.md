@@ -60,6 +60,17 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
   story IDs, push the slice branch, check CI, then update this file.
 - Refresh the founder's phone roadmap: publish `build/roadmap.html` (from `make roadmap-page`) to the existing
   Artifact https://claude.ai/artifact/THq22MAqSJrDauRH39oWAe (pass it as `url`; never create a new one).
+- Refresh the founder's live pages the same way (`make roadmap-page` builds them too). Each goes to its existing
+  Artifact (pass it as `url`; never create a new one):
+
+  | Page | File | Artifact |
+  |---|---|---|
+  | Roadmap | `build/roadmap.html` | https://claude.ai/artifact/THq22MAqSJrDauRH39oWAe |
+  | MVP scope and proof | `build/mvp-scope.html` | https://claude.ai/artifact/VJQA5MEV8ZxueYf8PKdBSW |
+  | User journey | `build/user-journey.html` | https://claude.ai/artifact/K9gPrc9w2Wg5wprYHuMs5k |
+
+  After a full `make eval`, run `make eval-snapshot` and commit `eval/results/latest.json` so the MVP page
+  shows that run. The journey's steps live in `founder/pages/user-journey.yaml`.
 - Report to the founder: what was built, test evidence, screenshots of new screens, gaps, open items.
 
 ## What S8 built

@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-19",
+  "commit": "S8 handoff",
+  "source": "HANDOFF.md, 'What S8 built' (the last full run reported at the S8 handoff). Replace with `make eval-snapshot` after the next `make eval`.",
+  "gate_passed": true,
+  "agent_answers": "recorded stand-ins (no ANTHROPIC_API_KEY)",
+  "networks": "local chain (31337) and the simulated bank rail",
+  "attacks": {"count": 120, "unauthorised_executions": 0},
+  "faults": {"count": 52, "duplicates": 0},
+  "interpretation": {"count": 30, "canonical_correct": 10, "canonical_runs": 10, "invented_values": 0},
+  "reconciliation": {"count": 500, "match_rate": "99.40%", "designed_breaks": "3 of 3 designed breaks found"},
+  "agreement": {"rules": "96%", "investigation": "59%"},
+  "latency_p95_ms": {"rules_only": 39, "with_investigation": 75}
+}

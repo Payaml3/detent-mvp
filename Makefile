@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec roadmap roadmap-page site site-dev site-test denylist governance secrets check
+.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec roadmap roadmap-page pages pages-html eval-snapshot site site-dev site-test denylist governance secrets check
 
 setup:            ## install dependencies and pre-commit hooks
 	$(UV) sync --all-packages
@@ -68,11 +68,21 @@ site-test:        ## site logic tests, build, then honesty/structure/SEO checks 
 spec:             ## regenerate specs/001-detent-mvp inventory, traceability and tasks; check coverage
 	$(UV) run python tools/build_spec.py
 
-roadmap:          ## regenerate founder/roadmap.md from slices, stories, decisions and founder/status.md
+roadmap: pages    ## regenerate founder/roadmap.md (and the live pages) from slices, stories, decisions and status
 	$(UV) run python tools/build_roadmap.py
 
 roadmap-page:     ## founder/roadmap.md plus the phone page at build/roadmap.html (publish it to the roadmap Artifact)
 	$(UV) run python tools/build_roadmap.py --html build/roadmap.html
+	$(UV) run python tools/build_pages.py --html build
+
+pages:            ## regenerate founder/mvp-scope.md and founder/user-journey.md (CI checks them)
+	$(UV) run python tools/build_pages.py
+
+pages-html:       ## the live pages plus build/mvp-scope.html and build/user-journey.html (publish to their Artifacts)
+	$(UV) run python tools/build_pages.py --html build
+
+eval-snapshot:    ## after `make eval`: copy the headline figures into eval/results/latest.json (the MVP page reads it)
+	$(UV) run python tools/build_pages.py --snapshot eval/out/results.json
 
 denylist:         ## OPS-02 independence check; needs DENYLIST in the environment
 	$(UV) run python tools/check_denylist.py .

@@ -1,0 +1,77 @@
+# Source for the user journey page (tools/build_pages.py). One payment, start to finish, in the three layers.
+# Edit the steps here; each step's built status is computed from the stories it lists (backlog/stories.yaml),
+# and the demo timeline and personas are read from spec/11-demo-script.md and spec/00-product-context.md.
+# Status: Proposed (written from spec/00, spec/11 and the W- workflows in specs/001-detent-mvp/spec.md).
+
+journey: "An $18,500 supplier invoice becomes a USDC payout: proposed by an AI agent, decided by the client's rules, sent exactly once, then reconciled and provable."
+
+steps:
+  - layer: Decision
+    title: The agent proposes a payment
+    actor: AI agent
+    what: Reads the invoice inside delimited data blocks, flags anything ambiguous instead of guessing, and proposes a payment intent inside its signed mandate. It has no way to send money.
+    workflows: [W-02]
+    demo: "1 to 3"
+    stories: [INT-01, INT-02, MND-01, MND-02, AGT-01, AGT-02, AGT-03, AGT-04]
+  - layer: Decision
+    title: The rules decide
+    actor: Compliance lead (owns the rules)
+    what: Every check runs against the active rule version and returns execute, escalate or block, each with its reason. Any error holds the payment.
+    workflows: [W-01, W-08]
+    demo: "3 to 4"
+    stories: [POL-01, POL-02, POL-03, POL-04, POL-05, POL-09]
+    branch: A block is final. It is never approved, retried, re-routed or resubmitted.
+    branch_stories: [POL-06]
+  - layer: Decision
+    title: A reviewer resolves the escalation
+    actor: Reviewer
+    what: The case has an owner and a deadline. The reviewer sees the raw facts first, then the investigation agent's cited evidence. Approval re-runs the rules before anything is sent.
+    workflows: [W-03]
+    demo: "3 to 6"
+    stories: [EXC-01, EXC-02, EXC-03, EXC-04, EXC-05]
+    branch: Past its deadline the case stays held, the counterparty is told, and the backup owner takes over.
+    branch_stories: [EXC-06, EXC-07]
+  - layer: Orchestration
+    title: The best rail is chosen
+    actor: Routing (by policy, never by an agent)
+    what: Base Sepolia, Ethereum Sepolia or the simulated instant bank rail, scored by policy behind one adapter contract.
+    workflows: [W-01]
+    demo: "4 to 6"
+    stories: [RAL-01, RAL-04, RAL-06]
+  - layer: Orchestration
+    title: It is sent exactly once
+    actor: Payments lead (owns the kill switch)
+    what: Under the payment lock the pre-send checks and the kill switch run, a nonce is taken, and one attempt is sent. The payment ID never changes.
+    workflows: [W-01, W-07]
+    demo: "4 to 6"
+    stories: [EXE-01, EXE-02, EXE-03, EXE-04, EXE-08, RAL-02, RAL-03]
+  - layer: Orchestration
+    title: A timeout becomes UNKNOWN, never FAILED
+    actor: Resolver
+    what: Nothing is resent while the outcome is unknown. Only evidence from the rail resolves it, here the chain receipt, so the payment is CONFIRMED.
+    workflows: [W-04]
+    demo: "4 to 6"
+    stories: [EXE-05, EXE-06]
+    branch: A technical failure retries by fixed rules, then fails over to another rail under the same payment ID.
+    branch_stories: [EXE-07, RAL-07]
+  - layer: Operations
+    title: One ledger across rails
+    actor: Platform
+    what: Payouts post to a double-entry ledger, and deposits are matched to deposit intents and credited once, to the right account.
+    workflows: [W-09]
+    demo: "7 to 9"
+    stories: [LED-01, LED-02, LED-03, LED-04, LED-05]
+  - layer: Operations
+    title: Reconciliation finds the breaks
+    actor: Payments lead (approves fixes)
+    what: Postings are matched to chain and bank records. Each break becomes an exception with a fix drafted by the reconciliation agent, which a person approves.
+    workflows: [W-10]
+    demo: "7 to 9"
+    stories: [LED-06, LED-07, CON-07]
+  - layer: Operations
+    title: Every payment can be proven
+    actor: Auditor
+    what: An append-only, hash-chained audit log, replay of any payment from stored outputs, and an evidence export.
+    workflows: [W-01]
+    demo: "7 to 10"
+    stories: [AUD-01, AUD-02, AUD-03]

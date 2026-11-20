@@ -140,6 +140,9 @@ make backlog      # python tools/build_backlog.py
 make spec         # python tools/build_spec.py: Spec Kit inventory, traceability, tasks + coverage checks
 make roadmap      # python tools/build_roadmap.py: founder/roadmap.md, the one-page roadmap (CI checks it)
 make roadmap-page # also build/roadmap.html, published to https://claude.ai/artifact/THq22MAqSJrDauRH39oWAe
+make pages        # founder/mvp-scope.md and founder/user-journey.md (CI checks them; `make roadmap` runs it)
+make pages-html   # also build/mvp-scope.html and build/user-journey.html (Artifact URLs in HANDOFF.md)
+make eval-snapshot # after make eval: eval/results/latest.json, the figures the MVP page shows
 make site-dev     # marketing site (Astro) dev server; make site builds it; make site-test runs its checks
 ```
 
