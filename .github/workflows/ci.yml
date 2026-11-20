@@ -142,6 +142,26 @@ jobs:
             | tar -xz gitleaks
           ./gitleaks detect --source . --redact --verbose --config .gitleaks.toml
 
+  governance:
+    # Operating protocol: slice done needs HANDOFF.md, cited D-/B- IDs exist, register statuses are valid.
+    name: governance check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check registers, slices and HANDOFF
+        env:
+          GOVERNANCE_BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || 'origin/main' }}
+        run: python tools/check_governance.py
+      - name: Hook and tool tests
+        run: |
+          python -m pip install --quiet "pytest>=8.3"
+          python -m pytest tools/tests -q -p no:cacheprovider -o addopts="" -c /dev/null --rootdir .
+
   independence:
     name: independence check (OPS-02)
     runs-on: ubuntu-24.04

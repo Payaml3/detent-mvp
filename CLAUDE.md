@@ -4,6 +4,14 @@ Read this file at the start of every session. It's the project's standing instru
 
 **Then read `HANDOFF.md`:** where the build is, which branch to start from, the next slice and the open founder items. We work one slice per session in this one repository; update `HANDOFF.md` at the end of each slice.
 
+## Operating protocol
+
+We work under `founder/operating-protocol.md`; `founder/status.md` holds priorities, risks and founder items.
+Decisions: product and engineering in `specs/001-detent-mvp/decisions.md`, business in `founder/decisions.md`.
+Skills: `handoff` (close a session or slice), `record-decision`, `weekly-review` (in `.claude/skills/`).
+The context guard (`.claude/hooks/`, limits in `.claude/governance.json`) warns, then asks for a handoff.
+New content starts as Proposed, Assumption or Open; only the founder makes anything Approved.
+
 ## What we are building
 
 Detent (working name) is **agentic payment controls** for UK and EU platforms that hold user balances: one layer that decides, orchestrates and operates every deposit and payout, under the platform's own rules. It sits **beside** the platform's payment rails, starting with rails that can't be reversed: stablecoins and instant bank payouts.
@@ -117,6 +125,7 @@ make test-fast    # unit + property only, no database
 make lint typecheck
 make eval         # detent eval run --suite all (fails until slice S8)
 make denylist     # OPS-02 check; needs DENYLIST in the environment
+make governance   # tools/check_governance.py (registers, HANDOFF on slice done) + tools/tests
 make backlog      # python tools/build_backlog.py
 make spec         # python tools/build_spec.py: Spec Kit inventory, traceability, tasks + coverage checks
 make roadmap      # python tools/build_roadmap.py: founder/roadmap.md, the one-page roadmap (CI checks it)

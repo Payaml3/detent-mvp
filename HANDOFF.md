@@ -9,20 +9,19 @@ Last updated: 2026-11-19, after slice S8.
 
 | Slice | Status | Branch |
 |---|---|---|
-| S0 to S7 (prototype engine: decide, send once, review, never twice, agent + mandates, operations, ledger, deposits, reconciliation, replay) | done | `s7` holds all of them (stacked: m0 -> s1 -> ... -> s7) |
-| S8 Proof and release gate | done | `claude/project-thread-uhabrn` (from `s7`; the session was required to use this branch name instead of `s8`) |
-| **S9 Demo-ready prototype in the EU** | **next** | start from the S8 branch |
+| S0 to S7 (prototype engine: decide, send once, review, never twice, agent + mandates, operations, ledger, deposits, reconciliation, replay) | done | `main` |
+| S8 Proof and release gate | done | `main` |
+| **S9 Demo-ready prototype in the EU** | **next** | branch from `main` |
 | P1 Sandbox API and webhooks, P2 Dashboard, P3 Docs and SDKs, P4 Website launch | todo | |
 | L After launch (Should and Could) | todo | |
 
-Nothing is merged to `main`. S8 is the first slice with a pull request (into `s7`, since the branches are
-stacked). Each slice branches from the previous one.
+`main` holds S0 to S8. Each new slice branches from `main` and comes back as one pull request into `main`.
 Progress: `make spec` reports criteria done with evidence (210/308 after S8).
 
 ## Start a session
 
 ```
-git fetch origin claude/project-thread-uhabrn && git checkout -b s9 FETCH_HEAD   # or the latest slice branch
+git fetch origin main && git checkout -b s9 origin/main
 ```
 
 The cloud environment `detent-mvp` has a setup script that starts Postgres, creates the `detent` role
@@ -98,6 +97,7 @@ Read `specs/001-detent-mvp/slices.yaml` (S9) and its stories. `make eval` must k
 - C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open.
 - Booking URL, inbox, final name and domain (`BRAND_NAME`), legal review of the site.
 - Delete the stale remote branch `s3-unknown-resolved` (the proxy refused).
+- Delete the merged branches (all are in `main`): `m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`.
 
 ## Known gaps carried forward
 
