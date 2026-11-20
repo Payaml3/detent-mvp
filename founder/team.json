@@ -1,0 +1,272 @@
+{
+ "repo": "Payaml3/detent-mvp",
+ "board": [
+  {
+   "id": "growth-advisor",
+   "name": "Growth",
+   "lens": "acquisition",
+   "asks": "Which channel brings the first 100 customers?"
+  },
+  {
+   "id": "owner-advisor",
+   "name": "Owner",
+   "lens": "long-term value",
+   "asks": "Can we survive being wrong?"
+  },
+  {
+   "id": "customer-advisor",
+   "name": "Customer",
+   "lens": "demand",
+   "asks": "What did customers do, not say?"
+  },
+  {
+   "id": "risk-advisor",
+   "name": "Risk",
+   "lens": "regulator's",
+   "asks": "Would this make us regulated?"
+  }
+ ],
+ "slices": [],
+ "tasks": [
+  {
+   "id": "CEO-01",
+   "title": "INDEPENDENCE_DENYLIST CI secret (OPS-02 fails closed until set)",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-02",
+   "title": "ANTHROPIC_API_KEY, also as a GitHub secret for the nightly eval (AGT-01, EVL-04)",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-03",
+   "title": "Funded test wallets for Base Sepolia and Ethereum Sepolia (RAL-02, RAL-03)",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-04",
+   "title": "Testnet RPC endpoints and wallets as secrets for the nightly eval (EVL-07 criterion 0)",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-05",
+   "title": "User payouts deferred: demo batch p07 to p20 can't run (LED-06 AC4)",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-06",
+   "title": "C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-07",
+   "title": "Publish measured results on the website (detent eval publish, EVL-06 criterion 1)",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "P4",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-08",
+   "title": "Booking URL, inbox, final name and domain (BRAND_NAME), legal review of the site",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "P4",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-09",
+   "title": "Delete the merged branches (m0-foundation, s1-decision-layer, s2-send-once, s3-review-loop, s3-unknown-resolved, s4-u...",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "C-10",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "C-12",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "C-13",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Open",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "C-14",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "C-16",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "G-10",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "G-17",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "G-18",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "G-19",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Open",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "G-20",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "G-23",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "G-25",
+   "title": "",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
+  }
+ ]
+}

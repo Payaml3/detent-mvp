@@ -1,0 +1,71 @@
+{
+ "chain": [
+  {
+   "order": 1,
+   "level": "User stories",
+   "total": 0,
+   "done": 0,
+   "pct": 0
+  },
+  {
+   "order": 2,
+   "level": "Acceptance criteria",
+   "total": 0,
+   "done": 0,
+   "pct": 0
+  },
+  {
+   "order": 3,
+   "level": "Criteria with test evidence",
+   "total": 0,
+   "done": 0,
+   "pct": 0
+  }
+ ],
+ "functions": [
+  {
+   "function": "00 Founder HQ",
+   "measure": "Decisions resolved",
+   "done": 32,
+   "total": 81,
+   "pct_done": 40
+  },
+  {
+   "function": "03 Architecture",
+   "measure": "Acceptance criteria done in the architect's epics",
+   "done": 0,
+   "total": 0,
+   "pct_done": 0
+  },
+  {
+   "function": "04 Engineering",
+   "measure": "Acceptance criteria done in the engineers' epics",
+   "done": 0,
+   "total": 0,
+   "pct_done": 0
+  },
+  {
+   "function": "05 QA",
+   "measure": "Acceptance criteria done in the QA epics",
+   "done": 0,
+   "total": 0,
+   "pct_done": 0
+  },
+  {
+   "function": "06 GTM",
+   "measure": "Acceptance criteria done in the growth epics",
+   "done": 0,
+   "total": 0,
+   "pct_done": 0
+  }
+ ],
+ "initiatives": [],
+ "stories": [],
+ "decision_counts": {
+  "Approved": 0,
+  "Proposed": 10,
+  "Assumption": 0,
+  "Open": 2,
+  "Confirmed": 32
+ }
+}
