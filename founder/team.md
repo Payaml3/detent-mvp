@@ -20,9 +20,9 @@ The founder is CEO and chairs the board. Claude is the AI core and chief of staf
 
 The only copy of the epic-to-role mapping. `tools/build_team.py` and `tools/build_traceability.py` read it. List epic codes (2 to 5 capitals) after each role; `init` proposes the split and the founder confirms it.
 
-- architect: Open (init proposes foundation, operations and audit epics)
-- qa: Open (evaluation and test epics)
-- growth: Open (website, docs and SDK epics)
+- architect: FND, OPS, AUD
+- qa: EVL
+- growth: WEB, DOC, SDK
 - engineer: all other epics
 - product: prepares the C-, G- and A- decisions
 - research: the non-software model items

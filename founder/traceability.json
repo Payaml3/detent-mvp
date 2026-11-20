@@ -33,30 +33,30 @@
   {
    "function": "03 Architecture",
    "measure": "Acceptance criteria done in the architect's epics",
-   "done": 0,
-   "total": 0,
-   "pct_done": 0
+   "done": 32,
+   "total": 40,
+   "pct_done": 80
   },
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 219,
-   "total": 304,
+   "done": 168,
+   "total": 232,
    "pct_done": 72
   },
   {
    "function": "05 QA",
    "measure": "Acceptance criteria done in the QA epics",
-   "done": 0,
-   "total": 0,
-   "pct_done": 0
+   "done": 11,
+   "total": 13,
+   "pct_done": 85
   },
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 0,
-   "total": 4,
-   "pct_done": 0
+   "done": 8,
+   "total": 23,
+   "pct_done": 35
   }
  ],
  "initiatives": [
@@ -81,7 +81,7 @@
   {
    "code": "AUD",
    "initiative": "Audit and replay",
-   "role": "engineer",
+   "role": "architect",
    "stories": 3,
    "criteria": 7,
    "criteria_done": 5,
@@ -108,7 +108,7 @@
   {
    "code": "DOC",
    "initiative": "Docs portal",
-   "role": "engineer",
+   "role": "growth",
    "stories": 6,
    "criteria": 8,
    "criteria_done": 0,
@@ -126,7 +126,7 @@
   {
    "code": "EVL",
    "initiative": "Evaluation harness",
-   "role": "engineer",
+   "role": "qa",
    "stories": 8,
    "criteria": 13,
    "criteria_done": 11,
@@ -153,7 +153,7 @@
   {
    "code": "FND",
    "initiative": "Foundation",
-   "role": "engineer",
+   "role": "architect",
    "stories": 9,
    "criteria": 29,
    "criteria_done": 26,
@@ -180,7 +180,7 @@
   {
    "code": "OPS",
    "initiative": "Operational controls",
-   "role": "engineer",
+   "role": "architect",
    "stories": 4,
    "criteria": 4,
    "criteria_done": 1,
@@ -234,7 +234,7 @@
   {
    "code": "WEB",
    "initiative": "Marketing site",
-   "role": "engineer",
+   "role": "growth",
    "stories": 8,
    "criteria": 11,
    "criteria_done": 8,
@@ -254,7 +254,7 @@
   {
    "story": "FND-01",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 4,
    "criteria_done": 4,
@@ -264,7 +264,7 @@
   {
    "story": "FND-02",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
    "criteria_done": 3,
@@ -274,7 +274,7 @@
   {
    "story": "FND-03",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 4,
    "criteria_done": 4,
@@ -284,7 +284,7 @@
   {
    "story": "FND-04",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
    "criteria_done": 3,
@@ -294,7 +294,7 @@
   {
    "story": "FND-05",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
    "criteria_done": 3,
@@ -304,7 +304,7 @@
   {
    "story": "FND-06",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
    "criteria_done": 3,
@@ -314,7 +314,7 @@
   {
    "story": "FND-07",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S9",
    "criteria": 3,
    "criteria_done": 2,
@@ -324,7 +324,7 @@
   {
    "story": "FND-08",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
    "criteria_done": 2,
@@ -334,7 +334,7 @@
   {
    "story": "FND-09",
    "epic": "FND",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
    "criteria_done": 2,
@@ -954,7 +954,7 @@
   {
    "story": "AUD-01",
    "epic": "AUD",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S1",
    "criteria": 3,
    "criteria_done": 2,
@@ -964,7 +964,7 @@
   {
    "story": "AUD-02",
    "epic": "AUD",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S7",
    "criteria": 3,
    "criteria_done": 3,
@@ -974,7 +974,7 @@
   {
    "story": "AUD-03",
    "epic": "AUD",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "L",
    "criteria": 1,
    "criteria_done": 0,
@@ -1084,7 +1084,7 @@
   {
    "story": "EVL-01",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 2,
    "criteria_done": 2,
@@ -1094,7 +1094,7 @@
   {
    "story": "EVL-02",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 2,
    "criteria_done": 2,
@@ -1104,7 +1104,7 @@
   {
    "story": "EVL-03",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 2,
    "criteria_done": 2,
@@ -1114,7 +1114,7 @@
   {
    "story": "EVL-04",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 1,
    "criteria_done": 1,
@@ -1124,7 +1124,7 @@
   {
    "story": "EVL-05",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 1,
    "criteria_done": 1,
@@ -1134,7 +1134,7 @@
   {
    "story": "EVL-06",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 2,
    "criteria_done": 1,
@@ -1144,7 +1144,7 @@
   {
    "story": "EVL-07",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 2,
    "criteria_done": 1,
@@ -1154,7 +1154,7 @@
   {
    "story": "EVL-08",
    "epic": "EVL",
-   "function": "04 Engineering",
+   "function": "05 QA",
    "slice": "S8",
    "criteria": 1,
    "criteria_done": 1,
@@ -1264,7 +1264,7 @@
   {
    "story": "OPS-01",
    "epic": "OPS",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "L",
    "criteria": 1,
    "criteria_done": 0,
@@ -1274,7 +1274,7 @@
   {
    "story": "OPS-02",
    "epic": "OPS",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "S0",
    "criteria": 1,
    "criteria_done": 1,
@@ -1284,7 +1284,7 @@
   {
    "story": "OPS-03",
    "epic": "OPS",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "L",
    "criteria": 1,
    "criteria_done": 0,
@@ -1294,7 +1294,7 @@
   {
    "story": "OPS-04",
    "epic": "OPS",
-   "function": "04 Engineering",
+   "function": "03 Architecture",
    "slice": "L",
    "criteria": 1,
    "criteria_done": 0,
@@ -1544,7 +1544,7 @@
   {
    "story": "DOC-01",
    "epic": "DOC",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
    "criteria_done": 0,
@@ -1554,7 +1554,7 @@
   {
    "story": "DOC-02",
    "epic": "DOC",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
    "criteria_done": 0,
@@ -1564,7 +1564,7 @@
   {
    "story": "DOC-03",
    "epic": "DOC",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
    "criteria_done": 0,
@@ -1574,7 +1574,7 @@
   {
    "story": "DOC-04",
    "epic": "DOC",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P3",
    "criteria": 2,
    "criteria_done": 0,
@@ -1584,7 +1584,7 @@
   {
    "story": "DOC-05",
    "epic": "DOC",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P3",
    "criteria": 2,
    "criteria_done": 0,
@@ -1594,7 +1594,7 @@
   {
    "story": "DOC-06",
    "epic": "DOC",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
    "criteria_done": 0,
@@ -1634,7 +1634,7 @@
   {
    "story": "WEB-01",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 3,
    "criteria_done": 3,
@@ -1644,7 +1644,7 @@
   {
    "story": "WEB-02",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 2,
    "criteria_done": 2,
@@ -1654,7 +1654,7 @@
   {
    "story": "WEB-03",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 1,
    "criteria_done": 1,
@@ -1664,7 +1664,7 @@
   {
    "story": "WEB-04",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 1,
    "criteria_done": 0,
@@ -1674,7 +1674,7 @@
   {
    "story": "WEB-05",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 1,
    "criteria_done": 1,
@@ -1684,7 +1684,7 @@
   {
    "story": "WEB-06",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 1,
    "criteria_done": 0,
@@ -1694,7 +1694,7 @@
   {
    "story": "WEB-07",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 1,
    "criteria_done": 0,
@@ -1704,7 +1704,7 @@
   {
    "story": "WEB-08",
    "epic": "WEB",
-   "function": "04 Engineering",
+   "function": "06 GTM",
    "slice": "P4",
    "criteria": 1,
    "criteria_done": 1,
