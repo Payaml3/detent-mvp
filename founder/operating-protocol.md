@@ -1,4 +1,4 @@
-Approved by the founder on <date of merge>.
+Approved by the founder on 2026-11-20.
 
 # Startup Operating Protocol
 
