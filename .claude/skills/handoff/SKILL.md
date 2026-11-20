@@ -33,6 +33,8 @@ Rules:
 - Edit only what changed. Keep `HANDOFF.md` and `founder/status.md` to one page each.
 - Never mark a row Approved or Confirmed without the founder's words in this session.
 - If a slice is done: `status: done` in `specs/001-detent-mvp/slices.yaml`, then `make backlog spec`.
+- Always run `make roadmap-page` and commit `founder/roadmap.md`; then publish `build/roadmap.html` to the roadmap
+  Artifact URL in `HANDOFF.md` (pass it as `url`, never create a new one).
 
 ## 3. Check, commit, push, PR
 

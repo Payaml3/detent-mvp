@@ -47,6 +47,8 @@ jobs:
         run: |
           uv run ruff check .
           uv run ruff format --check .
+      - name: Roadmap is up to date
+        run: uv run python tools/build_roadmap.py --check
       - name: Typecheck
         run: uv run mypy
       - name: Migrate
