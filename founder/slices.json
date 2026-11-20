@@ -240,7 +240,7 @@
    "epic": "FND",
    "slice": "S9",
    "criteria": 3,
-   "done": 0
+   "done": 2
   },
   {
    "id": "FND-08",
@@ -765,7 +765,7 @@
    "epic": "CON",
    "slice": "S9",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "CON-10",
@@ -835,7 +835,7 @@
    "epic": "DEM",
    "slice": "S9",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "DEM-02",
@@ -849,21 +849,21 @@
    "epic": "DEM",
    "slice": "S9",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DEM-04",
    "epic": "DEM",
    "slice": "S9",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DEM-05",
    "epic": "DEM",
    "slice": "S9",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DEM-06",

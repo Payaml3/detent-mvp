@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 from pydantic import SecretStr
-from sqlalchemy import Engine, text
+from sqlalchemy import Connection, Engine, text
 
 from detent.audit.log import Actor, append
 from detent.clock import Clock
@@ -40,41 +40,46 @@ def is_engaged(engine: Engine, org_id: str) -> bool:
 
 
 def engage(engine: Engine, clock: Clock, *, org_id: str, actor: Actor) -> list[str]:
+    with transaction(engine) as conn:
+        return engage_in(conn, clock, org_id=org_id, actor=actor)
+
+
+def engage_in(conn: Connection, clock: Clock, *, org_id: str, actor: Actor) -> list[str]:
+    """Engage inside the caller's transaction, so a check made under the same lock holds (demo reset)."""
     if not allowed("kill_switch.engage", _role(actor)):
         raise PermissionError(f"{actor.role} may not engage the kill switch")
     held: list[str] = []
-    with transaction(engine) as conn:
+    conn.execute(
+        text("UPDATE kill_switch SET engaged=true, engaged_by=:a, engaged_at=:t WHERE org_id=:o"),
+        {"a": actor.id, "t": clock.now(), "o": org_id},
+    )
+    ready = (
         conn.execute(
-            text("UPDATE kill_switch SET engaged=true, engaged_by=:a, engaged_at=:t WHERE org_id=:o"),
-            {"a": actor.id, "t": clock.now(), "o": org_id},
+            text(
+                "SELECT id FROM payment_intents WHERE org_id=:o AND status='READY' ORDER BY created_at "
+                "FOR UPDATE"
+            ),
+            {"o": org_id},
         )
-        ready = (
-            conn.execute(
-                text(
-                    "SELECT id FROM payment_intents WHERE org_id=:o AND status='READY' ORDER BY created_at "
-                    "FOR UPDATE"
-                ),
-                {"o": org_id},
-            )
-            .scalars()
-            .all()
+        .scalars()
+        .all()
+    )
+    for pid in ready:
+        transition(conn, clock, org_id=org_id, payment_id=pid, to=Status.HELD, actor=actor, reason=REASON)
+        conn.execute(
+            text("UPDATE payment_intents SET held_reason=:r WHERE org_id=:o AND id=:p"),
+            {"r": REASON, "o": org_id, "p": pid},
         )
-        for pid in ready:
-            transition(conn, clock, org_id=org_id, payment_id=pid, to=Status.HELD, actor=actor, reason=REASON)
-            conn.execute(
-                text("UPDATE payment_intents SET held_reason=:r WHERE org_id=:o AND id=:p"),
-                {"r": REASON, "o": org_id, "p": pid},
-            )
-            held.append(pid)
-        append(
-            conn,
-            clock,
-            org_id=org_id,
-            actor=actor,
-            kind="kill_switch.engaged",
-            subject_id=org_id,
-            payload={"held": held},
-        )
+        held.append(pid)
+    append(
+        conn,
+        clock,
+        org_id=org_id,
+        actor=actor,
+        kind="kill_switch.engaged",
+        subject_id=org_id,
+        payload={"held": held},
+    )
     return held
 
 

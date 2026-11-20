@@ -4,6 +4,7 @@ generation, D-08 applied to the demo), FND-07 (/healthz reports each check; the 
 from __future__ import annotations
 
 import secrets
+import threading
 from collections.abc import Iterator
 
 import pytest
@@ -26,7 +27,7 @@ from detent.seed import seed_demo
 from detent.settings import REPO_ROOT, Settings
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
-from sqlalchemy import Engine, text
+from sqlalchemy import Connection, Engine, text
 
 pytestmark = pytest.mark.db
 
@@ -176,6 +177,97 @@ def test_reset_is_refused_while_an_attempt_is_in_flight(demo: Runtime) -> None:
     with pytest.raises(ResetRefused, match="in flight"):
         reset_demo(demo, actor=_pl(demo, org))
     assert active_demo_org(demo.engine, demo.settings) == org
+
+
+def _ready_payout(demo: Runtime, key: str) -> str:
+    from decision_helpers import payout
+    from detent.intents.service import IntentRequest, submit_intent
+    from detent.policy.screening import MockScreening
+
+    _, body = submit_intent(
+        demo.engine,
+        demo.clock,
+        org_id=demo.settings.demo_org_id,
+        actor_id="usr_api",
+        idempotency_key=key,
+        request=IntentRequest.model_validate(
+            payout(
+                "cpt_kestrel",
+                "40.00",
+                "GBP",
+                {"kind": "bank_account", "network": "banksim-fps", "destination_id": "dst_kestrel_acct"},
+            )
+        ),
+        decision_only=False,
+        screening=MockScreening.from_fixture(),
+    )
+    assert body["status"] == "READY"
+    return str(body["id"])
+
+
+def _insert_attempt(c: Connection, org: str, pid: str) -> None:
+    c.execute(
+        text(
+            "INSERT INTO attempts (id, org_id, payment_id, attempt_no, rail_id, status, idempotency_key, "
+            "created_at) VALUES ('att_demo_race_' || :o, :o, :p, 1, 'banksim-fps', 'UNKNOWN', :p, now())"
+        ),
+        {"o": org, "p": pid},
+    )
+
+
+def _engaged(demo: Runtime, org: str) -> bool:
+    with demo.engine.connect() as c:
+        return bool(
+            c.execute(text("SELECT engaged FROM kill_switch WHERE org_id=:o"), {"o": org}).scalar_one()
+        )
+
+
+def test_a_refused_reset_leaves_the_kill_switch_off(demo: Runtime) -> None:
+    """The check and the engage are one transaction: refusing a reset changes nothing."""
+    org = demo.settings.demo_org_id
+    pid = _ready_payout(demo, "refused-reset")
+    with demo.engine.begin() as c:
+        _insert_attempt(c, org, pid)
+    with pytest.raises(ResetRefused, match="in flight"):
+        reset_demo(demo, actor=_pl(demo, org))
+    assert not _engaged(demo, org)
+    with demo.engine.connect() as c:
+        status = c.execute(
+            text("SELECT status FROM payment_intents WHERE org_id=:o AND id=:p"), {"o": org, "p": pid}
+        ).scalar_one()
+    assert status == "READY"  # not held by a kill switch that never engaged
+
+
+def test_reset_waits_for_a_send_holding_the_kill_switch_lock(demo: Runtime) -> None:
+    """A sender reads the kill switch FOR SHARE in the transaction that creates its attempt. A reset that
+    starts meanwhile waits for it, then sees the new attempt and refuses (no attempt slips between the
+    in-flight check and the engage)."""
+    org = demo.settings.demo_org_id
+    pid = _ready_payout(demo, "race")
+    outcome: list[BaseException | None] = []
+
+    def do_reset() -> None:
+        try:
+            reset_demo(demo, actor=_pl(demo, org))
+            outcome.append(None)
+        except BaseException as exc:  # the test inspects it
+            outcome.append(exc)
+
+    with demo.engine.begin() as sender:
+        engaged = sender.execute(
+            text("SELECT engaged FROM kill_switch WHERE org_id=:o FOR SHARE"), {"o": org}
+        ).scalar_one()
+        assert engaged is False
+        t = threading.Thread(target=do_reset)
+        t.start()
+        t.join(timeout=1.0)
+        assert t.is_alive(), "the reset must wait for the sender's lock"
+        _insert_attempt(sender, org, pid)
+    t.join(timeout=10)
+    assert not t.is_alive()
+    assert isinstance(outcome[0], ResetRefused)
+    assert active_demo_org(demo.engine, demo.settings) == org
+    assert not _engaged(demo, org)
 
 
 def test_each_generation_gets_its_own_agent_key(demo: Runtime) -> None:

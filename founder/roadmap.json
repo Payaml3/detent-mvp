@@ -312,7 +312,7 @@
    "exit": "The deployed EU instance runs spec/11 end to end on Base Sepolia and Ethereum Sepolia; mismatches are fixed in spec/11.",
    "stories": 6,
    "criteria": 10,
-   "criteria_done": 0
+   "criteria_done": 9
   },
   {
    "id": "P1",
@@ -367,19 +367,19 @@
  ],
  "blockers": [
   {
-   "item": "`INDEPENDENCE_DENYLIST` CI secret (OPS-02 fails closed until set)",
-   "owner": "Founder",
-   "needed_by": "S9"
-  },
-  {
    "item": "`ANTHROPIC_API_KEY`, also as a GitHub secret for the nightly eval (AGT-01, EVL-04)",
    "owner": "Founder",
    "needed_by": "S9"
   },
   {
-   "item": "Funded test wallets for Base Sepolia and Ethereum Sepolia (RAL-02, RAL-03)",
+   "item": "Funded test wallets for Base Sepolia and Ethereum Sepolia: a sender and a demo payer on each (RAL-02, RAL-03, DEM-04)",
    "owner": "Founder",
-   "needed_by": "S9"
+   "needed_by": "S9 live run"
+  },
+  {
+   "item": "Render (Frankfurt) and Neon (EU) accounts, the plans (worker is not on Render's free plan: Proposed), the `render.yaml` secrets (FND-07)",
+   "owner": "Founder",
+   "needed_by": "S9 live run"
   },
   {
    "item": "Testnet RPC endpoints and wallets as secrets for the nightly eval (EVL-07 criterion 0)",
@@ -387,14 +387,9 @@
    "needed_by": "S9"
   },
   {
-   "item": "User payouts deferred: demo batch p07 to p20 can't run (LED-06 AC4)",
-   "owner": "Founder (decision)",
-   "needed_by": "S9"
-  },
-  {
-   "item": "C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open",
+   "item": "C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open",
    "owner": "Founder",
-   "needed_by": "S9 (C-10, C-13), P1 to P2 (rest)"
+   "needed_by": "P1 to P2"
   },
   {
    "item": "Publish measured results on the website (`detent eval publish`, EVL-06 criterion 1)",
@@ -414,23 +409,9 @@
  ],
  "decisions_waiting": [
   {
-   "id": "C-10",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
    "id": "C-12",
    "decision": "",
    "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "C-13",
-   "decision": "",
-   "status": "Open",
    "date": "",
    "register": "specs/001-detent-mvp/decisions.md"
   },

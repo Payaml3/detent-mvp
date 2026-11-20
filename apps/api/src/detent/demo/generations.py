@@ -98,27 +98,31 @@ def _in_flight(conn: Connection, org_id: str) -> int:
 def reset_demo(rt: Runtime, *, actor: Actor) -> ResetResult:
     """Start a new demo generation. Only the payments lead may reset (they alone can release a kill switch,
     and a reset engages the old generation's switch for good)."""
-    from detent.execution.kill_switch import engage
+    from detent.execution.kill_switch import engage_in
     from detent.seed import seed_demo
 
     if actor.role != Role.PAYMENTS_LEAD.value:
         raise ResetRefused("only the payments lead can reset the demo data")
     base = rt.settings.demo_org_id
-    with rt.engine.connect() as conn:
+    with transaction(rt.engine) as conn:
         gen = current_generation(conn, base)
         old = generation_org_id(base, gen)
+        # Lock the old generation's kill switch row first. The send path reads it FOR SHARE in the same
+        # transaction that creates an attempt, so no attempt can appear between this check and the engage.
+        conn.execute(text("SELECT engaged FROM kill_switch WHERE org_id=:o FOR UPDATE"), {"o": old})
         busy = _in_flight(conn, old)
+        if busy:
+            # Raising rolls the transaction back: a refused reset leaves the kill switch as it was.
+            raise ResetRefused(
+                f"{busy} attempt(s) are still in flight (CREATED, SUBMITTED or UNKNOWN); wait for the "
+                "resolver, then reset"
+            )
         offset = conn.execute(
             text("SELECT offset_seconds FROM demo_clock WHERE org_id=:o"), {"o": old}
         ).scalar_one_or_none()
-    if busy:
-        raise ResetRefused(
-            f"{busy} attempt(s) are still in flight (CREATED, SUBMITTED or UNKNOWN); wait for the resolver, "
-            "then reset"
-        )
+        engage_in(conn, rt.clock, org_id=old, actor=actor)
     new_gen = gen + 1
     new_org = generation_org_id(base, new_gen)
-    engage(rt.engine, rt.clock, org_id=old, actor=actor)
     seed_demo(rt, org_id=new_org)
     with transaction(rt.engine) as conn:
         # The demo clock never runs backwards across a reset: the new generation starts at the old offset.

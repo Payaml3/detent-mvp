@@ -197,9 +197,11 @@
    "initiative": "Foundation",
    "slice": "S9",
    "priority": "",
-   "status": "todo",
-   "progress": "0/3",
-   "deps": [],
+   "status": "in_progress",
+   "progress": "2/3",
+   "deps": [
+    "CEO-03"
+   ],
    "dependents": []
   },
   {
@@ -480,7 +482,7 @@
    "status": "in_progress",
    "progress": "3/4",
    "deps": [
-    "CEO-02"
+    "CEO-01"
    ],
    "dependents": []
   },
@@ -720,7 +722,7 @@
    "status": "in_progress",
    "progress": "2/3",
    "deps": [
-    "CEO-03"
+    "CEO-02"
    ],
    "dependents": []
   },
@@ -736,7 +738,7 @@
    "status": "in_progress",
    "progress": "1/2",
    "deps": [
-    "CEO-03"
+    "CEO-02"
    ],
    "dependents": []
   },
@@ -1059,9 +1061,7 @@
    "priority": "",
    "status": "in_progress",
    "progress": "4/5",
-   "deps": [
-    "CEO-05"
-   ],
+   "deps": [],
    "dependents": []
   },
   {
@@ -1255,8 +1255,8 @@
    "initiative": "Back-office console",
    "slice": "S9",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -1328,7 +1328,7 @@
    "status": "done",
    "progress": "1/1",
    "deps": [
-    "CEO-02"
+    "CEO-01"
    ],
    "dependents": []
   },
@@ -1358,7 +1358,7 @@
    "status": "in_progress",
    "progress": "1/2",
    "deps": [
-    "CEO-07"
+    "CEO-06"
    ],
    "dependents": []
   },
@@ -1401,8 +1401,8 @@
    "initiative": "Demo data and scenarios",
    "slice": "S9",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -1429,8 +1429,8 @@
    "initiative": "Demo data and scenarios",
    "slice": "S9",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1443,9 +1443,11 @@
    "initiative": "Demo data and scenarios",
    "slice": "S9",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
-   "deps": [],
+   "status": "done",
+   "progress": "1/1",
+   "deps": [
+    "CEO-02"
+   ],
    "dependents": []
   },
   {
@@ -1457,8 +1459,8 @@
    "initiative": "Demo data and scenarios",
    "slice": "S9",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1557,9 +1559,7 @@
    "priority": "",
    "status": "done",
    "progress": "1/1",
-   "deps": [
-    "CEO-01"
-   ],
+   "deps": [],
    "dependents": []
   },
   {
@@ -2166,22 +2166,6 @@
   },
   {
    "id": "CEO-01",
-   "title": "INDEPENDENCE_DENYLIST CI secret (OPS-02 fails closed until set)",
-   "kind": "founder",
-   "role": "founder",
-   "slice": "S9",
-   "status": "todo",
-   "progress": "",
-   "deps": [],
-   "blocks": [
-    "OPS-02"
-   ],
-   "dependents": [
-    "OPS-02"
-   ]
-  },
-  {
-   "id": "CEO-02",
    "title": "ANTHROPIC_API_KEY, also as a GitHub secret for the nightly eval (AGT-01, EVL-04)",
    "kind": "founder",
    "role": "founder",
@@ -2199,8 +2183,8 @@
    ]
   },
   {
-   "id": "CEO-03",
-   "title": "Funded test wallets for Base Sepolia and Ethereum Sepolia (RAL-02, RAL-03)",
+   "id": "CEO-02",
+   "title": "Funded test wallets for Base Sepolia and Ethereum Sepolia: a sender and a demo payer on each (RAL-02, RAL-03, DEM-04)",
    "kind": "founder",
    "role": "founder",
    "slice": "S9",
@@ -2208,12 +2192,30 @@
    "progress": "",
    "deps": [],
    "blocks": [
+    "DEM-04",
     "RAL-02",
     "RAL-03"
    ],
    "dependents": [
     "RAL-02",
-    "RAL-03"
+    "RAL-03",
+    "DEM-04"
+   ]
+  },
+  {
+   "id": "CEO-03",
+   "title": "Render (Frankfurt) and Neon (EU) accounts, the plans (worker is not on Render's free plan: Proposed), the render.yaml...",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [
+    "FND-07"
+   ],
+   "dependents": [
+    "FND-07"
    ]
   },
   {
@@ -2234,26 +2236,10 @@
   },
   {
    "id": "CEO-05",
-   "title": "User payouts deferred: demo batch p07 to p20 can't run (LED-06 AC4)",
+   "title": "C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open",
    "kind": "founder",
    "role": "founder",
-   "slice": "S9",
-   "status": "todo",
-   "progress": "",
-   "deps": [],
-   "blocks": [
-    "LED-06"
-   ],
-   "dependents": [
-    "LED-06"
-   ]
-  },
-  {
-   "id": "CEO-06",
-   "title": "C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open",
-   "kind": "founder",
-   "role": "founder",
-   "slice": "S9",
+   "slice": "P1",
    "status": "todo",
    "progress": "",
    "deps": [],
@@ -2261,7 +2247,7 @@
    "dependents": []
   },
   {
-   "id": "CEO-07",
+   "id": "CEO-06",
    "title": "Publish measured results on the website (detent eval publish, EVL-06 criterion 1)",
    "kind": "founder",
    "role": "founder",
@@ -2277,7 +2263,7 @@
    ]
   },
   {
-   "id": "CEO-08",
+   "id": "CEO-07",
    "title": "Booking URL, inbox, final name and domain (BRAND_NAME), legal review of the site",
    "kind": "founder",
    "role": "founder",
@@ -2289,7 +2275,7 @@
    "dependents": []
   },
   {
-   "id": "CEO-09",
+   "id": "CEO-08",
    "title": "Delete the merged branches (m0-foundation, s1-decision-layer, s2-send-once, s3-review-loop, s3-unknown-resolved, s4-u...",
    "kind": "founder",
    "role": "founder",
@@ -2301,17 +2287,6 @@
    "dependents": []
   },
   {
-   "id": "C-10",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
    "id": "C-12",
    "title": "",
    "kind": "decision",
@@ -2319,17 +2294,6 @@
    "slice": "",
    "status": "todo",
    "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "C-13",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Open",
    "deps": [],
    "dependents": []
   },
