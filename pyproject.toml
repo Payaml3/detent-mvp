@@ -64,6 +64,7 @@ ignore = [
 "apps/api/tests/**" = ["S", "PLR", "PLW1510", "TID251", "DTZ", "PT012", "PT018", "E501"]
 "apps/api/migrations/**" = ["E501"]
 "tools/**" = ["S", "PLR", "T20", "TID251", "DTZ", "E501"]  # generators hold long Markdown templates
+"tools/tests/**" = ["S", "PLR", "TID251", "DTZ", "E501", "PT018"]  # hook and governance tests, as apps/api/tests
 "apps/banksim/**" = ["TID251"]
 "apps/faultproxy/**" = ["TID251"]
 

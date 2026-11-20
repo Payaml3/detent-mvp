@@ -36,3 +36,6 @@ chain/local.json
 
 # Evaluation output (results.json, report.html, report.md); CI keeps them as build artifacts
 eval/out/
+
+# Claude Code context guard state (per session, per machine)
+.claude/state/
