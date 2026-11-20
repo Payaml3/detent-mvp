@@ -1,22 +1,7 @@
-# Monday weekly review: scheduled task prompt
+# Monday scheduled task: weekly review, then refresh the views
 
-Create a scheduled Claude Code task on `Payaml3/detent-mvp`, every Monday at 08:00 (your time zone),
-starting from `main`, and paste the prompt below as its message.
+Create this as a weekly scheduled task (Mondays), in a Claude Code session on `Payaml3/detent-mvp` that has artifact tools. Model: mid-tier.
 
----
+## Prompt
 
-Name this session `Detent · Weekly review <today's date>`.
-
-You are working in `Payaml3/detent-mvp`, starting from `main`. Read `CLAUDE.md`, then run the
-`weekly-review` skill (`.claude/skills/weekly-review/SKILL.md`) exactly as written:
-
-- Start with its step 0. If nothing changed since `founder/status.md`'s "Last updated" date (no commits,
-  no PR activity, CI on `main` passing), reply in at most 2 lines and stop: no branch, no PR.
-- Read only the files and GitHub data the skill lists.
-- Report progress since last week, CI health on `main`, Proposed or Open items older than 7 days,
-  contradictions between documents, merged branches not yet deleted, founder items blocking the next
-  slice, and one recommended focus.
-- Update `founder/status.md` on a branch `review/<yyyy-mm-dd>` and open a PR into `main`. Never merge it.
-- Mark nothing Approved. The recommended focus is Proposed.
-
-End with the PR link and the report, in at most 25 lines (or the 2-line early stop).
+Read AGENTS.md and HANDOFF.md. On the default branch, run the solo-to-scale `weekly-review` skill, starting with its quiet-week stop: if nothing changed since the "Last updated" date in founder/status.md and CI passes, reply in 2 lines and stop. Otherwise open the review PR and never merge it. Then run the `publish-views` skill. It republishes only the views whose sources changed, and stops if none did or if this session has no artifact tools.
