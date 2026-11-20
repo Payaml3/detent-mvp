@@ -1,6 +1,6 @@
 # 10 · Security, settings and deploy
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** security and hosting for all three layers.
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** security and hosting for all three layers.
 
 ## Settings (`.env.example`)
 

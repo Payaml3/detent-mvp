@@ -34,7 +34,7 @@ CI (`.github/workflows/ci.yml`) runs lint, typecheck, migrations and the full te
 
 | Path | Contents |
 |---|---|
-| `CLAUDE.md` | Product summary, 17 non-negotiable invariants, stack, layout, commands, definition of done, things never to do |
+| `AGENTS.md` (imported by `CLAUDE.md`) | Product summary, 17 non-negotiable invariants, stack, commands, definition of done, things never to do |
 | `spec/` | 12 specs: product context, architecture, domain model and state machine, API, policy, agents and mandates, rails and faults, console, developer portal, evaluation, security and deploy, demo script |
 | `backlog/stories.yaml` | 146 user stories in 21 epics (the source) |
 | `backlog/user-stories.md` | The stories as a readable document with acceptance-criteria checkboxes |

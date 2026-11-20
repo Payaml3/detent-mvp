@@ -203,7 +203,7 @@ eval/ docs/ sdks/ apps/site/      # S8, P3, P4
 chain/                            # MockUSDC (done)
 ```
 
-**Structure Decision**: keep the uv workspace and layout from CLAUDE.md as built in M0; new packages appear when
+**Structure Decision**: keep the uv workspace and layout from apps/api/CLAUDE.md as built in M0; new packages appear when
 their slice starts.
 
 ## Complexity Tracking

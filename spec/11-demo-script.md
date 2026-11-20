@@ -1,6 +1,6 @@
 # 11 · The 10-minute demo (update to match the built screens, DEM-05)
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** a demo that shows all three layers: decision (escalation and approval), orchestration (best rail, timeout to UNKNOWN, never paid twice) and operations (held overdue case, reconciliation, replay).
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** a demo that shows all three layers: decision (escalation and approval), orchestration (best rail, timeout to UNKNOWN, never paid twice) and operations (held overdue case, reconciliation, replay).
 
 **Before the demo:** open the app 2 minutes early so it wakes. Run `detent demo check` for wallet balances. Reset the demo data.
 

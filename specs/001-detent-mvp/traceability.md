@@ -23,7 +23,7 @@ Sources: [spec/09 §release-gate-evl-07](../../spec/09-evaluation-and-tests.md#r
 
 The API and worker refuse to start when any configured or RPC-reported chain ID is outside 84532, 11155111 and 31337, and any request using an sk_live_ key gets 403 live_mode_unavailable.
 
-Sources: [Invariant 14](../../CLAUDE.md#non-negotiable-invariants); [spec/10 §settings-envexample](../../spec/10-security-and-deploy.md#settings-envexample)
+Sources: [Invariant 14](../../AGENTS.md#non-negotiable-invariants); [spec/10 §settings-envexample](../../spec/10-security-and-deploy.md#settings-envexample)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -35,7 +35,7 @@ Sources: [Invariant 14](../../CLAUDE.md#non-negotiable-invariants); [spec/10 §s
 
 Every record carries its organisation; every read or change is scoped to one organisation; IDs are prefixed UUIDv7; money is integer minor units plus a currency.
 
-Sources: [spec/02 §conventions](../../spec/02-domain-model.md#conventions); [spec/02 §exactly-once-constraints-database](../../spec/02-domain-model.md#exactly-once-constraints-database); [Invariant 15](../../CLAUDE.md#non-negotiable-invariants); [Invariant 16](../../CLAUDE.md#non-negotiable-invariants)
+Sources: [spec/02 §conventions](../../spec/02-domain-model.md#conventions); [spec/02 §exactly-once-constraints-database](../../spec/02-domain-model.md#exactly-once-constraints-database); [Invariant 15](../../AGENTS.md#non-negotiable-invariants); [Invariant 16](../../AGENTS.md#non-negotiable-invariants)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -60,7 +60,7 @@ Sources: [FND-04 criteria](../../backlog/user-stories.md#fnd-04); [spec/07 §07-
 
 All time comes from one clock service; in demo mode the clock can be advanced by 15 minutes, 1 hour or 1 day; outside demo mode the control does not exist.
 
-Sources: [Invariant 17](../../CLAUDE.md#non-negotiable-invariants); [FND-05 criteria](../../backlog/user-stories.md#fnd-05)
+Sources: [Invariant 17](../../AGENTS.md#non-negotiable-invariants); [FND-05 criteria](../../backlog/user-stories.md#fnd-05)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -120,7 +120,7 @@ Sources: [spec/10 §hosting](../../spec/10-security-and-deploy.md#hosting); [FND
 
 A platform or an agent creates a payout intent and gets a pay_ ID, the decision and the status synchronously; the ID never changes through retries, failovers or approvals.
 
-Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout-intent); [Invariant 1](../../CLAUDE.md#non-negotiable-invariants)
+Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout-intent); [Invariant 1](../../AGENTS.md#non-negotiable-invariants)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -327,7 +327,7 @@ Sources: [spec/04 §checks](../../spec/04-policy.md#checks)
 
 A block is final: approve, retry, reroute or resubmit of a blocked payment returns 409 payment_blocked and the database rejects any status change away from BLOCKED or REJECTED.
 
-Sources: [Invariant 4](../../CLAUDE.md#non-negotiable-invariants); [POL-06 criteria](../../backlog/user-stories.md#pol-06)
+Sources: [Invariant 4](../../AGENTS.md#non-negotiable-invariants); [POL-06 criteria](../../backlog/user-stories.md#pol-06)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -388,7 +388,7 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints)
 
 Any failure in a decision path (database, screening, policy load, model) gives ESCALATE SYSTEM_UNAVAILABLE handled by the organisation's fail-safe; no error ever becomes EXECUTE.
 
-Sources: [Invariant 9](../../CLAUDE.md#non-negotiable-invariants); [spec/01 §fail-safe](../../spec/01-architecture.md#fail-safe)
+Sources: [Invariant 9](../../AGENTS.md#non-negotiable-invariants); [spec/01 §fail-safe](../../spec/01-architecture.md#fail-safe)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -489,7 +489,7 @@ Sources: [spec/05 §instruction-agent-agt-01-agt-02-agt-04](../../spec/05-agents
 
 Agents can only propose: read-only tools plus propose_payment_intent through the API with a mandate-bound key; an import-boundary test forbids agents from importing execution, rails or approval code.
 
-Sources: [Invariant 5](../../CLAUDE.md#non-negotiable-invariants); [spec/05 §containment-rules-apply-to-every-agent](../../spec/05-agents.md#containment-rules-apply-to-every-agent); [spec/01 §module-boundaries](../../spec/01-architecture.md#module-boundaries)
+Sources: [Invariant 5](../../AGENTS.md#non-negotiable-invariants); [spec/05 §containment-rules-apply-to-every-agent](../../spec/05-agents.md#containment-rules-apply-to-every-agent); [spec/01 §module-boundaries](../../spec/01-architecture.md#module-boundaries)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -501,7 +501,7 @@ Sources: [Invariant 5](../../CLAUDE.md#non-negotiable-invariants); [spec/05 §co
 
 Untrusted text reaches models only inside delimited data blocks; instructions inside them are ignored and flagged POSSIBLE_INJECTION.
 
-Sources: [Invariant 11](../../CLAUDE.md#non-negotiable-invariants); [spec/05 §containment-rules-apply-to-every-agent](../../spec/05-agents.md#containment-rules-apply-to-every-agent)
+Sources: [Invariant 11](../../AGENTS.md#non-negotiable-invariants); [spec/05 §containment-rules-apply-to-every-agent](../../spec/05-agents.md#containment-rules-apply-to-every-agent)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -537,7 +537,7 @@ Sources: [spec/05 §models-from-settings-dont-hard-code](../../spec/05-agents.md
 
 Every status change goes through one transition function, under a row lock, using the allowed-transitions table; terminal states never change.
 
-Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment-state-machine); [Invariant 13](../../CLAUDE.md#non-negotiable-invariants)
+Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment-state-machine); [Invariant 13](../../AGENTS.md#non-negotiable-invariants)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -549,7 +549,7 @@ Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment
 
 At most one in-flight and one confirmed attempt per payment, enforced by the database; rails receive idempotency keys derived from the payment ID.
 
-Sources: [Invariant 2](../../CLAUDE.md#non-negotiable-invariants); [spec/02 §exactly-once-constraints-database](../../spec/02-domain-model.md#exactly-once-constraints-database); [spec/06 §idempotency-keys-passed-to-rails](../../spec/06-rails-and-faults.md#idempotency-keys-passed-to-rails)
+Sources: [Invariant 2](../../AGENTS.md#non-negotiable-invariants); [spec/02 §exactly-once-constraints-database](../../spec/02-domain-model.md#exactly-once-constraints-database); [spec/06 §idempotency-keys-passed-to-rails](../../spec/06-rails-and-faults.md#idempotency-keys-passed-to-rails)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -586,7 +586,7 @@ Sources: [spec/06 §idempotency-keys-passed-to-rails](../../spec/06-rails-and-fa
 
 A timeout or dropped connection makes the attempt UNKNOWN, never FAILED; nothing is resent while any attempt is UNKNOWN.
 
-Sources: [Invariant 3](../../CLAUDE.md#non-negotiable-invariants); [spec/06 §adapter-contract-ral-01](../../spec/06-rails-and-faults.md#adapter-contract-ral-01)
+Sources: [Invariant 3](../../AGENTS.md#non-negotiable-invariants); [spec/06 §adapter-contract-ral-01](../../spec/06-rails-and-faults.md#adapter-contract-ral-01)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -611,7 +611,7 @@ Sources: [spec/06 §unknown-resolution-exe-06](../../spec/06-rails-and-faults.md
 
 Only the execution layer retries, only on TECHNICAL_RETRYABLE, by configured attempts and backoff, keeping the payment ID.
 
-Sources: [Invariant 6](../../CLAUDE.md#non-negotiable-invariants); [fixtures/policy/default-policy.yaml](../../fixtures/policy/default-policy.yaml)
+Sources: [Invariant 6](../../AGENTS.md#non-negotiable-invariants); [fixtures/policy/default-policy.yaml](../../fixtures/policy/default-policy.yaml)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -623,7 +623,7 @@ Sources: [Invariant 6](../../CLAUDE.md#non-negotiable-invariants); [fixtures/pol
 
 The kill switch stops all sends (checked inside the lock), holds pending payments, lets UNKNOWN attempts keep resolving, shows a red banner, is audited, and only the payments lead releases it.
 
-Sources: [Invariant 10](../../CLAUDE.md#non-negotiable-invariants); [EXE-08 criteria](../../backlog/user-stories.md#exe-08)
+Sources: [Invariant 10](../../AGENTS.md#non-negotiable-invariants); [EXE-08 criteria](../../backlog/user-stories.md#exe-08)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -832,7 +832,7 @@ Sources: [spec/05 §investigation-agent-exc-03](../../spec/05-agents.md#investig
 
 Approve or reject needs a reason; approve re-runs the policy; reject is terminal; the approver is never the initiator.
 
-Sources: [EXC-04 criteria](../../backlog/user-stories.md#exc-04); [Invariant 8](../../CLAUDE.md#non-negotiable-invariants)
+Sources: [EXC-04 criteria](../../backlog/user-stories.md#exc-04); [Invariant 8](../../AGENTS.md#non-negotiable-invariants)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -869,7 +869,7 @@ Sources: [EXC-05 criteria](../../backlog/user-stories.md#exc-05)
 
 Past the deadline the case is HELD_OVERDUE, the payment stays held, the counterparty gets a status update in the outbox and the backup owner takes over; no payment is ever approved by timeout; nothing sends real email.
 
-Sources: [Invariant 7](../../CLAUDE.md#non-negotiable-invariants); [EXC-06 criteria](../../backlog/user-stories.md#exc-06); [EXC-07 criteria](../../backlog/user-stories.md#exc-07)
+Sources: [Invariant 7](../../AGENTS.md#non-negotiable-invariants); [EXC-06 criteria](../../backlog/user-stories.md#exc-06); [EXC-07 criteria](../../backlog/user-stories.md#exc-07)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -974,7 +974,7 @@ Sources: [LED-08 criteria](../../backlog/user-stories.md#led-08)
 
 The audit log is append-only and hash-chained per organisation, written in the same transaction as each change, and its chain can be verified.
 
-Sources: [Invariant 12](../../CLAUDE.md#non-negotiable-invariants); [spec/02 §entities](../../spec/02-domain-model.md#entities)
+Sources: [Invariant 12](../../AGENTS.md#non-negotiable-invariants); [spec/02 §entities](../../spec/02-domain-model.md#entities)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
@@ -1258,7 +1258,7 @@ Sources: [spec/08 §sandbox-sbx](../../spec/08-developer-portal.md#sandbox-sbx);
 
 Sandbox reset starts a new data generation: earlier intents, cases, ledger and logs are hidden from the API and dashboard but never deleted; keys, webhooks and settings are kept.
 
-Sources: [SBX-04 criteria](../../backlog/user-stories.md#sbx-04); [Invariant 12](../../CLAUDE.md#non-negotiable-invariants)
+Sources: [SBX-04 criteria](../../backlog/user-stories.md#sbx-04); [Invariant 12](../../AGENTS.md#non-negotiable-invariants)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|

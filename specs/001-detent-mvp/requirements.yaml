@@ -4,7 +4,7 @@
 # id:      FR-nnn, stable
 # area:    capability area; layer: decision | orchestration | operations | cross-cutting | portal
 # text:    the requirement, testable
-# src:     source references. "spec/04#checks" = spec/04-policy.md heading anchor; "inv:N" = CLAUDE.md
+# src:     source references. "spec/04#checks" = spec/04-policy.md heading anchor; "inv:N" = AGENTS.md
 #          invariant N; "fixture:<path>"; "story:<ID>" = acceptance criteria in backlog/stories.yaml
 # stories: backlog stories that implement it (model-item codes are taken from their `trace`)
 # status:  confirmed (stated in a source) | proposed (my decision, pending) | open (founder decides)

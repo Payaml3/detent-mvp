@@ -13,7 +13,7 @@
   delimited data blocks. Uncertain values MUST be flagged and nulled, never guessed.
 
 Rationale: on irreversible rails a wrong decision cannot be undone; decisions stay with rules the
-client owns (CLAUDE.md invariants 5, 11; spec/05).
+client owns (AGENTS.md invariants 5, 11; spec/05).
 
 ### II. Exactly once (NON-NEGOTIABLE)
 
@@ -64,7 +64,7 @@ Rationale: invariants 14–17.
 - A test that guards an invariant MUST NOT be weakened to make a change pass; if a story seems to
   need an exception, work stops and the founder is asked.
 
-Rationale: CLAUDE.md "How to work a story" and "Non-negotiable invariants".
+Rationale: AGENTS.md "How to work a story" and "Non-negotiable invariants".
 
 ### VII. Honesty, independence and no invented rules
 
@@ -77,7 +77,7 @@ Rationale: CLAUDE.md "How to work a story" and "Non-negotiable invariants".
   documents don't settle is recorded as a proposed decision and is not treated as confirmed until
   the founder approves it.
 
-Rationale: spec/00 honesty rules; CLAUDE.md "Things never to do" and "Open decisions".
+Rationale: spec/00 honesty rules; AGENTS.md "Things never to do" and "Open decisions".
 
 ## Product and Honesty Constraints
 
@@ -104,7 +104,7 @@ Rationale: spec/00 honesty rules; CLAUDE.md "Things never to do" and "Open decis
 
 ## Governance
 
-- This constitution restates `CLAUDE.md`; it does not supersede it. Amendments change both in the
+- This constitution restates `AGENTS.md`; it does not supersede it. Amendments change both in the
   same commit and need the founder's approval.
 - Versioning: MAJOR for removing or redefining a principle; MINOR for a new principle or section;
   PATCH for wording.

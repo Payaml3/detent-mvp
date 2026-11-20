@@ -1,6 +1,6 @@
 # 04 · Policy
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** the **decision** layer.
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** the **decision** layer.
 
 ## Principles
 

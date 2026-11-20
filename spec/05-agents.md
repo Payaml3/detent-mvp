@@ -1,6 +1,6 @@
 # 05 · Agents and mandates
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** the AI agents that work across all three layers (instruction agent for decision, investigation agent and reconciliation agent for operations), and mandates (decision).
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** the AI agents that work across all three layers (instruction agent for decision, investigation agent and reconciliation agent for operations), and mandates (decision).
 
 ## Containment rules (apply to every agent)
 

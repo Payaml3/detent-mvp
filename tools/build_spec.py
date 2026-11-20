@@ -2,7 +2,7 @@
 
 Usage: python tools/build_spec.py
 Reads:  backlog/stories.yaml, backlog/model-items.yaml, specs/001-detent-mvp/{requirements,slices,test-map}.yaml,
-        spec/*.md and CLAUDE.md (for anchors), apps/api/tests/**/*.py (for test IDs)
+        spec/*.md and AGENTS.md (for anchors), apps/api/tests/**/*.py (for test IDs)
 Writes: specs/001-detent-mvp/{inventory,traceability,tasks}.md
 Fails (exit 1) if:
   - a requirement cites an unknown story, an unknown decision ID, or a source anchor that doesn't exist
@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 FEAT = ROOT / "specs" / "001-detent-mvp"
 TESTS = ROOT / "apps" / "api" / "tests"
 SPEC_FILES = {p.name[:2]: p for p in (ROOT / "spec").glob("[0-9][0-9]-*.md")}
-INVARIANTS_ANCHOR = "../../CLAUDE.md#non-negotiable-invariants"
+INVARIANTS_ANCHOR = "../../AGENTS.md#non-negotiable-invariants"
 
 EPIC_LEVEL = {
     "FND": "integration",
@@ -389,7 +389,7 @@ def write_inventory(reqs, req_links, req_models, items, item_reqs, inv_reqs, sto
         out.append(f"| {code} | {it['source']} | {it['item']} | {it['status']} | {reqs_for} |")
     out += [
         "",
-        "## 3. Non-negotiable invariants (CLAUDE.md)",
+        "## 3. Non-negotiable invariants (AGENTS.md)",
         "",
         "| Invariant | Requirements |",
         "|---|---|",

@@ -1,6 +1,6 @@
 # 08 · Developer portal: dashboard, sandbox, docs, SDKs and website
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** how developers and buyers reach all three layers (dashboard, sandbox, docs, SDKs, website).
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** how developers and buyers reach all three layers (dashboard, sandbox, docs, SDKs, website).
 
 Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and docs are public. **Sandbox keys are not self-serve.** A developer gets keys only after contacting sales by email or booking a demo; the admin then creates the organisation and sends an invite.
 
