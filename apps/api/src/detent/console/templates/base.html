@@ -38,12 +38,14 @@
     {% for href, label in [("/console/", "Overview"), ("/console/payments", "Payments"), ("/console/exceptions", "Exceptions"), ("/console/invoices", "Invoices"),
                            ("/console/reconciliation", "Reconciliation"), ("/console/rails", "Rails"), ("/console/policy", "Policy"),
                            ("/console/mandates", "Mandates"), ("/console/counterparties", "Counterparties"), ("/console/outbox", "Outbox"),
-                           ("/console/audit", "Audit"), ("/console/evaluation", "Evaluation"), ("/console/settings", "Settings")] %}
+                           ("/console/audit", "Audit"), ("/console/evaluation", "Evaluation"), ("/console/settings", "Settings"),
+                           ("/console/demo", "Demo")] %}
     <a href="{{ href }}">{{ label }}</a>
     {% endfor %}
   </nav>
   {% endif %}
   <main>{% block main %}{% endblock %}</main>
-  <footer>Fictional demo data. {{ brand }} is a working name. Agentic payment controls: decision, orchestration and operations.</footer>
+  <footer>Fictional demo data. {{ brand }} is a working name. Agentic payment controls: decision, orchestration and operations.
+    <span class="regions">Hosted in {{ hosting_region }} · database in {{ database_region }}.</span></footer>
 </body>
 </html>

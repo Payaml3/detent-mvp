@@ -38,7 +38,7 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 | **Audit** | Event stream with filters; hash-chain status | Verify chain | AUD-01 |
 | **Evaluation** | Latest results.json summary; link to the report | Run suite (demo) | EVL-06 |
 | **Settings** | Mode, fail-safe, deadlines, routing weights | Change mode (needs two roles) | CON-10, EXE-09 |
-| **Demo** | Scenario runner: $18,500 flow; forced timeout; 20-payment batch; attack sample; reset | Run; reset | CON-09 |
+| **Demo** | Scenario runner: $18,500 invoice; forced timeout; 20-payment batch; close the day; attack sample; reset. Each scenario runs once per demo generation and then shows what it did. Not in the public sandbox | Run; reset (payments lead) | CON-09 |
 
 ## UX rules
 
@@ -46,3 +46,16 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 - Use one colour per status: CONFIRMED blue, UNKNOWN amber, BLOCKED and REJECTED orange or red, ESCALATED ink outline.
 - Destructive or irreversible buttons (Approve, Send, Kill switch release) ask for confirmation in-page, not with a browser dialog.
 - Agent content is visually distinct (a tinted panel with an "AI-generated, cited" label). It is never mixed into the raw facts.
+
+## As built (S9, CON-09)
+
+- **Reset is a new data generation** (D-08 applied to the demo): a fresh fictional organisation seeded from the
+  fixtures (`org_demo_g2`, ...), recorded in the append-only `demo_generations` table. The console, the demo clock
+  and the agent's key follow the newest generation. Nothing is deleted: the previous generation keeps its audit
+  log and ledger, and its kill switch is engaged at reset so it can never send again. A reset is refused while
+  any attempt is in flight, and only the payments lead can reset. The demo clock carries over (never backwards).
+- **Scenarios** (`detent/demo/scenarios.py`, also `detent demo run <id>`) go through the product's own services:
+  the rules decide and the worker sends. The runner never sends a payout or approves anything; it plays the
+  outside world (fictional payers sending deposits, a fault armed on the proxy for the next matching send).
+  Idempotent: a second run in the same generation returns the recorded result (`demo.scenario_run`).
+- **Footer:** the hosting and database regions (FND-07).

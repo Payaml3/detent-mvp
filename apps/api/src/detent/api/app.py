@@ -131,6 +131,10 @@ def create_app(
 
     @app.get("/healthz", include_in_schema=False)
     def healthz() -> JSONResponse:
+        """FND-07: the database and both chain RPCs, each reported. A chain RPC that is not configured is
+        reported as such; it fails the check only in demo mode, where the demo needs both testnets."""
+        from detent.chainguard import rpc_health
+
         checks: dict[str, str] = {}
         try:
             with rt.engine.connect() as conn:
@@ -139,9 +143,18 @@ def create_app(
         except Exception as exc:  # report, never raise, from a health check
             log.warning("healthz database check failed", extra={"error": type(exc).__name__})
             checks["database"] = "error"
-        ok = all(v == "ok" for v in checks.values())
+        checks.update(rpc_health(settings))
+        required_ok = {"ok"} if settings.is_demo else {"ok", "not_configured"}
+        ok = checks["database"] == "ok" and all(
+            v in required_ok for k, v in checks.items() if k != "database"
+        )
         return JSONResponse(
-            {"status": "ok" if ok else "degraded", "checks": checks, "env": settings.app_env},
+            {
+                "status": "ok" if ok else "degraded",
+                "checks": checks,
+                "env": settings.app_env,
+                "regions": {"hosting": settings.hosting_region, "database": settings.database_region},
+            },
             status_code=200 if ok else 503,
         )
 

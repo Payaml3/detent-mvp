@@ -149,6 +149,14 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
     return out
 
 
+def _address_of(key: Any) -> str | None:
+    if key is None:
+        return None
+    from eth_account import Account
+
+    return str(Account.from_key(key.get_secret_value()).address)
+
+
 def seed_rails(conn: Connection, org_id: str, settings: Settings) -> list[str]:
     """Install the fixture rails for an organisation. EVM rails get their token address from settings
     (and from chain/local.json for the local chain)."""
@@ -158,6 +166,11 @@ def seed_rails(conn: Connection, org_id: str, settings: Settings) -> list[str]:
         "base-sepolia": settings.usdc_address_base_sepolia,
         "eth-sepolia": settings.usdc_address_eth_sepolia,
         "local-evm": local.get("usdc_address"),
+    }
+    senders = {
+        "base-sepolia": settings.test_wallet_private_key_base,
+        "eth-sepolia": settings.test_wallet_private_key_eth,
+        "local-evm": settings.test_wallet_private_key_local,
     }
     installed = []
     for r in data["rails"]:
@@ -175,6 +188,9 @@ def seed_rails(conn: Connection, org_id: str, settings: Settings) -> list[str]:
             currency=r["currency"],
             chain_id=r.get("chain_id"),
             token_address=tokens.get(r["id"]),
+            # The sending wallet, so the watcher records the rail's own payouts for reconciliation (S9 found
+            # seeded rails had none, so every chain payout showed as missing on the rail).
+            from_address=_address_of(senders.get(r["id"])),
             confirmations=int(r.get("confirmations", 1)),
             prefunded_daily_limit=Money.parse(lim, r["currency"]) if lim else None,
             weights=data.get("routing_weights"),

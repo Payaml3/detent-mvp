@@ -26,6 +26,7 @@ from detent.console.auth import (
 from detent.db.engine import transaction
 from detent.db.repo import OrgScoped
 from detent.db.tables import kill_switch
+from detent.demo.generations import active_org, agent_key_for
 from detent.domain.roles import Role
 from detent.intents.registry import update_destination
 from detent.runtime import Runtime
@@ -38,7 +39,7 @@ router = APIRouter(prefix="/console")
 
 def _kill_switch_engaged(rt: Runtime) -> bool:
     with rt.engine.connect() as conn:
-        repo = OrgScoped(conn, rt.settings.demo_org_id)
+        repo = OrgScoped(conn, active_org(conn, rt.settings.demo_org_id))
         v = conn.execute(repo.select(kill_switch, kill_switch.c.engaged)).scalar_one_or_none()
     return bool(v)
 
@@ -51,6 +52,8 @@ def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ct
         "demo_mode": rt.settings.is_demo,
         "now": rt.clock.now(),
         "demo_steps": list(DEMO_STEPS),
+        "hosting_region": rt.settings.hosting_region,
+        "database_region": rt.settings.database_region,
     }
     return templates.TemplateResponse(request, name, {**base, **ctx})
 
@@ -941,7 +944,7 @@ def submit_as_agent(
 
     from detent.agents.submit import NotReady, submit_proposal
 
-    key = rt.settings.agent_api_key
+    key = agent_key_for(rt.settings, user.org_id)
     if key is None:
         raise HTTPException(status_code=409, detail="the agent's API key is not configured (AGENT_API_KEY)")
     try:
@@ -1303,6 +1306,81 @@ def console_reject_fix(
     except FixError as exc:
         return _recon_redirect(exc)
     return _recon_redirect()
+
+
+# ------------------------------------------------------------------------------------ CON-09 demo runner
+def _demo_enabled(rt: Runtime) -> None:
+    """The scenario runner exists in the demo and on developer machines, never in the public sandbox."""
+    if rt.settings.app_env == "sandbox":
+        raise HTTPException(status_code=404)
+
+
+@router.get("/demo", response_class=HTMLResponse)
+def demo_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    from detent.demo.generations import current_generation
+    from detent.demo.scenarios import SCENARIOS, recorded
+
+    _demo_enabled(rt)
+    with rt.engine.connect() as conn:
+        gen = current_generation(conn, rt.settings.demo_org_id)
+    results = {sid: recorded(rt, user.org_id, sid) for sid in SCENARIOS if sid != "reset"}
+    return page(
+        request,
+        rt,
+        "demo.html",
+        user,
+        scenarios=list(SCENARIOS.values()),
+        results=results,
+        generation=gen,
+        flash=request.query_params.get("result"),
+        error=request.query_params.get("error"),
+    )
+
+
+@router.get("/demo/invoice.txt")
+def demo_invoice(
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> Response:
+    """The $18,500 invoice as the fictional supplier sent it, for dropping on the Invoices screen."""
+    from detent.demo.scenarios import CANONICAL_INVOICE, demo_document
+
+    _demo_enabled(rt)
+    body = demo_document(rt, user.org_id, CANONICAL_INVOICE)
+    return Response(
+        body,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'attachment; filename="bluefin-invoice-18500-usdc.txt"'},
+    )
+
+
+@router.post("/demo/run/{scenario_id}")
+def demo_run(
+    request: Request,
+    scenario_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    from urllib.parse import quote
+
+    from detent.demo.scenarios import SCENARIOS, ScenarioError, run_scenario
+
+    _demo_enabled(rt)
+    if scenario_id not in SCENARIOS:
+        raise HTTPException(status_code=404)
+    try:
+        result = run_scenario(rt, user.org_id, scenario_id, Actor(user.id, user.role.value))
+    except ScenarioError as exc:
+        return RedirectResponse(f"/console/demo?error={quote(str(exc)[:400])}", status_code=303)
+    if scenario_id == "reset":
+        request.session.pop("user_id", None)  # the new generation has its own users
+        return RedirectResponse("/console/act-as", status_code=303)
+    note = " ".join(result.lines)[:600]
+    return RedirectResponse(f"/console/demo?result={quote(note)}#{scenario_id}", status_code=303)
 
 
 # ------------------------------------------------------------------------------------- AUD-02 replay

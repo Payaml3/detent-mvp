@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Demo{% endblock %}
+{% block main %}
+<h1>Demo scenarios</h1>
+<p class="note">One click per part of the 10-minute demo (spec/11). Each scenario runs once per demo generation;
+running it again shows what it did. Payouts go through the rules and the worker like any other payment: the runner
+never sends or approves anything. It only plays the outside world (fictional payers, faults on the next send).
+Current generation: <strong>{{ generation }}</strong> ({{ user.org_id }}).</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if flash %}<p class="ok" role="status">{{ flash }}</p>{% endif %}
+<table>
+  <thead><tr><th>Minute</th><th>Scenario</th><th>What it does</th><th>Result in this generation</th><th></th></tr></thead>
+  <tbody>
+  {% for sc in scenarios %}
+    {% set r = results.get(sc.id) %}
+    <tr id="{{ sc.id }}">
+      <td>{{ sc.minute }}</td>
+      <td><strong>{{ sc.title }}</strong></td>
+      <td>{{ sc.what }}</td>
+      <td>
+        {% if r %}
+          {% for line in r.lines %}<div>{{ line }}</div>{% endfor %}
+          {% for label, href in r.links %}<a href="{{ href }}">{{ label }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
+        {% elif sc.id == 'reset' %}<span class="muted">Starts generation {{ generation + 1 }}; payments lead only.</span>
+        {% else %}<span class="muted">Not run yet.</span>{% endif %}
+      </td>
+      <td>
+        <form method="post" action="/console/demo/run/{{ sc.id }}">
+          <button class="{{ 'danger' if sc.id == 'reset' else '' }}" {{ 'disabled' if r else '' }}>{{ 'Reset' if sc.id == 'reset' else ('Done' if r else 'Run') }}</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

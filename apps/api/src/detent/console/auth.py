@@ -16,6 +16,7 @@ from fastapi import Depends, HTTPException, Request
 from detent.audit.log import Actor
 from detent.db.repo import OrgScoped
 from detent.db.tables import users
+from detent.demo.generations import active_org
 from detent.domain.roles import Role, allowed
 from detent.runtime import Runtime
 
@@ -61,7 +62,7 @@ def require_login(request: Request) -> None:
 
 def load_user(rt: Runtime, user_id: str) -> ActingUser | None:
     with rt.engine.connect() as conn:
-        repo = OrgScoped(conn, rt.settings.demo_org_id)
+        repo = OrgScoped(conn, active_org(conn, rt.settings.demo_org_id))
         row = conn.execute(repo.select(users).where(users.c.id == user_id)).one_or_none()
     if row is None:
         return None
@@ -70,7 +71,7 @@ def load_user(rt: Runtime, user_id: str) -> ActingUser | None:
 
 def list_users(rt: Runtime) -> list[ActingUser]:
     with rt.engine.connect() as conn:
-        repo = OrgScoped(conn, rt.settings.demo_org_id)
+        repo = OrgScoped(conn, active_org(conn, rt.settings.demo_org_id))
         rows = conn.execute(repo.select(users).order_by(users.c.id)).all()
     return [ActingUser(r.id, r.org_id, r.display_name, Role(r.role)) for r in rows]
 
