@@ -54,7 +54,7 @@ def test_low_balances_ask_for_a_top_up_with_faucets() -> None:
         ("payer", "eth-sepolia"): "top_up",
     }
     out = render(lines)
-    assert "faucet.circle.com" in out and "top up 18,781.42 test USDC" in out
+    assert "detent demo token fund --network base-sepolia" in out and "top up 18,781.42 test USDC" in out
 
 
 def test_a_wrong_chain_is_reported_not_trusted() -> None:

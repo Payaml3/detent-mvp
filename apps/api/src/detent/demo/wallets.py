@@ -22,11 +22,11 @@ CANONICAL_MINOR = 1_850_000  # the $18,500 invoice, paid on Base Sepolia (spec/1
 FAUCETS = {
     "base-sepolia": (
         "Test ETH: a Base Sepolia faucet listed at docs.base.org (tools, network faucets). "
-        "Test USDC: faucet.circle.com, network Base Sepolia."
+        "Test USDC: the demo's own test token (D-33): detent demo token fund --network base-sepolia."
     ),
     "eth-sepolia": (
         "Test ETH: a Sepolia faucet (for example the ones listed at ethereum.org, developers, networks). "
-        "Test USDC: faucet.circle.com, network Ethereum Sepolia."
+        "Test USDC: the demo's own test token (D-33): detent demo token fund --network eth-sepolia."
     ),
 }
 

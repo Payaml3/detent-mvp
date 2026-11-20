@@ -11,6 +11,7 @@ detent agent record      run the instruction agent on an invoice with the Claude
 detent demo check        test-wallet balances per wallet and chain, and what to top up (DEM-04)
 detent demo run <id>     run one demo scenario in the current generation (CON-09); --list shows them
 detent demo reset        start a new demo data generation; nothing is deleted (CON-09)
+detent demo token deploy|fund --network <n>   the demo's own labelled test token (D-33)
 detent eval run ...      evaluation suites and the release gate (eval/, S8)
 """
 
@@ -198,6 +199,35 @@ def cmd_demo_check(_: argparse.Namespace) -> int:
     return 0 if all(w.ok for w in lines) else 1
 
 
+def cmd_demo_token(args: argparse.Namespace) -> int:
+    from detent.demo.token import ENV_NAME, TokenError, deploy_token, fund
+
+    settings = _load_settings()
+    try:
+        if args.step == "deploy":
+            address = deploy_token(settings, args.network)
+            print(
+                f"deployed the demo token (tUSDC, a test stand-in, not USDC) on {args.network} at {address}"
+            )
+            print(
+                f"set {ENV_NAME[args.network]}={address}, "
+                f"then run: detent demo token fund --network {args.network}"
+            )
+            return 0
+        minted = fund(settings, args.network, runs=args.runs)
+    except TokenError as exc:
+        print(f"detent demo token: {exc}", file=sys.stderr)
+        return 1
+    if not minted:
+        print(f"{args.network}: both wallets already hold enough for {args.runs} run(s)")
+    for m in minted:
+        print(
+            f"{args.network}: minted {m.cents // 100:,}.{m.cents % 100:02d} tUSDC "
+            f"to the {m.role} ({m.address})"
+        )
+    return 0
+
+
 def cmd_demo_run(args: argparse.Namespace) -> int:
     from detent.audit.log import Actor
     from detent.demo.generations import active_demo_org, demo_user_id
@@ -252,6 +282,13 @@ def main(argv: list[str] | None = None) -> int:
     dr.add_argument("scenario", nargs="?")
     dr.add_argument("--list", action="store_true")
     dr.set_defaults(fn=cmd_demo_run)
+    tk = dm.add_parser("token").add_subparsers(dest="step", required=True)
+    for name in ("deploy", "fund"):
+        tp = tk.add_parser(name)
+        tp.add_argument("--network", required=True, choices=["base-sepolia", "eth-sepolia"])
+        if name == "fund":
+            tp.add_argument("--runs", type=int, default=3)
+        tp.set_defaults(fn=cmd_demo_token)
     dm.add_parser("reset").set_defaults(
         fn=lambda a: cmd_demo_run(argparse.Namespace(list=False, scenario="reset"))
     )

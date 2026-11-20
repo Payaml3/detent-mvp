@@ -120,8 +120,9 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
 - **S9 live run:** a Render account (Frankfurt) and a Neon project in an EU region; the plans (Render's free plan
   covers the web service only; the worker and the two private services need a paid instance type: Proposed);
   the secrets in `render.yaml`; funded test wallets (four: sender and payer on each chain).
-- **G-27 (Open):** which test USDC: the script needs about $20,000 of test USDC per run and Circle's faucet gives
-  about 20 per request. Recommended: our own labelled test token (needs `MockUSDC.sol` to allow the two Sepolias).
+- **G-27 Confirmed (D-33):** the live demo pays in its own labelled test token (tUSDC). Before the live run, per
+  network: `detent demo token deploy --network <n>`, set `USDC_ADDRESS_*` to the printed address, then
+  `detent demo token fund --network <n>`; gas comes from a faucet.
 - C-10 (match line counts money-moving items only) and C-13 (scope) were asked on 2026-11-20; still Proposed/Open
   until answered.
 - `ANTHROPIC_API_KEY` (also as a GitHub secret for the nightly eval): every agent answer is a labelled

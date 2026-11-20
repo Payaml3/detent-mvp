@@ -2,12 +2,17 @@
 pragma solidity 0.8.28;
 
 /// @title MockUSDC
-/// @notice A 6-decimal ERC-20 for the local test chain (anvil, chain ID 31337) only.
-///         It has an open mint so tests can fund wallets. Never deploy it to a public network.
+/// @notice A 6-decimal ERC-20 test stand-in for USDC. It is not USDC and has no value.
+///         It deploys only on the test chains Detent allows: anvil (31337), Base Sepolia (84532)
+///         and Ethereum Sepolia (11155111) (decision D-33). Any other chain, mainnets included,
+///         reverts in the constructor. Only the deployer can mint, so on a public test network
+///         nobody else can create balances in it.
 contract MockUSDC {
-    string public constant name = "Mock USD Coin (test only)";
-    string public constant symbol = "USDC";
+    string public constant name = "Detent Demo USD (test stand-in, not USDC)";
+    string public constant symbol = "tUSDC";
     uint8 public constant decimals = 6;
+
+    address public immutable minter;
 
     uint256 public totalSupply;
     mapping(address => uint256) public balanceOf;
@@ -17,10 +22,15 @@ contract MockUSDC {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     constructor() {
-        require(block.chainid == 31337, "MockUSDC: local chain only");
+        require(
+            block.chainid == 31337 || block.chainid == 84532 || block.chainid == 11155111,
+            "MockUSDC: test chains only"
+        );
+        minter = msg.sender;
     }
 
     function mint(address to, uint256 amount) external {
+        require(msg.sender == minter, "MockUSDC: minter only");
         totalSupply += amount;
         balanceOf[to] += amount;
         emit Transfer(address(0), to, amount);

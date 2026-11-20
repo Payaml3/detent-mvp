@@ -6,7 +6,7 @@ Every screen named below is in the console nav. Every "Demo" step is one button 
 
 **Before the demo (10 minutes ahead):**
 1. Open the app 2 minutes early so it wakes (the free web service sleeps). `/healthz` must show `database`, `base-sepolia` and `eth-sepolia` as `ok`.
-2. Run `detent demo check`: every wallet line must say `OK` (test USDC and gas for one full run; it says what to top up and where).
+2. Run `detent demo check`: every wallet line must say `OK` (test USDC and gas for one full run; it says what to top up and where). Once per network, the demo's own test token is deployed with `detent demo token deploy` and topped up with `detent demo token fund` (D-33).
 3. Act as **Priya (payments lead)**, open **Demo** and click **Reset demo data**. This starts a new data generation; nothing is deleted. Then act as Priya again.
 4. On **Demo**, click **Download the invoice** (it is also offered after the first scenario) so the $18,500 invoice is ready to drop.
 
@@ -26,4 +26,5 @@ Every screen named below is in the console nav. Every "Demo" step is one button 
 - The match line counts only items that moved money (decision C-10, **Proposed**: the founder has not approved it yet). If the presenter approves both escalations before Close the day, the line should read 26 of 27 (not yet covered by a test).
 - The Evaluation screen in the console is not built yet (it says so); show the report file instead.
 - Agent answers are hand-written stand-ins, labelled as such on screen, until an `ANTHROPIC_API_KEY` is set and real runs are recorded.
+- On the live test networks the "USDC" is the demo's own test token, tUSDC ("Detent Demo USD, test stand-in, not USDC"; D-33); say so if asked. Local runs use the same contract on anvil.
 - Every name in the demo is invented and labelled fictional. The batch pays counterparties only: user payouts are deferred (D-26, D-32).

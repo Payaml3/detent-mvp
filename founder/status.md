@@ -33,7 +33,6 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 | `ANTHROPIC_API_KEY`, also as a GitHub secret for the nightly eval (AGT-01, EVL-04) | Founder | S9 |
 | Funded test wallets for Base Sepolia and Ethereum Sepolia: a sender and a demo payer on each (RAL-02, RAL-03, DEM-04) | Founder | S9 live run |
 | Render (Frankfurt) and Neon (EU) accounts, the plans (worker is not on Render's free plan: Proposed), the `render.yaml` secrets (FND-07) | Founder | S9 live run |
-| G-27: which test USDC (about $20,000 per run; the faucet gives about 20 per request) | Founder (decision) | S9 live run |
 | Testnet RPC endpoints and wallets as secrets for the nightly eval (EVL-07 criterion 0) | Founder | S9 |
 | C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open | Founder | S9 (C-10, C-13), P1 to P2 (rest) |
 | Publish measured results on the website (`detent eval publish`, EVL-06 criterion 1) | Founder, then Claude | P4 |

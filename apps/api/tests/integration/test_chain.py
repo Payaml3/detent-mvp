@@ -41,7 +41,7 @@ def test_mock_usdc_has_6_decimals_and_funded_accounts(chain: devchain.LocalChain
     w3 = Web3(Web3.HTTPProvider(chain.rpc_url))
     usdc = w3.eth.contract(address=chain.usdc_address, abi=devchain.abi())
     assert usdc.functions.decimals().call() == 6
-    assert usdc.functions.symbol().call() == "USDC"
+    assert usdc.functions.symbol().call() == "tUSDC"  # D-33: labelled as a test stand-in, never "USDC"
     assert usdc.functions.balanceOf(chain.accounts[0]).call() == devchain.MINT_MINOR
 
 

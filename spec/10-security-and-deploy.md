@@ -36,7 +36,7 @@ EMAIL_PROVIDER=outbox                # outbox | <provider>
 SALES_INBOX=...
 ```
 
-The two testnet USDC contract addresses were checked against Circle's "USDC on Test Networks" page on 17 Nov 2026 (https://developers.circle.com/docs/usdc-on-testnet). Re-check them if a transfer fails. Startup fails if a configured chain ID is not in `ALLOWED_CHAIN_IDS`.
+The two testnet USDC contract addresses were checked against Circle's "USDC on Test Networks" page on 17 Nov 2026 (https://developers.circle.com/docs/usdc-on-testnet). Re-check them if a transfer fails. The live demo instead sets both to its own test token (D-33): `detent demo token deploy --network <n>` deploys `chain/src/MockUSDC.sol` ("Detent Demo USD (test stand-in, not USDC)", symbol `tUSDC`) from the sending wallet and prints the address to set. The contract reverts on any chain but 31337, 84532 and 11155111, and only its deployer can mint. Startup fails if a configured chain ID is not in `ALLOWED_CHAIN_IDS`.
 
 ## Security controls in the MVP
 
@@ -85,7 +85,8 @@ Recheck free-tier limits and prices when you deploy; they change.
 ## Runbooks (write as the features land)
 
 - **Fund test wallets:** `detent demo check` (DEM-04) prints each demo wallet's test USDC and gas against what one
-  full demo run needs (from the fixtures), and what to top up. Then Circle's faucet (20 test USDC per address per chain every 2 hours, as of Nov 2026; check), plus a gas faucet for each chain.
+  full demo run needs (from the fixtures), and what to top up. `detent demo token fund --network <n> [--runs 3]`
+  mints the demo token (D-33) to the sending wallet and the payer up to that many runs; gas still comes from a faucet for each chain.
 - **Kill switch:** engage from the Overview or `POST /v1/kill_switch`; release by the payments lead only.
 - **Sev 1:** triggered by the invariant monitor. Kill switch on, incident opened, notification within 1 hour (outbox), replay the affected payments, root cause within 5 days.
 - **Restore (OPS-03):** use the provider's point-in-time restore to a new branch, run `detent audit verify` and switch the URL. Target under 1 hour.

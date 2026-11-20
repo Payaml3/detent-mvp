@@ -1,6 +1,6 @@
 """CON-09 and DEM-03: the demo scenario runner, end to end on a local rehearsal of the demo's three rails.
 
-Two local anvil chains (chain 31337, with MockUSDC, which refuses any other chain) stand in for Base Sepolia
+Two local anvil chains (chain 31337, with MockUSDC; `devchain.deploy` is local-only) stand in for Base Sepolia
 and Ethereum Sepolia: after seeding, this test points the organisation's two EVM rails at chain 31337. The bank
 simulator is the bank rail and the fault proxy sits in front of "Base Sepolia". The demo organisation is seeded
 from the fixtures and the real worker sends. Test networks only (invariant 14).

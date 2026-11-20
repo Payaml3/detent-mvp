@@ -36,7 +36,7 @@ class RailAdapter(Protocol):
 
 | Rail | ID | Currency | Settlement | Notes |
 |---|---|---|---|---|
-| Base Sepolia | `base-sepolia` | USDC (testnet) | About 2 s blocks; confirmations threshold 3 (config) | Test USDC from Circle's faucet |
+| Base Sepolia | `base-sepolia` | USDC (testnet) | About 2 s blocks; confirmations threshold 3 (config) | Test USDC (Circle's testnet contract) by default; the live demo uses its own labelled test token, tUSDC (D-33) |
 | Ethereum Sepolia | `eth-sepolia` | USDC (testnet) | About 12 s blocks; threshold 2 (config) | Higher fee profile in routing |
 | Bank simulator, Faster Payments-style | `banksim-fps` | GBP | Instant; cut-off none; limits configurable | Separate app `apps/banksim` |
 | Bank simulator, SEPA Instant-style | `banksim-sepa-inst` | EUR | Instant | Same app, second scheme |
