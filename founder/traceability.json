@@ -1,0 +1,1722 @@
+{
+ "chain": [
+  {
+   "order": 1,
+   "level": "User stories",
+   "total": 146,
+   "done": 66,
+   "pct": 45
+  },
+  {
+   "order": 2,
+   "level": "Acceptance criteria",
+   "total": 308,
+   "done": 210,
+   "pct": 68
+  },
+  {
+   "order": 3,
+   "level": "Criteria with test evidence",
+   "total": 308,
+   "done": 0,
+   "pct": 0
+  }
+ ],
+ "functions": [
+  {
+   "function": "00 Founder HQ",
+   "measure": "Decisions resolved",
+   "done": 32,
+   "total": 81,
+   "pct_done": 40
+  },
+  {
+   "function": "03 Architecture",
+   "measure": "Acceptance criteria done in the architect's epics",
+   "done": 0,
+   "total": 0,
+   "pct_done": 0
+  },
+  {
+   "function": "04 Engineering",
+   "measure": "Acceptance criteria done in the engineers' epics",
+   "done": 210,
+   "total": 304,
+   "pct_done": 69
+  },
+  {
+   "function": "05 QA",
+   "measure": "Acceptance criteria done in the QA epics",
+   "done": 0,
+   "total": 0,
+   "pct_done": 0
+  },
+  {
+   "function": "06 GTM",
+   "measure": "Acceptance criteria done in the growth epics",
+   "done": 0,
+   "total": 4,
+   "pct_done": 0
+  }
+ ],
+ "initiatives": [
+  {
+   "code": "AGT",
+   "initiative": "Mandates and instruction agent",
+   "role": "engineer",
+   "stories": 9,
+   "criteria": 27,
+   "criteria_done": 25,
+   "pct_done": 93
+  },
+  {
+   "code": "API",
+   "initiative": "Public sandbox API",
+   "role": "engineer",
+   "stories": 7,
+   "criteria": 10,
+   "criteria_done": 2,
+   "pct_done": 20
+  },
+  {
+   "code": "AUD",
+   "initiative": "Audit and replay",
+   "role": "engineer",
+   "stories": 3,
+   "criteria": 7,
+   "criteria_done": 5,
+   "pct_done": 71
+  },
+  {
+   "code": "CON",
+   "initiative": "Back-office console",
+   "role": "engineer",
+   "stories": 10,
+   "criteria": 16,
+   "criteria_done": 11,
+   "pct_done": 69
+  },
+  {
+   "code": "DEM",
+   "initiative": "Demo data and scenarios",
+   "role": "engineer",
+   "stories": 6,
+   "criteria": 7,
+   "criteria_done": 1,
+   "pct_done": 14
+  },
+  {
+   "code": "DOC",
+   "initiative": "Docs portal",
+   "role": "engineer",
+   "stories": 6,
+   "criteria": 8,
+   "criteria_done": 0,
+   "pct_done": 0
+  },
+  {
+   "code": "DSH",
+   "initiative": "Developer dashboard",
+   "role": "engineer",
+   "stories": 10,
+   "criteria": 12,
+   "criteria_done": 0,
+   "pct_done": 0
+  },
+  {
+   "code": "EVL",
+   "initiative": "Evaluation harness",
+   "role": "engineer",
+   "stories": 8,
+   "criteria": 13,
+   "criteria_done": 11,
+   "pct_done": 85
+  },
+  {
+   "code": "EXC",
+   "initiative": "Exceptions and investigation",
+   "role": "engineer",
+   "stories": 9,
+   "criteria": 21,
+   "criteria_done": 16,
+   "pct_done": 76
+  },
+  {
+   "code": "EXE",
+   "initiative": "Exactly-once execution",
+   "role": "engineer",
+   "stories": 10,
+   "criteria": 32,
+   "criteria_done": 29,
+   "pct_done": 91
+  },
+  {
+   "code": "FND",
+   "initiative": "Foundation",
+   "role": "engineer",
+   "stories": 9,
+   "criteria": 29,
+   "criteria_done": 24,
+   "pct_done": 83
+  },
+  {
+   "code": "INT",
+   "initiative": "Payment intents",
+   "role": "engineer",
+   "stories": 5,
+   "criteria": 15,
+   "criteria_done": 12,
+   "pct_done": 80
+  },
+  {
+   "code": "LED",
+   "initiative": "Ledger, deposits and reconciliation",
+   "role": "engineer",
+   "stories": 8,
+   "criteria": 20,
+   "criteria_done": 18,
+   "pct_done": 90
+  },
+  {
+   "code": "OPS",
+   "initiative": "Operational controls",
+   "role": "engineer",
+   "stories": 4,
+   "criteria": 4,
+   "criteria_done": 1,
+   "pct_done": 25
+  },
+  {
+   "code": "POL",
+   "initiative": "Policy and decisions",
+   "role": "engineer",
+   "stories": 9,
+   "criteria": 31,
+   "criteria_done": 29,
+   "pct_done": 94
+  },
+  {
+   "code": "RAL",
+   "initiative": "Rails, routing and faults",
+   "role": "engineer",
+   "stories": 11,
+   "criteria": 28,
+   "criteria_done": 18,
+   "pct_done": 64
+  },
+  {
+   "code": "SBX",
+   "initiative": "Sandbox",
+   "role": "engineer",
+   "stories": 4,
+   "criteria": 5,
+   "criteria_done": 0,
+   "pct_done": 0
+  },
+  {
+   "code": "SDK",
+   "initiative": "SDKs",
+   "role": "growth",
+   "stories": 3,
+   "criteria": 4,
+   "criteria_done": 0,
+   "pct_done": 0
+  },
+  {
+   "code": "SHD",
+   "initiative": "Shadow mode",
+   "role": "engineer",
+   "stories": 4,
+   "criteria": 4,
+   "criteria_done": 0,
+   "pct_done": 0
+  },
+  {
+   "code": "WEB",
+   "initiative": "Marketing site",
+   "role": "engineer",
+   "stories": 8,
+   "criteria": 11,
+   "criteria_done": 8,
+   "pct_done": 73
+  },
+  {
+   "code": "WHK",
+   "initiative": "Webhooks",
+   "role": "engineer",
+   "stories": 3,
+   "criteria": 4,
+   "criteria_done": 0,
+   "pct_done": 0
+  }
+ ],
+ "stories": [
+  {
+   "story": "FND-01",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "FND-02",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "FND-03",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "FND-04",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "FND-05",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "FND-06",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "FND-07",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S9",
+   "criteria": 3,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "FND-08",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "FND-09",
+   "epic": "FND",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "INT-01",
+   "epic": "INT",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 4,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "INT-02",
+   "epic": "INT",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "INT-03",
+   "epic": "INT",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "INT-04",
+   "epic": "INT",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "INT-05",
+   "epic": "INT",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "POL-01",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "POL-02",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 4,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "POL-03",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 6,
+   "criteria_done": 6,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "POL-04",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "POL-05",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "POL-06",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "POL-07",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S6",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "POL-08",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "POL-09",
+   "epic": "POL",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "MND-01",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "MND-02",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "MND-03",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "AGT-01",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 4,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "AGT-02",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "AGT-03",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "AGT-04",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 4,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "AGT-05",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "AGT-06",
+   "epic": "AGT",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-01",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S2",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-02",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S2",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-03",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S2",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "EXE-04",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S2",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-05",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-06",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-07",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-08",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-09",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "S6",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXE-10",
+   "epic": "EXE",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "RAL-01",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "S2",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "RAL-02",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "S2",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "RAL-03",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 2,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "RAL-04",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "RAL-05",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "RAL-06",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "RAL-07",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 4,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "RAL-08",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "RAL-09",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "RAL-10",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "RAL-11",
+   "epic": "RAL",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "EXC-01",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "EXC-02",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXC-03",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "S6",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXC-04",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXC-05",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXC-06",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "S6",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EXC-07",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 2,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "EXC-08",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "EXC-09",
+   "epic": "EXC",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "LED-01",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "LED-02",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "LED-03",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "LED-04",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "LED-05",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 4,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "LED-06",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 5,
+   "criteria_done": 4,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "LED-07",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "LED-08",
+   "epic": "LED",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "AUD-01",
+   "epic": "AUD",
+   "function": "04 Engineering",
+   "slice": "S1",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "AUD-02",
+   "epic": "AUD",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "AUD-03",
+   "epic": "AUD",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "CON-01",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "CON-02",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S6",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "CON-03",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "CON-04",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S3",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "CON-05",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 2,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "CON-06",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S6",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "CON-07",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S7",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "CON-08",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S4",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "CON-09",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "S9",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "CON-10",
+   "epic": "CON",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "EVL-01",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EVL-02",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EVL-03",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EVL-04",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EVL-05",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "EVL-06",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 2,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "EVL-07",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 2,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "EVL-08",
+   "epic": "EVL",
+   "function": "04 Engineering",
+   "slice": "S8",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "DEM-01",
+   "epic": "DEM",
+   "function": "04 Engineering",
+   "slice": "S9",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DEM-02",
+   "epic": "DEM",
+   "function": "04 Engineering",
+   "slice": "S5",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "DEM-03",
+   "epic": "DEM",
+   "function": "04 Engineering",
+   "slice": "S9",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DEM-04",
+   "epic": "DEM",
+   "function": "04 Engineering",
+   "slice": "S9",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DEM-05",
+   "epic": "DEM",
+   "function": "04 Engineering",
+   "slice": "S9",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DEM-06",
+   "epic": "DEM",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SHD-01",
+   "epic": "SHD",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SHD-02",
+   "epic": "SHD",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SHD-03",
+   "epic": "SHD",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SHD-04",
+   "epic": "SHD",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "OPS-01",
+   "epic": "OPS",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "OPS-02",
+   "epic": "OPS",
+   "function": "04 Engineering",
+   "slice": "S0",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "OPS-03",
+   "epic": "OPS",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "OPS-04",
+   "epic": "OPS",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "API-01",
+   "epic": "API",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 3,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "In progress"
+  },
+  {
+   "story": "API-02",
+   "epic": "API",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "API-03",
+   "epic": "API",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "API-04",
+   "epic": "API",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "API-05",
+   "epic": "API",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "API-06",
+   "epic": "API",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "API-07",
+   "epic": "API",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "WHK-01",
+   "epic": "WHK",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "WHK-02",
+   "epic": "WHK",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "WHK-03",
+   "epic": "WHK",
+   "function": "04 Engineering",
+   "slice": "P1",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-01",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-02",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-03",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-04",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-05",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-06",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-07",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-08",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-09",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-10",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SBX-01",
+   "epic": "SBX",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SBX-02",
+   "epic": "SBX",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SBX-03",
+   "epic": "SBX",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SBX-04",
+   "epic": "SBX",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DOC-01",
+   "epic": "DOC",
+   "function": "04 Engineering",
+   "slice": "P3",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DOC-02",
+   "epic": "DOC",
+   "function": "04 Engineering",
+   "slice": "P3",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DOC-03",
+   "epic": "DOC",
+   "function": "04 Engineering",
+   "slice": "P3",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DOC-04",
+   "epic": "DOC",
+   "function": "04 Engineering",
+   "slice": "P3",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DOC-05",
+   "epic": "DOC",
+   "function": "04 Engineering",
+   "slice": "P3",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DOC-06",
+   "epic": "DOC",
+   "function": "04 Engineering",
+   "slice": "P3",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SDK-01",
+   "epic": "SDK",
+   "function": "06 GTM",
+   "slice": "P3",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SDK-02",
+   "epic": "SDK",
+   "function": "06 GTM",
+   "slice": "P3",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "SDK-03",
+   "epic": "SDK",
+   "function": "06 GTM",
+   "slice": "P3",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "WEB-01",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 3,
+   "criteria_done": 3,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "WEB-02",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 2,
+   "criteria_done": 2,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "WEB-03",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "WEB-04",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "WEB-05",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "WEB-06",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "WEB-07",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "WEB-08",
+   "epic": "WEB",
+   "function": "04 Engineering",
+   "slice": "P4",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  }
+ ],
+ "decision_counts": {
+  "Approved": 0,
+  "Proposed": 10,
+  "Assumption": 0,
+  "Open": 2,
+  "Confirmed": 32
+ }
+}

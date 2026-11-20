@@ -1,6 +1,6 @@
 # Research and technical decisions: Detent MVP
 
-Phase 0 of [plan.md](plan.md). These are **technical** decisions within the stack the founder fixed in `CLAUDE.md`.
+Phase 0 of [plan.md](plan.md). These are **technical** decisions within the stack the founder fixed in `AGENTS.md`.
 None of them sets a business rule. Business rules are in [decisions.md](decisions.md).
 
 ## R-01 Identifiers: prefixed UUIDv7 in Crockford base32 (implemented, M0)

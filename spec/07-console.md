@@ -1,6 +1,6 @@
 # 07 · Back-office console
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** the screens for all three layers. Decision: Invoice drop, Policy, Mandates, Counterparties. Orchestration: Payments, Rails, kill switch. Operations: Exceptions, Reconciliation, Audit, Outbox.
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** the screens for all three layers. Decision: Invoice drop, Policy, Mandates, Counterparties. Orchestration: Payments, Rails, kill switch. Operations: Exceptions, Reconciliation, Audit, Outbox.
 
 Jinja2 and htmx, server-rendered. Use one CSS file with tokens from the brand (placeholders until the identity is done):
 

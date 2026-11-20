@@ -1,6 +1,6 @@
 # 01 · Architecture
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** all three layers and how they connect.
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** all three layers and how they connect.
 
 **The three layers in code:** Decision = `intents`, `mandates`, `policy`. Orchestration = `routing`, `execution`, `rails`. Operations = `exceptions`, `ledger`, `reconciliation`, `audit`. The `agents` package serves all three through read-only tools, plus `propose_payment_intent`.
 

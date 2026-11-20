@@ -48,7 +48,7 @@ jobs:
           uv run ruff check .
           uv run ruff format --check .
       - name: Roadmap is up to date
-        run: uv run python tools/build_roadmap.py --check
+        run: uv run python tools/build_roadmap_page.py --check
       - name: Typecheck
         run: uv run mypy
       - name: Migrate
@@ -64,7 +64,7 @@ jobs:
       - name: Backlog documents are up to date
         run: |
           uv run python tools/build_backlog.py
-          git diff --exit-code -- backlog/
+          git diff --exit-code -- backlog/ founder/slices.json
 
   eval:
     # EVL-07 release gate: the attack and fault suites (and the agent, reconciliation and latency suites) on

@@ -1,6 +1,6 @@
 # 06 · Rails, routing, failover and fault injection
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** the **orchestration** layer.
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** the **orchestration** layer.
 
 ## Adapter contract (RAL-01)
 

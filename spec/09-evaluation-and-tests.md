@@ -1,6 +1,6 @@
 # 09 · Evaluation and test strategy
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** proof for all three layers. Attacks test decision; faults test orchestration; interpretation and agreement test the agents; reconciliation sets test operations.
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** proof for all three layers. Attacks test decision; faults test orchestration; interpretation and agreement test the agents; reconciliation sets test operations.
 
 ## Test layers
 

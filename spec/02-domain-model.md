@@ -1,6 +1,6 @@
 # 02 · Domain model
 
-**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `CLAUDE.md`). **This spec covers:** the data behind all three layers. The payment state machine is the core of the **orchestration** layer.
+**Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** the data behind all three layers. The payment state machine is the core of the **orchestration** layer.
 
 ## Conventions
 
