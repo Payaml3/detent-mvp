@@ -3,6 +3,7 @@
 Status-line shim. Plugins can't register a status line, so this file finds the solo-to-scale plugin
 (its session-start hook records where it is) and runs the plugin's status line. Fails safe.
 """
+
 import json
 import runpy
 import sys
@@ -14,5 +15,5 @@ try:
     runpy.run_path(str(Path(root) / "scripts" / "hooks" / "statusline.py"), run_name="__main__")
 except SystemExit:
     pass
-except Exception:  # noqa: BLE001
+except Exception:
     print("Claude")

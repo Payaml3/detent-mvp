@@ -7,6 +7,7 @@ Run only the tests for one area during a session; CI runs the full suite.
 If <path> holds test files, pytest runs on it. Otherwise it runs the repo's tests whose file names
 mention the area's name (for example `tools/claim.py` -> tests matching `claim`).
 """
+
 from __future__ import annotations
 
 import subprocess

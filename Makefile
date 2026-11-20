@@ -68,11 +68,12 @@ site-test:        ## site logic tests, build, then honesty/structure/SEO checks 
 spec:             ## regenerate specs/001-detent-mvp inventory, traceability and tasks; check coverage
 	$(UV) run python tools/build_spec.py
 
-roadmap:          ## regenerate founder/roadmap.md from slices, stories, decisions and founder/status.md
+roadmap:          ## regenerate founder/roadmap.md (and roadmap.json) from slices, stories, decisions and founder/status.md
+	$(UV) run python tools/build_roadmap_page.py
 	$(UV) run python tools/build_roadmap.py
 
 roadmap-page:     ## founder/roadmap.md plus the phone page at build/roadmap.html (publish it to the roadmap Artifact)
-	$(UV) run python tools/build_roadmap.py --html build/roadmap.html
+	$(UV) run python tools/build_roadmap_page.py --html build/roadmap.html
 
 denylist:         ## OPS-02 independence check; needs DENYLIST in the environment
 	$(UV) run python tools/check_denylist.py .

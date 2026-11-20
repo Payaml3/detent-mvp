@@ -2,6 +2,7 @@
 
 Tests for the operating-system tools, each rule shown passing and failing, in a throwaway git repo.
 """
+
 from __future__ import annotations
 
 import datetime as dt
@@ -13,14 +14,34 @@ from pathlib import Path
 
 import pytest
 
+# Detent keeps its own tools/check_governance.py (its decision registers have no Status column on
+# D- rows, which the plugin's check requires), so the plugin's governance-check tests are left out here.
+# Its tests live in tools/tests/test_check_governance.py.
+
 TOOLS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS))
 MARK = " → ".join(["Define", "Analyse", "Decide"])
 
 
 def git(cwd: Path, *args: str) -> str:
-    return subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@example.invalid", "-c", "commit.gpgsign=false",
-                           "-c", "init.defaultBranch=main", *args], cwd=cwd, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@example.invalid",
+            "-c",
+            "commit.gpgsign=false",
+            "-c",
+            "init.defaultBranch=main",
+            *args,
+        ],
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
 
 
 def write(p: Path, text: str) -> None:
@@ -44,11 +65,31 @@ TEAM = """# Team
 
 ## Rules
 """
-SLICES = {"epics": {"CORE": {"name": "Foundation"}, "PAY": {"name": "Payments"}, "SITE": {"name": "Website"}},
-          "slices": [{"id": "S1", "name": "Walking skeleton", "status": "todo"}],
-          "stories": [{"id": "CORE-01", "title": "CI", "epic": "CORE", "slice": "S1", "criteria": 4, "done": 4, "tested": 3},
-                      {"id": "PAY-01", "title": "Pay", "epic": "PAY", "slice": "S1", "criteria": 2, "done": 1, "deps": ["CORE-01"]},
-                      {"id": "SITE-01", "title": "Site", "epic": "SITE", "slice": "S1", "criteria": [1, 2], "done": []}]}
+SLICES = {
+    "epics": {"CORE": {"name": "Foundation"}, "PAY": {"name": "Payments"}, "SITE": {"name": "Website"}},
+    "slices": [{"id": "S1", "name": "Walking skeleton", "status": "todo"}],
+    "stories": [
+        {
+            "id": "CORE-01",
+            "title": "CI",
+            "epic": "CORE",
+            "slice": "S1",
+            "criteria": 4,
+            "done": 4,
+            "tested": 3,
+        },
+        {
+            "id": "PAY-01",
+            "title": "Pay",
+            "epic": "PAY",
+            "slice": "S1",
+            "criteria": 2,
+            "done": 1,
+            "deps": ["CORE-01"],
+        },
+        {"id": "SITE-01", "title": "Site", "epic": "SITE", "slice": "S1", "criteria": [1, 2], "done": []},
+    ],
+}
 STATUS = f"""# Status
 Last updated: {dt.date.today().isoformat()}
 
@@ -70,9 +111,14 @@ PLAYBOOK = """## Stages
 def repo(tmp_path: Path) -> Path:
     root = tmp_path / "repo"
     shutil.copytree(TOOLS, root / "tools", ignore=shutil.ignore_patterns("tests", "__pycache__"))
-    write(root / ".claude/governance.json", json.dumps({"claude_md_max_lines": 20, "pr_warn_lines": 40,
-                                                        "generated_paths": ["founder/*.json"]}))
-    write(root / "founder/project.json", json.dumps({"name": "Example Startup", "repo": "example/example-startup", "stage": 13}))
+    write(
+        root / ".claude/governance.json",
+        json.dumps({"claude_md_max_lines": 20, "pr_warn_lines": 40, "generated_paths": ["founder/*.json"]}),
+    )
+    write(
+        root / "founder/project.json",
+        json.dumps({"name": "Example Startup", "repo": "example/example-startup", "stage": 13}),
+    )
     write(root / "founder/decisions.md", REGISTER)
     write(root / "founder/team.md", TEAM)
     write(root / "founder/slices.json", json.dumps(SLICES))
@@ -91,99 +137,14 @@ def repo(tmp_path: Path) -> Path:
     return root
 
 
-def gov(root: Path) -> tuple[list[str], list[str]]:
-    import check_governance
-    return check_governance.check(root, "main", dt.date.today())
-
-
 def commit(root: Path, msg: str = "change") -> None:
     git(root, "add", "-A")
     git(root, "commit", "-qm", msg)
 
 
-def test_clean_repo_passes(repo):
-    errors, warnings = gov(repo)
-    assert errors == [] and warnings == []
-
-
-def test_unknown_cited_id_fails_then_passes(repo):
-    write(repo / "docs/note.md", "See B-09.\n")
-    commit(repo)
-    assert any("cites B-09" in e for e in gov(repo)[0])
-    write(repo / "docs/note.md", "See B-02.\n")
-    commit(repo)
-    assert gov(repo)[0] == []
-
-
-def test_bad_status_fails(repo):
-    write(repo / "founder/decisions.md", REGISTER.replace("Proposed", "Maybe"))
-    assert any("status 'Maybe'" in e for e in gov(repo)[0])
-
-
-def test_protocol_copy_fails(repo):
-    write(repo / "docs/copy.md", f"{MARK}\n")
-    commit(repo)
-    assert any("restates the protocol" in e for e in gov(repo)[0])
-    write(repo / "founder/prompts/bootstrap.md", f"{MARK}\n")
-    (repo / "docs/copy.md").unlink()
-    commit(repo)
-    assert gov(repo)[0] == []
-
-
-def test_slice_done_needs_handoff(repo):
-    data = json.loads((repo / "founder/slices.json").read_text())
-    data["slices"][0]["status"] = "done"
-    write(repo / "founder/slices.json", json.dumps(data))
-    subprocess.run([sys.executable, str(repo / "tools/build_roadmap.py")], check=True, capture_output=True)
-    subprocess.run([sys.executable, str(repo / "tools/build_team.py")], check=True, capture_output=True)
-    commit(repo)
-    assert any("S1 marked done but HANDOFF.md" in e for e in gov(repo)[0])
-    write(repo / "HANDOFF.md", "# HANDOFF\n\nS1 done.\n")
-    commit(repo)
-    assert gov(repo)[0] == []
-
-
-def test_stage_passed_needs_handoff(repo):
-    write(repo / "founder/playbook.md", PLAYBOOK.replace("| Current |", "| Passed |"))
-    subprocess.run([sys.executable, str(repo / "tools/build_roadmap.py")], check=True, capture_output=True)
-    commit(repo)
-    assert any("stage 13 marked done" in e for e in gov(repo)[0])
-
-
-def test_stale_view_data_fails(repo):
-    write(repo / "founder/decisions.md", REGISTER + "| B-03 | New | Business | Open | 2026-11-03 | | Business | |\n")
-    errors = gov(repo)[0]
-    assert any("roadmap.json is out of date" in e for e in errors) and any("team.json is out of date" in e for e in errors)
-
-
-def test_instruction_size_limit(repo):
-    write(repo / "AGENTS.md", "x\n" * 19)
-    assert not any("AGENTS.md + CLAUDE.md" in e for e in gov(repo)[0]), "20 lines together is at the limit, not over"
-    write(repo / "AGENTS.md", "x\n" * 20)
-    assert any("AGENTS.md + CLAUDE.md are 21 lines" in e for e in gov(repo)[0])
-    write(repo / "AGENTS.md", "x\n")
-    write(repo / "apps/web/CLAUDE.md", "y\n" * 21)
-    commit(repo)
-    assert any("apps/web/CLAUDE.md is 21 lines" in e for e in gov(repo)[0])
-
-
-def test_pr_size_warns_but_ignores_generated(repo):
-    write(repo / "founder/roadmap.json", "{}\n" * 100)
-    commit(repo)
-    assert not any("changes" in w for w in gov(repo)[1])
-    write(repo / "src/big.py", "x = 1\n" * 50)
-    commit(repo)
-    assert any("changes 50 lines" in w for w in gov(repo)[1])
-
-
-def test_stale_status_warns(repo):
-    write(repo / "founder/status.md", STATUS.replace(dt.date.today().isoformat(), "2020-01-01"))
-    errors, warnings = gov(repo)
-    assert any("more than 14 days ago" in w for w in warnings)
-
-
 def test_traceability_counts_by_role(repo):
     import build_traceability
+
     data = build_traceability.build(repo)
     fn = {f["function"]: f for f in data["functions"]}
     assert (fn["03 Architecture"]["done"], fn["03 Architecture"]["total"]) == (4, 4)
@@ -194,6 +155,7 @@ def test_traceability_counts_by_role(repo):
 
 def test_team_data(repo):
     import build_team
+
     data = build_team.build(repo)
     by = {t["id"]: t for t in data["tasks"]}
     assert by["CORE-01"]["role"] == "architect" and by["PAY-01"]["role"] == "engineer"
@@ -204,6 +166,7 @@ def test_team_data(repo):
 
 def test_roadmap_check_mode(repo):
     import build_roadmap
+
     assert build_roadmap.main(["--check", "--root", str(repo)]) == 0
     write(repo / "founder/status.md", STATUS + "| Another | Founder | S1 |\n")
     assert build_roadmap.main(["--check", "--root", str(repo)]) == 1
@@ -211,7 +174,12 @@ def test_roadmap_check_mode(repo):
 
 def test_claim_dry_run_and_refusal(repo, tmp_path, capsys):
     import claim
-    issue = {"title": "S1 group 1", "labels": [], "body": "## Goal chain\n\n- Company goal: first customer\n- Initiative: CORE\n\n## Owner\n\n- Role: `role:engineer`\n"}
+
+    issue = {
+        "title": "S1 group 1",
+        "labels": [],
+        "body": "## Goal chain\n\n- Company goal: first customer\n- Initiative: CORE\n\n## Owner\n\n- Role: `role:engineer`\n",
+    }
     p = tmp_path / "issue.json"
     p.write_text(json.dumps(issue))
     assert claim.main(["7", "--from-json", str(p), "--dry-run", "--root", str(repo)]) == 0
@@ -224,6 +192,7 @@ def test_claim_dry_run_and_refusal(repo, tmp_path, capsys):
 
 def test_test_area_targets(repo):
     import test_area
+
     write(repo / "tests/test_claim_flow.py", "def test_x():\n    pass\n")
     assert test_area.targets("tools/claim.py", repo) == [str(repo / "tests/test_claim_flow.py")]
     assert test_area.targets("nothing-here", repo) == []
