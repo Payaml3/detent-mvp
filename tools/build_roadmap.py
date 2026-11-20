@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import html
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -189,77 +190,162 @@ def build() -> tuple[str, dict[str, Any]]:
     return "\n".join(md), data
 
 
-def render_html(data: dict[str, Any]) -> str:
+CSS = """
+/* Layout: one column of slice cards on a dark ink ground; the next slice carries the orange. */
+:root {
+  --bg: #070C1A; --surface: #0F1629; --raised: #141D36; --line: #24304F;
+  --fg: #F6F5F0; --muted: #B9BFCE; --accent: #F2622E; --blue: #8FB0FF; --ok: #7FD1A4; --track: #1B2542;
+  --font-head: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #F6F5F0; --surface: #FFFFFF; --raised: #EEEDE6; --line: #DAD8CF;
+  --fg: #0F1629; --muted: #4B5470; --accent: #C9471A; --blue: #2F6BFF; --ok: #1E7A4C; --track: #E3E1D8;
+  color-scheme: light; } }
+:root[data-theme="light"] {
+  --bg: #F6F5F0; --surface: #FFFFFF; --raised: #EEEDE6; --line: #DAD8CF;
+  --fg: #0F1629; --muted: #4B5470; --accent: #C9471A; --blue: #2F6BFF; --ok: #1E7A4C; --track: #E3E1D8;
+  color-scheme: light; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { min-width: 0; max-width: 720px; margin: 0 auto; padding-block: 28px 56px; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; letter-spacing: -0.01em; }
+h2 { font-size: 19px; }
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+section { display: grid; gap: 12px; min-width: 0; }
+.eyebrow { font: 600 12px/1 var(--font-head); text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+.lede { color: var(--muted); margin: 6px 0 0; }
+.summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.stat b { display: block; font: 600 22px/1.1 var(--font-head); font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 13px; }
+.bar { height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--blue); }
+.done .bar i { background: var(--ok); }
+.next .bar i { background: var(--accent); }
+.focus { background: var(--surface); border: 2px solid var(--accent); border-radius: 12px; padding: 16px; display: grid; gap: 12px; }
+.focus p { margin: 0; }
+ul.list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+ul.list li { display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+ul.list li > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.blk li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); transform: translateY(-1px); }
+code, .mono { font-family: var(--font-mono); font-size: 12px; }
+code { white-space: nowrap; flex: none; }
+.n { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; margin-left: auto; white-space: nowrap; flex: none; }
+ol.slices { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ol.slices li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; }
+ol.slices li.next { border-color: var(--accent); }
+ol.slices li.todo { background: transparent; }
+.row { display: flex; gap: 10px; align-items: baseline; }
+.id { font: 600 13px/1 var(--font-mono); min-width: 26px; }
+.name { font-weight: 500; min-width: 0; }
+.pill { font: 600 11px/1 var(--font-head); text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.done .pill { color: var(--ok); border-color: currentColor; }
+.next .pill { color: var(--accent); border-color: currentColor; }
+ol.slices p { margin: 0; color: var(--muted); font-size: 13px; }
+.tag { font: 600 11px/1 var(--font-head); padding: 3px 5px; border-radius: 4px; background: var(--raised); color: var(--muted); white-space: nowrap; flex: none; margin-left: auto; }
+.tag.open { color: var(--accent); }
+footer { color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+"""
+
+
+def render_html(data: dict[str, Any], stamp: str = "") -> str:
+    """The same data as founder/roadmap.md, as a phone page for the published Artifact."""
     e = html.escape
     nxt: Slice | None = data["next"]
-    rows = "".join(
+    status_label = {"done": "Done", "next": "Next", "todo": "To do"}
+
+    def pct(d: int, t: int) -> int:
+        return round(100 * d / t) if t else 0
+
+    def plain(s: str) -> str:
+        return e(s.replace("`", ""))
+
+    slices = "".join(
         f'<li class="{s.status}"><div class="row"><span class="id">{e(s.id)}</span>'
-        f'<span class="name">{e(s.name)}</span><span class="n">{s.done}/{s.total}</span></div>'
-        f'<div class="bar"><i style="width:{round(100 * s.done / s.total) if s.total else 0}%"></i></div>'
-        f"<p>{e(s.goal)}</p></li>"
+        f'<span class="name">{e(s.name)}</span><span class="n">{s.done}/{s.total}</span>'
+        f'<span class="pill">{status_label[s.status]}</span></div>'
+        f'<div class="bar"><i style="width:{pct(s.done, s.total)}%"></i></div><p>{e(s.goal)}</p></li>'
         for s in data["slices"]
     )
-    blockers = ""
-    open_stories = ""
-    exit_ = ""
+    focus = ""
     if nxt:
-        exit_ = f"<p><b>Exit check:</b> {e(nxt.exit)}</p>"
+        blockers = ""
         if nxt.blockers:
             blockers = (
-                "<h3>Blocked on you</h3><ul class='plain'>"
-                + "".join(f"<li>{e(b.replace('`', ''))}</li>" for b in nxt.blockers)
+                "<h3>Blocked on you</h3><ul class='list blk'>"
+                + "".join(f"<li><span>{plain(b)}</span></li>" for b in nxt.blockers)
                 + "</ul>"
             )
-        open_stories = (
-            "<h3>Stories left</h3><ul class='plain'>"
+        stories = (
+            "<h3>Stories left</h3><ul class='list'>"
             + "".join(
-                f"<li><code>{e(sid)}</code> {e(t)} <span class='n'>{d}/{n}</span></li>"
+                f"<li><code>{e(sid)}</code><span>{e(t)}</span><span class='n'>{d}/{n}</span></li>"
                 for sid, t, d, n in nxt.open_stories
             )
             + "</ul>"
         )
-    later = "".join(
-        f"<li><b>{e(s.id)}</b> " + e("; ".join(b.replace("`", "") for b in s.blockers)) + "</li>"
-        for s in data["later"]
+        focus = (
+            f"<section><div class='eyebrow'>Next slice</div><div class='focus'>"
+            f"<h2>{e(nxt.id)} {e(nxt.name)}</h2><p><b>Done when:</b> {e(nxt.exit)}</p>"
+            f"{blockers}{stories}</div></section>"
+        )
+    later = ""
+    if data["later"]:
+        later = (
+            "<section><h2>Founder items for later slices</h2><ul class='list'>"
+            + "".join(
+                f"<li><code>{e(s.id)}</code><span>{plain('; '.join(s.blockers))}</span></li>"
+                for s in data["later"]
+            )
+            + "</ul></section>"
+        )
+    decisions = (
+        "".join(
+            f"<li><code>{e(i)}</code><span>{e(t[:160])}</span>"
+            f"<span class='tag{' open' if st == 'Open' else ''}'>{e(st)}</span></li>"
+            for i, t, st in data["decisions"]
+        )
+        or "<li><span>None. Every item is Confirmed.</span></li>"
     )
-    decisions = "".join(
-        f"<li><code>{e(i)}</code> <span class='tag'>{e(st)}</span> {e(t[:160])}</li>"
-        for i, t, st in data["decisions"]
-    )
-    pct = round(100 * data["done_c"] / data["total_c"]) if data["total_c"] else 0
-    headline = (
-        f"{data['n_done']} of {len(data['slices'])} slices done · {data['done_c']}/{data['total_c']} criteria"
-    )
-    return f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Detent roadmap</title>
-<style>
-:root{{--bg:#f7f6f2;--fg:#15171c;--mut:#5d6270;--line:#dedbd2;--card:#fff;--acc:#e8590c;--ok:#2f7d4f;--track:#ebe8e0}}
-@media (prefers-color-scheme:dark){{:root:not([data-theme="light"]){{--bg:#0f1218;--fg:#e8e9ec;--mut:#9aa0ad;--line:#262b35;--card:#161a22;--acc:#ff7a2f;--ok:#4fb57a;--track:#232833}}}}
-:root[data-theme="dark"]{{--bg:#0f1218;--fg:#e8e9ec;--mut:#9aa0ad;--line:#262b35;--card:#161a22;--acc:#ff7a2f;--ok:#4fb57a;--track:#232833}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,sans-serif}}
-main{{max-width:760px;margin:0 auto;padding:24px 16px 48px}}h1{{font-size:26px;margin:0 0 4px}}h2{{font-size:18px;margin:28px 0 10px}}
-h3{{font-size:15px;margin:16px 0 6px}}.sub{{color:var(--mut);margin:0 0 16px}}
-.big{{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}}
-.big b{{font-size:20px}}.bar{{height:6px;background:var(--track);border-radius:3px;overflow:hidden;margin:6px 0}}
-.bar i{{display:block;height:100%;background:var(--acc)}}.done .bar i{{background:var(--ok)}}
-ol{{list-style:none;padding:0;margin:0}}ol li{{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 8px}}
-ol li.next{{border-color:var(--acc);border-width:2px}}ol li p{{margin:0;color:var(--mut);font-size:13px}}
-.row{{display:flex;gap:8px;align-items:baseline}}.id{{font-weight:700;min-width:28px}}.name{{flex:1}}.n{{color:var(--mut);font-variant-numeric:tabular-nums;font-size:13px}}
-ul.plain{{padding-left:18px;margin:0}}ul.plain li{{margin:4px 0}}code{{font-size:12px}}
-.tag{{font-size:11px;border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--mut)}}
-footer{{color:var(--mut);font-size:12px;margin-top:32px}}
-</style></head><body><main>
-<h1>Roadmap</h1><p class="sub">Agentic payment controls · prototype and developer portal</p>
-<div class="big"><b>{e(headline)}</b><div class="bar"><i style="width:{pct}%"></i></div>
-{f"Next: <b style='font-size:15px'>{e(nxt.id)} {e(nxt.name)}</b>" if nxt else ""}</div>
-{f"<h2>Next: {e(nxt.id)} {e(nxt.name)}</h2>{exit_}{blockers}{open_stories}" if nxt else ""}
-<h2>All slices</h2><ol>{rows}</ol>
-{f"<h2>Founder items for later slices</h2><ul class='plain'>{later}</ul>" if later else ""}
-<h2>Decisions waiting on you</h2><ul class="plain">{decisions or "<li>None.</li>"}</ul>
-<footer>Generated from the repository by tools/build_roadmap.py. Same data as founder/roadmap.md.</footer>
-</main></body></html>
+    total, done_c = data["total_c"], data["done_c"]
+    n_slices = len(data["slices"])
+    return f"""<title>Detent roadmap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>{CSS}</style>
+<main>
+<header><div class="eyebrow">Agentic payment controls · prototype</div><h1>Detent roadmap</h1>
+<p class="lede">Built from the repository on every handoff. Slices, acceptance criteria and the decisions waiting on you.</p></header>
+<section class="summary">
+<div class="stat"><b>{data["n_done"]} / {n_slices}</b><span>slices done</span></div>
+<div class="stat"><b>{done_c} / {total}</b><span>criteria done ({pct(done_c, total)}%)</span>
+<div class="bar" style="margin-top:8px"><i style="width:{pct(done_c, total)}%"></i></div></div>
+<div class="stat"><b>{len(data["decisions"])}</b><span>decisions waiting on you</span></div>
+</section>
+{focus}
+<section><h2>All slices</h2><ol class="slices">{slices}</ol></section>
+{later}
+<section><h2>Decisions waiting on you</h2><ul class="list">{decisions}</ul></section>
+<footer>Generated by <span class="mono">tools/build_roadmap.py</span>{e(stamp)}. The same data as <span class="mono">founder/roadmap.md</span>. Working name; prototype on test networks only.</footer>
+</main>
 """
+
+
+def _stamp() -> str:
+    """' at <commit> (<date>)' for the phone page footer; the Markdown page carries none."""
+    try:
+        out = subprocess.run(
+            ["git", "log", "-1", "--format=%h (%cs)"], cwd=ROOT, capture_output=True, text=True, check=True
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+    return f" at commit {out}" if out else ""
 
 
 def main() -> int:
@@ -269,7 +355,8 @@ def main() -> int:
     args = ap.parse_args()
     text, data = build()
     if args.html:
-        args.html.write_text(render_html(data))
+        args.html.parent.mkdir(parents=True, exist_ok=True)
+        args.html.write_text(render_html(data, _stamp()))
     if args.check:
         current = OUT.read_text() if OUT.exists() else ""
         if current != text:

@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec roadmap site site-dev site-test denylist secrets check
+.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec roadmap roadmap-page site site-dev site-test denylist secrets check
 
 setup:            ## install dependencies and pre-commit hooks
 	$(UV) sync --all-packages
@@ -70,6 +70,9 @@ spec:             ## regenerate specs/001-detent-mvp inventory, traceability and
 
 roadmap:          ## regenerate founder/roadmap.md from slices, stories, decisions and founder/status.md
 	$(UV) run python tools/build_roadmap.py
+
+roadmap-page:     ## founder/roadmap.md plus the phone page at build/roadmap.html (publish it to the roadmap Artifact)
+	$(UV) run python tools/build_roadmap.py --html build/roadmap.html
 
 denylist:         ## OPS-02 independence check; needs DENYLIST in the environment
 	$(UV) run python tools/check_denylist.py .

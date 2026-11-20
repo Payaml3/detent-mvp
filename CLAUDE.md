@@ -120,6 +120,7 @@ make denylist     # OPS-02 check; needs DENYLIST in the environment
 make backlog      # python tools/build_backlog.py
 make spec         # python tools/build_spec.py: Spec Kit inventory, traceability, tasks + coverage checks
 make roadmap      # python tools/build_roadmap.py: founder/roadmap.md, the one-page roadmap (CI checks it)
+make roadmap-page # also build/roadmap.html, published to https://claude.ai/artifact/THq22MAqSJrDauRH39oWAe
 make site-dev     # marketing site (Astro) dev server; make site builds it; make site-test runs its checks
 ```
 
