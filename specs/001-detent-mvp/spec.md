@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 98 requirements confirmed; 5 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 99 requirements confirmed; 4 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -411,7 +411,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 **Demo**
 
 - **FR-095**: A fictional demo platform, the 20-payment batch with deposits, a wallet-funding check and a scenario runner make the 10-minute script reproducible on real testnets.
-- **FR-096**: The demo's match figure counts only items that moved money (proposed: 26 of 27 with one designed break), and spec/11 is updated to the measured numbers. *(proposed: C-10)*
+- **FR-096**: The demo's match figure counts only items that moved money (24 of 25 as scripted; 26 of 27 if both escalations are approved; one designed break; D-35), and spec/11 is updated to the measured numbers.
 - **FR-097**: (Should) Scenario packs per platform type.
 
 **Shadow**

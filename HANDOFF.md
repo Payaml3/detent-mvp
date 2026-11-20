@@ -123,8 +123,8 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
 - **G-27 Confirmed (D-33):** the live demo pays in its own labelled test token (tUSDC). Before the live run, per
   network: `detent demo token deploy --network <n>`, set `USDC_ADDRESS_*` to the printed address, then
   `detent demo token fund --network <n>`; gas comes from a faucet.
-- C-10 (match line counts money-moving items only) and C-13 (scope) were asked on 2026-11-20; still Proposed/Open
-  until answered.
+- C-10 Confirmed (D-35): the match line counts money-moving items only (24 of 25; 26 of 27 with both escalations
+  approved, now tested). C-13 Confirmed (D-34): prototype first; decide on the portal (P1 to P4) after the first demos.
 - `ANTHROPIC_API_KEY` (also as a GitHub secret for the nightly eval): every agent answer is a labelled
   hand-written stand-in until real runs are recorded (AGT-01 10/10, EVL-04). The interpretation and
   agreement figures measure Detent's checks, not a model, until then.
@@ -133,7 +133,7 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
 - Nightly eval against public testnets needs funded test wallets and RPC endpoints as secrets (EVL-07 criterion 0).
 - A funded test wallet for Base Sepolia and Ethereum Sepolia (RAL-02, RAL-03, S9).
 - User payouts are deferred (founder, before S1); the demo batch now pays counterparties instead (D-32).
-- C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open.
+- C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open.
 - Booking URL, inbox, final name and domain (`BRAND_NAME`), legal review of the site.
 - Delete the stale remote branch `s3-unknown-resolved` (the proxy refused).
 - Delete the merged branches (all are in `main`): `m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`.

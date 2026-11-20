@@ -34,12 +34,12 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 | Funded test wallets for Base Sepolia and Ethereum Sepolia: a sender and a demo payer on each (RAL-02, RAL-03, DEM-04) | Founder | S9 live run |
 | Render (Frankfurt) and Neon (EU) accounts, the plans (worker is not on Render's free plan: Proposed), the `render.yaml` secrets (FND-07) | Founder | S9 live run |
 | Testnet RPC endpoints and wallets as secrets for the nightly eval (EVL-07 criterion 0) | Founder | S9 |
-| C-13 scope choice; C-10, C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open | Founder | S9 (C-10, C-13), P1 to P2 (rest) |
+| C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open | Founder | P1 to P2 |
 | Publish measured results on the website (`detent eval publish`, EVL-06 criterion 1) | Founder, then Claude | P4 |
 | Booking URL, inbox, final name and domain (`BRAND_NAME`), legal review of the site | Founder | P4 |
 | Delete the merged branches (`m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`) | Founder | S9 |
 
 ## This week's focus (Proposed)
 
-- **Proposed:** close the four S9 blockers (denylist secret, API key, funded wallets, the C-10 and C-13 choices), then start S9.
+- **Proposed:** close the four S9 blockers (denylist secret, API key, funded wallets; C-10, C-13 and G-27 were answered on 2026-11-20), then start S9.
 - **Proposed:** answer the business-context questions so P4 copy and pricing rest on evidence.

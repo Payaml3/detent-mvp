@@ -33,7 +33,7 @@ estimates for one developer working with Claude Code (Estimate); see `epics.md` 
 - The website copy and layout (WEB-01, WEB-02) don't depend on the engine and can be built at any time. Only WEB-03 waits for the results.
 - Shadow mode (SHD) is the first thing to pull forward if a prospect agrees to share an export before P1.
 
-## If time is short (founder decision, open: C-13)
+## If time is short (C-13 Confirmed 2026-11-20, D-34: option 2, prototype first)
 
 The decomposed Must scope is larger than the earlier top-down estimate (`mvp-scope.md` 22.5 days plus `05-developer-portal.md` 16.5 days). The options are:
 

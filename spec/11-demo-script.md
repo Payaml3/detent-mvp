@@ -23,7 +23,7 @@ Every screen named below is in the console nav. Every "Demo" step is one button 
 **The signal:** a "yes" to the shadow report. Praise for the demo isn't the signal.
 
 **Notes:**
-- The match line counts only items that moved money (decision C-10, **Proposed**: the founder has not approved it yet). If the presenter approves both escalations before Close the day, the line should read 26 of 27 (not yet covered by a test).
+- The match line counts only items that moved money (C-10, Confirmed as D-35). If the presenter approves both escalations before Close the day, the line reads 26 of 27 (covered by a test).
 - The Evaluation screen in the console is not built yet (it says so); show the report file instead.
 - Agent answers are hand-written stand-ins, labelled as such on screen, until an `ANTHROPIC_API_KEY` is set and real runs are recorded.
 - On the live test networks the "USDC" is the demo's own test token, tUSDC ("Detent Demo USD, test stand-in, not USDC"; D-33); say so if asked. Local runs use the same contract on anvil.

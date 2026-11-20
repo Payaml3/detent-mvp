@@ -280,11 +280,51 @@ def test_batch_moves_money_on_three_rails_with_one_break(
         ).all()
     assert breaks == ["unallocated_inbound"]  # exactly one designed break: dep-07
     assert sorted(int(n) for _, n in credits) == [0] + [1] * 7  # dep-08's duplicate is credited once
-    # C-10 (Proposed): only money-moving items count: 17 settled payouts and 8 deposits, one unmatched.
+    # C-10 (Confirmed, D-35): only money-moving items count: 17 settled payouts and 8 deposits, one unmatched.
     assert "24 of 25 money-moving items matched, 1 break" in " ".join(close.lines), close.lines
 
     again = run_scenario(demo, org, "batch_20", pl)
     assert again.repeated and len(_statuses(demo)) == 20  # idempotent: no new payments or deposits
+
+
+def test_match_line_counts_approved_escalations(
+    demo: Runtime, base_chain: devchain.LocalChain, eth_chain: devchain.LocalChain
+) -> None:
+    """C-10 (D-35): if the presenter approves both held escalations before Close the day, they move money and
+    count: 19 payouts and 8 deposits, 26 matched and the one designed break (spec/11 notes)."""
+    org = demo.settings.demo_org_id
+    pl = Actor(demo_user_id("usr_pl", org), "payments_lead")
+    run_scenario(demo, org, "batch_20", pl)
+    _drain(demo, [base_chain, eth_chain])
+    with demo.engine.connect() as c:
+        cases = (
+            c.execute(
+                text(
+                    "SELECT x.id FROM exception_cases x JOIN payment_intents p ON p.org_id=x.org_id "
+                    "AND p.id=x.payment_id WHERE x.org_id=:o AND p.reference LIKE 'demo batch %' "
+                    "AND p.status='ESCALATED' ORDER BY p.reference"
+                ),
+                {"o": org},
+            )
+            .scalars()
+            .all()
+        )
+    assert len(cases) == 2
+    for case in cases:
+        approve(
+            demo.engine,
+            demo.clock,
+            case_id=case,
+            org_id=org,
+            actor=Actor(demo_user_id("usr_rv", org), "reviewer"),
+            reason="called the counterparty and checked the new details",
+            mandate_key=MANDATE_KEY,
+        )
+    _drain(demo, [base_chain, eth_chain])
+    st = _statuses(demo)
+    assert sorted(st.values()).count("CONFIRMED") == 19 and list(st.values()).count("BLOCKED") == 1
+    close = run_scenario(demo, org, "close_day", pl)
+    assert "26 of 27 money-moving items matched, 1 break" in " ".join(close.lines), close.lines
 
 
 def test_attack_sample_is_refused(demo: Runtime) -> None:
