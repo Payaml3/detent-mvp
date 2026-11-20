@@ -1,58 +1,70 @@
 ---
 name: handoff
-description: Use when the founder says "close", "handoff" or "wrap up", when the context guard asks for a handoff, or when a slice is done; writes the closing summary into the repo, pushes and names the next session.
+description: Use when the founder says "close", "handoff" or "wrap up", when the context guard asks for a handoff, or when a story group or slice is done; picks a short close or a full handoff and names the next session.
 ---
 
 # Handoff
 
-Close the session so the next one starts from the repository, not from chat history.
+**Read lean.** Never read a whole file over 150 lines. Use `grep -n` to find the section, then read only that line range. Use `git diff` and `git log` to see what changed instead of re-reading files.
+
 Stop starting new work. Finish or revert the step in progress first.
 
-## 1. Closing summary (protocol §7), at most 15 lines
+## Pick the mode
 
-```
-Outcome: <one or two lines>
-Approved: <decisions the founder approved in this session, with their words; or "none">
-Pending: <Proposed / Assumption / Open items raised, with IDs>
-Files changed: <paths, grouped>
-Risks / blockers: <short list>
-Next action: <one line>
-```
-
-Only list something under Approved if the founder said so in this session. Everything else is Pending.
-
-## 2. Write it into the right files
-
-| What | Where |
+| Situation | Mode |
 |---|---|
-| Build state: slices, branches, what was built, known gaps, next slice | `HANDOFF.md` |
-| Priorities, risks, open founder items, this week's focus | `founder/status.md` (bump "Last updated") |
-| Decisions the founder approved in this session | Product/engineering: `specs/001-detent-mvp/decisions.md` (next `D-` row). Business: `founder/decisions.md` (next `B-` row). Use the `record-decision` skill. |
+| Small task, or a story group done with the slice still unfinished | **Short close** |
+| Slice done, or the context guard fired mid-slice (the state must survive) | **Full handoff** |
 
-Rules:
-- Edit only what changed. Keep `HANDOFF.md` and `founder/status.md` to one page each.
-- Never mark a row Approved or Confirmed without the founder's words in this session.
-- If a slice is done: `status: done` in `specs/001-detent-mvp/slices.yaml`, then `make backlog spec`.
+When unsure, use the full handoff.
 
-## 3. Check, commit, push, PR
+## Short close
 
-```
-make governance            # registers, HANDOFF-on-slice-done, tool tests
-git add -A && git commit -m "HANDOFF: <slice or task>"
-git push -u origin <branch>
-```
+1. In the chat, 3 lines: `Done: … / Pending: … / Next: <next story group or task>`.
+2. Change no files beyond the work itself. Touch `HANDOFF.md` only if the next step changed: one line in
+   the "Now" row of "Where we are" (add the row if missing), found with `grep -n "| Now" HANDOFF.md`.
+3. Commit and push the branch. No PR update text, no status edit. Then the "Next session" block below.
 
-- Never push to `main`. If the branch has no PR, open one into `main`; otherwise the push updates it.
-- If `make governance` fails, fix the cause; never weaken the check.
+## Full handoff
 
-## 4. Tell the founder the next session
+1. Closing summary (protocol §7), at most 15 lines:
+   ```
+   Outcome: <one or two lines>
+   Approved: <decisions the founder approved in this session, with their words; or "none">
+   Pending: <Proposed / Assumption / Open items raised, with IDs>
+   Files changed: <paths, grouped>
+   Risks / blockers: <short list>
+   Next action: <one line>
+   ```
+   Only list something under Approved if the founder said so in this session.
+2. Write it into the files. Edit only the changed lines, found with `grep -n`; never rewrite a whole file.
+   - `HANDOFF.md`: build state, branches, what was built, known gaps, next slice.
+   - `founder/status.md`: priorities, risks, founder items, "Last updated".
+   - Decisions approved in this session: `record-decision` skill (`D-` specs register, `B-` business).
+   - Slice done: `status: done` in `specs/001-detent-mvp/slices.yaml`, then `make backlog spec`.
+3. Slice done: propose the next slice's story groups (3 to 6 related stories that share files) under
+   "Next slice" in `HANDOFF.md`, one line each: `Group 1: STORY-IDs (why grouped) · Model: <strongest | mid-tier>`.
+   Use the "Model choice" table in `CLAUDE.md`.
+4. Check and ship:
+   ```
+   make governance
+   git add -A && git commit -m "HANDOFF: <slice or task>"
+   git push -u origin <branch>
+   ```
+   Never push to `main`. Open a PR into `main` if none exists; otherwise the push updates it.
+   If `make governance` fails, fix the cause; never weaken the check.
+
+Never mark a row Approved or Confirmed without the founder's words in this session.
+
+## Next session (both modes)
 
 End with exactly:
 
 ```
-Next session name: Detent · <slice or task> <short name>
+Next session name: Detent · <slice> <group or task>
+Model: <strongest | mid-tier>
 First message:
   Read CLAUDE.md and HANDOFF.md, then <the next action>. Start from main.
 ```
 
-If the work continues on the same branch (PR not yet merged), say "Start from <branch>" instead.
+If the work continues on an unmerged branch, say "Start from <branch>" instead.

@@ -137,6 +137,22 @@ def test_main_exit_codes(repo: Path, capsys: pytest.CaptureFixture[str]) -> None
     assert "governance: FAILED" in capsys.readouterr().out
 
 
+def test_protocol_copy_elsewhere_fails(repo: Path) -> None:
+    marker = gov.PROTOCOL_MARKER
+    write(repo / gov.PROTOCOL, f"# Protocol\n\n{marker} → Execute\n")
+    git(repo, "add", "-A")
+    git(repo, "commit", "-qm", "protocol")
+    assert run(repo)[0] == []
+    commit(repo, "founder/claude-project/instructions.md", f"Lifecycle: {marker}\n")
+    errors, _ = run(repo)
+    assert any("founder/claude-project/instructions.md: restates the protocol" in e for e in errors)
+
+
+def test_untracked_copy_is_ignored(repo: Path) -> None:
+    write(repo / "scratch.md", gov.PROTOCOL_MARKER)
+    assert run(repo)[0] == []
+
+
 def test_real_registers_have_valid_statuses() -> None:
     for reg in gov.REGISTERS:
         rows = gov.register_rows((REPO / reg).read_text(encoding="utf-8"))
