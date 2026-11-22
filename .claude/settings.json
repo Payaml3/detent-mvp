@@ -1,4 +1,15 @@
 {
+  "extraKnownMarketplaces": {
+    "solo-to-scale": {
+      "source": {
+        "source": "github",
+        "repo": "Payaml3/solo-to-scale"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "solo-to-scale@solo-to-scale": true
+  },
   "statusLine": {
     "type": "command",
     "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/statusline.py\""
@@ -7,17 +18,32 @@
     "SessionStart": [
       {
         "matcher": "startup|resume|compact",
-        "hooks": [{"type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_start.py\""}]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_start.py\""
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
       {
-        "hooks": [{"type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/context_guard.py\""}]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/context_guard.py\""
+          }
+        ]
       }
     ],
     "Stop": [
       {
-        "hooks": [{"type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_check.py\""}]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop_check.py\""
+          }
+        ]
       }
     ]
   }
