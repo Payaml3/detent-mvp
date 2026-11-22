@@ -3,7 +3,7 @@
 One repository, one session per slice. A new session reads `CLAUDE.md`, then this file, and then only
 the specs and code the slice needs. At the end of the slice, update this file and push it with the slice.
 
-Last updated: 2026-11-20, S9 code built (branch `claude/project-thread-rbgh7v`); the live deploy and testnet run wait on the founder.
+Last updated: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-scale operating system (#7); the live deploy and testnet run wait on the founder. The Monday weekly review runs as a scheduled task (07:39 UK time).
 
 ## Where we are
 
@@ -11,11 +11,11 @@ Last updated: 2026-11-20, S9 code built (branch `claude/project-thread-rbgh7v`);
 |---|---|---|
 | S0 to S7 (prototype engine: decide, send once, review, never twice, agent + mandates, operations, ledger, deposits, reconciliation, replay) | done | `main` |
 | S8 Proof and release gate | done | `main` |
-| **S9 Demo-ready prototype in the EU** | **code built; deploy and live testnet run pending** | `claude/project-thread-rbgh7v` (one PR into `main`) |
+| **S9 Demo-ready prototype in the EU** | **code merged; deploy and live testnet run pending** | `main` (the live-run fixes come back as one PR) |
 | P1 Sandbox API and webhooks, P2 Dashboard, P3 Docs and SDKs, P4 Website launch | todo | |
 | L After launch (Should and Could) | todo | |
 
-`main` holds S0 to S8. Each new slice branches from `main` and comes back as one pull request into `main`.
+`main` holds S0 to S8 and the S9 code. Each new slice branches from `main` and comes back as one pull request into `main`.
 Progress: `make spec` reports criteria done with evidence (219/308 after the S9 build).
 
 ## Start a session
