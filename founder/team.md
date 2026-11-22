@@ -1,6 +1,6 @@
 # Team: Detent
 
-The founder is CEO and chairs the board. Claude is the AI core and chief of staff. Six AI roles each own one function, and four AI advisors sit on the board. Role definitions come from the solo-to-scale plugin (`roles/`). Claude Code runs them from `.claude/agents/` and Codex from `.codex/agents/`; `make agents` keeps the two in step.
+The founder is CEO and chairs the board. Claude is the AI core and chief of staff. Six AI roles each own one function, and four AI advisors sit on the board. Role definitions come from the solo-to-scale plugin (`roles/`).
 
 ## Org
 
