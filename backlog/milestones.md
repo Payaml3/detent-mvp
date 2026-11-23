@@ -33,12 +33,27 @@ estimates for one developer working with Claude Code (Estimate); see `epics.md` 
 - The website copy and layout (WEB-01, WEB-02) don't depend on the engine and can be built at any time. Only WEB-03 waits for the results.
 - Shadow mode (SHD) is the first thing to pull forward if a prospect agrees to share an export before P1.
 
-## If time is short (C-13 Confirmed 2026-11-20, D-34: option 2, prototype first)
+## Scope: the full MVP (C-13 Confirmed 2026-11-23, D-37: option 1, full scope)
 
-The decomposed Must scope is larger than the earlier top-down estimate (`mvp-scope.md` 22.5 days plus `05-developer-portal.md` 16.5 days). The options are:
+The founder chose the full scope on 2026-11-23 ("we want to complete the build everything"), superseding D-34
+(prototype first, 2026-11-20). Every slice in the table above is in scope and is built in order:
 
-1. **Keep the full scope** and plan about 12 weeks.
-2. **Prototype first.** Ship S0 to S9 as the proof of work, then decide on the portal (P1 to P4) after the first demos.
+1. **S9** Demo-ready prototype in the EU: the code is merged; the deploy and live testnet run wait on the founder
+   (Render and Neon accounts, funded test wallets, `ANTHROPIC_API_KEY`).
+2. **P1** Public sandbox API and webhooks. It starts now, while the S9 live run waits: no P1 story depends on S9.
+3. **P2** Dashboard and sandbox.
+4. **P3** Docs and SDKs.
+5. **P4** Website launch. WEB-07 depends on FND-07, so P4 closes after the S9 deploy.
+6. **L** After launch (Should and Could).
+
+Remaining after S8, from `epics.md`: about 2.25 days (S9), 5.25 (P1), 5.75 (P2), 6.5 (P3), 3.75 (P4) and 7 (L) of
+Must and Should work, about 30 days for one developer with Claude Code. P1 and P2 need answers on C-12, C-14, C-16,
+G-10, G-17 to G-20, G-23 and G-25 (still Proposed or Open) before the stories that build on them.
+
+The options weighed under C-13 were:
+
+1. **Keep the full scope** and plan about 12 weeks. **Chosen (D-37).**
+2. **Prototype first.** Ship S0 to S9 as the proof of work, then decide on the portal (P1 to P4) after the first demos. Chosen 2026-11-20 (D-34), superseded.
 3. **Trim the prototype.** Candidates to cut or defer:
    - Ethereum Sepolia (RAL-03, S4), keeping one chain and the bank simulator
    - POL-07 two-approver UI (S6; keep it as a config file signed off in git)

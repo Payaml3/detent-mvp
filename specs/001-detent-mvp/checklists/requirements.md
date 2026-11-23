@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No [NEEDS CLARIFICATION] markers remain. Open founder decisions are tracked by ID in decisions.md (C-13, G-19) instead of inline markers.
+- [x] No [NEEDS CLARIFICATION] markers remain. Open founder decisions are tracked by ID in decisions.md (for example G-19) instead of inline markers.
 - [x] Requirements are testable and unambiguous: each FR maps to stories whose criteria have a done or planned test (traceability.md)
 - [x] Success criteria are measurable (SC-001 to SC-011 carry counts, rates or times)
 - [x] Success criteria are technology-agnostic

@@ -13,10 +13,11 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 
 - **Slices done:** S0 to S8, all on `main` (prototype engine plus the S8 proof and release gate).
 - **S9:** code built and rehearsed locally (scenario runner, reset, demo check, health check, Render blueprint); the deployed EU instance and the live testnet run wait on the founder items below.
-- **Criteria done:** 219 of 308 with evidence (`make spec`, 2026-11-20). 103 requirements: 98 confirmed, 5 proposed.
+- **Criteria done:** 219 of 308 with evidence (`make spec`, 2026-11-20). 103 requirements: 99 confirmed, 4 proposed.
+- **Scope (Approved 2026-11-23, D-37):** the full MVP backlog, superseding prototype first (D-34). Order: S9, P1 Sandbox API and webhooks, P2 Dashboard and sandbox, P3 Docs and SDKs, P4 Website launch, L After launch (about 30 days of Must and Should work after S8).
 - **Operating system (22 Nov):** the solo-to-scale plugin is enabled (#10), the AI team roles come from the plugin (#11, reverted by #12), and the handoff is refreshed (#9). No product code changed this week.
-- **Next:** finish S9 live (deploy, fund wallets, run spec/11 on the Sepolias), then P1 Sandbox API.
-- **After that:** P1 Sandbox API, P2 Dashboard, P3 Docs and SDKs, P4 Website launch, L After launch.
+- **Next:** P1 Sandbox API and webhooks starts now; the S9 live run (deploy, fund wallets, run spec/11 on the Sepolias) follows when the founder items below are in.
+- **After that:** P2 Dashboard, P3 Docs and SDKs, P4 Website launch, L After launch.
 
 ## Top risks
 
@@ -45,5 +46,6 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 
 ## This week's focus (Proposed)
 
-- **Proposed:** close the S9 live-run blockers (Render and Neon accounts with the `render.yaml` secrets, four funded test wallets, `ANTHROPIC_API_KEY`), then run spec/11 live on the Sepolias and mark S9 done. The S9 code is already on `main`.
+- **Proposed:** start P1 with its first story group (API-01 to API-04 and API-06: keys and scopes, errors, versions, rate limits, request logs) while the S9 blockers close (Render and Neon accounts, API key, funded wallets).
+- **Proposed:** answer C-12, C-14, C-16, G-10, G-17 to G-20, G-23 and G-25 before the P1 and P2 stories that build on them.
 - **Proposed:** answer the business-context questions so P4 copy and pricing rest on evidence.
