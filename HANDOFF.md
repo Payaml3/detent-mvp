@@ -3,7 +3,7 @@
 One repository, one session per slice. A new session reads `CLAUDE.md`, then this file, and then only
 the specs and code the slice needs. At the end of the slice, update this file and push it with the slice.
 
-Last updated: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-scale operating system (#7); the live deploy and testnet run wait on the founder. The Monday weekly review runs as a scheduled task (07:39 UK time).
+Last updated: 2026-11-23, full MVP scope chosen (D-37); 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-scale operating system (#7); the live deploy and testnet run wait on the founder. The Monday weekly review runs as a scheduled task (07:39 UK time).
 
 ## Where we are
 
@@ -12,8 +12,11 @@ Last updated: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to
 | S0 to S7 (prototype engine: decide, send once, review, never twice, agent + mandates, operations, ledger, deposits, reconciliation, replay) | done | `main` |
 | S8 Proof and release gate | done | `main` |
 | **S9 Demo-ready prototype in the EU** | **code merged; deploy and live testnet run pending** | `main` (the live-run fixes come back as one PR) |
-| P1 Sandbox API and webhooks, P2 Dashboard, P3 Docs and SDKs, P4 Website launch | todo | |
+| P1 Sandbox API and webhooks | **next: starts now, while the S9 live run waits** | branch from `main` |
+| P2 Dashboard, P3 Docs and SDKs, P4 Website launch | todo, in this order | |
 | L After launch (Should and Could) | todo | |
+
+Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
 
 `main` holds S0 to S8 and the S9 code. Each new slice branches from `main` and comes back as one pull request into `main`.
 Progress: `make spec` reports criteria done with evidence (219/308 after the S9 build).
@@ -108,12 +111,16 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
   over Base to Ethereum under one ID, close the day gives 24 of 25 matched with one break (dep-07), and a rerun
   changes nothing. `integration/test_demo_generations.py`, `unit/test_demo_wallets.py`.
 
-## Next: finish S9 (live), then P1
+## Next: P1 now, the S9 live run when the founder items are in
 
 - **S9 live run** (needs the founder items below): deploy `render.yaml`, set the secrets, `detent demo check`,
   then run spec/11 on Base Sepolia and Ethereum Sepolia and fix any mismatch in spec/11; then mark S9 done
   (FND-07 criterion 0 and the slice exit). · Model: mid-tier
-- Group 1 of P1, after S9: see `specs/001-detent-mvp/slices.yaml` (P1). · Model: strongest (API and webhooks touch money paths)
+- **P1 group 1, now:** API-01 to API-04 and API-06 (keys and scopes, error model, dated versions, rate limits,
+  request logs); then group 2: WHK-01 to WHK-03, EXC-08, API-07 and API-05 (the OpenAPI file last, as it depends
+  on EXC-08). No P1 story depends on S9. See `specs/001-detent-mvp/slices.yaml` (P1). · Model: strongest (API and
+  webhooks touch money paths)
+- **Then:** P2, P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items
 
@@ -124,7 +131,8 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
   network: `detent demo token deploy --network <n>`, set `USDC_ADDRESS_*` to the printed address, then
   `detent demo token fund --network <n>`; gas comes from a faucet.
 - C-10 Confirmed (D-35): the match line counts money-moving items only (24 of 25; 26 of 27 with both escalations
-  approved, now tested). C-13 Confirmed (D-34): prototype first; decide on the portal (P1 to P4) after the first demos.
+  approved, now tested). C-13 Confirmed (D-37, 2026-11-23): full scope,
+  superseding D-34 (prototype first).
 - `ANTHROPIC_API_KEY` (also as a GitHub secret for the nightly eval): every agent answer is a labelled
   hand-written stand-in until real runs are recorded (AGT-01 10/10, EVL-04). The interpretation and
   agreement figures measure Detent's checks, not a model, until then.

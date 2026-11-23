@@ -155,9 +155,9 @@ Exit checks per slice and the task list: [tasks.md](tasks.md).
 loop is clickable in S3 instead of M4; the agent comes after the paths it depends on exist, so its first demo is the
 real flow. **Trade-off**: the console shell (CON-01) moves earlier, to S3.
 
-**Scope option (C-13, open)**: whichever order is chosen, the prototype (S0 to S9) is about 44 days of Must and Should
-work for one developer with Claude Code, and the portal about 21 more. Founder choice: full scope, prototype first,
-or trim (backlog/milestones.md).
+**Scope (C-13 Confirmed 2026-11-23, D-37: full scope)**: the prototype (S0 to S9) is about 44 days of Must and Should
+work for one developer with Claude Code, and the portal about 21 more. The founder chose the full scope, superseding
+prototype first (D-34): S9, then P1 to P4 and L, in order (backlog/milestones.md).
 
 ## Project Structure
 
