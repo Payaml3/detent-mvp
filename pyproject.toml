@@ -38,7 +38,19 @@ dev = [
 [tool.ruff]
 line-length = 110
 target-version = "py312"
-extend-exclude = ["chain/lib", "chain/out", "chain/cache", "tools/build_backlog.py", "*.md", ".specify", ".claude"]  # supplied or vendored; specs are prose
+extend-exclude = [
+  "chain/lib", "chain/out", "chain/cache", "tools/build_backlog.py", "*.md", ".specify", ".claude",  # supplied or vendored; specs are prose
+  # Plugin-owned (solo-to-scale): every upgrade rewrites these from the plugin's templates, so Detent's lint
+  # rules don't apply. The plugin tests them; tools/tests runs them here too.
+  "tools/_s2s.py", "tools/approval.py", "tools/build_dashboard.py", "tools/build_portfolio.py",
+  "tools/build_roadmap.py", "tools/build_team.py", "tools/build_traceability.py", "tools/check_governance.py",
+  "tools/claim.py", "tools/control.py", "tools/doctor.py", "tools/finance.py", "tools/goals.py",
+  "tools/heartbeat.py", "tools/test_area.py", "tools/tickets.py",
+  "tools/tests/test_approval.py", "tools/tests/test_control.py", "tools/tests/test_dashboard.py",
+  "tools/tests/test_doctor.py", "tools/tests/test_finance.py", "tools/tests/test_goals.py",
+  "tools/tests/test_heartbeat.py", "tools/tests/test_portfolio.py", "tools/tests/test_tickets.py",
+  "tools/tests/test_tools.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "DTZ", "TID", "RUF", "PL", "SIM", "PT"]
