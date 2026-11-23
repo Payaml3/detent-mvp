@@ -15,6 +15,7 @@ Warns (never fails) if:
   - the branch changes more than `pr_warn_lines` lines, not counting generated and lock files
 Standard library only. Limits live in .claude/governance.json.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -26,17 +27,20 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import _s2s as s  # noqa: E402
-import build_roadmap  # noqa: E402
-import build_team  # noqa: E402
-import build_traceability  # noqa: E402
+import _s2s as s
+import build_roadmap
+import build_team
+import build_traceability
 
 PROTOCOL = "founder/operating-protocol.md"
 # Built from parts, so this file doesn't contain the lifecycle line itself.
 PROTOCOL_MARKER = " → ".join(["Define", "Analyse", "Decide"])
 CITED = re.compile(r"\b([A-Z]-\d{2,})\b")
-VIEW_DATA = {"founder/roadmap.json": build_roadmap, "founder/team.json": build_team,
-             "founder/traceability.json": build_traceability}
+VIEW_DATA = {
+    "founder/roadmap.json": build_roadmap,
+    "founder/team.json": build_team,
+    "founder/traceability.json": build_traceability,
+}
 
 
 def lines(path: Path) -> int:
@@ -48,8 +52,10 @@ def instruction_size(root: Path, cfg: dict, tracked: list[str]) -> list[str]:
     errors = []
     total = lines(root / "AGENTS.md") + lines(root / "CLAUDE.md")
     if total > limit:
-        errors.append(f"AGENTS.md + CLAUDE.md are {total} lines together; keep them at or under {limit} "
-                      "(move area rules into a subdirectory CLAUDE.md)")
+        errors.append(
+            f"AGENTS.md + CLAUDE.md are {total} lines together; keep them at or under {limit} "
+            "(move area rules into a subdirectory CLAUDE.md)"
+        )
     for name in tracked:
         if name.endswith("CLAUDE.md") and name != "CLAUDE.md" and lines(root / name) > limit:
             errors.append(f"{name} is {lines(root / name)} lines; keep it at or under {limit}")
@@ -61,12 +67,20 @@ def done_slices(text: str | None) -> set[str]:
         data = json.loads(text or "{}")
     except ValueError:
         return set()
-    return {str(x.get("id")) for x in (data.get("slices") or []) if isinstance(x, dict) and x.get("status") == "done"}
+    return {
+        str(x.get("id"))
+        for x in (data.get("slices") or [])
+        if isinstance(x, dict) and x.get("status") == "done"
+    }
 
 
 def passed_stages(text: str | None) -> set[str]:
-    return {f"stage {r['#']}" for t in s.tables(text or "") for r in t
-            if r.get("#", "").isdigit() and r.get("status", "").lower() == "passed"}
+    return {
+        f"stage {r['#']}"
+        for t in s.tables(text or "")
+        for r in t
+        if r.get("#", "").isdigit() and r.get("status", "").lower() == "passed"
+    }
 
 
 def check(root: Path, base_ref: str, today: dt.date) -> tuple[list[str], list[str]]:
@@ -79,7 +93,9 @@ def check(root: Path, base_ref: str, today: dt.date) -> tuple[list[str], list[st
     known = {r["id"] for r in rows}
     for r in rows:
         if r["status"] and r["status"] not in allowed:
-            errors.append(f"{r['register']}: {r['id']} has status '{r['status']}'; use one of {sorted(allowed)}")
+            errors.append(
+                f"{r['register']}: {r['id']} has status '{r['status']}'; use one of {sorted(allowed)}"
+            )
         if not r["status"] and r["has_status"]:
             errors.append(f"{r['register']}: {r['id']} has no status")
     prefixes = {r["id"].split("-")[0] for r in rows} | {"B", "D"}
@@ -108,11 +124,18 @@ def check(root: Path, base_ref: str, today: dt.date) -> tuple[list[str], list[st
     if not base:
         warnings.append(f"base '{base_ref}' not found; skipped the branch checks (fetch it first)")
     else:
-        handoff_changed = bool((s.git(root, "diff", "--name-only", base, "HEAD", "--", "HANDOFF.md") or "").strip())
+        handoff_changed = bool(
+            (s.git(root, "diff", "--name-only", base, "HEAD", "--", "HANDOFF.md") or "").strip()
+        )
         rel = str(cfg.get("slices_file") or "founder/slices.json")
-        newly = sorted(done_slices(s.git(root, "show", f"HEAD:{rel}")) - done_slices(s.git(root, "show", f"{base}:{rel}")))
-        newly += sorted(passed_stages(s.git(root, "show", "HEAD:founder/playbook.md"))
-                        - passed_stages(s.git(root, "show", f"{base}:founder/playbook.md")))
+        newly = sorted(
+            done_slices(s.git(root, "show", f"HEAD:{rel}"))
+            - done_slices(s.git(root, "show", f"{base}:{rel}"))
+        )
+        newly += sorted(
+            passed_stages(s.git(root, "show", "HEAD:founder/playbook.md"))
+            - passed_stages(s.git(root, "show", f"{base}:founder/playbook.md"))
+        )
         if newly and not handoff_changed:
             errors.append(f"{', '.join(newly)} marked done but HANDOFF.md not changed; run the handoff skill")
 
@@ -130,8 +153,10 @@ def check(root: Path, base_ref: str, today: dt.date) -> tuple[list[str], list[st
                 total += int(parts[0]) + int(parts[1])
         limit = int(cfg.get("pr_warn_lines") or 400)
         if total > limit:
-            warnings.append(f"this branch changes {total} lines (over {limit}, not counting generated files); "
-                            "consider splitting the PR")
+            warnings.append(
+                f"this branch changes {total} lines (over {limit}, not counting generated files); "
+                "consider splitting the PR"
+            )
 
     status = s.read(root / "founder" / "status.md")
     if status:

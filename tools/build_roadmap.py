@@ -11,6 +11,7 @@ Writes founder/roadmap.json, the roadmap data behind the progress dashboard, fro
 
 JSON only, no markdown copy. No generation date, so --check fails only when a source changed.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -18,25 +19,45 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import _s2s as s  # noqa: E402
+import _s2s as s
 
 
 def build(root: Path) -> dict:
     cfg = s.config(root)
     stages = s.playbook(root)
-    current = next((x["stage"] for x in stages if x["status"].lower() == "current"), s.project(root).get("stage"))
+    current = next(
+        (x["stage"] for x in stages if x["status"].lower() == "current"), s.project(root).get("stage")
+    )
     data = s.slices(root, cfg)
     out_slices = []
     for sl in data["slices"]:
         stories = [st for st in data["stories"] if st.get("slice") == sl.get("id")]
         crit = [s.story_counts(st) for st in stories]
-        out_slices.append({"id": sl.get("id"), "name": sl.get("name", ""), "status": sl.get("status", "todo"),
-                           "goal": sl.get("goal", ""), "exit": sl.get("exit", ""), "stories": len(stories),
-                           "criteria": sum(c[0] for c in crit), "criteria_done": sum(c[1] for c in crit)})
-    waiting = [{k: d[k] for k in ("id", "decision", "status", "date", "register")}
-               for d in s.decisions(root, cfg) if d["status"] in ("Proposed", "Open")]
-    return {"project": s.project(root).get("name", ""), "current_stage": current, "stages": stages,
-            "slices": out_slices, "blockers": s.founder_items(root), "decisions_waiting": waiting}
+        out_slices.append(
+            {
+                "id": sl.get("id"),
+                "name": sl.get("name", ""),
+                "status": sl.get("status", "todo"),
+                "goal": sl.get("goal", ""),
+                "exit": sl.get("exit", ""),
+                "stories": len(stories),
+                "criteria": sum(c[0] for c in crit),
+                "criteria_done": sum(c[1] for c in crit),
+            }
+        )
+    waiting = [
+        {k: d[k] for k in ("id", "decision", "status", "date", "register")}
+        for d in s.decisions(root, cfg)
+        if d["status"] in ("Proposed", "Open")
+    ]
+    return {
+        "project": s.project(root).get("name", ""),
+        "current_stage": current,
+        "stages": stages,
+        "slices": out_slices,
+        "blockers": s.founder_items(root),
+        "decisions_waiting": waiting,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:

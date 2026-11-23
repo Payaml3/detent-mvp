@@ -7,6 +7,7 @@ founder/team.md, the only copy. publish-views fills the team-view page with this
   python tools/build_team.py          # write
   python tools/build_team.py --check  # exit 1 if out of date (CI)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -15,12 +16,27 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import _s2s as s  # noqa: E402
+import _s2s as s
 
 BOARD = [
-    {"id": "growth-advisor", "name": "Growth", "lens": "acquisition", "asks": "Which channel brings the first 100 customers?"},
-    {"id": "owner-advisor", "name": "Owner", "lens": "long-term value", "asks": "Can we survive being wrong?"},
-    {"id": "customer-advisor", "name": "Customer", "lens": "demand", "asks": "What did customers do, not say?"},
+    {
+        "id": "growth-advisor",
+        "name": "Growth",
+        "lens": "acquisition",
+        "asks": "Which channel brings the first 100 customers?",
+    },
+    {
+        "id": "owner-advisor",
+        "name": "Owner",
+        "lens": "long-term value",
+        "asks": "Can we survive being wrong?",
+    },
+    {
+        "id": "customer-advisor",
+        "name": "Customer",
+        "lens": "demand",
+        "asks": "What did customers do, not say?",
+    },
     {"id": "risk-advisor", "name": "Risk", "lens": "regulator's", "asks": "Would this make us regulated?"},
 ]
 
@@ -38,31 +54,66 @@ def build(root: Path) -> dict:
     tasks = []
     for st in data["stories"]:
         total, done, _ = s.story_counts(st)
-        tasks.append({"id": st.get("id"), "title": short(st.get("title", "")), "kind": "story",
-                      "role": roles.get(st.get("epic", ""), "engineer"), "epic": st.get("epic", ""),
-                      "initiative": (epics.get(st.get("epic", "")) or {}).get("name", ""),
-                      "slice": st.get("slice", ""), "priority": st.get("priority", ""),
-                      "status": "done" if total and done == total else ("in_progress" if done else "todo"),
-                      "progress": f"{done}/{total}", "deps": list(st.get("deps") or [])})
+        tasks.append(
+            {
+                "id": st.get("id"),
+                "title": short(st.get("title", "")),
+                "kind": "story",
+                "role": roles.get(st.get("epic", ""), "engineer"),
+                "epic": st.get("epic", ""),
+                "initiative": (epics.get(st.get("epic", "")) or {}).get("name", ""),
+                "slice": st.get("slice", ""),
+                "priority": st.get("priority", ""),
+                "status": "done" if total and done == total else ("in_progress" if done else "todo"),
+                "progress": f"{done}/{total}",
+                "deps": list(st.get("deps") or []),
+            }
+        )
     story_ids = {t["id"] for t in tasks}
     for i, item in enumerate(s.founder_items(root)):
         blocks = sorted({m for m in re.findall(r"\b[A-Z]{2,5}-\d{2,}\b", item["item"]) if m in story_ids})
-        tasks.append({"id": f"CEO-{i + 1:02d}", "title": short(item["item"]), "kind": "founder", "role": "founder",
-                      "slice": item["needed_by"].split(" ")[0].strip("(),") if item["needed_by"] else "",
-                      "status": "todo", "progress": "", "deps": [], "blocks": blocks})
+        tasks.append(
+            {
+                "id": f"CEO-{i + 1:02d}",
+                "title": short(item["item"]),
+                "kind": "founder",
+                "role": "founder",
+                "slice": item["needed_by"].split(" ")[0].strip("(),") if item["needed_by"] else "",
+                "status": "todo",
+                "progress": "",
+                "deps": [],
+                "blocks": blocks,
+            }
+        )
     for d in s.decisions(root, cfg):
         if d["status"] in ("Proposed", "Open"):
-            tasks.append({"id": d["id"], "title": short(d["decision"]), "kind": "decision", "role": "product",
-                          "slice": "", "status": "todo", "progress": d["status"], "deps": []})
+            tasks.append(
+                {
+                    "id": d["id"],
+                    "title": short(d["decision"]),
+                    "kind": "decision",
+                    "role": "product",
+                    "slice": "",
+                    "status": "todo",
+                    "progress": d["status"],
+                    "deps": [],
+                }
+            )
     by_id = {t["id"]: t for t in tasks}
     for t in tasks:
         for b in t.get("blocks", []):
             by_id[b]["deps"].append(t["id"])
     for t in tasks:
         t["dependents"] = [u["id"] for u in tasks if t["id"] in u["deps"]]
-    return {"repo": s.project(root).get("repo", ""), "board": BOARD,
-            "slices": [{"id": x.get("id"), "name": x.get("name", ""), "status": x.get("status", "todo")} for x in data["slices"]],
-            "tasks": tasks}
+    return {
+        "repo": s.project(root).get("repo", ""),
+        "board": BOARD,
+        "slices": [
+            {"id": x.get("id"), "name": x.get("name", ""), "status": x.get("status", "todo")}
+            for x in data["slices"]
+        ],
+        "tasks": tasks,
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
