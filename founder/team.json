@@ -1559,7 +1559,9 @@
    "priority": "",
    "status": "done",
    "progress": "1/1",
-   "deps": [],
+   "deps": [
+    "CEO-09"
+   ],
    "dependents": []
   },
   {
@@ -2276,6 +2278,34 @@
   },
   {
    "id": "CEO-08",
+   "title": "Let scheduled sessions load the solo-to-scale plugin: add Payaml3/solo-to-scale to the cloud environment's repositories",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "next",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [],
+   "dependents": []
+  },
+  {
+   "id": "CEO-09",
+   "title": "Confirm the INDEPENDENCE_DENYLIST secret is set for the OPS-02 CI check",
+   "kind": "founder",
+   "role": "founder",
+   "slice": "S9",
+   "status": "todo",
+   "progress": "",
+   "deps": [],
+   "blocks": [
+    "OPS-02"
+   ],
+   "dependents": [
+    "OPS-02"
+   ]
+  },
+  {
+   "id": "CEO-10",
    "title": "Delete the merged branches (m0-foundation, s1-decision-layer, s2-send-once, s3-review-loop, s3-unknown-resolved, s4-u...",
    "kind": "founder",
    "role": "founder",

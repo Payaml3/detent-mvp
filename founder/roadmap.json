@@ -402,7 +402,17 @@
    "needed_by": "P4"
   },
   {
-   "item": "Delete the merged branches (`m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`)",
+   "item": "Let scheduled sessions load the solo-to-scale plugin: add `Payaml3/solo-to-scale` to the cloud environment's repositories",
+   "owner": "Founder",
+   "needed_by": "next weekly review"
+  },
+  {
+   "item": "Confirm the `INDEPENDENCE_DENYLIST` secret is set for the OPS-02 CI check",
+   "owner": "Founder",
+   "needed_by": "S9"
+  },
+  {
+   "item": "Delete the merged branches (`m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`, and since 2026-11-20 `ops/operating-system`, `ops/leaner-os`, `ops/enable-solo-to-scale`, `claude/project-thread-li5pkd`, `-rbgh7v`, `-bzfdtj`, `-zjuwnv`, `-jhkdgn`, `-7ez3r4`); and the unmerged leftovers `add-spec-kit` and `claude/project-thread-5z58f0` (PR #5, closed)",
    "owner": "Founder",
    "needed_by": "S9"
   }
