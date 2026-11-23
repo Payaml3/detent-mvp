@@ -3,10 +3,8 @@
 Shared readers for the repo tools: config, registers, playbook, team mapping, founder items, slices.
 Python 3 standard library only; runs on Linux, macOS and Windows.
 """
-
 from __future__ import annotations
 
-import contextlib
 import fnmatch
 import json
 import re
@@ -18,20 +16,11 @@ ROOT = Path(__file__).resolve().parents[1]
 ROW_ID = re.compile(r"^([A-Z]{1,3})-(\d+)$")
 STATUSES = ("Approved", "Proposed", "Assumption", "Open")
 ROLES = ("architect", "qa", "growth", "engineer", "product", "research")
-FUNCTION_OF_ROLE = {
-    "architect": "03 Architecture",
-    "qa": "05 QA",
-    "growth": "06 GTM",
-    "engineer": "04 Engineering",
-}
+FUNCTION_OF_ROLE = {"architect": "03 Architecture", "qa": "05 QA", "growth": "06 GTM", "engineer": "04 Engineering"}
 DEFAULT_CFG: dict[str, Any] = {
-    "claude_md_max_lines": 200,
-    "pr_warn_lines": 400,
-    "status_stale_days": 14,
-    "slices_file": "founder/slices.json",
-    "registers": ["founder/decisions.md", "specs/*/decisions.md"],
-    "approved_words": ["Approved", "Confirmed"],
-    "generated_paths": [],
+    "claude_md_max_lines": 200, "pr_warn_lines": 400, "status_stale_days": 14,
+    "slices_file": "founder/slices.json", "registers": ["founder/decisions.md", "specs/*/decisions.md"],
+    "approved_words": ["Approved", "Confirmed"], "generated_paths": [],
 }
 
 
@@ -44,8 +33,10 @@ def read(path: Path) -> str:
 
 def config(root: Path = ROOT) -> dict[str, Any]:
     cfg = dict(DEFAULT_CFG)
-    with contextlib.suppress(ValueError):
+    try:
         cfg.update(json.loads(read(root / ".claude" / "governance.json") or "{}"))
+    except ValueError:
+        pass
     return cfg
 
 
@@ -58,15 +49,8 @@ def project(root: Path = ROOT) -> dict[str, Any]:
 
 def git(root: Path, *args: str) -> str | None:
     try:
-        out = subprocess.run(
-            ["git", *args],
-            cwd=root,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            timeout=30,
-            check=False,
-        )
+        out = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8",
+                             timeout=30, check=False)
     except (OSError, subprocess.SubprocessError):
         return None
     return out.stdout if out.returncode == 0 else None
@@ -81,7 +65,7 @@ def tables(text: str) -> list[list[dict[str, str]]]:
     out: list[list[dict[str, str]]] = []
     header: list[str] | None = None
     rows: list[dict[str, str]] = []
-    for line in [*text.splitlines(), ""]:
+    for line in text.splitlines() + [""]:
         if line.strip().startswith("|"):
             if set(line.strip()) <= set("|-: "):
                 continue
@@ -110,22 +94,21 @@ def status_word(cell: str) -> str:
 
 
 def decisions(root: Path, cfg: dict[str, Any]) -> list[dict[str, str]]:
-    """Every register row whose first cell is an ID like B-01 or D-12."""
+    """Every register row whose first cell is an ID like B-01 or D-12.
+
+    `has_status` is "yes" when the row's table has a status column. A log table without one
+    (for example an approvals log of D- rows) is still read, so its IDs can be cited.
+    """
     rows: list[dict[str, str]] = []
     for path in register_paths(root, cfg):
         for table in tables(read(path)):
             for r in table:
                 first = next(iter(r.values()), "").strip("*` ")
                 if ROW_ID.match(first):
-                    rows.append(
-                        {
-                            "id": first,
-                            "decision": r.get("decision", r.get("item", "")),
-                            "status": status_word(r.get("status", "")),
-                            "date": r.get("date", ""),
-                            "register": path.relative_to(root).as_posix(),
-                        }
-                    )
+                    rows.append({"id": first, "decision": r.get("decision", r.get("item", "")),
+                                 "status": status_word(r.get("status", "")), "date": r.get("date", ""),
+                                 "has_status": "yes" if "status" in r else "",
+                                 "register": path.relative_to(root).as_posix()})
     return rows
 
 
@@ -138,15 +121,8 @@ def playbook(root: Path) -> list[dict[str, Any]]:
     for table in tables(read(root / "founder" / "playbook.md")):
         for r in table:
             if r.get("#", "").isdigit() and "gate" in r:
-                stages.append(
-                    {
-                        "stage": int(r["#"]),
-                        "phase": r.get("phase", ""),
-                        "name": r.get("stage", ""),
-                        "gate": r.get("gate", ""),
-                        "status": r.get("status", ""),
-                    }
-                )
+                stages.append({"stage": int(r["#"]), "phase": r.get("phase", ""), "name": r.get("stage", ""),
+                               "gate": r.get("gate", ""), "status": r.get("status", "")})
     return stages
 
 
@@ -172,13 +148,8 @@ def founder_items(root: Path) -> list[dict[str, str]]:
     for table in tables(block):
         for r in table:
             vals = list(r.values())
-            items.append(
-                {
-                    "item": vals[0] if vals else "",
-                    "owner": r.get("owner", ""),
-                    "needed_by": r.get("needed by", ""),
-                }
-            )
+            items.append({"item": vals[0] if vals else "", "owner": r.get("owner", ""),
+                          "needed_by": r.get("needed by", "")})
     return items
 
 
@@ -188,27 +159,19 @@ def slices(root: Path, cfg: dict[str, Any]) -> dict[str, Any]:
         data = json.loads(read(root / str(cfg.get("slices_file") or "founder/slices.json")) or "{}")
     except ValueError:
         data = {}
-    return {
-        "epics": data.get("epics") or {},
-        "slices": data.get("slices") or [],
-        "stories": data.get("stories") or [],
-    }
+    return {"epics": data.get("epics") or {}, "slices": data.get("slices") or [], "stories": data.get("stories") or []}
 
 
 def story_counts(s: dict[str, Any]) -> tuple[int, int, int]:
     """(criteria, done, tested) for a story; `done`/`tested` may be counts or lists of criterion numbers."""
-
     def n(v: Any) -> int:
         return len(v) if isinstance(v, list) else int(v or 0)
-
     return n(s.get("criteria")), n(s.get("done")), n(s.get("tested"))
 
 
 def is_generated(path: str, cfg: dict[str, Any]) -> bool:
-    return any(
-        fnmatch.fnmatch(path, pat) or fnmatch.fnmatch(Path(path).name, pat)
-        for pat in cfg.get("generated_paths") or []
-    )
+    return any(fnmatch.fnmatch(path, pat) or fnmatch.fnmatch(Path(path).name, pat)
+               for pat in cfg.get("generated_paths") or [])
 
 
 def dump(data: Any) -> str:

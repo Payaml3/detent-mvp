@@ -9,7 +9,6 @@ and decision counts. The epic-to-role mapping comes from founder/team.md, the on
   python tools/build_traceability.py          # write
   python tools/build_traceability.py --check  # exit 1 if out of date (CI)
 """
-
 from __future__ import annotations
 
 import argparse
@@ -17,7 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import _s2s as s
+import _s2s as s  # noqa: E402
 
 
 def pct(done: int, total: int) -> int:
@@ -33,18 +32,9 @@ def build(root: Path) -> dict:
         total, done, tested = s.story_counts(st)
         epic = st.get("epic", "")
         fn = s.FUNCTION_OF_ROLE.get(roles.get(epic, "engineer"), "04 Engineering")
-        stories.append(
-            {
-                "story": st.get("id"),
-                "epic": epic,
-                "function": fn,
-                "slice": st.get("slice", ""),
-                "criteria": total,
-                "criteria_done": done,
-                "criteria_tested": tested,
-                "status": "Done" if total and done == total else ("In progress" if done else "To do"),
-            }
-        )
+        stories.append({"story": st.get("id"), "epic": epic, "function": fn, "slice": st.get("slice", ""),
+                        "criteria": total, "criteria_done": done, "criteria_tested": tested,
+                        "status": "Done" if total and done == total else ("In progress" if done else "To do")})
     decisions = s.decisions(root, cfg)
     resolved = sum(1 for d in decisions if s.resolved(d["status"], cfg))
 
@@ -52,44 +42,20 @@ def build(root: Path) -> dict:
         rows = [r for r in stories if r["function"] == fn]
         return sum(r["criteria_done"] for r in rows), sum(r["criteria"] for r in rows)
 
-    functions = [
-        {
-            "function": "00 Founder HQ",
-            "measure": "Decisions resolved",
-            "done": resolved,
-            "total": len(decisions),
-        }
-    ]
-    for fn, measure in (
-        ("03 Architecture", "Acceptance criteria done in the architect's epics"),
-        ("04 Engineering", "Acceptance criteria done in the engineers' epics"),
-        ("05 QA", "Acceptance criteria done in the QA epics"),
-        ("06 GTM", "Acceptance criteria done in the growth epics"),
-    ):
+    functions = [{"function": "00 Founder HQ", "measure": "Decisions resolved", "done": resolved, "total": len(decisions)}]
+    for fn, measure in (("03 Architecture", "Acceptance criteria done in the architect's epics"),
+                        ("04 Engineering", "Acceptance criteria done in the engineers' epics"),
+                        ("05 QA", "Acceptance criteria done in the QA epics"),
+                        ("06 GTM", "Acceptance criteria done in the growth epics")):
         d, t = crit(fn)
         functions.append({"function": fn, "measure": measure, "done": d, "total": t})
     for f in functions:
         f["pct_done"] = pct(f["done"], f["total"])
     total_c = sum(r["criteria"] for r in stories)
     chain = [
-        {
-            "order": 1,
-            "level": "User stories",
-            "total": len(stories),
-            "done": sum(r["status"] == "Done" for r in stories),
-        },
-        {
-            "order": 2,
-            "level": "Acceptance criteria",
-            "total": total_c,
-            "done": sum(r["criteria_done"] for r in stories),
-        },
-        {
-            "order": 3,
-            "level": "Criteria with test evidence",
-            "total": total_c,
-            "done": sum(r["criteria_tested"] for r in stories),
-        },
+        {"order": 1, "level": "User stories", "total": len(stories), "done": sum(r["status"] == "Done" for r in stories)},
+        {"order": 2, "level": "Acceptance criteria", "total": total_c, "done": sum(r["criteria_done"] for r in stories)},
+        {"order": 3, "level": "Criteria with test evidence", "total": total_c, "done": sum(r["criteria_tested"] for r in stories)},
     ]
     for c in chain:
         c["pct"] = pct(c["done"], c["total"])
@@ -97,28 +63,10 @@ def build(root: Path) -> dict:
     for code, ep in sorted(data["epics"].items()):
         rows = [r for r in stories if r["epic"] == code]
         t, d = sum(r["criteria"] for r in rows), sum(r["criteria_done"] for r in rows)
-        initiatives.append(
-            {
-                "code": code,
-                "initiative": (ep or {}).get("name", code),
-                "role": roles.get(code, "engineer"),
-                "stories": len(rows),
-                "criteria": t,
-                "criteria_done": d,
-                "pct_done": pct(d, t),
-            }
-        )
-    counts = {
-        w: sum(1 for d in decisions if d["status"] == w)
-        for w in (*s.STATUSES, *cfg.get("approved_words", []))
-    }
-    return {
-        "chain": chain,
-        "functions": functions,
-        "initiatives": initiatives,
-        "stories": stories,
-        "decision_counts": counts,
-    }
+        initiatives.append({"code": code, "initiative": (ep or {}).get("name", code), "role": roles.get(code, "engineer"),
+                            "stories": len(rows), "criteria": t, "criteria_done": d, "pct_done": pct(d, t)})
+    counts = {w: sum(1 for d in decisions if d["status"] == w) for w in (*s.STATUSES, *cfg.get("approved_words", []))}
+    return {"chain": chain, "functions": functions, "initiatives": initiatives, "stories": stories, "decision_counts": counts}
 
 
 def main(argv: list[str] | None = None) -> int:
