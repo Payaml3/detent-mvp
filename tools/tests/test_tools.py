@@ -14,10 +14,6 @@ from pathlib import Path
 
 import pytest
 
-# Detent keeps its own tools/check_governance.py (its decision registers have no Status column on
-# D- rows, which the plugin's check requires), so the plugin's governance-check tests are left out here.
-# Its tests live in tools/tests/test_check_governance.py.
-
 TOOLS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS))
 MARK = " → ".join(["Define", "Analyse", "Decide"])
@@ -137,9 +133,118 @@ def repo(tmp_path: Path) -> Path:
     return root
 
 
+def gov(root: Path) -> tuple[list[str], list[str]]:
+    import check_governance
+
+    return check_governance.check(root, "main", dt.date.today())
+
+
 def commit(root: Path, msg: str = "change") -> None:
     git(root, "add", "-A")
     git(root, "commit", "-qm", msg)
+
+
+def test_clean_repo_passes(repo):
+    errors, warnings = gov(repo)
+    assert errors == [] and warnings == []
+
+
+def test_unknown_cited_id_fails_then_passes(repo):
+    write(repo / "docs/note.md", "See B-09.\n")
+    commit(repo)
+    assert any("cites B-09" in e for e in gov(repo)[0])
+    write(repo / "docs/note.md", "See B-02.\n")
+    commit(repo)
+    assert gov(repo)[0] == []
+
+
+def test_bad_status_fails(repo):
+    write(repo / "founder/decisions.md", REGISTER.replace("Proposed", "Maybe"))
+    assert any("status 'Maybe'" in e for e in gov(repo)[0])
+
+
+def test_empty_status_fails(repo):
+    write(repo / "founder/decisions.md", REGISTER.replace("Proposed", ""))
+    assert any("has no status" in e for e in gov(repo)[0])
+
+
+def test_log_table_without_status_column_passes(repo):
+    log = "\n## Approvals log\n\n| ID | Decision | Date | Approval |\n| --- | --- | --- | --- |\n| D-01 | Ship the pilot | 2026-01-02 | founder reply |\n"
+    write(repo / "founder/decisions.md", REGISTER + log)
+    write(repo / "docs/note.md", "See D-01.\n")
+    for tool in ("build_roadmap", "build_team", "build_traceability"):
+        subprocess.run([sys.executable, str(repo / "tools" / f"{tool}.py")], check=True, capture_output=True)
+    commit(repo)
+    assert gov(repo)[0] == []
+
+
+def test_protocol_copy_fails(repo):
+    write(repo / "docs/copy.md", f"{MARK}\n")
+    commit(repo)
+    assert any("restates the protocol" in e for e in gov(repo)[0])
+    write(repo / "founder/prompts/bootstrap.md", f"{MARK}\n")
+    (repo / "docs/copy.md").unlink()
+    commit(repo)
+    assert gov(repo)[0] == []
+
+
+def test_slice_done_needs_handoff(repo):
+    data = json.loads((repo / "founder/slices.json").read_text())
+    data["slices"][0]["status"] = "done"
+    write(repo / "founder/slices.json", json.dumps(data))
+    subprocess.run([sys.executable, str(repo / "tools/build_roadmap.py")], check=True, capture_output=True)
+    subprocess.run([sys.executable, str(repo / "tools/build_team.py")], check=True, capture_output=True)
+    commit(repo)
+    assert any("S1 marked done but HANDOFF.md" in e for e in gov(repo)[0])
+    write(repo / "HANDOFF.md", "# HANDOFF\n\nS1 done.\n")
+    commit(repo)
+    assert gov(repo)[0] == []
+
+
+def test_stage_passed_needs_handoff(repo):
+    write(repo / "founder/playbook.md", PLAYBOOK.replace("| Current |", "| Passed |"))
+    subprocess.run([sys.executable, str(repo / "tools/build_roadmap.py")], check=True, capture_output=True)
+    commit(repo)
+    assert any("stage 13 marked done" in e for e in gov(repo)[0])
+
+
+def test_stale_view_data_fails(repo):
+    write(
+        repo / "founder/decisions.md",
+        REGISTER + "| B-03 | New | Business | Open | 2026-11-03 | | Business | |\n",
+    )
+    errors = gov(repo)[0]
+    assert any("roadmap.json is out of date" in e for e in errors) and any(
+        "team.json is out of date" in e for e in errors
+    )
+
+
+def test_instruction_size_limit(repo):
+    write(repo / "AGENTS.md", "x\n" * 19)
+    assert not any("AGENTS.md + CLAUDE.md" in e for e in gov(repo)[0]), (
+        "20 lines together is at the limit, not over"
+    )
+    write(repo / "AGENTS.md", "x\n" * 20)
+    assert any("AGENTS.md + CLAUDE.md are 21 lines" in e for e in gov(repo)[0])
+    write(repo / "AGENTS.md", "x\n")
+    write(repo / "apps/web/CLAUDE.md", "y\n" * 21)
+    commit(repo)
+    assert any("apps/web/CLAUDE.md is 21 lines" in e for e in gov(repo)[0])
+
+
+def test_pr_size_warns_but_ignores_generated(repo):
+    write(repo / "founder/roadmap.json", "{}\n" * 100)
+    commit(repo)
+    assert not any("changes" in w for w in gov(repo)[1])
+    write(repo / "src/big.py", "x = 1\n" * 50)
+    commit(repo)
+    assert any("changes 50 lines" in w for w in gov(repo)[1])
+
+
+def test_stale_status_warns(repo):
+    write(repo / "founder/status.md", STATUS.replace(dt.date.today().isoformat(), "2020-01-01"))
+    _errors, warnings = gov(repo)
+    assert any("more than 14 days ago" in w for w in warnings)
 
 
 def test_traceability_counts_by_role(repo):
