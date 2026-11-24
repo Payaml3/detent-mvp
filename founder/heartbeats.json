@@ -1,8 +1,17 @@
 {
-  "about": "Heartbeats and AI budgets per role. Only the founder edits this file (the budget gate). enabled: the role wakes on its cron schedule (UTC) as a cloud scheduled task; run `python tools/heartbeat.py plan` for the prompts. monthly_budget_usd: AI usage cost per calendar month (UTC), warned at 80% and stopped at 100%; null means not set, and a role without a budget never runs a heartbeat. company.monthly_budget_usd caps all roles together: every run checks it too, with the same 80% warning and 100% stop. Costs are API-equivalent prices per million tokens, measured from session transcripts; fallback_run_usd is recorded when a run can't be measured.",
+  "about": "Heartbeats and AI budgets per role. Only the founder edits this file (the budget gate). enabled: the role wakes on its cron schedule (UTC) as a cloud scheduled task; run `python tools/heartbeat.py plan` for the prompts. monthly_budget_usd: AI usage cost per calendar month (UTC), warned at 80% and stopped at 100%; null means not set, and a role without a budget never runs a heartbeat. company.monthly_budget_usd caps all roles together: every run checks it too, with the same 80% warning and 100% stop. Costs are API-equivalent prices per million tokens, measured from session transcripts; fallback_run_usd is recorded when a run can't be measured. Detent: the agents run on the founder's Claude subscription (CLAUDE_CODE_OAUTH_TOKEN), so these caps are safety stops measured at API-equivalent prices, not money spent; the subscription's own usage limit is the real limit.",
   "fallback_run_usd": 2.0,
+  "autopilot": {
+    "enabled": true,
+    "plan_every_hours": 24,
+    "max_runs_per_day": 12,
+    "max_parallel": 2,
+    "models": {
+      "architect": "opus"
+    }
+  },
   "company": {
-    "monthly_budget_usd": null
+    "monthly_budget_usd": 1000
   },
   "prices_usd_per_mtok": {
     "opus": {
@@ -32,9 +41,9 @@
   },
   "roles": {
     "chief-of-staff": {
-      "enabled": false,
+      "enabled": true,
       "cron": "0 7 * * 1",
-      "monthly_budget_usd": null
+      "monthly_budget_usd": 200
     },
     "research": {
       "enabled": false,
@@ -42,24 +51,24 @@
       "monthly_budget_usd": null
     },
     "product": {
-      "enabled": false,
+      "enabled": true,
       "cron": "0 8 * * 1-5",
-      "monthly_budget_usd": null
+      "monthly_budget_usd": 150
     },
     "architect": {
-      "enabled": false,
+      "enabled": true,
       "cron": "0 9 * * 1,4",
-      "monthly_budget_usd": null
+      "monthly_budget_usd": 150
     },
     "engineer": {
-      "enabled": false,
+      "enabled": true,
       "cron": "0 10 * * 1-5",
-      "monthly_budget_usd": null
+      "monthly_budget_usd": 300
     },
     "qa": {
-      "enabled": false,
+      "enabled": true,
       "cron": "0 15 * * 1-5",
-      "monthly_budget_usd": null
+      "monthly_budget_usd": 200
     },
     "growth": {
       "enabled": false,
