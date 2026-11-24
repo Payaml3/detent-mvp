@@ -2236,10 +2236,10 @@
   },
   {
    "id": "CEO-05",
-   "title": "C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open",
+   "title": "Legal review of sandbox data retention (G-19, approved as proposed in D-38)",
    "kind": "founder",
    "role": "founder",
-   "slice": "P1",
+   "slice": "P4",
    "status": "todo",
    "progress": "",
    "deps": [],
@@ -2284,116 +2284,6 @@
    "progress": "",
    "deps": [],
    "blocks": [],
-   "dependents": []
-  },
-  {
-   "id": "C-12",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "C-14",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "C-16",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "G-10",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "G-17",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "G-18",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "G-19",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Open",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "G-20",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "G-23",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
-   "dependents": []
-  },
-  {
-   "id": "G-25",
-   "title": "",
-   "kind": "decision",
-   "role": "product",
-   "slice": "",
-   "status": "todo",
-   "progress": "Proposed",
-   "deps": [],
    "dependents": []
   }
  ]

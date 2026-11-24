@@ -387,9 +387,9 @@
    "needed_by": "S9"
   },
   {
-   "item": "C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open",
+   "item": "Legal review of sandbox data retention (G-19, approved as proposed in D-38)",
    "owner": "Founder",
-   "needed_by": "P1 to P2"
+   "needed_by": "P4"
   },
   {
    "item": "Publish measured results on the website (`detent eval publish`, EVL-06 criterion 1)",
@@ -407,76 +407,5 @@
    "needed_by": "S9"
   }
  ],
- "decisions_waiting": [
-  {
-   "id": "C-12",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "C-14",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "C-16",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "G-10",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "G-17",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "G-18",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "G-19",
-   "decision": "",
-   "status": "Open",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "G-20",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "G-23",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  },
-  {
-   "id": "G-25",
-   "decision": "",
-   "status": "Proposed",
-   "date": "",
-   "register": "specs/001-detent-mvp/decisions.md"
-  }
- ]
+ "decisions_waiting": []
 }

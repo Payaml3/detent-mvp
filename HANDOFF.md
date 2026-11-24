@@ -141,7 +141,9 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
 - Nightly eval against public testnets needs funded test wallets and RPC endpoints as secrets (EVL-07 criterion 0).
 - A funded test wallet for Base Sepolia and Ethereum Sepolia (RAL-02, RAL-03, S9).
 - User payouts are deferred (founder, before S1); the demo batch now pays counterparties instead (D-32).
-- C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open.
+- C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 Confirmed as proposed (D-38, 2026-11-24); G-19 retention still
+  needs the founder's legal review before the P4 launch. With G-10 decided, user payouts (D-26) can be built; no story
+  covers them yet and the API still returns 422 `user_payouts_unavailable`. Ask the founder which slice takes them.
 - Booking URL, inbox, final name and domain (`BRAND_NAME`), legal review of the site.
 - Delete the stale remote branch `s3-unknown-resolved` (the proxy refused).
 - Delete the merged branches (all are in `main`): `m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`.

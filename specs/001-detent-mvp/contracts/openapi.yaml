@@ -68,7 +68,7 @@ paths:
     post:
       tags: [Decision]
       operationId: cancelPaymentIntent
-      summary: Cancel before it is sent (INT-05; who may cancel is PROPOSED, G-17)
+      summary: Cancel before it is sent (INT-05; who may cancel: G-17, Confirmed D-38)
       x-scope: intents:create
       parameters: [{$ref: "#/components/parameters/PaymentId"}, {$ref: "#/components/parameters/IdempotencyKey"}]
       responses:
