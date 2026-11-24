@@ -47,8 +47,8 @@ The founder chose the full scope on 2026-11-23 ("we want to complete the build e
 6. **L** After launch (Should and Could).
 
 Remaining after S8, from `epics.md`: about 2.25 days (S9), 5.25 (P1), 5.75 (P2), 6.5 (P3), 3.75 (P4) and 7 (L) of
-Must and Should work, about 30 days for one developer with Claude Code. P1 and P2 need answers on C-12, C-14, C-16,
-G-10, G-17 to G-20, G-23 and G-25 (still Proposed or Open) before the stories that build on them.
+Must and Should work, about 30 days for one developer with Claude Code. The P1 and P2 rules (C-12, C-14, C-16,
+G-10, G-17 to G-20, G-23, G-25) were approved as proposed on 2026-11-24 (D-38).
 
 The options weighed under C-13 were:
 

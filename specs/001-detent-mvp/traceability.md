@@ -165,7 +165,7 @@ Sources: [INT-04 criteria](../../backlog/user-stories.md#int-04); [spec/04 §che
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 1 | Each counterparty exposes payment count and median amount, computed from confirmed payments | done | `integration/test_registry.py::test_stats_are_computed_from_confirmed_payments` |
 | [INT-04](../../backlog/user-stories.md#int-04) | S1 | 2 | Counterparties are seeded from fixtures and editable in the console | done | `integration/test_registry.py::test_fixture_counterparties_are_seeded`<br>`integration/test_registry.py::test_destination_editable_in_console_by_payments_lead_only` |
 
-## FR-014 · Intents (proposed)
+## FR-014 · Intents (confirmed)
 
 An intent naming an address that is not a registered destination of the counterparty records it as a new destination, so NEW_WALLET escalates; it is never trusted silently.
 
@@ -185,7 +185,7 @@ Sources: [spec/03 §create-a-payout-intent](../../spec/03-api.md#create-a-payout
 | [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 2 | Amount above k x the counterparty's median -> ESCALATE `ABOVE_NORM` | done | `unit/test_policy_engine.py::test_above_norm`<br>`unit/test_policy_engine.py::test_above_norm_ignores_history_in_another_currency` |
 | [POL-05](../../backlog/user-stories.md#pol-05) | S3 | 3 | Each hit stores the raw fact (address, timestamps, median, ratio) as evidence | done | `unit/test_policy_engine.py::test_above_norm_evidence_has_the_ratio`<br>`unit/test_policy_engine.py::test_changed_details_evidence_has_old_and_new`<br>`integration/test_registry.py::test_changed_details_shows_the_old_address` |
 
-## FR-015 · Intents (proposed)
+## FR-015 · Intents (confirmed)
 
 An intent can be cancelled by the platform or the payments lead until it is submitted, never after.
 
@@ -1198,7 +1198,7 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks)
 | [WHK-02](../../backlog/user-stories.md#whk-02) | P1 | 0 | `Detent-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language) | planned | integration: `apps/api/tests/integration/test_whk_02.py` |
 | [WHK-03](../../backlog/user-stories.md#whk-03) | P1 | 0 | Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event' | planned | integration: `apps/api/tests/integration/test_whk_03.py` |
 
-## FR-104 · Webhooks (proposed)
+## FR-104 · Webhooks (confirmed)
 
 Webhook retries back off at 1 min, 5 min, 30 min, 2 h, 6 h and 24 h, then the delivery is marked failed.
 
@@ -1264,9 +1264,9 @@ Sources: [SBX-04 criteria](../../backlog/user-stories.md#sbx-04); [Invariant 12]
 |---|---|---|---|---|---|
 | [SBX-04](../../backlog/user-stories.md#sbx-04) | P2 | 0 | Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08) | planned | integration: `apps/api/tests/integration/test_sbx_04.py` |
 
-## FR-108 · Sandbox (proposed)
+## FR-108 · Sandbox (confirmed)
 
-A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days (pending legal review).
+A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days; request logs 30 days (D-38; legal review before launch).
 
 Sources: [spec/08 §sandbox-sbx](../../spec/08-developer-portal.md#sandbox-sbx)
 

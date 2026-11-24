@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-18
 
-**Status**: Draft: 99 requirements confirmed; 4 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
+**Status**: Draft: 103 requirements confirmed; 0 proposed and 0 open, awaiting the founder (see [decisions.md](decisions.md))
 
 **Input**: User description: "Read the product documentation, operating model and MVP scope. Build a source-linked
 requirements inventory; identify contradictions, missing business rules and assumptions; separate confirmed
@@ -237,13 +237,13 @@ Roles from spec/00 and spec/02. **C** = confirmed by a source; **P** = proposed 
 
 | Action | Payments lead | Compliance lead | Reviewer | Backup owner | On-call (Detent) | Auditor | Agent (API key + mandate) | Integrator (API key) | Detent admin |
 |---|---|---|---|---|---|---|---|---|---|
-| View console for own organisation | C | C | C | C | C | P (C-14) | | | |
+| View console for own organisation | C | C | C | C | C | C (C-14, D-38) | | | |
 | Propose a payment intent | | | | | | | C (spec/05) | | |
 | Create a payment intent | | | | | | | | C (`intents:create`) | |
 | Approve or reject an exception | P (G-06) | | C (spec/00) | C overdue cases (spec/00) | | | | P via key's named user (G-08) | |
 | Approve after the deadline | P (G-05) | | | P as current owner (G-05) | | | | | |
 | Click Send in Assist mode | P (G-09) | | P (G-09) | P (G-09) | | | | P (`exceptions:approve`, spec/03) | |
-| Cancel before submission | C escalated (spec/02); P otherwise (G-17) | | | | | | | P (G-17) | |
+| Cancel before submission | C escalated (spec/02); C otherwise (G-17, D-38) | | | | | | | C (G-17, D-38) | |
 | Engage kill switch | C | | | | C (B3.kill_switch) | | | C (`admin` scope, spec/03) | |
 | Release kill switch | C only (inv. 10) | | | | | | | | |
 | Propose a rule change | C | C | | | | | | | |
@@ -306,8 +306,8 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 - **FR-011**: Every create carries an Idempotency-Key; the same key and body return the stored response; the same key with a different body returns 409 idempotency_conflict.
 - **FR-012**: An intent can be read with its decisions, checks, route, attempts, postings and events, and listed with filters and cursor pagination.
 - **FR-013**: A counterparty registry holds KYB status, allowlist flag, destinations with first-seen and last-changed times, and statistics from confirmed payments; editing a destination is audited.
-- **FR-014**: An intent naming an address that is not a registered destination of the counterparty records it as a new destination, so NEW_WALLET escalates; it is never trusted silently. *(proposed: G-01, C-16)*
-- **FR-015**: An intent can be cancelled by the platform or the payments lead until it is submitted, never after. *(proposed: G-17)*
+- **FR-014**: An intent naming an address that is not a registered destination of the counterparty records it as a new destination, so NEW_WALLET escalates; it is never trusted silently.
+- **FR-015**: An intent can be cancelled by the platform or the payments lead until it is submitted, never after.
 - **FR-016**: A payout to the platform's own end user (account reference instead of counterparty) uses the user payout profile: counterparty KYB, allowlist, first-payment and above-norm checks are skipped; screening, networks, limits, caps and wallet checks apply.
 
 **Policy**
@@ -431,7 +431,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 **Webhooks**
 
 - **FR-103**: Webhook endpoints subscribe to the listed event types; deliveries are signed (HMAC-SHA256 with timestamp, 300 s tolerance), at least once, with sequence per payment, retries and a delivery log.
-- **FR-104**: Webhook retries back off at 1 min, 5 min, 30 min, 2 h, 6 h and 24 h, then the delivery is marked failed. *(proposed: G-20)*
+- **FR-104**: Webhook retries back off at 1 min, 5 min, 30 min, 2 h, 6 h and 24 h, then the delivery is marked failed.
 - **FR-113**: Webhook signing secrets are shown once and stored encrypted (not hashed), because every delivery is signed with the plaintext secret.
 
 **Dashboard**
@@ -442,7 +442,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 
 - **FR-106**: Sandbox test values trigger every path; quotas and abuse limits apply; expired organisations get 403 organisation_expired; (Should) opt-in real testnet mode from a capped faucet wallet.
 - **FR-107**: Sandbox reset starts a new data generation: earlier intents, cases, ledger and logs are hidden from the API and dashboard but never deleted; keys, webhooks and settings are kept.
-- **FR-108**: A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days (pending legal review). *(proposed: G-18, G-19)*
+- **FR-108**: A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days; request logs 30 days (D-38; legal review before launch).
 
 **Docs**
 

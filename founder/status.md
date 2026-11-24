@@ -1,6 +1,6 @@
 # Founder status
 
-Last updated: 2026-11-23
+Last updated: 2026-11-24
 
 Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumption, Open.
 
@@ -13,7 +13,7 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 
 - **Slices done:** S0 to S8, all on `main` (prototype engine plus the S8 proof and release gate).
 - **S9:** code built and rehearsed locally (scenario runner, reset, demo check, health check, Render blueprint); the deployed EU instance and the live testnet run wait on the founder items below.
-- **Criteria done:** 219 of 308 with evidence (`make spec`, 2026-11-20). 103 requirements: 99 confirmed, 4 proposed.
+- **Criteria done:** 219 of 308 with evidence (`make spec`, 2026-11-20). 103 requirements, all confirmed.
 - **Scope (Approved 2026-11-23, D-37):** the full MVP backlog, superseding prototype first (D-34). Order: S9, P1 Sandbox API and webhooks, P2 Dashboard and sandbox, P3 Docs and SDKs, P4 Website launch, L After launch (about 30 days of Must and Should work after S8).
 - **Operating system (22 Nov):** the solo-to-scale plugin is enabled (#10), the AI team roles come from the plugin (#11, reverted by #12), and the handoff is refreshed (#9). No product code changed this week.
 - **Next:** P1 Sandbox API and webhooks starts now; the S9 live run (deploy, fund wallets, run spec/11 on the Sepolias) follows when the founder items below are in.
@@ -37,7 +37,7 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 | Funded test wallets for Base Sepolia and Ethereum Sepolia: a sender and a demo payer on each (RAL-02, RAL-03, DEM-04) | Founder | S9 live run |
 | Render (Frankfurt) and Neon (EU) accounts, the plans (worker is not on Render's free plan: Proposed), the `render.yaml` secrets (FND-07) | Founder | S9 live run |
 | Testnet RPC endpoints and wallets as secrets for the nightly eval (EVL-07 criterion 0) | Founder | S9 |
-| C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 still Proposed or Open | Founder | P1 to P2 |
+| Legal review of sandbox data retention (G-19, approved as proposed in D-38) | Founder | P4 |
 | Publish measured results on the website (`detent eval publish`, EVL-06 criterion 1) | Founder, then Claude | P4 |
 | Booking URL, inbox, final name and domain (`BRAND_NAME`), legal review of the site | Founder | P4 |
 | Let scheduled sessions load the solo-to-scale plugin: add `Payaml3/solo-to-scale` to the cloud environment's repositories | Founder | next weekly review |
@@ -47,5 +47,5 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 ## This week's focus (Proposed)
 
 - **Proposed:** start P1 with its first story group (API-01 to API-04 and API-06: keys and scopes, errors, versions, rate limits, request logs) while the S9 blockers close (Render and Neon accounts, API key, funded wallets).
-- **Proposed:** answer C-12, C-14, C-16, G-10, G-17 to G-20, G-23 and G-25 before the P1 and P2 stories that build on them.
+- **Approved 2026-11-24 (D-38):** C-12, C-14, C-16, G-10, G-17 to G-20, G-23 and G-25, all as proposed.
 - **Proposed:** answer the business-context questions so P4 copy and pricing rest on evidence.

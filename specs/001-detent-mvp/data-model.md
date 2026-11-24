@@ -152,7 +152,7 @@ Derived, not stored: `not_yet_valid` (before `valid_from`), `valid`, `expired` (
   `expired → active` when the admin extends.
 - Key: `active → rolled` (overlap window, then `revoked`) or `active → revoked`; `active → expired` at `expires_at`.
 
-### Webhook delivery (proposed schedule, G-20)
+### Webhook delivery (schedule G-20, Confirmed D-38)
 
 `pending → succeeded` (2xx) or `pending → retrying` (at 1 m, 5 m, 30 m, 2 h, 6 h, 24 h) `→ failed`; manual resend
 creates a new delivery.
@@ -172,5 +172,5 @@ rolls back the run's effects.
 | S3 | `exception_cases.version` (or row lock plus status check) | EXC-05 double approval |
 | S4 | `cancel_replacements` | spec/02 |
 | S6 | `counterparties.contact_email` if G-02 is approved; two-person mode change table | G-02, EXE-09 |
-| P1 | `webhook_endpoints.secret_encrypted` replaces `secret_hash` (D-12); `api_keys.user_id` if G-08 is approved; `users.role` adds `auditor` if C-14 is approved | G-08, C-14 |
+| P1 | `webhook_endpoints.secret_encrypted` replaces `secret_hash` (D-12); `api_keys.user_id` if G-08 is approved; `users.role` adds `auditor` (C-14, Confirmed D-38) | G-08, C-14 |
 | P2 | `organisations.data_generation` and a `generation` column on intents, cases, ledger and logs; queries filter the current one | D-08 |
