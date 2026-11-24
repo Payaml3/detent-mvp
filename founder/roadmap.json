@@ -7,210 +7,240 @@
    "phase": "A Discover",
    "name": "Problem validation",
    "gate": "Pain confirmed by evidence, not assumption",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 01"
   },
   {
    "stage": 2,
    "phase": "A Discover",
    "name": "Customer discovery",
    "gate": "5 to 8 interviews show pain and willingness to pay",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 01"
   },
   {
    "stage": 3,
    "phase": "B Define",
    "name": "Business model and positioning",
    "gate": "Founder approves",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 01"
   },
   {
    "stage": 4,
    "phase": "B Define",
    "name": "Brand strategy",
    "gate": "Name, trademark and domain checked",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 06"
   },
   {
    "stage": 5,
    "phase": "B Define",
    "name": "Product and operating model",
    "gate": "Founder approves",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 02"
   },
   {
    "stage": 6,
    "phase": "B Define",
    "name": "UX prototype and test",
    "gate": "Tested with 3 to 5 target users",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 02, Code"
   },
   {
    "stage": 7,
    "phase": "B Define",
    "name": "MVP scope and launch criteria",
    "gate": "Founder approves scope",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 02"
   },
   {
    "stage": 8,
    "phase": "C Specify and design",
    "name": "Specify",
    "gate": "Every open item answered or deferred",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code"
   },
   {
    "stage": 9,
    "phase": "C Specify and design",
    "name": "Screen specs",
    "gate": "Criteria linked to stories",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code"
   },
   {
    "stage": 10,
    "phase": "C Specify and design",
    "name": "Plan the system",
    "gate": "Founder approves architecture, threat model and Well-Architected review; threat model (STRIDE), Well-Architected review, scale-ready defaults in the constitution",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code, P 03"
   },
   {
    "stage": 11,
    "phase": "C Specify and design",
    "name": "Design system",
    "gate": "Founder approves foundations",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code"
   },
   {
    "stage": 12,
    "phase": "C Specify and design",
    "name": "Tasks and story groups",
    "gate": "`analyze` finds no contradictions",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code"
   },
   {
    "stage": 13,
    "phase": "D Build and prove",
    "name": "Build, one session per story group",
    "gate": "Definition of done met",
-   "status": "Current"
+   "status": "Current",
+   "where": "Code 04"
   },
   {
    "stage": 14,
    "phase": "D Build and prove",
    "name": "Test at 5 levels",
    "gate": "All levels pass",
-   "status": "To do"
+   "status": "To do",
+   "where": "CI, founder"
   },
   {
    "stage": 15,
    "phase": "D Build and prove",
    "name": "Integrate continuously",
    "gate": "Founder merges",
-   "status": "To do"
+   "status": "To do",
+   "where": "GitHub"
   },
   {
    "stage": 16,
    "phase": "D Build and prove",
    "name": "Deploy continuously, to non-production",
    "gate": "Test data only; dependencies pinned, builds signed; pinned dependencies, automated updates, bill of materials, signed build provenance",
-   "status": "To do"
+   "status": "To do",
+   "where": "CI"
   },
   {
    "stage": 17,
    "phase": "D Build and prove",
    "name": "Release check",
    "gate": "Go",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 05, Code"
   },
   {
    "stage": 18,
    "phase": "E Launch",
    "name": "Demo and website",
    "gate": "Honesty checklist signed",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code, P 06"
   },
   {
    "stage": 19,
    "phase": "E Launch",
    "name": "Sandbox or beta",
    "gate": "External user completes the core flow",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code"
   },
   {
    "stage": 20,
    "phase": "E Launch",
    "name": "Design partners",
    "gate": "Partner confirms value",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 06"
   },
   {
    "stage": 21,
    "phase": "E Launch",
    "name": "Production readiness",
    "gate": "All readiness items closed; service targets and error-budget policy, alerts on user impact, restore and load tests, AI spending caps per customer",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 05, Code"
   },
   {
    "stage": 22,
    "phase": "E Launch",
    "name": "General availability",
    "gate": "Founder go-live decision",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 00"
   },
   {
    "stage": 23,
    "phase": "F Grow to product-market fit",
    "name": "Measure",
    "gate": "5 stage metrics tracked weekly",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 00, Task"
   },
   {
    "stage": 24,
    "phase": "F Grow to product-market fit",
    "name": "Iterate",
    "gate": "Retention and conversion hit targets",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 01, P 06"
   },
   {
    "stage": 25,
    "phase": "F Grow to product-market fit",
    "name": "Fundraise",
    "gate": "Round closed or deferred",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 00"
   },
   {
    "stage": 26,
    "phase": "G Scale",
    "name": "Team and ownership",
    "gate": "Every area has a human owner",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 00"
   },
   {
    "stage": 27,
    "phase": "G Scale",
    "name": "Operations",
    "gate": "Targets met for a quarter; monthly error-budget review, blameless postmortems",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code, P 05"
   },
   {
    "stage": 28,
    "phase": "G Scale",
    "name": "Compliance and certifications",
    "gate": "Audit passed",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 03, P 05"
   },
   {
    "stage": 29,
    "phase": "G Scale",
    "name": "Platform and new products",
    "gate": "Architecture approved",
-   "status": "To do"
+   "status": "To do",
+   "where": "Code, P 03"
   },
   {
    "stage": 30,
    "phase": "G Scale",
    "name": "Governance cadence",
    "gate": "Cadence running",
-   "status": "To do"
+   "status": "To do",
+   "where": "P 00, Task"
   }
  ],
  "slices": [

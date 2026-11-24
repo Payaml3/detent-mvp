@@ -247,7 +247,7 @@ def test_documents_are_grouped_business_product_technical(root):
         "docs/engineering-standards.md": "technical"}
     assert docs["specs/001-pay/plan.md"]["feature"] == "001-pay" and docs["docs/product/vision.md"]["feature"] == ""
     page = bd.PAGE.read_text(encoding="utf-8")
-    assert "function stagePanel" in page and '"This stage"' in page and '["documents", "Documents", documentsTab]' in page
+    assert "function journeyPanel" in page and '"Agents on it now"' in page and '["documents", "Documents", documentsTab]' in page
 
 
 def test_the_run_log_feeds_costs_by_group_the_forecast_and_agent_pages(root, fake):
@@ -310,6 +310,29 @@ def test_the_page_has_the_inbox_charts_and_freshness_and_rebuilds_on_activity():
     if wf.exists():
         text = wf.read_text(encoding="utf-8")
         assert "issue_comment:" in text and "sleep 60" in text and "cancel-in-progress: true" in text
+
+
+def test_the_stage_ladder_shows_every_gate_with_its_evidence(root, fake):
+    (root / "founder" / "playbook.md").write_text(
+        "| # | Phase | Stage | Where | Gate | Evidence | Status |\n| --- | --- | --- | --- | --- | --- | --- |\n"
+        f"| 1 | A Discover | Problem validation | P 01 | Pain confirmed | B-01, founder/sources/interviews.md </script><img src=x onerror=alert(1)> | Passed |\n"
+        "| 2 | A Discover | Customer discovery | P 01 | 5 to 8 interviews |  | Deferred |\n"
+        "| 3 | B Define | Business model | P 01 | Founder approves |  | To do |\n"
+        "| 4 | B Define | Product and operating model | P 02 | Founder approves |  | Current |\n", encoding="utf-8")
+    page = bd.page(bd.build(root, now=NOW))
+    assert page.count("</script>") == 2, "evidence text stays text"
+    road = data_of(page)["repo"]["roadmap"]
+    assert road["current_stage"] == 4
+    assert [(x["stage"], x["status"]) for x in road["stages"]] == [(1, "Passed"), (2, "Deferred"), (3, "To do"), (4, "Current")]
+    assert road["stages"][0]["evidence"].startswith("B-01, founder/sources/interviews.md")
+    html = bd.PAGE.read_text(encoding="utf-8")
+    assert "ladderPanel()" in html and '"Venture stage"' in html and "Not passed" in html
+    # an older playbook without the Evidence column still builds, and says evidence is missing
+    (root / "founder" / "playbook.md").write_text(
+        "| # | Phase | Stage | Where | Gate | Status |\n| --- | --- | --- | --- | --- | --- |\n"
+        "| 1 | A Discover | Problem validation | P 01 | Pain confirmed | Passed |\n", encoding="utf-8")
+    assert "evidence" not in data_of(bd.page(bd.build(root, now=NOW)))["repo"]["roadmap"]["stages"][0]
+    assert "add an Evidence column to founder/playbook.md" in html
 
 
 def test_paused_roles_revise_and_approval_reminders_reach_the_page(root, fake):
@@ -457,3 +480,69 @@ def test_both_workflows_deploy_to_vercel_only_after_the_guard():
         assert re.search(r"if: steps\.guard\.outputs\.deploy == 'yes' && steps\.guard\.outputs\.provider == 'vercel'\n"
                          r"(?:.*\n){0,5}?\s+run: npx --yes vercel@\d+\.\d+\.\d+ deploy ", wf), name
         assert "provider != 'vercel'" in wf and "VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}" in wf
+
+
+def test_the_roadmap_timeline_has_planned_dates_and_actual_dates_from_git(root, tmp_path):
+    import os
+    import subprocess
+
+    def commit(date: str) -> None:
+        env = dict(os.environ, GIT_AUTHOR_DATE=f"{date}T12:00:00Z", GIT_COMMITTER_DATE=f"{date}T12:00:00Z")
+        for args in (["add", "-A"], ["commit", "-qm", date]):
+            subprocess.run(["git", *args], cwd=root, check=True, env=env, capture_output=True)
+
+    def playbook(s1: str, s2: str) -> None:
+        (root / "founder" / "playbook.md").write_text(
+            "| # | Phase | Stage | Gate | Start | Target | Status |\n| --- | --- | --- | --- | --- | --- | --- |\n"
+            f"| 1 | A Discover | Problem | Pain | 2026-06-01 | 2026-06-20 | {s1} |\n"
+            f"| 2 | A Discover | Customers | Interviews | not a date | 2026-02-30 | {s2} |\n", encoding="utf-8")
+
+    def slices(status: str) -> None:
+        (root / "founder" / "slices.json").write_text(json.dumps({"slices": [
+            {"id": "S1", "name": "First invoice", "status": status, "start": "2026-10-01", "target": "2026-10-20"}]}),
+            encoding="utf-8")
+
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "config", "user.email", "t@example.com"], cwd=root, check=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=root, check=True)
+    playbook("Current", "To do"); slices("todo"); commit("2026-06-02")
+    playbook("Passed", "Current"); slices("in progress"); commit("2026-06-25")
+    playbook("Passed", "Current"); slices("done"); commit("2026-10-18")
+    rows = {r["id"]: r for r in bd.build(root, offline=True, now=NOW)["repo"]["schedule"]["rows"]}
+    s1, s2, sl = rows["1"], rows["2"], rows["S1"]
+    assert (s1["start"], s1["target"], s1["started"], s1["finished"], s1["state"]) == \
+        ("2026-06-01", "2026-06-20", "2026-06-02", "2026-06-25", "done")
+    assert (s2["start"], s2["target"], s2["started"], s2["finished"], s2["state"]) == ("", "", "2026-06-25", "", "progress")
+    assert (sl["kind"], sl["start"], sl["target"], sl["started"], sl["finished"]) == \
+        ("slice", "2026-10-01", "2026-10-20", "2026-06-25", "2026-10-18")
+
+
+def test_the_timeline_without_git_still_builds(root):
+    rows = bd.build(root, offline=True, now=NOW)["repo"]["schedule"]["rows"]
+    assert rows == [{"kind": "slice", "id": "S1", "name": "First invoice", "phase": "", "status": "done", "state": "done",
+                     "start": "", "target": "", "started": "", "finished": ""}]
+
+
+def test_the_overview_shows_the_journey_simply_and_the_rest_moves_to_its_tabs(root, fake):
+    (root / "founder" / "playbook.md").write_text(
+        "| # | Phase | Stage | Where | Gate | Evidence | Status |\n| --- | --- | --- | --- | --- | --- | --- |\n"
+        "| 1 | A Discover | Problem validation | P 01 | Pain confirmed | B-01 | Passed |\n"
+        "| 2 | B Define | Product and operating model | P 02 | Founder approves |  | Current |\n"
+        "| 3 | C Specify and design | Specify | Code | Open items answered |  | To do |\n", encoding="utf-8")
+    road = data_of(bd.page(bd.build(root, now=NOW)))["repo"]["roadmap"]
+    assert [x.get("where") for x in road["stages"]] == ["P 01", "P 02", "Code"], "the lead role comes from the Where column"
+    html = bd.PAGE.read_text(encoding="utf-8")
+    body = html[html.index("  function overview() {"):html.index("  // --- setup: what tools/doctor.py found")]
+    # the Overview: what needs you, the journey, the team and the goals; four tiles, each opening its tab
+    assert body.index('panel("Needs you"') < body.index("journeyPanel(),") < body.index('"Your AI team"') < body.index("goalStrip()")
+    assert body.count('el("a", { cls: "tile') == 4 and '"grid g4"' in body
+    for gone in ("ladderPanel()", "moneyPanel()", "trendPanel()", '"Recently merged"', '"Slices done"', '"Stuck"'):
+        assert gone not in body, gone
+    # and where each went
+    tab = lambda name, nxt: html[html.index("  function " + name + "() {"):html.index("  function " + nxt)]
+    assert "ladderPanel()" in tab("scopeTab", "showAgent") and "moneyPanel()" in tab("costsTab", "groupTable")
+    assert "trendPanel()" in tab("activityTab", "decisionsTab") and '"Recently merged"' in tab("activityTab", "decisionsTab")
+    assert '"Slices done"' in tab("roadmapTab", "scopeTab") and '"Stuck"' in tab("roadmapTab", "scopeTab")
+    # the journey: 7 phases in plain words, the current phase's stages, the gate, who leads, what blocks it
+    assert '"Your journey"' in html and "You are here" in html and "Is the problem real?" in html
+    assert '"Done when"' in html and '"Led by"' in html and '"Blocking this stage"' in html and '"Next"' in html
