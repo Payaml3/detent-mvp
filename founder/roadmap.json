@@ -95,7 +95,7 @@
    "phase": "C Specify and design",
    "name": "Screen specs",
    "gate": "Criteria linked to stories",
-   "status": "To do",
+   "status": "Passed",
    "where": "Code",
    "evidence": "`spec/07-console.md`; criteria traced to stories in `specs/001-detent-mvp/traceability.md` and `test-map.yaml`",
    "start": "2026-11-18",
