@@ -1704,6 +1704,7 @@ stories:
   so: the sandbox stays healthy
   ac:
     - "`RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After`"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [API-01]
