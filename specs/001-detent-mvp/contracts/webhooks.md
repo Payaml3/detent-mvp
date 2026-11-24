@@ -30,15 +30,15 @@ Detent-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")
 - Receivers reject a delivery whose `t` is more than 300 s from their clock.
 - The signing secret is shown once when the endpoint is created. It is stored **encrypted** (D-12), not
   hashed: Detent needs the plaintext to compute each signature.
-- `send test event` (spec/08) delivers a signed sample event; marking it `"test": true` is PROPOSED (G-20).
+- `send test event` (spec/08) delivers a signed sample event; marking it `"test": true` (G-20, Confirmed D-38).
 
 ## Delivery and retries
 
-| Attempt | Delay after the previous attempt (PROPOSED, G-20) |
+| Attempt | Delay after the previous attempt (G-20, Confirmed D-38) |
 |---|---|
 | 1 | immediately, from the worker after the change commits (outbox pattern) |
 | 2 to 7 | 1 min, 5 min, 30 min, 2 h, 6 h, 24 h |
 | after 7 | delivery marked `failed`; visible in the delivery log with a Resend button |
 
-A 2xx response is success; anything else, or no response within 10 s (PROPOSED, G-20), is a failure. Every attempt is a
+A 2xx response is success; anything else, or no response within 10 s (G-20, Confirmed D-38), is a failure. Every attempt is a
 `webhook_deliveries` row with the status code or error.

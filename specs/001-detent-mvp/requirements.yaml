@@ -54,10 +54,10 @@ requirements:
 - {id: FR-013, area: Intents, layer: decision, status: confirmed, stories: [INT-04],
    src: ["story:INT-04", "spec/04#checks"],
    text: "A counterparty registry holds KYB status, allowlist flag, destinations with first-seen and last-changed times, and statistics from confirmed payments; editing a destination is audited."}
-- {id: FR-014, area: Intents, layer: decision, status: proposed, decision: [G-01, C-16], stories: [INT-01, INT-04, POL-05],
+- {id: FR-014, area: Intents, layer: decision, status: confirmed, decision: [G-01, C-16], stories: [INT-01, INT-04, POL-05],
    src: ["spec/03#create-a-payout-intent", "fixture:fixtures/invoices/expected-outputs.yaml"],
    text: "An intent naming an address that is not a registered destination of the counterparty records it as a new destination, so NEW_WALLET escalates; it is never trusted silently."}
-- {id: FR-015, area: Intents, layer: decision, status: proposed, decision: [G-17], stories: [INT-05],
+- {id: FR-015, area: Intents, layer: decision, status: confirmed, decision: [G-17], stories: [INT-05],
    src: ["spec/02#payment-state-machine", "spec/03#endpoints"],
    text: "An intent can be cancelled by the platform or the payments lead until it is submitted, never after."}
 - {id: FR-016, area: Intents, layer: decision, status: confirmed, decision: [D-04, G-10], stories: [INT-01, POL-03],
@@ -307,7 +307,7 @@ requirements:
 - {id: FR-103, area: Webhooks, layer: portal, status: confirmed, stories: [WHK-01, WHK-02, WHK-03],
    src: ["spec/03#webhooks"],
    text: "Webhook endpoints subscribe to the listed event types; deliveries are signed (HMAC-SHA256 with timestamp, 300 s tolerance), at least once, with sequence per payment, retries and a delivery log."}
-- {id: FR-104, area: Webhooks, layer: portal, status: proposed, decision: [G-20], stories: [WHK-03],
+- {id: FR-104, area: Webhooks, layer: portal, status: confirmed, decision: [G-20], stories: [WHK-03],
    src: ["spec/03#webhooks"],
    text: "Webhook retries back off at 1 min, 5 min, 30 min, 2 h, 6 h and 24 h, then the delivery is marked failed."}
 - {id: FR-113, area: Webhooks, layer: portal, status: confirmed, decision: [C-19, D-12], stories: [WHK-01, WHK-02],
@@ -323,9 +323,9 @@ requirements:
 - {id: FR-107, area: Sandbox, layer: portal, status: confirmed, decision: [C-04, D-08], stories: [SBX-04],
    src: ["story:SBX-04", "inv:12"],
    text: "Sandbox reset starts a new data generation: earlier intents, cases, ledger and logs are hidden from the API and dashboard but never deleted; keys, webhooks and settings are kept."}
-- {id: FR-108, area: Sandbox, layer: portal, status: proposed, decision: [G-18, G-19], stories: [DSH-01, SBX-04],
+- {id: FR-108, area: Sandbox, layer: portal, status: confirmed, decision: [G-18, G-19], stories: [DSH-01, SBX-04],
    src: ["spec/08#sandbox-sbx"],
-   text: "A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days (pending legal review)."}
+   text: "A new or reset sandbox organisation is seeded with the fictional counterparties; sandbox data is kept until expiry plus 30 days; request logs 30 days (D-38; legal review before launch)."}
 - {id: FR-109, area: Docs, layer: portal, status: confirmed, stories: [DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, DOC-06],
    src: ["spec/08#docs-doc"],
    text: "Docs site with the listed sections; samples in 8 languages run in CI against the sandbox; try-it uses sandbox keys only; (Should) changelog."}
