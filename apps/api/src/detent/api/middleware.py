@@ -66,7 +66,7 @@ async def request_context(request: Request, call_next: Callable[[Request], Await
                     now = request.app.state.runtime.clock.now()
                     host = request.client.host if request.client else "unknown"
                     ip = limiter.hit(f"ip:{host}", now, limiter.limit * IP_LIMIT_FACTOR)
-                    limit = limiter.hit(bearer, now) if ip.allowed else ip
+                    limit = limiter.hit(bearer, now, scope=host) if ip.allowed else ip
             if limit is not None and not limit.allowed:
                 response = error_response(
                     429,

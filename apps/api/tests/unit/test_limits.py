@@ -34,3 +34,14 @@ def test_memory_is_bounded_and_overflow_fails_closed(monkeypatch) -> None:  # ty
     assert rl.hit("new1", T).allowed  # first overflow hit uses the shared bucket
     assert not rl.hit("new2", T).allowed  # then new keys share it: fail closed
     assert len(rl._state) <= 6
+
+
+def test_overflow_is_per_client_address(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    import detent.api.limits as lim
+
+    monkeypatch.setattr(lim, "MAX_TRACKED", 2)
+    rl = RateLimiter(limit=1)
+    assert rl.hit("k0", T).allowed and rl.hit("k1", T).allowed
+    assert rl.hit("junk1", T, scope="1.1.1.1").allowed
+    assert not rl.hit("junk2", T, scope="1.1.1.1").allowed  # the abuser is limited
+    assert rl.hit("legit", T, scope="2.2.2.2").allowed  # other addresses are not locked out

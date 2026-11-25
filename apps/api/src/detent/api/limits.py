@@ -35,7 +35,9 @@ class RateLimiter:
         self._lock = threading.Lock()
         self._state: dict[str, tuple[int, int]] = {}  # digest -> (window index, count)
 
-    def hit(self, token: str, now: datetime, limit: int | None = None) -> LimitResult:
+    def hit(
+        self, token: str, now: datetime, limit: int | None = None, scope: str = ""
+    ) -> LimitResult:
         limit = self.limit if limit is None else limit
         digest = hashlib.sha256(token.encode()).hexdigest()
         ts = int(now.timestamp())
@@ -45,7 +47,7 @@ class RateLimiter:
             if len(self._state) >= MAX_TRACKED:  # bound memory: drop windows that have passed
                 self._state = {k: v for k, v in self._state.items() if v[0] == idx}
             if digest not in self._state and len(self._state) >= MAX_TRACKED:
-                digest = OVERFLOW_KEY  # still full: new keys share one bucket (fail closed)
+                digest = f"{OVERFLOW_KEY}:{scope}"  # still full: new keys share one bucket per client address
             w, n = self._state.get(digest, (idx, 0))
             if w != idx:
                 n = 0
