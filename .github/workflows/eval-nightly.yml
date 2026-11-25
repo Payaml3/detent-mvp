@@ -13,8 +13,30 @@ permissions:
   contents: read
 
 jobs:
+  changed:
+    # Minutes: a night with no new engine commits on main skips the suites, except on Mondays.
+    # A manual run always runs them.
+    name: anything new since yesterday?
+    runs-on: ubuntu-24.04
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          # Mondays always run, so live agent answers are still checked weekly when the code is quiet.
+          if [ "$(date -u +%u)" = 1 ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          n=$(git log --since="25 hours ago" --format=%H -- apps/ eval/ chain/ fixtures/ prompts/ pyproject.toml uv.lock | wc -l)
+          echo "engine commits in the last 25 hours: $n"
+          if [ "$n" -gt 0 ]; then echo "run=true" >> "$GITHUB_OUTPUT"; else echo "run=false" >> "$GITHUB_OUTPUT"; fi
+
   eval:
     name: detent eval (nightly)
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     services:
