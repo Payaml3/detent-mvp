@@ -84,9 +84,9 @@
    "phase": "C Specify and design",
    "name": "Specify",
    "gate": "Every open item answered or deferred",
-   "status": "To do",
+   "status": "Passed",
    "where": "Code",
-   "evidence": "`specs/001-detent-mvp/spec.md`, `requirements.yaml`; decisions D-01 to D-36; still Proposed or Open: C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 (`founder/status.md`)",
+   "evidence": "`specs/001-detent-mvp/spec.md`, `requirements.yaml`; decisions D-01 to D-38; every C- and G- item Confirmed (D-38 closed the last ten); G-19 legal review due before P4",
    "start": "2026-11-18",
    "target": ""
   },
