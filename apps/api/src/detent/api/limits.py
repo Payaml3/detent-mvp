@@ -15,6 +15,9 @@ VERSION_HEADER = "Detent-Version"
 CURRENT_VERSION = "2026-12-01"
 SUPPORTED_VERSIONS = frozenset({CURRENT_VERSION})
 DEFAULT_LIMIT = 120
+IP_LIMIT_FACTOR = 10  # per-client-address ceiling, so rotating junk tokens cannot dodge the limit
+MAX_TRACKED = 10_000
+OVERFLOW_KEY = "overflow"
 WINDOW_SECONDS = 60
 
 
@@ -32,18 +35,21 @@ class RateLimiter:
         self._lock = threading.Lock()
         self._state: dict[str, tuple[int, int]] = {}  # digest -> (window index, count)
 
-    def hit(self, token: str, now: datetime) -> LimitResult:
+    def hit(self, token: str, now: datetime, limit: int | None = None) -> LimitResult:
+        limit = self.limit if limit is None else limit
         digest = hashlib.sha256(token.encode()).hexdigest()
         ts = int(now.timestamp())
         idx = ts // self.window
         reset = (idx + 1) * self.window - ts
         with self._lock:
-            if len(self._state) > 10_000:  # bound memory: drop windows that have passed
+            if len(self._state) >= MAX_TRACKED:  # bound memory: drop windows that have passed
                 self._state = {k: v for k, v in self._state.items() if v[0] == idx}
+            if digest not in self._state and len(self._state) >= MAX_TRACKED:
+                digest = OVERFLOW_KEY  # still full: new keys share one bucket (fail closed)
             w, n = self._state.get(digest, (idx, 0))
             if w != idx:
                 n = 0
-            if n >= self.limit:
-                return LimitResult(False, self.limit, 0, reset)
+            if n >= limit:
+                return LimitResult(False, limit, 0, reset)
             self._state[digest] = (idx, n + 1)
-            return LimitResult(True, self.limit, self.limit - n - 1, reset)
+            return LimitResult(True, limit, limit - n - 1, reset)

@@ -22,3 +22,15 @@ def test_limit_counts_down_then_blocks_and_resets() -> None:
 def test_limits_are_per_key() -> None:
     rl = RateLimiter(limit=1)
     assert rl.hit("a", T).allowed and rl.hit("b", T).allowed and not rl.hit("a", T).allowed
+
+
+def test_memory_is_bounded_and_overflow_fails_closed(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    import detent.api.limits as lim
+
+    monkeypatch.setattr(lim, "MAX_TRACKED", 5)
+    rl = RateLimiter(limit=1)
+    for i in range(5):
+        assert rl.hit(f"k{i}", T).allowed
+    assert rl.hit("new1", T).allowed  # first overflow hit uses the shared bucket
+    assert not rl.hit("new2", T).allowed  # then new keys share it: fail closed
+    assert len(rl._state) <= 6

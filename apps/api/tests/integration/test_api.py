@@ -98,3 +98,14 @@ def test_errors_use_the_envelope_for_404_and_405(client: TestClient) -> None:
     ):
         err = r.json()["error"]
         assert err["code"] == code and err["request_id"] == r.headers["Request-Id"]
+
+
+def test_rotating_junk_tokens_still_hit_the_client_address_limit(client: TestClient) -> None:
+    from detent.api.limits import IP_LIMIT_FACTOR, RateLimiter
+
+    client.app.state.limiter = RateLimiter(limit=1)  # type: ignore[attr-defined]
+    codes = [
+        client.get("/v1/payment_intents", headers={"Authorization": f"Bearer junk{i}"}).status_code
+        for i in range(IP_LIMIT_FACTOR + 2)
+    ]
+    assert codes[-1] == 429

@@ -14,7 +14,13 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from detent.api.errors import error_response
-from detent.api.limits import CURRENT_VERSION, SUPPORTED_VERSIONS, VERSION_HEADER, LimitResult
+from detent.api.limits import (
+    CURRENT_VERSION,
+    IP_LIMIT_FACTOR,
+    SUPPORTED_VERSIONS,
+    VERSION_HEADER,
+    LimitResult,
+)
 from detent.logging import request_id_var
 
 log = logging.getLogger("detent.http")
@@ -57,7 +63,10 @@ async def request_context(request: Request, call_next: Callable[[Request], Await
                 limiter = getattr(request.app.state, "limiter", None)
                 bearer = request.headers.get("authorization", "")
                 if limiter is not None:
-                    limit = limiter.hit(bearer, request.app.state.runtime.clock.now())
+                    now = request.app.state.runtime.clock.now()
+                    host = request.client.host if request.client else "unknown"
+                    ip = limiter.hit(f"ip:{host}", now, limiter.limit * IP_LIMIT_FACTOR)
+                    limit = limiter.hit(bearer, now) if ip.allowed else ip
             if limit is not None and not limit.allowed:
                 response = error_response(
                     429,
