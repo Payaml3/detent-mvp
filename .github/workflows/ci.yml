@@ -1,8 +1,15 @@
 name: CI
 
+# Minutes: a pull request runs once (not once for the push and again for the PR), and the two heavy jobs
+# (tests on Postgres and the local chain, and the release gate) run only when the engine changed: docs,
+# founder/, backlog/, specs/ and operating-system tools (tools/) skip them, and a skipped job counts as passed.
+# Main gets the same check against the commit before the push; tags and manual runs run everything.
 on:
   push:
+    branches: [main]
+    tags: ["v*"]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,8 +19,61 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: what changed
+    runs-on: ubuntu-24.04
+    outputs:
+      engine: ${{ steps.diff.outputs.engine }}
+      site: ${{ steps.diff.outputs.site }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: engine or site files in this change?
+        id: diff
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && github.event.before) || '' }}
+        run: |
+          # The engine: the API, simulators, eval, chain, fixtures, prompts, the spec the tests read, dependencies,
+          # the denylist script a test runs, and this workflow. Anything unknown (no base) runs everything.
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "engine=true" >> "$GITHUB_OUTPUT"; echo "site=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          files=$(git diff --name-only "$BASE" HEAD)
+          echo "$files"
+          if echo "$files" | grep -qE '^(apps/(api|banksim|faultproxy)/|eval/|chain/|fixtures/|prompts/|spec/|pyproject\.toml$|uv\.lock$|tools/check_denylist\.py$|\.github/workflows/ci\.yml$)'; then
+            echo "engine=true" >> "$GITHUB_OUTPUT"; else echo "engine=false" >> "$GITHUB_OUTPUT"; fi
+          if echo "$files" | grep -qE '^(apps/site/|eval/|\.github/workflows/ci\.yml$)'; then
+            echo "site=true" >> "$GITHUB_OUTPUT"; else echo "site=false" >> "$GITHUB_OUTPUT"; fi
+
+  views:
+    # Cheap checks that run on every change: lint and the generated documents (roadmap page, backlog).
+    name: lint and generated documents
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python and dependencies
+        run: |
+          uv python install 3.12
+          uv sync --all-packages --frozen
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Roadmap is up to date
+        run: uv run python tools/build_roadmap_page.py --check
+      - name: Backlog documents are up to date
+        run: |
+          uv run python tools/build_backlog.py
+          git diff --exit-code -- backlog/ founder/slices.json
+
   test:
-    name: lint, typecheck, test
+    name: lint, typecheck, test   # the name stays for branch protection; lint runs in `views`
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
     runs-on: ubuntu-24.04
     services:
       postgres:
@@ -43,12 +103,6 @@ jobs:
           version: stable
       - name: Build MockUSDC
         run: cd chain && forge build
-      - name: Lint
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
-      - name: Roadmap is up to date
-        run: uv run python tools/build_roadmap_page.py --check
       - name: Typecheck
         run: uv run mypy
       - name: Migrate
@@ -61,17 +115,14 @@ jobs:
         env:
           REQUIRE_CHAIN: "1"   # chain tests must run in CI, never skip
         run: uv run pytest -p no:cacheprovider
-      - name: Backlog documents are up to date
-        run: |
-          uv run python tools/build_backlog.py
-          git diff --exit-code -- backlog/ founder/slices.json
 
   eval:
     # EVL-07 release gate: the attack and fault suites (and the agent, reconciliation and latency suites) on
     # the local chain and simulators. Any unauthorised execution, duplicate, timeout turned FAILED or
     # auto-approval after a timeout fails the build, whatever the other scores say.
     name: release gate (detent eval)
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/claude/')
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     services:
@@ -114,6 +165,8 @@ jobs:
 
   site:
     name: marketing site
+    needs: changes
+    if: needs.changes.outputs.site == 'true'
     runs-on: ubuntu-24.04
     defaults:
       run:
