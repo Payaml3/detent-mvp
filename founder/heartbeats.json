@@ -4,7 +4,7 @@
   "autopilot": {
     "enabled": true,
     "plan_every_hours": 24,
-    "max_runs_per_day": 12,
+    "max_runs_per_day": 6,
     "max_parallel": 2,
     "models": {
       "architect": "opus"
