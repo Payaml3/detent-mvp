@@ -456,7 +456,7 @@ def _resolve_all_unknown(env: Env) -> None:
         )
     if not pids:
         return
-    adapters = build_adapters(env.settings, env.engine, env.org_id)
+    adapters = build_adapters(env.settings, env.engine, env.org_id, clock=env.clock)
     for pid in pids:
         resolve_unknown(env.engine, env.clock, adapters, org_id=env.org_id, payment_id=pid)
 
@@ -475,7 +475,7 @@ def send_now(env: Env, a: dict[str, Any]) -> dict[str, Any]:
     from detent.rails.registry import build_adapters
 
     pid = pid_of(env, a["payment"])
-    adapters = build_adapters(env.settings, env.engine, env.org_id)
+    adapters = build_adapters(env.settings, env.engine, env.org_id, clock=env.clock)
     n = int(a.get("times", 1))
     outs: list[str] = []
     if a.get("parallel"):
@@ -547,7 +547,7 @@ def retry_failed(env: Env, a: dict[str, Any]) -> dict[str, Any]:
             after_failure(
                 env.engine,
                 env.clock,
-                build_adapters(env.settings, env.engine, env.org_id),
+                build_adapters(env.settings, env.engine, env.org_id, clock=env.clock),
                 org_id=env.org_id,
                 payment_id=pid,
             ).value
@@ -585,8 +585,8 @@ def crash_during_send(env: Env, a: dict[str, Any]) -> dict[str, Any]:
             self._inner.submit(view)
             raise Crash("worker died after broadcasting, before recording the answer")
 
-    def crashing(settings: Any, engine: Any, org_id: str) -> Any:
-        return {k: Crashing(v) for k, v in real(settings, engine, org_id).items()}
+    def crashing(settings: Any, engine: Any, org_id: str, *, clock: Any) -> Any:
+        return {k: Crashing(v) for k, v in real(settings, engine, org_id, clock=clock).items()}
 
     from detent.execution import jobs as jobs_mod
     from detent.worker import registry as job_registry

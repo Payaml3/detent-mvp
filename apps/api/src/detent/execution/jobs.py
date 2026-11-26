@@ -35,7 +35,7 @@ class StillPending(RuntimeError):
 def _adapters(ctx: JobContext) -> dict[str, RailAdapter]:
     assert ctx.engine is not None
     assert ctx.settings is not None
-    return build_adapters(ctx.settings, ctx.engine, ctx.job.org_id)
+    return build_adapters(ctx.settings, ctx.engine, ctx.job.org_id, clock=ctx.clock)
 
 
 @handler(SEND_JOB)
@@ -128,7 +128,9 @@ def reconcile_all(engine: Engine, clock: Clock, settings: Settings) -> list[nonc
     problems: list[nonces.NonceProblem] = []
     for org in orgs:
         try:
-            problems += nonces.reconcile(engine, clock, org, build_adapters(settings, engine, org))
+            problems += nonces.reconcile(
+                engine, clock, org, build_adapters(settings, engine, org, clock=clock)
+            )
         except Exception:
             log.exception("nonce reconciliation failed", extra={"org_id": org})
     for p in problems:

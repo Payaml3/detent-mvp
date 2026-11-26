@@ -421,7 +421,7 @@ def _watch(rt: Runtime, org_id: str, rescan: dict[str, int]) -> None:
     from detent.ledger.watchers import _cursor, _set_cursor, watch_bank, watch_evm
     from detent.rails.registry import build_adapters
 
-    adapters = build_adapters(rt.settings, rt.engine, org_id)
+    adapters = build_adapters(rt.settings, rt.engine, org_id, clock=rt.clock)
     for rid, a in adapters.items():
         if hasattr(a, "transfers"):
             watch_evm(rt.engine, rt.clock, org_id, rid, a)
@@ -467,7 +467,7 @@ def close_day(rt: Runtime, org_id: str, actor: Actor) -> Result:
         day = date.fromisoformat(str(info["business_date"]))
     except (httpx.HTTPError, KeyError, ValueError) as exc:
         raise ScenarioError(f"the bank simulator at {rt.settings.banksim_url} did not answer") from exc
-    for rid, a in build_adapters(rt.settings, rt.engine, org_id).items():
+    for rid, a in build_adapters(rt.settings, rt.engine, org_id, clock=rt.clock).items():
         if hasattr(a, "inbound"):
             import_statement(rt.engine, rt.clock, org_id=org_id, rail_id=rid, adapter=a, day=day)
     res = run_for(rt.engine, rt.clock, rt.settings, org_id)

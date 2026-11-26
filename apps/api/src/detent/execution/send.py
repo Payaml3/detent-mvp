@@ -177,6 +177,54 @@ def _free_nonce(conn: Connection, org_id: str, pid: str, rail_id: str, address: 
     ).scalar_one_or_none()
 
 
+def _check_shared_wallet(
+    conn: Connection, org_id: str, rail_id: str, amount: Money, day: str, cap: Any
+) -> None:
+    """SBX-02, SBX-03: real test-network payouts by client and evaluation organisations come from one shared
+    faucet wallet, so its daily outflow is capped for everyone together and for each organisation. A
+    transaction-scoped advisory lock serialises the check across organisations; each organisation counts
+    its own outflow in its own counters."""
+    scope = f"faucet:{rail_id}"
+    conn.execute(
+        text("SELECT pg_advisory_xact_lock(hashtext(:k))").execution_options(
+            cross_org="shared faucet wallet: one lock for every organisation that sends from it"
+        ),
+        {"k": f"{scope}:{day}"},
+    )
+    total = conn.execute(
+        text(
+            "SELECT coalesce(sum(amount_minor), 0) FROM counters WHERE scope=:s AND period=:p"
+        ).execution_options(
+            cross_org="shared faucet wallet: the daily cap covers every organisation that sends from it"
+        ),
+        {"s": scope, "p": day},
+    ).scalar_one()
+    mine = conn.execute(
+        text("SELECT amount_minor FROM counters WHERE org_id=:o AND scope=:s AND period=:p"),
+        {"o": org_id, "s": scope, "p": day},
+    ).scalar_one_or_none()
+    mine = int(mine or 0)
+    if int(total) + amount.amount_minor > cap.daily_minor or mine + amount.amount_minor > cap.org_daily_minor:
+        raise _Hold(
+            "SHARED_WALLET_DAILY_CAP",
+            {
+                "this_payment": str(amount.amount_minor),
+                "used_by_all": str(total),
+                "cap_all": str(cap.daily_minor),
+                "used_by_you": str(mine),
+                "cap_you": str(cap.org_daily_minor),
+            },
+        )
+    conn.execute(
+        text(
+            "INSERT INTO counters (org_id, scope, period, currency, amount_minor, count) "
+            "VALUES (:o, :s, :p, :c, :a, 1) ON CONFLICT (org_id, scope, period) DO UPDATE SET "
+            "amount_minor = counters.amount_minor + EXCLUDED.amount_minor, count = counters.count + 1"
+        ),
+        {"o": org_id, "s": scope, "p": day, "c": amount.currency.value, "a": amount.amount_minor},
+    )
+
+
 def _prepare(  # noqa: PLR0912, PLR0915 - the pre-send checks in the order EXE-03 lists them
     conn: Connection,
     clock: Clock,
@@ -264,6 +312,9 @@ def _prepare(  # noqa: PLR0912, PLR0915 - the pre-send checks in the order EXE-0
         # Reservations (pre-funded room, attempt, nonce) roll back together if anything below holds.
         with conn.begin_nested():
             _check_prefund(conn, org_id, rail_id, amount, clock.now().date().isoformat())
+            cap = getattr(adapter, "shared_wallet", None)
+            if cap is not None:
+                _check_shared_wallet(conn, org_id, rail_id, amount, clock.now().date().isoformat(), cap)
             att = create_attempt(conn, clock, org_id=org_id, payment_id=pid, rail_id=rail_id)
             view = AttemptView(
                 attempt_id=att.id,

@@ -92,6 +92,10 @@ class Settings(BaseSettings):
     sandbox_daily_investigations: int = 50
     # DSH-04: how long a rolled key keeps working, unless the person rolling it picks another overlap.
     key_roll_overlap_hours: int = 24
+    # SBX-02, SBX-03: daily outflow caps (USDC) on the shared faucet wallet for real test-network payouts by
+    # client and evaluation organisations: for all of them together per network, and for each one.
+    faucet_daily_cap: str = "500.00"
+    faucet_org_daily_cap: str = "50.00"
     sales_inbox: str | None = None
 
     # FND-07: where this instance and its database run, as stated in the console footer and /healthz.
@@ -134,6 +138,23 @@ class Settings(BaseSettings):
             return tuple(p for p in v.replace(" ", "").split(",") if p)
         return v
 
+    def _check_faucet_caps(self) -> None:
+        from detent.domain.money import Money, MoneyError
+
+        try:
+            caps = [
+                Money.parse(v, "USDC").amount_minor
+                for v in (self.faucet_daily_cap, self.faucet_org_daily_cap)
+            ]
+        except MoneyError as exc:
+            raise ValueError(
+                "FAUCET_DAILY_CAP and FAUCET_ORG_DAILY_CAP are USDC amounts such as 50.00"
+            ) from exc
+        if min(caps) <= 0 or caps[1] > caps[0]:
+            raise ValueError(
+                "faucet caps must be positive, and the per-organisation cap no more than the total"
+            )
+
     @model_validator(mode="after")
     def _guard(self) -> Settings:
         outside = self.allowed_chain_ids - TESTNET_CHAIN_IDS
@@ -161,6 +182,7 @@ class Settings(BaseSettings):
             raise ValueError("INVITE_DAYS must be 1 to 30 and EVALUATION_DAYS 1 to 365")
         if self.sandbox_daily_payments < 1 or self.sandbox_daily_investigations < 1:
             raise ValueError("SANDBOX_DAILY_PAYMENTS and SANDBOX_DAILY_INVESTIGATIONS must be at least 1")
+        self._check_faucet_caps()
         if not 0 <= self.key_roll_overlap_hours <= 168:
             raise ValueError("KEY_ROLL_OVERLAP_HOURS must be 0 to 168")
         if self.app_env in ("demo", "sandbox"):

@@ -370,8 +370,8 @@ def not_built(
     rt: Runtime = Depends(runtime),  # noqa: B008
     member: Member = Depends(client_member),  # noqa: B008
 ) -> HTMLResponse:
-    """Pages from later P2 story groups (sandbox, policy, verification)."""
-    known = {"sandbox", "policy", "verification"}
+    """Pages from later P2 story groups (policy, verification)."""
+    known = {"policy", "verification"}
     if section not in known:
         return page(request, rt, "not_found.html", member, status_code=404)
     return page(request, rt, "coming.html", member, section=section)

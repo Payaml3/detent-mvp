@@ -877,6 +877,7 @@ stories:
   ac:
     - "Implements the adapter contract with instant settlement and the same test values"
     - "Sandbox organisations use it by default; real testnet is opt-in (SBX-03)"
+  done: [0, 1]
   pri: Must
   est: 0.5
   deps: [RAL-01]
@@ -2004,6 +2005,7 @@ stories:
   ac:
     - "Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK"
     - "Documented in the docs and covered by tests"
+  done: [0]
   pri: Must
   est: 0.5
   deps: [RAL-11, RAL-05]
@@ -2017,6 +2019,7 @@ stories:
   so: sandbox costs stay bounded
   ac:
     - "Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [API-04]
@@ -2030,6 +2033,7 @@ stories:
   so: I can see real explorer links
   ac:
     - "Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned"
+  done: [0]
   pri: Should
   est: 0.5
   deps: [RAL-03, SBX-02]

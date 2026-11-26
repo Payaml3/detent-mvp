@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 87,
-   "pct": 58
+   "done": 90,
+   "pct": 60
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 246,
-   "pct": 77
+   "done": 251,
+   "pct": 78
   },
   {
    "order": 3,
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 196,
+   "done": 201,
    "total": 244,
-   "pct_done": 80
+   "pct_done": 82
   },
   {
    "function": "05 QA",
@@ -201,8 +201,8 @@
    "role": "engineer",
    "stories": 11,
    "criteria": 28,
-   "criteria_done": 18,
-   "pct_done": 64
+   "criteria_done": 20,
+   "pct_done": 71
   },
   {
    "code": "SBX",
@@ -210,8 +210,8 @@
    "role": "engineer",
    "stories": 4,
    "criteria": 5,
-   "criteria_done": 0,
-   "pct_done": 0
+   "criteria_done": 3,
+   "pct_done": 60
   },
   {
    "code": "SDK",
@@ -777,9 +777,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "EXC-01",
@@ -1537,9 +1537,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "In progress"
   },
   {
    "story": "SBX-02",
@@ -1547,9 +1547,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SBX-03",
@@ -1557,9 +1557,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SBX-04",

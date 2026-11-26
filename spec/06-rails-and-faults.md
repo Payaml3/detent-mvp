@@ -40,7 +40,7 @@ class RailAdapter(Protocol):
 | Ethereum Sepolia | `eth-sepolia` | USDC (testnet) | About 12 s blocks; threshold 2 (config) | Higher fee profile in routing |
 | Bank simulator, Faster Payments-style | `banksim-fps` | GBP | Instant; cut-off none; limits configurable | Separate app `apps/banksim` |
 | Bank simulator, SEPA Instant-style | `banksim-sepa-inst` | EUR | Instant | Same app, second scheme |
-| Simulated chain (sandbox) | `simchain` | USDC | Instant | Default for sandbox organisations |
+| Simulated chain (sandbox) | `base-sepolia`, `eth-sepolia` (simulated) | USDC | Instant | Default for client and evaluation organisations (RAL-11): the same rail IDs, on an in-database simulated chain |
 | Local chain (tests) | `local-evm` | MockUSDC | anvil, automine | CI and fault suite |
 | Second local chain (tests) | `local-evm-b` | MockUSDC | anvil, automine | Failover tests only; never seeded into the demo (S4) |
 

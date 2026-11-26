@@ -849,8 +849,8 @@
    "initiative": "Rails, routing and faults",
    "slice": "P2",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -1923,8 +1923,8 @@
    "initiative": "Sandbox",
    "slice": "P2",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "in_progress",
+   "progress": "1/2",
    "deps": [],
    "dependents": []
   },
@@ -1937,8 +1937,8 @@
    "initiative": "Sandbox",
    "slice": "P2",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1951,8 +1951,8 @@
    "initiative": "Sandbox",
    "slice": "P2",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },

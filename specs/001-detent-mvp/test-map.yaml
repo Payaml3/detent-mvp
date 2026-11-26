@@ -410,6 +410,15 @@ DSH-08:
   0: ["integration/test_dashboard_developer.py::test_new_organisations_get_the_quotas_and_the_usage_page_shows_them"]
 LED-08:
   0: ["integration/test_dashboard_developer.py::test_api_calls_are_metered_and_months_add_up", "integration/test_dashboard_developer.py::test_over_the_daily_payment_quota_is_429_quota_exceeded_and_nothing_is_created"]
+RAL-11:
+  0: ["integration/test_sandbox_rails.py::test_a_new_sandbox_organisation_pays_on_the_simulated_chain", "integration/test_sandbox_rails.py::test_the_simulated_chain_is_append_only_and_deduplicates_a_rebroadcast", "integration/test_sandbox_rails.py::test_point_13_times_out_to_unknown_then_confirms_without_a_resend", "integration/test_sandbox_rails.py::test_point_42_reverts_on_the_first_rail_and_fails_over_under_the_same_id"]
+  1: ["integration/test_sandbox_rails.py::test_a_new_sandbox_organisation_pays_on_the_simulated_chain", "integration/test_sandbox_rails.py::test_moving_to_real_test_networks_needs_configuration_and_no_payout_in_flight"]
+SBX-01:
+  0: ["integration/test_sandbox_rails.py::test_point_13_times_out_to_unknown_then_confirms_without_a_resend", "integration/test_sandbox_rails.py::test_point_42_reverts_on_the_first_rail_and_fails_over_under_the_same_id", "integration/test_sandbox_rails.py::test_point_42_without_a_network_switch_ends_failed", "integration/test_sandbox_rails.py::test_flagged_address_blocks_and_a_payee_off_the_allowlist_escalates", "integration/test_sandbox_rails.py::test_test_values_are_exact_cents", "integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason"]
+SBX-02:
+  0: ["integration/test_dashboard_developer.py::test_over_the_daily_payment_quota_is_429_quota_exceeded_and_nothing_is_created", "integration/test_dashboard_developer.py::test_the_quota_holds_under_concurrent_requests", "integration/test_sandbox_rails.py::test_the_shared_faucet_wallet_has_daily_caps_for_everyone_and_each_org"]
+SBX-03:
+  0: ["integration/test_sandbox_rails.py::test_moving_to_real_test_networks_needs_configuration_and_no_payout_in_flight", "integration/test_sandbox_rails.py::test_the_shared_faucet_wallet_has_daily_caps_for_everyone_and_each_org", "integration/test_sandbox_rails.py::test_the_sandbox_page_forces_scenarios_and_shows_the_rails"]
 DSH-11:
   0: ["integration/test_dashboard_access.py::test_owner_invites_a_developer_who_cannot_manage_the_team", "integration/test_dashboard_access.py::test_removing_a_member_stops_their_sign_in_and_keys"]
   1: ["unit/test_dashboard_rules.py::test_member_roles_are_the_spec_02_list", "unit/test_dashboard_rules.py::test_dashboard_permissions_follow_spec_08", "integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays"]
