@@ -41,8 +41,23 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 - Use "agentic payment controls" or "payment controls". Never "payments company" or "payment provider".
 - A timeout is "unknown", never "failed"; a block is final.
 
-## Visual identity (Open)
+## Visual identity
 
-- Palette: options in `/mnt/project-files/brand/palette-options-draft.md` (project files), founder to choose.
-- The detent-wheel motif (D-20) no longer fits the name; proposed replacement idea: "sift then settle"
+- Palette (Approved, B-02): Graphite and safety orange. Dark first, with a light mode for docs and the console.
+
+  | Token | Hex | Use |
+  |---|---|---|
+  | Graphite | #18191B | Dark ground; ink on light grounds |
+  | Steel | #232427 | Surfaces on dark |
+  | Paper | #F3F3F1 | Light ground; ink on dark |
+  | Safety orange | #FF4A1F | The one action colour: primary buttons, the mark, focus (black text on it) |
+  | Orange text | #C2360F | Orange links and text on light grounds |
+  | Unknown amber | #F2C94C | "Unknown" status |
+  | Confirmed green | #237A46 | "Confirmed" status |
+
+  Orange is the colour of the override switch: it only ever means "act here". Blocked is a graphite pill with a stop
+  icon and its label, never orange and never colour alone. Every pairing passes WCAG AA (text 15.4, orange on graphite
+  5.2, black on orange 5.9, orange text on paper 4.9).
+- Fonts (D-18): Space Grotesk, Inter, JetBrains Mono.
+- Proposed: the detent-wheel motif (D-20) no longer fits the name; replacement idea "sift then settle"
   (many inputs filtering to one clear outcome). Decided in the design-system work.
