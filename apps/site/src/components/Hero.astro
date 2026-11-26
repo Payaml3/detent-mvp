@@ -25,6 +25,8 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   {(config.heroArt ?? "agent") === "agent" && <>
     <span class="art-label small" data-art-label="agent" aria-hidden="true" hidden>AI agent prepares</span>
     <span class="art-label small" data-art-label="rules" aria-hidden="true" hidden>Your rules decide</span>
+    <span class="art-label art-bubble small" data-art-label="bubble" aria-hidden="true" hidden><span data-bubble-text></span><i aria-hidden="true"></i></span>
+    <span class="art-label art-verdict small" data-art-label="verdict" data-verdict aria-hidden="true" hidden></span>
   </>}
   <div class="wrap hero-grid">
     <div class="intro">
@@ -72,6 +74,19 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   .art { z-index: 1; }
   .art-label { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; white-space: nowrap; font-weight: 600; letter-spacing: 0.01em;
     color: color-mix(in srgb, var(--paper) 78%, var(--ink)); padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--paper) 8%, transparent); }
+  .art-bubble { font: 500 12px/1.45 var(--font-mono); border-radius: 10px 10px 10px 2px; padding: 8px 12px; min-height: 1.4em; white-space: normal; width: 210px;
+    background: color-mix(in srgb, var(--paper) 10%, var(--ink)); border: 1px solid color-mix(in srgb, var(--paper) 20%, var(--ink)); color: var(--paper); }
+  .art-bubble i { display: inline-block; width: 7px; height: 13px; margin-left: 2px; vertical-align: -2px; background: var(--signal); animation: caret 1s steps(1) infinite; }
+  @keyframes caret { 50% { opacity: 0; } }
+  .art-verdict { opacity: 0; transition: opacity 240ms; white-space: normal; width: max-content; max-width: 260px; text-align: center; border-radius: 10px; padding: 8px 12px; font-weight: 500; line-height: 1.35; }
+  .art-verdict :global(b) { display: block; font-weight: 700; letter-spacing: 0.04em; }
+  .art-verdict.on { opacity: 1; }
+  .art-label { transition: opacity 240ms; }
+  .art-label.off { opacity: 0; }
+  .art-verdict[data-kind="EXECUTE"], .art-verdict[data-kind="APPROVED"] { background: var(--ok); color: var(--paper); }
+  .art-verdict[data-kind="ESCALATE"] { background: var(--signal); color: var(--on-signal); }
+  .art-verdict[data-kind="BLOCK"] { background: var(--paper); color: var(--ink); }
+  .art-verdict[data-kind="BLOCK"] :global(b)::before { content: "✕ "; }
   .art-label[data-art-label="rules"] { color: var(--signal); background: color-mix(in srgb, var(--signal) 12%, transparent); }
   .hero-grid { --text: var(--paper); --bg: var(--ink); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --line: color-mix(in srgb, var(--paper) 18%, var(--ink)); color: var(--text); }
   .cards .card { --text: var(--ink); --bg: var(--paper); --text-soft: var(--ink-soft); color: var(--text); }

@@ -135,6 +135,100 @@ export function mountAgent(canvas) {
   scene.updateMatrixWorld(true);
   flights.forEach((f) => { const u = f.u; launch(f); f.u = u; });
 
+  // ---- the story: one payment at a time, told in words. The robot says what it is preparing; the payment
+  // travels to the D; the rules answer with a verdict. Execute settles into the point. Escalate waits, in
+  // orange, for a person, and the rules run again before it settles. Block is final: the payment drops away
+  // in graphite, never orange (B-02). Fictional payees on test networks.
+  const CASES = [
+    { say: "Preparing payout · €2,400.00 to Harbor Logistics GmbH", verdict: "EXECUTE", why: "Within your limits. Sent once." },
+    { say: "Preparing payout · £820.00 to Quill Studio Ltd", verdict: "ESCALATE", why: "Bank details changed 3 days ago", after: "Approved by a person · rules ran again" },
+    { say: "Preparing withdrawal · 500.00 USDC to 0x9f…c21", verdict: "BLOCK", why: "Screening hit. A block is final." },
+    { say: "Preparing payout · $1,120.00 to Northwind Creators", verdict: "EXECUTE", why: "Within your limits. Sent once." },
+    { say: "Preparing payout · $64,000.00 to Marlow Prop Traders", verdict: "ESCALATE", why: "Far above this trader’s usual payout", after: "Approved by a person · rules ran again" },
+  ];
+  const bubble = document.querySelector("[data-bubble-text]"), verdictEl = document.querySelector("[data-verdict]"), rulesLabel = document.querySelector('[data-art-label="rules"]');
+  const token = new THREE.Sprite(new THREE.SpriteMaterial({ map, color: paper, transparent: true, depthWrite: false }));
+  token.scale.setScalar(4.2); token.visible = false; scene.add(token);
+  const trail = cloud(40, 1.6, map); scene.add(trail.pts);
+  const trailAt = Array.from({ length: 40 }, () => new THREE.Vector3());
+  const tk = { i: -1, phase: "say", t: 0, from: new THREE.Vector3(), mid: new THREE.Vector3(), gate: new THREE.Vector3(), seat: new THREE.Vector3(), vel: new THREE.Vector3() };
+  const graphite = paper.clone().multiplyScalar(0.28);
+  function showVerdict(kind, text) {
+    if (!verdictEl) return;
+    verdictEl.dataset.kind = kind || ""; verdictEl.classList.toggle("on", !!text);
+    rulesLabel?.classList.toggle("off", !!text); // the verdict takes the caption's place
+    if (!text) return;
+    const [head2, ...rest] = text.split(" · ");
+    const b = document.createElement("b"); b.textContent = head2;
+    verdictEl.replaceChildren(b, rest.join(" · "));
+  }
+  function nextCase() {
+    tk.i = (tk.i + 1) % CASES.length; tk.phase = "say"; tk.t = 0; token.visible = false;
+    showVerdict("", "");
+    if (bubble) bubble.textContent = "";
+  }
+  function story(dt) {
+    const c = CASES[tk.i];
+    tk.t += dt;
+    if (tk.phase === "say") {
+      const n = Math.min(c.say.length, Math.floor(tk.t * 34));
+      if (bubble && bubble.textContent.length !== n) bubble.textContent = c.say.slice(0, n);
+      if (tk.t > c.say.length / 34 + 0.5) {
+        agent.localToWorld(tk.from.copy(HAND));
+        rules.localToWorld(tk.gate.set(PX - 1, PY + 9, 7));
+        rules.localToWorld(tk.seat.set(PX, PY, 4));
+        tk.mid.copy(tk.from).lerp(tk.gate, 0.5).add(tmp.set(2, 9, 6));
+        token.material.color.copy(paper); token.material.opacity = 1; token.visible = true;
+        trailAt.forEach((v) => v.copy(tk.from));
+        tk.phase = "fly"; tk.t = 0;
+      }
+    } else if (tk.phase === "fly") {
+      const u = Math.min(1, tk.t / 1.3), e = u * u * (3 - 2 * u), v = 1 - e;
+      token.position.set(v * v * tk.from.x + 2 * v * e * tk.mid.x + e * e * tk.gate.x, v * v * tk.from.y + 2 * v * e * tk.mid.y + e * e * tk.gate.y, v * v * tk.from.z + 2 * v * e * tk.mid.z + e * e * tk.gate.z);
+      if (u >= 1) {
+        tk.phase = c.verdict; tk.t = 0;
+        showVerdict(c.verdict, `${c.verdict} · ${c.why}`);
+        if (c.verdict === "BLOCK") tk.vel.set(-9, 6, 4);
+      }
+    } else if (tk.phase === "EXECUTE") {
+      token.position.lerp(tk.seat, Math.min(1, dt * 4));
+      token.material.color.lerp(signal, Math.min(1, dt * 3));
+      if (tk.t > 0.7 && token.visible) { token.visible = false; pulse = 1; }
+      if (tk.t > 2.6) nextCase();
+    } else if (tk.phase === "ESCALATE") {
+      token.material.color.lerp(signal, Math.min(1, dt * 5));
+      const a = tk.t * 2.4;
+      token.position.set(tk.gate.x + Math.cos(a) * 2.6, tk.gate.y + Math.sin(a * 2) * 0.8, tk.gate.z + Math.sin(a) * 2.6);
+      if (tk.t > 2.6) { tk.phase = "EXECUTE"; tk.t = 0; showVerdict("APPROVED", c.after); }
+    } else if (tk.phase === "BLOCK") {
+      token.material.color.lerp(graphite, Math.min(1, dt * 6));
+      tk.vel.y -= 26 * dt;
+      token.position.addScaledVector(tk.vel, dt);
+      token.material.opacity = Math.max(0, 1 - tk.t * 0.5);
+      if (tk.t > 3) nextCase();
+    }
+    // the token's trail
+    for (let i = trailAt.length - 1; i > 0; i--) trailAt[i].lerp(trailAt[i - 1], 0.6);
+    trailAt[0].copy(token.position);
+    const tc = token.material.color, on = token.visible ? token.material.opacity : 0;
+    trailAt.forEach((v, i) => {
+      trail.pos.set([v.x, v.y, v.z], i * 3);
+      const k = on * (1 - i / trailAt.length) * 0.8;
+      trail.col.set([tc.r * k, tc.g * k, tc.b * k], i * 3);
+    });
+    trail.geo.attributes.position.needsUpdate = true; trail.geo.attributes.color.needsUpdate = true;
+  }
+
+  // ---- the floor: a field of dots receding into the dark, drifting toward the rules ----
+  const FX = 34, FZ = 22, fl = cloud(FX * FZ, 0.9, map);
+  const floorY = -34;
+  for (let i = 0; i < FX; i++) for (let j = 0; j < FZ; j++) {
+    const k = (i * FZ + j) * 3, a = 0.05 + 0.13 * (j / FZ);
+    fl.pos.set([(i - FX / 2) * 6, floorY, -90 + j * 6], k);
+    fl.col.set([paper.r * a, paper.g * a, paper.b * a], k);
+  }
+  scene.add(fl.pts);
+
   // ---- pointer ----
   const aim = { x: 0, y: 0 }, look = { x: 0, y: 0 };
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -220,21 +314,25 @@ export function mountAgent(canvas) {
       s.col.set([k.r * fade, k.g * fade, k.b * fade], i * 3);
     }
     s.geo.attributes.position.needsUpdate = true; s.geo.attributes.color.needsUpdate = true;
+    if (!reduce) story(dt);
+    fl.pts.position.x = ((t * 3) % 6) - look.x * 4; fl.pts.rotation.x = 0.04 + look.y * 0.03;
     renderer.render(scene, camera);
     placeLabels();
   }
 
   // captions that travel with the scene: "AI agent prepares" under the agent, "Your rules decide" under the D
   const labels = [...document.querySelectorAll("[data-art-label]")];
-  const anchor = { agent: new THREE.Vector3(0, -18.5, 0), rules: new THREE.Vector3(0, -22.5 * S, 0) };
+  const anchor = { agent: new THREE.Vector3(0, -18.5, 0), rules: new THREE.Vector3(0, -22.5 * S, 0), bubble: new THREE.Vector3(HX + 2, 1, 0), verdict: new THREE.Vector3(0, -22.5 * S, 0) };
+  const owner = { agent: () => agent, bubble: () => head, rules: () => rules, verdict: () => rules };
+  const shift = { agent: "translate(-50%, 0)", rules: "translate(-50%, 0)", bubble: "translate(0, -50%)", verdict: "translate(-50%, 0)" };
   const proj = new THREE.Vector3();
   function placeLabels() {
     if (!labels.length) return;
     const w = canvas.clientWidth, h = canvas.clientHeight, ox = canvas.offsetLeft, oy = canvas.offsetTop;
     for (const el of labels) {
-      const g = el.dataset.artLabel === "agent" ? agent : rules;
-      g.localToWorld(proj.copy(anchor[el.dataset.artLabel])).project(camera);
-      el.style.transform = `translate(${ox + (proj.x + 1) / 2 * w}px, ${oy + (1 - proj.y) / 2 * h}px) translate(-50%, 0)`;
+      const key = el.dataset.artLabel;
+      owner[key]().localToWorld(proj.copy(anchor[key])).project(camera);
+      el.style.transform = `translate(${ox + (proj.x + 1) / 2 * w}px, ${oy + (1 - proj.y) / 2 * h}px) ${shift[key]}`;
       el.hidden = false;
     }
   }
@@ -250,7 +348,8 @@ export function mountAgent(canvas) {
     raf = requestAnimationFrame(tick);
   }
 
-  if (reduce) { home.forEach((h, i) => d.pos.set([h.x, h.y, h.z], i * 3)); frame(0); }
+  nextCase();
+  if (reduce) { home.forEach((h, i) => d.pos.set([h.x, h.y, h.z], i * 3)); if (bubble) bubble.textContent = CASES[1].say; showVerdict("ESCALATE", `ESCALATE · ${CASES[1].why}`); frame(0); }
   else loop();
 
   return { setState(status, transferred) { if (transferred) pulse = 1; if (reduce) frame(0); } };
