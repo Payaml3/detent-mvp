@@ -35,9 +35,7 @@ class RateLimiter:
         self._lock = threading.Lock()
         self._state: dict[str, tuple[int, int]] = {}  # digest -> (window index, count)
 
-    def hit(
-        self, token: str, now: datetime, limit: int | None = None, scope: str = ""
-    ) -> LimitResult:
+    def hit(self, token: str, now: datetime, limit: int | None = None, scope: str = "") -> LimitResult:
         limit = self.limit if limit is None else limit
         digest = hashlib.sha256(token.encode()).hexdigest()
         ts = int(now.timestamp())

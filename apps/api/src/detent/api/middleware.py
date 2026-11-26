@@ -6,10 +6,12 @@ Pure ASGI-style HTTP middleware so it runs before routing and authentication.
 from __future__ import annotations
 
 import logging
+import re
 import secrets
 import time
 from collections.abc import Awaitable, Callable
 
+from sqlalchemy import text
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -30,6 +32,46 @@ LIVE_KEY_PREFIX = "sk_live_"
 
 def new_request_id() -> str:
     return "req_" + secrets.token_hex(12)
+
+
+_PAYMENT_ID = re.compile(r"/(pay_[A-Za-z0-9]+)")
+_IDEM_MAX = 255
+
+
+def record_request(request: Request, response: Response, rid: str, latency_ms: int) -> None:
+    """API-06: one row per authenticated API call. Metadata only: no bodies, no query string, no keys.
+
+    A logging failure never changes the API response.
+    """
+    principal = getattr(request.state, "principal", None)
+    if principal is None:
+        return
+    rt = request.app.state.runtime
+    match = _PAYMENT_ID.search(request.url.path)
+    idem = request.headers.get("idempotency-key")
+    try:
+        with rt.engine.begin() as conn:
+            conn.execute(
+                text(
+                    "INSERT INTO request_logs (org_id, key_id, method, path, status, latency_ms, "
+                    "idempotency_key, payment_id, request_id, at) "
+                    "VALUES (:org_id, :key_id, :method, :path, :status, :latency, :idem, :pay, :rid, :at)"
+                ),
+                {
+                    "org_id": principal.org_id,
+                    "key_id": principal.key_id,
+                    "method": request.method,
+                    "path": request.url.path[:500],
+                    "status": response.status_code,
+                    "latency": latency_ms,
+                    "idem": idem[:_IDEM_MAX] if idem else None,
+                    "pay": match.group(1) if match else None,
+                    "rid": rid,
+                    "at": rt.clock.now(),
+                },
+            )
+    except Exception:
+        log.exception("request log write failed")
 
 
 def _uses_live_key(request: Request) -> bool:
@@ -105,6 +147,8 @@ async def request_context(request: Request, call_next: Callable[[Request], Await
                     response.headers["RateLimit-Remaining"] = str(limit.remaining)
                     response.headers["RateLimit-Reset"] = str(limit.reset_seconds)
             response.headers["Request-Id"] = rid
+            if is_api:
+                record_request(request, response, rid, round((time.perf_counter() - started) * 1000))
         log.info(
             "request",
             extra={

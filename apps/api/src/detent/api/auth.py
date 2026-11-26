@@ -106,7 +106,9 @@ def authenticate(request: Request) -> Principal:
         raise AuthError(401, "authentication", "invalid_api_key", "The API key is not valid.")
     if row.org_expires_at is not None and row.org_expires_at <= now:  # DSH-03 (API side), found by atk-au-02
         raise AuthError(403, "permission", "organisation_expired", "This sandbox organisation has expired.")
-    return Principal(row.org_id, row.id, row.user_id, row.role, frozenset(row.scopes), row.mandate_id)
+    principal = Principal(row.org_id, row.id, row.user_id, row.role, frozenset(row.scopes), row.mandate_id)
+    request.state.principal = principal  # read by the request log middleware (API-06)
+    return principal
 
 
 def require(principal: Principal, scope: str) -> None:

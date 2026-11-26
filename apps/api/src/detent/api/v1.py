@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, Query, Request
@@ -275,6 +275,68 @@ def release_kill_switch(
 
 
 # --------------------------------------------------------------------------------- mandates (MND-01, MND-03)
+REQUEST_LOG_DAYS = 30
+
+
+@router.get("/request_logs")
+def list_request_logs(
+    request: Request,
+    principal: Annotated[Principal, Depends(authenticate)],
+    status: int | None = Query(default=None, ge=100, le=599),
+    payment_id: str | None = None,
+    idempotency_key: str | None = None,
+    limit: int = Query(default=50, ge=1, le=100),
+    before: int | None = Query(default=None, ge=1),
+) -> JSONResponse:
+    """API-06: this organisation's own calls of the last 30 days, newest first."""
+    require(principal, "read")
+    rt = request.app.state.runtime
+    since = rt.clock.now() - timedelta(days=REQUEST_LOG_DAYS)
+    with rt.engine.begin() as conn:
+        conn.execute(
+            text("DELETE FROM request_logs WHERE org_id = :o AND at < :since"),
+            {"o": principal.org_id, "since": since},
+        )
+        rows = conn.execute(
+            text(
+                "SELECT id, key_id, method, path, status, latency_ms, idempotency_key, payment_id, "
+                "request_id, at FROM request_logs WHERE org_id = :o AND at >= :since "
+                "AND (CAST(:status AS INTEGER) IS NULL OR status = :status) "
+                "AND (CAST(:pay AS TEXT) IS NULL OR payment_id = :pay) "
+                "AND (CAST(:idem AS TEXT) IS NULL OR idempotency_key = :idem) "
+                "AND (CAST(:before AS BIGINT) IS NULL OR id < :before) "
+                "ORDER BY id DESC LIMIT :n"
+            ),
+            {
+                "o": principal.org_id,
+                "since": since,
+                "status": status,
+                "pay": payment_id,
+                "idem": idempotency_key,
+                "before": before,
+                "n": limit + 1,
+            },
+        ).all()
+    page = rows[:limit]
+    data = [
+        {
+            "id": r.id,
+            "key_id": r.key_id,
+            "method": r.method,
+            "path": r.path,
+            "status": r.status,
+            "latency_ms": r.latency_ms,
+            "idempotency_key": r.idempotency_key,
+            "payment_id": r.payment_id,
+            "request_id": r.request_id,
+            "at": r.at.isoformat(),
+        }
+        for r in page
+    ]
+    more = len(rows) > limit
+    return JSONResponse({"data": data, "has_more": more, "next_cursor": str(page[-1].id) if more else None})
+
+
 @router.get("/mandates")
 def list_mandates_api(
     request: Request, principal: Annotated[Principal, Depends(authenticate)]
