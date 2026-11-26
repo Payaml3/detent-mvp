@@ -2326,6 +2326,17 @@
    "progress": "Proposed",
    "deps": [],
    "dependents": []
+  },
+  {
+   "id": "B-05",
+   "title": "Naming the people we serve: **client** is the company that contracts with DekernAI (contracts, rules, onboarding, con...",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
   }
  ]
 }

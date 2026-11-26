@@ -544,6 +544,13 @@
    "status": "Proposed",
    "date": "2026-11-26",
    "register": "founder/decisions.md"
+  },
+  {
+   "id": "B-05",
+   "decision": "Naming the people we serve: **client** is the company that contracts with DekernAI (contracts, rules, onboarding, console); **platform** is the same company in marketing copy (\"platforms that hold user balances\"); **users** are the client's own end customers. Never \"merchant\": it suggests card acquiring and a payment provider",
+   "status": "Proposed",
+   "date": "2026-11-26",
+   "register": "founder/decisions.md"
   }
  ]
 }
