@@ -21,7 +21,7 @@ const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
 const category = config.category.charAt(0).toUpperCase() + config.category.slice(1);
 ---
 <section class="hero" data-section="hero" aria-labelledby="hero-title">
-  <canvas class="art" aria-hidden="true" data-hero-sift></canvas>
+  <canvas class="art" aria-hidden="true" data-hero-sift data-art={config.heroArt ?? "mark"}></canvas>
   <div class="wrap hero-grid">
     <div class="intro">
       <h1 id="hero-title" class="headline">
@@ -123,7 +123,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   const cards = Object.fromEntries([...root.querySelectorAll("[data-card]")].map((c) => [c.dataset.card, c]));
   let sift = null;
   const canvas = document.querySelector("[data-hero-sift]");
-  if (canvas && getComputedStyle(canvas).display !== "none") import("../scripts/gate3d.js").then(({ mountGate }) => { sift = mountGate(canvas); sift?.setState(phases.at(-1).status, true); });
+  if (canvas && getComputedStyle(canvas).display !== "none") (canvas.dataset.art === "layers" ? import("../scripts/gate3d.js").then((m) => m.mountGate(canvas)) : import("../scripts/mark3d.js").then((m) => m.mountMark(canvas))).then((art) => { sift = art; sift?.setState(phases.at(-1).status, true); });
   else canvas?.remove();
   const show = (i) => {
     const p = phases[i];
