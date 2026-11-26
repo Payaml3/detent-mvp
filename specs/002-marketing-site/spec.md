@@ -18,7 +18,7 @@ brand ([decisions.md](../001-detent-mvp/decisions.md#decision-log)).
 
 - Q: Show prices? → A: No. Name the free shadow report, Pilot, Growth and Scale; every plan says "Talk to us" (D-15).
 - Q: Where do "Book a demo" and "Request sandbox access" go before the booking page and access inbox exist? → A: Clearly marked placeholders in one config value each; nothing is sent (D-16).
-- Q: Name? → A: The working name "Detent" from one setting; domain stays a placeholder (D-17).
+- Q: Name? → A: The name "Dekernai" (B-01, replacing the working name Detent) from one setting; domain stays a placeholder (D-17).
 - Q: Look? → A: The spec/07 brand tokens (D-18), in a cinematic dark-blue style with an original WebGL watch-escapement scene, built in-house after reviewing GetLayers references; glows and gradients allowed (D-19).
 
 ## User Scenarios & Testing *(mandatory)*
@@ -26,7 +26,7 @@ brand ([decisions.md](../001-detent-mvp/decisions.md#decision-log)).
 ### User Story 1 - A head of payments understands the product and books a demo (Priority: P1)
 
 A buyer from a platform that holds user balances lands on the home page and, within the first screen, learns what
-Detent is ("agentic payment controls") and what to do (book a demo). Scrolling, they see how it works, the three
+Dekernai is ("agentic payment controls") and what to do (book a demo). Scrolling, they see how it works, the three
 layers, why it suits irreversible rails, security, use cases and how pricing works.
 
 **Why this priority**: the site's job is demos (spec/11: the signal is a "yes" to the shadow report).

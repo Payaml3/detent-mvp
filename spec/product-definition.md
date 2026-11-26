@@ -1,6 +1,6 @@
 # Product definition: agentic payment controls
 
-**Source of truth.** Decided 17 Nov 2026 (see `facts.md`). Every other document follows this page. Detent is the working name.
+**Source of truth.** Decided 17 Nov 2026 (see `facts.md`). Every other document follows this page. Dekernai is the brand name (B-01, 26 Nov 2026; it replaced the working name Detent).
 
 **In one line:** “Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules.”
 
@@ -26,8 +26,8 @@ AI agents work across all three, preparing intents, investigating escalations an
 ## Rules for wording
 
 - "Agentic" describes how the work is done, never who decides. AI agents prepare; the rules decide.
-- Never call Detent a "payments company" or "payment provider". It never holds funds or keys.
-- Pair the name with the category in public: "Detent agentic payment controls" or "Detent payment controls".
+- Never call Dekernai a "payments company" or "payment provider". It never holds funds or keys.
+- Pair the name with the category in public: "Dekernai agentic payment controls" or "Dekernai payment controls".
 - Rails are chosen by policy, never by an AI agent.
 - Avoid the terms "trust layer" and "guardrails" (a competitor's wording).
 

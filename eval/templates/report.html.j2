@@ -60,7 +60,7 @@ Seeds: {{ r.seeds }}</p>
 
 {% if flt %}
 <h2>Orchestration layer: fault suite</h2>
-<p>{{ flt.count }} scenarios, {{ flt.passed }} passed. Duplicates are counted from the rails' own records (the chain's transfer logs and the bank simulator's payments), not from Detent's database.</p>
+<p>{{ flt.count }} scenarios, {{ flt.passed }} passed. Duplicates are counted from the rails' own records (the chain's transfer logs and the bank simulator's payments), not from Dekernai's database.</p>
 <div class="scroll"><table><tr><th>Category</th><th class="n">Scenarios</th><th class="n">Passed</th><th class="n">Duplicates</th></tr>
 {% for cat, c in flt.per_category.items() %}<tr><td>{{ cat.replace('_', ' ') }}</td><td class="n">{{ c.count }}</td><td class="n">{{ c.passed }}</td><td class="n {{ 'bad' if c.duplicates else '' }}">{{ c.duplicates }}</td></tr>{% endfor %}
 </table></div>
@@ -82,7 +82,7 @@ Seeds: {{ r.seeds }}</p>
 <tr><td>Invented values (must be 0)</td><td class="n {{ 'bad' if interp.invented_values else 'ok' }}">{{ interp.invented_values }}</td></tr>
 <tr><td>Canonical invoice</td><td class="n">{{ interp.canonical.correct }}/{{ interp.canonical.runs }} runs</td></tr>
 </table></div>
-<p class="note">With recorded stand-ins these figures show that Detent's own checks hold (a stand-in that invents a value has it removed and flagged); they do not measure a model. The live run asks the model itself.</p>
+<p class="note">With recorded stand-ins these figures show that Dekernai's own checks hold (a stand-in that invents a value has it removed and flagged); they do not measure a model. The live run asks the model itself.</p>
 {% endif %}
 
 {% if agr %}

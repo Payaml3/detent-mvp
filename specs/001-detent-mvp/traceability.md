@@ -1129,7 +1129,7 @@ Sources: [spec/00 §product-principles](../../spec/00-product-context.md#product
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [SHD-01](../../backlog/user-stories.md#shd-01) | L | 0 | Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed | planned | integration: `apps/api/tests/integration/test_shd_01.py` |
-| [SHD-02](../../backlog/user-stories.md#shd-02) | L | 0 | Sections: decision mix, agreement, unsafe approvals (approved by Detent but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF | planned | integration: `apps/api/tests/integration/test_shd_02.py` |
+| [SHD-02](../../backlog/user-stories.md#shd-02) | L | 0 | Sections: decision mix, agreement, unsafe approvals (approved by Dekernai but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF | planned | integration: `apps/api/tests/integration/test_shd_02.py` |
 | [SHD-03](../../backlog/user-stories.md#shd-03) | L | 0 | Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change | planned | integration: `apps/api/tests/integration/test_shd_03.py` |
 | [SHD-04](../../backlog/user-stories.md#shd-04) | L | 0 | Raw names and account identifiers never stored; hashes are consistent within one import | planned | integration: `apps/api/tests/integration/test_shd_04.py` |
 
@@ -1157,7 +1157,7 @@ Sources: [spec/03 §standards](../../spec/03-api.md#standards); [spec/03 §error
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 1 | Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable` | done | `integration/test_intents_api.py::test_wrong_scope_is_403`<br>`integration/test_api.py::test_live_keys_are_always_rejected` |
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 2 | Every data access filters by the key's organisation (cross-organisation tests in EVL-02) | planned | contract: `apps/api/tests/integration/test_api_01.py` |
 | [API-02](../../backlog/user-stories.md#api-02) | P1 | 0 | Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs | planned | contract: `apps/api/tests/integration/test_api_02.py` |
-| [API-03](../../backlog/user-stories.md#api-03) | P1 | 0 | `Detent-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400 | planned | contract: `apps/api/tests/integration/test_api_03.py` |
+| [API-03](../../backlog/user-stories.md#api-03) | P1 | 0 | `Dekernai-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400 | planned | contract: `apps/api/tests/integration/test_api_03.py` |
 | [API-04](../../backlog/user-stories.md#api-04) | P1 | 0 | `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After` | planned | contract: `apps/api/tests/integration/test_api_04.py` |
 
 ## FR-101 · API (confirmed)
@@ -1195,7 +1195,7 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks)
 |---|---|---|---|---|---|
 | [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 0 | Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break) | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
 | [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 1 | Signing secret shown once; events carry `id` and a per-payment `sequence` | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
-| [WHK-02](../../backlog/user-stories.md#whk-02) | P1 | 0 | `Detent-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language) | planned | integration: `apps/api/tests/integration/test_whk_02.py` |
+| [WHK-02](../../backlog/user-stories.md#whk-02) | P1 | 0 | `Dekernai-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language) | planned | integration: `apps/api/tests/integration/test_whk_02.py` |
 | [WHK-03](../../backlog/user-stories.md#whk-03) | P1 | 0 | Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event' | planned | integration: `apps/api/tests/integration/test_whk_03.py` |
 
 ## FR-104 · Webhooks (confirmed)
@@ -1218,7 +1218,7 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks); [spec/02 §entitie
 |---|---|---|---|---|---|
 | [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 0 | Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break) | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
 | [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 1 | Signing secret shown once; events carry `id` and a per-payment `sequence` | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
-| [WHK-02](../../backlog/user-stories.md#whk-02) | P1 | 0 | `Detent-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language) | planned | integration: `apps/api/tests/integration/test_whk_02.py` |
+| [WHK-02](../../backlog/user-stories.md#whk-02) | P1 | 0 | `Dekernai-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language) | planned | integration: `apps/api/tests/integration/test_whk_02.py` |
 
 ## FR-105 · Dashboard (confirmed)
 

@@ -16,7 +16,7 @@ Deterministic test values (SBX-01): an amount ending in .13 is accepted but its 
 until the client times out, then it settles; an amount ending in .42 fails technically. A configurable
 failure rate fails a deterministic share of keys.
 
-Storage: its own Postgres schema ``banksim``; it never touches Detent's tables.
+Storage: its own Postgres schema ``banksim``; it never touches Dekernai's tables.
 Run it with ``uvicorn banksim.app:create_app --factory --port 8100``.
 """
 
@@ -100,7 +100,7 @@ class Config:
 
 
 def _now() -> datetime:
-    return datetime.now(UTC)  # the simulator is a separate app; it is not bound by Detent's Clock
+    return datetime.now(UTC)  # the simulator is a separate app; it is not bound by Dekernai's Clock
 
 
 def _fails(key: str, rate: float) -> bool:
@@ -136,7 +136,7 @@ def create_app(database_url: str | None = None, config: Config | None = None) ->
     engine: Engine = create_engine(url)
     with engine.begin() as conn:
         conn.exec_driver_sql(DDL)
-    app = FastAPI(title="Detent bank simulator (test only; not a real bank)")
+    app = FastAPI(title="Dekernai bank simulator (test only; not a real bank)")
     app.state.config = cfg
     held_once: set[str] = set()
     lock = threading.Lock()
@@ -152,7 +152,7 @@ def create_app(database_url: str | None = None, config: Config | None = None) ->
         out = [_row(r) for r in rows]
         if cfg.callback_url:
             for p in out:
-                with contextlib.suppress(httpx.HTTPError):  # best effort; Detent also polls
+                with contextlib.suppress(httpx.HTTPError):  # best effort; Dekernai also polls
                     httpx.post(cfg.callback_url, json={"key": p["key"], "status": p["status"]}, timeout=3)
         return out
 
