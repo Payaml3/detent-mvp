@@ -1,14 +1,11 @@
 ---
-// The brand mark, "sift then settle" (B-01): many inputs above a rule, one settled outcome below it.
-// Five dots, then three, cross the rule; one dot settles in the --settle colour.
+// The brand mark, the "settled D": a D monogram with one point resting in its counter, the one
+// outcome the rules settle on. The D takes currentColor; the point is --settle (safety orange).
+// Rules and lockups: docs/brand/logo.md and apps/site/public/brand/.
 interface Props { size?: number; }
 const { size = 22 } = Astro.props;
 ---
-<svg class="mark" viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
-  <g fill="currentColor">
-    <circle cx="3.5" cy="4" r="1.6" /><circle cx="8.25" cy="4" r="1.6" /><circle cx="12" cy="4" r="1.6" /><circle cx="15.75" cy="4" r="1.6" /><circle cx="20.5" cy="4" r="1.6" />
-    <circle cx="7.5" cy="10" r="1.7" /><circle cx="12" cy="10" r="1.7" /><circle cx="16.5" cy="10" r="1.7" />
-  </g>
-  <rect x="2" y="14" width="20" height="1.6" fill="currentColor" />
-  <circle cx="12" cy="20" r="2.9" fill="var(--settle)" />
+<svg class="mark" viewBox="0 0 48 48" width={size} height={size} aria-hidden="true">
+  <path fill="currentColor" fill-rule="evenodd" d="M5 4H23A20 20 0 0 1 23 44H5Z M13 12V36H23A12 12 0 0 0 23 12Z" />
+  <circle cx="22" cy="30.5" r="5.5" fill="var(--settle)" />
 </svg>
