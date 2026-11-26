@@ -1,0 +1,8 @@
+# API-05: lint rules for docs/api/openapi.json (CI: `lint and generated documents`).
+extends:
+  - recommended
+rules:
+  # The sandbox address is published at launch; until then the spec names the local server.
+  no-server-example.com: off
+  security-defined: error
+  operation-4xx-response: error

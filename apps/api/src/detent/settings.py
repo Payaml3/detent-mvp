@@ -101,6 +101,10 @@ class Settings(BaseSettings):
     worker_max_attempts: int = 8
     # API-04: requests per key per minute (the per-address ceiling is 10 times this).
     api_rate_limit_per_minute: int = 120
+    # WHK-03: webhook delivery. Plain http:// and private or loopback addresses are refused unless this is
+    # set, which is allowed only in dev and test (a local receiver); the public sandbox never reaches inside.
+    webhook_allow_private_urls: bool = False
+    webhook_timeout_seconds: float = 10.0  # G-20
     # Extra handler modules, for tests only (rejected outside APP_ENV=test).
     worker_extra_handler_modules: Annotated[tuple[str, ...], NoDecode] = ()
 
@@ -134,6 +138,8 @@ class Settings(BaseSettings):
                 )
         if self.worker_extra_handler_modules and self.app_env != "test":
             raise ValueError("WORKER_EXTRA_HANDLER_MODULES is only allowed with APP_ENV=test")
+        if self.webhook_allow_private_urls and self.app_env not in ("dev", "test"):
+            raise ValueError("WEBHOOK_ALLOW_PRIVATE_URLS is only allowed with APP_ENV=dev or test")
         if self.app_env in ("demo", "sandbox"):
             for name in ("demo_password", "session_secret"):
                 val: SecretStr = getattr(self, name)

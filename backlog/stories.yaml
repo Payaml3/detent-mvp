@@ -1002,6 +1002,7 @@ stories:
   ac:
     - "GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve`"
     - "Same rules as the console: re-run, separation of duties, 409 on double approval"
+  done: [0, 1]
   pri: Must
   est: 0.25
   deps: [EXC-04]
@@ -1722,6 +1723,7 @@ stories:
   ac:
     - "Generated from FastAPI, then completed with descriptions, examples and error responses"
     - "Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift"
+  done: [0, 1]
   pri: Must
   est: 1.5
   deps: [API-02, EXC-08, LED-03]
@@ -1749,6 +1751,7 @@ stories:
   so: I can poll if I can't receive webhooks
   ac:
     - "Same event objects as webhooks; filter by type and payment ID"
+  done: [0]
   pri: Should
   est: 0.25
   deps: [WHK-01]
@@ -1765,6 +1768,7 @@ stories:
   ac:
     - "Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break)"
     - "Signing secret shown once; events carry `id` and a per-payment `sequence`"
+  done: [0, 1]
   pri: Must
   est: 0.5
   deps: [API-01]
@@ -1791,6 +1795,7 @@ stories:
   so: I never silently miss an event
   ac:
     - "Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event'"
+  done: [0]
   pri: Must
   est: 0.5
   deps: [WHK-02, FND-06]

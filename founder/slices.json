@@ -618,7 +618,7 @@
    "epic": "EXC",
    "slice": "P1",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "EXC-09",
@@ -961,7 +961,7 @@
    "epic": "API",
    "slice": "P1",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "API-06",
@@ -975,14 +975,14 @@
    "epic": "API",
    "slice": "P1",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "WHK-01",
    "epic": "WHK",
    "slice": "P1",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "WHK-02",
@@ -996,7 +996,7 @@
    "epic": "WHK",
    "slice": "P1",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DSH-01",

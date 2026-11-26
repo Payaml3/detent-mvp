@@ -38,7 +38,10 @@ Base URL (placeholder): `https://sandbox.api.<domain>/v1`. Every request uses TL
 | GET `/policy/versions`, GET `/policy/versions/{v}` | read | POL-01 | Read rule versions (changes happen in the console) |
 | POST `/kill_switch` and DELETE `/kill_switch` | admin | EXE-08 | Engage, and release (payments lead only) |
 | GET `/reconciliation/runs`, GET `/reconciliation/breaks` | read | LED-06 | Results and breaks |
-| GET `/events` | read | API-07 | Polling alternative to webhooks |
+| GET `/events`, GET `/events/{id}` | read | API-07 | Polling alternative to webhooks; filters `type`, `payment_id`, `test` |
+| POST `/webhook_endpoints`, GET `/webhook_endpoints`, GET and DELETE `/webhook_endpoints/{id}` | admin (read for GET) | WHK-01 | Register (`Idempotency-Key` required; the secret is in the first response only), list, read and disable endpoints |
+| POST `/webhook_endpoints/{id}/test`, POST `/webhook_endpoints/{id}/resend` | admin | WHK-03 | Send a `webhook.test` event; resend one event by `event_id` |
+| GET `/webhook_endpoints/{id}/deliveries` | read | WHK-03 | Delivery log: attempt, status, response time, outcome |
 | POST `/sandbox/reset` | admin | SBX-04 | Reset the organisation's test data by starting a new data generation; nothing is deleted (D-08) |
 | POST `/sandbox/scenarios` | admin | DSH-07 | Force the next payment's scenario: `timeout_unknown`, `rail_failure`, `flagged_address` |
 
@@ -110,7 +113,6 @@ Event types:
 - `exception.created`
 - `exception.overdue`
 - `exception.resolved`
-- `deposit.received`
 - `deposit.credited`
 - `deposit.exception`
 - `reconciliation.break`
@@ -125,6 +127,8 @@ Event envelope:
 ```
 
 The signature header is `DekernAI-Signature: t=1764756000,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>`. Reject any delivery whose timestamp is more than 300 s from now. Delivery is at least once, so deduplicate on `id`. `sequence` increases per payment.
+
+`deposit.received` (funds seen, not yet credited) is planned; nothing emits it yet, so endpoints cannot subscribe to it.
 
 ## Error codes
 
@@ -146,3 +150,28 @@ Codes planned by later stories join the catalogue with the code that returns the
   `idempotency_key`, paged with `limit` and `starting_after`. Metadata only: no bodies, no query strings, no keys.
   The worker deletes rows older than 30 days (`detent/db/retention.py`); reads never show them.
 - **Errors (API-02):** framework errors (404, 405 and others) use the same envelope as every other error.
+
+## As built (P1 group 2)
+
+- **OpenAPI (API-05):** `docs/api/openapi.json` (OpenAPI 3.1) is generated from the routes by
+  `detent/api/openapi.py` (`make openapi`), which adds summaries, success schemas, every catalogued error with an
+  example, rate-limit headers and one `webhooks` entry per event type. A unit test fails if the file drifts or a
+  `/v1` route has no entry; CI lints it with Redocly (`redocly.yaml`). The server is localhost until the public
+  sandbox address exists (S9).
+- **Events (WHK-01, API-07):** written by `audit.log.append` in the same transaction as the change, so a rolled-back
+  change has no event. `sequence` is per payment (per subject for events without one). Stored events are
+  append-only (database triggers). `GET /v1/events` returns the same envelope the webhook delivers.
+- **Endpoints (WHK-01):** at most 16 enabled per organisation; https only; no credentials, private, loopback,
+  link-local or `.local`/`.internal` hosts (`WEBHOOK_ALLOW_PRIVATE_URLS` lifts this in dev and test only). Secrets
+  are stored encrypted with `CREDENTIALS_ENCRYPTION_KEY`; without the key, creation is 503 `webhooks_unavailable`.
+  An idempotent replay of the create call returns `secret: null`.
+- **Delivery (WHK-03):** one `webhook.deliver` job per endpoint and event, at least once. Timeout 10 s, no
+  redirects; any 2xx succeeds. Retries after 1 m, 5 m, 30 m, 2 h, 6 h and 24 h, then the delivery is `failed`
+  (G-20). Each attempt is logged with status code, latency and outcome. Known limit: the host's addresses are
+  checked when the delivery runs, so a DNS answer that changes between the check and the connection (rebinding)
+  is not caught; pinning the resolved address is a follow-up before production.
+- **Signing (WHK-02):** `detent/webhooks/signing.py` signs and verifies. The verify helpers in each docs language,
+  with their tests, come with the docs snippets (DOC-04), so WHK-02 stays open until then.
+- **Exceptions (EXC-08):** `GET /v1/exceptions` filters `status` (open, resolved), `owner`, `tier`, `overdue`, paged
+  with `starting_after`; `GET /v1/exceptions/{id}` shows raw facts first, then rule hits, the investigation and
+  history.

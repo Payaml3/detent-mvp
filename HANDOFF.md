@@ -16,8 +16,9 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | S0 to S7 (prototype engine: decide, send once, review, never twice, agent + mandates, operations, ledger, deposits, reconciliation, replay) | done | `main` |
 | S8 Proof and release gate | done | `main` |
 | **S9 Demo-ready prototype in the EU** | **code merged; deploy and live testnet run pending** | `main` (the live-run fixes come back as one PR) |
-| P1 Sandbox API and webhooks | **next: starts now, while the S9 live run waits** | branch from `main` |
-| P2 Dashboard, P3 Docs and SDKs, P4 Website launch | todo, in this order | |
+| P1 Sandbox API and webhooks | **built except WHK-02's per-language tests (DOC-04, P3)** | `main` |
+| P2 Dashboard and sandbox | **next** | branch from `main` |
+| P3 Docs and SDKs, P4 Website launch | todo, in this order | |
 | L After launch (Should and Could) | todo | |
 
 Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
@@ -124,10 +125,16 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   error-code catalogue is `detent/api/error_codes.py` (`make error-docs` writes `docs/api/errors.md`; the test session
   fails on an uncatalogued code); `DekernAI-Version` with the organisation's pinned default; per-key and per-address
   rate limits; `GET /v1/request_logs` with a 30-day worker sweep. See spec/03 "As built (P1 group 1)".
-- **P1 group 2, next:** WHK-01 to WHK-03, EXC-08, API-07 and API-05 (the OpenAPI file last, as it depends on EXC-08).
-  No P1 story depends on S9. See `specs/001-detent-mvp/slices.yaml` (P1). · Model: strongest (API and webhooks touch
-  money paths)
-- **Then:** P2, P3, P4 (WEB-07 waits on the FND-07 deploy), L.
+- **P1 group 2: built (second PR from `claude/project-thread-babje1`, 2026-11-26):** WHK-01, WHK-03, API-05,
+  API-07, EXC-08. Events come from `audit.log.append` in the same transaction (`detent/webhooks/events.py`);
+  endpoints with encrypted secrets and an SSRF guard; signed delivery jobs with the G-20 retries and a delivery log;
+  `GET /v1/events` and `GET /v1/exceptions`; `docs/api/openapi.json` from `make openapi`, Redocly-linted in CI.
+  Read-only views shared by the API, console and webhooks moved to `detent/views/`. WHK-02 stays open until the
+  docs verify helpers have tests in every language (DOC-04). DNS rebinding at delivery is a known follow-up.
+  See spec/03 "As built (P1 group 2)".
+- **P2 next:** DSH-01 to DSH-07, DSH-09 to DSH-12, SBX-01, SBX-02, SBX-04, RAL-11. · Model: strongest for the
+  auth and roles group (DSH-01, DSH-02), mid-tier for the screens
+- **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items
 

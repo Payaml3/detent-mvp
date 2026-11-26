@@ -29,6 +29,8 @@ people and may change. Quote `request_id` when you contact DekernAI; it is also 
 | `mandate_invalid` | 422 | The mandate is unknown, revoked, expired or not signed for this agent. | Use an active mandate ID for the agent's key. |
 | `user_payouts_unavailable` | 422 | Payouts to end users are not available in the sandbox yet. | Pay a counterparty instead. |
 | `invalid_mode` | 422 | The execution mode is not one of `shadow`, `assist` or `auto`. | Send one of the three modes. |
+| `invalid_url` | 422 | The webhook URL is not https://, carries credentials, or points at a private address. | Use a public https:// URL. |
+| `unknown_event_type` | 422 | An event type is not one of the documented types. | Use the types listed in the webhooks reference, or "*" for all. |
 | `reason_required` | 422 | This action needs a written reason. | Send a non-empty `reason`. |
 
 ## `authentication`
@@ -66,6 +68,8 @@ people and may change. Quote `request_id` when you contact DekernAI; it is also 
 | `already_resolved` | 409 | The case was already approved or rejected. | Read the case to see its outcome. |
 | `payment_blocked` | 409 | The payment was BLOCKED. A block is final and is never approved, retried or resent. | Create a new intent only if the reason for the block no longer applies. |
 | `resolve_via_reconciliation` | 409 | The payment's outcome is UNKNOWN; only rail evidence through reconciliation can resolve it. | Wait for reconciliation. Never resend while the outcome is UNKNOWN. |
+| `too_many_endpoints` | 409 | The organisation already has the maximum number of enabled webhook endpoints. | Disable an endpoint you no longer use. |
+| `endpoint_disabled` | 409 | The webhook endpoint is disabled. | Create a new endpoint. |
 | `shadow_mode` | 409 | The organisation is in shadow mode, so nothing is sent. | Switch to assist or auto mode in the console to send. |
 
 ## `rate_limit`
@@ -78,4 +82,5 @@ people and may change. Quote `request_id` when you contact DekernAI; it is also 
 
 | Code | HTTP | Meaning | What to do |
 |---|---|---|---|
+| `webhooks_unavailable` | 503 | Webhooks are not configured on this instance, so no endpoint can be created or signed. | Contact DekernAI; nothing was created. |
 | `internal_error` | 500 | Something went wrong on DekernAI's side. Nothing was executed because of it. | Retry with the same `Idempotency-Key`; quote the `request_id` if it persists. |

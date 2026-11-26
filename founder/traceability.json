@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 74,
-   "pct": 50
+   "done": 79,
+   "pct": 53
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 222,
-   "pct": 69
+   "done": 230,
+   "pct": 72
   },
   {
    "order": 3,
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 172,
+   "done": 180,
    "total": 244,
-   "pct_done": 70
+   "pct_done": 74
   },
   {
    "function": "05 QA",
@@ -75,8 +75,8 @@
    "role": "engineer",
    "stories": 7,
    "criteria": 10,
-   "criteria_done": 6,
-   "pct_done": 60
+   "criteria_done": 9,
+   "pct_done": 90
   },
   {
    "code": "AUD",
@@ -138,8 +138,8 @@
    "role": "engineer",
    "stories": 9,
    "criteria": 21,
-   "criteria_done": 16,
-   "pct_done": 76
+   "criteria_done": 18,
+   "pct_done": 86
   },
   {
    "code": "EXE",
@@ -246,8 +246,8 @@
    "role": "engineer",
    "stories": 3,
    "criteria": 4,
-   "criteria_done": 0,
-   "pct_done": 0
+   "criteria_done": 3,
+   "pct_done": 75
   }
  ],
  "stories": [
@@ -857,9 +857,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "EXC-09",
@@ -1347,9 +1347,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "API-06",
@@ -1367,9 +1367,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "WHK-01",
@@ -1377,9 +1377,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "WHK-02",
@@ -1397,9 +1397,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DSH-01",

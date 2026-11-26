@@ -37,6 +37,7 @@ class Worker:
         self._last_log_purge: float | None = None
         importlib.import_module("detent.execution.jobs")  # payment.send, payment.confirm
         importlib.import_module("detent.exceptions.investigation_job")  # case.investigate (EXC-03)
+        importlib.import_module("detent.webhooks.delivery")  # webhook.deliver (WHK-03)
         for mod in rt.settings.worker_extra_handler_modules:
             importlib.import_module(mod)
 

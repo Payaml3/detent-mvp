@@ -19,6 +19,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from detent import logging as dlog
 from detent.api import v1
+from detent.api import webhooks as v1_webhooks
 from detent.api.auth import AuthError
 from detent.api.error_codes import HTTP_STATUS_CODES
 from detent.api.errors import error_response
@@ -76,6 +77,7 @@ def create_app(
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
     app.include_router(console_routes.router)
     app.include_router(v1.router)
+    app.include_router(v1_webhooks.router)
     app.state.screening = MockScreening.from_fixture()
 
     def _err(status: int, type_: str, code: str, message: str, param: str | None = None) -> Response:

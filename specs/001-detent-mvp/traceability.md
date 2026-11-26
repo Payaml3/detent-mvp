@@ -851,8 +851,8 @@ Sources: [spec/00 §who-uses-the-mvp](../../spec/00-product-context.md#who-uses-
 | [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 0 | Approve re-runs policy with the active version and fresh data; a new BLOCK stays blocked; a new escalation reason opens a new case; otherwise the payment proceeds per mode | done | `integration/test_cases.py::test_approval_reruns_policy_and_proceeds`<br>`integration/test_cases.py::test_changed_facts_after_escalation_open_a_new_case`<br>`integration/test_cases.py::test_a_new_block_on_rerun_stays_blocked`<br>`chain/test_review_loop.py::test_first_payment_escalates_is_approved_and_sent_once` |
 | [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 1 | Reject -> REJECTED (terminal); a reason is required for both | done | `integration/test_cases.py::test_reject_is_terminal_and_needs_a_reason` |
 | [EXC-04](../../backlog/user-stories.md#exc-04) | S3 | 2 | The approver can't be the user who initiated the intent | done | `integration/test_cases.py::test_initiator_cannot_approve`<br>`integration/test_cases.py::test_api_approval_errors` |
-| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 0 | GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve` | planned | integration: `apps/api/tests/integration/test_exc_08.py` |
-| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 1 | Same rules as the console: re-run, separation of duties, 409 on double approval | planned | integration: `apps/api/tests/integration/test_exc_08.py` |
+| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 0 | GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve` | done | `integration/test_exceptions_api.py::test_filters_and_paging`<br>`integration/test_exceptions_api.py::test_approving_needs_the_approve_scope` |
+| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 1 | Same rules as the console: re-run, separation of duties, 409 on double approval | done | `integration/test_cases.py::test_api_approval_errors`<br>`integration/test_cases.py::test_parallel_approvals_through_api_and_console`<br>`integration/test_cases.py::test_initiator_cannot_approve` |
 
 ## FR-076 · Exceptions (confirmed)
 
@@ -897,8 +897,8 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints); [EXC-09 criteria
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 0 | GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve` | planned | integration: `apps/api/tests/integration/test_exc_08.py` |
-| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 1 | Same rules as the console: re-run, separation of duties, 409 on double approval | planned | integration: `apps/api/tests/integration/test_exc_08.py` |
+| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 0 | GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve` | done | `integration/test_exceptions_api.py::test_filters_and_paging`<br>`integration/test_exceptions_api.py::test_approving_needs_the_approve_scope` |
+| [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 1 | Same rules as the console: re-run, separation of duties, 409 on double approval | done | `integration/test_cases.py::test_api_approval_errors`<br>`integration/test_cases.py::test_parallel_approvals_through_api_and_console`<br>`integration/test_cases.py::test_initiator_cannot_approve` |
 | [EXC-09](../../backlog/user-stories.md#exc-09) | L | 0 | Per period: cases, agreement rate, disagreements listed with both rationales | planned | integration: `apps/api/tests/integration/test_exc_09.py` |
 
 ## FR-080 · Ledger (confirmed)
@@ -1183,10 +1183,10 @@ Sources: [spec/03 §03--public-api-sandbox](../../spec/03-api.md#03--public-api-
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [API-05](../../backlog/user-stories.md#api-05) | P1 | 0 | Generated from FastAPI, then completed with descriptions, examples and error responses | planned | contract: `apps/api/tests/integration/test_api_05.py` |
-| [API-05](../../backlog/user-stories.md#api-05) | P1 | 1 | Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift | planned | contract: `apps/api/tests/integration/test_api_05.py` |
+| [API-05](../../backlog/user-stories.md#api-05) | P1 | 0 | Generated from FastAPI, then completed with descriptions, examples and error responses | done | `unit/test_openapi.py::test_every_v1_route_is_described`<br>`unit/test_openapi.py::test_refs_resolve_and_examples_use_catalogued_codes` |
+| [API-05](../../backlog/user-stories.md#api-05) | P1 | 1 | Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift | done | `unit/test_openapi.py::test_the_committed_file_matches_the_code`<br>`manual:CI step 'OpenAPI file is valid (API-05)' runs Redocly lint (redocly.yaml)` |
 | [API-06](../../backlog/user-stories.md#api-06) | P1 | 0 | Stored per organisation for 30 days; bodies redacted; filterable in the dashboard | done | `integration/test_request_logs.py::test_calls_are_logged_with_key_payment_and_no_body`<br>`integration/test_request_logs.py::test_the_retention_sweep_deletes_only_old_rows`<br>`integration/test_request_logs.py::test_logs_page_with_starting_after_and_filter_by_status`<br>`manual:the dashboard screen over GET /v1/request_logs is DSH 'Request logs page' (P2)` |
-| [API-07](../../backlog/user-stories.md#api-07) | P1 | 0 | Same event objects as webhooks; filter by type and payment ID | planned | contract: `apps/api/tests/integration/test_api_07.py` |
+| [API-07](../../backlog/user-stories.md#api-07) | P1 | 0 | Same event objects as webhooks; filter by type and payment ID | done | `integration/test_webhooks.py::test_events_filter_by_type_and_page`<br>`integration/test_webhooks.py::test_deliveries_are_signed_and_logged` |
 
 ## FR-103 · Webhooks (confirmed)
 
@@ -1196,10 +1196,10 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 0 | Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break) | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
-| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 1 | Signing secret shown once; events carry `id` and a per-payment `sequence` | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
+| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 0 | Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break) | done | `unit/test_webhook_rules.py::test_event_types_match_spec_03`<br>`unit/test_webhook_rules.py::test_payment_status_changes_map_to_event_types` |
+| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 1 | Signing secret shown once; events carry `id` and a per-payment `sequence` | done | `integration/test_webhooks.py::test_the_secret_is_shown_once_and_stored_encrypted`<br>`integration/test_webhooks.py::test_events_carry_id_and_a_per_payment_sequence` |
 | [WHK-02](../../backlog/user-stories.md#whk-02) | P1 | 0 | `DekernAI-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language) | planned | integration: `apps/api/tests/integration/test_whk_02.py` |
-| [WHK-03](../../backlog/user-stories.md#whk-03) | P1 | 0 | Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event' | planned | integration: `apps/api/tests/integration/test_whk_03.py` |
+| [WHK-03](../../backlog/user-stories.md#whk-03) | P1 | 0 | Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event' | done | `integration/test_webhooks.py::test_deliveries_are_signed_and_logged`<br>`integration/test_webhooks.py::test_failures_retry_on_the_g20_schedule_then_fail`<br>`integration/test_webhooks.py::test_send_test_event_and_manual_resend` |
 
 ## FR-104 · Webhooks (confirmed)
 
@@ -1209,7 +1209,7 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [WHK-03](../../backlog/user-stories.md#whk-03) | P1 | 0 | Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event' | planned | integration: `apps/api/tests/integration/test_whk_03.py` |
+| [WHK-03](../../backlog/user-stories.md#whk-03) | P1 | 0 | Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event' | done | `integration/test_webhooks.py::test_deliveries_are_signed_and_logged`<br>`integration/test_webhooks.py::test_failures_retry_on_the_g20_schedule_then_fail`<br>`integration/test_webhooks.py::test_send_test_event_and_manual_resend` |
 
 ## FR-113 · Webhooks (confirmed)
 
@@ -1219,8 +1219,8 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks); [spec/02 §entitie
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 0 | Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break) | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
-| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 1 | Signing secret shown once; events carry `id` and a per-payment `sequence` | planned | integration: `apps/api/tests/integration/test_whk_01.py` |
+| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 0 | Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break) | done | `unit/test_webhook_rules.py::test_event_types_match_spec_03`<br>`unit/test_webhook_rules.py::test_payment_status_changes_map_to_event_types` |
+| [WHK-01](../../backlog/user-stories.md#whk-01) | P1 | 1 | Signing secret shown once; events carry `id` and a per-payment `sequence` | done | `integration/test_webhooks.py::test_the_secret_is_shown_once_and_stored_encrypted`<br>`integration/test_webhooks.py::test_events_carry_id_and_a_per_payment_sequence` |
 | [WHK-02](../../backlog/user-stories.md#whk-02) | P1 | 0 | `DekernAI-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language) | planned | integration: `apps/api/tests/integration/test_whk_02.py` |
 
 ## FR-105 · Dashboard (confirmed)
