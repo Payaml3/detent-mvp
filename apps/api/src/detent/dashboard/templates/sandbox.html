@@ -2,9 +2,9 @@
 {% block title %}Sandbox{% endblock %}
 {% block main %}
 <h1>Sandbox controls</h1>
-<p class="muted">Run a test scenario on demand, or move between the simulated chain and real test networks. Every action is recorded in the audit log. The test values work from the API too: see the docs.</p>
+<p class="muted">Run a test scenario on demand, move between the simulated chain and real test networks, or reset your test data. Every action is recorded in the audit log. The test values work from the API too: see the docs.</p>
 {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
-{% set n = {"scenario": "Scenario started. Its payout is at the top of the list below; refresh to follow it.", "rails": "Rails changed."}.get(request.query_params.get('notice')) %}
+{% set n = {"scenario": "Scenario started. Its payout is at the top of the list below; refresh to follow it.", "rails": "Rails changed.", "reset": "Test data reset. Earlier payments, cases, logs and events are hidden; nothing was deleted."}.get(request.query_params.get('notice')) %}
 {% if n %}<p class="note" role="status">{{ n }}</p>{% endif %}
 {% if mode == 'shadow' %}<p class="note" role="status">The organisation is in shadow mode, so payouts are decided but never sent. Switch to assist or auto mode in the console to see scenarios reach the rail.</p>{% endif %}
 
@@ -39,8 +39,22 @@
     {% endif %}
   </form>
   {% endif %}
-  <p class="muted small">Reset of test data arrives in a later part of the sandbox build.</p>
 </section>
+
+{% if kind in ('client', 'evaluation', 'sandbox') %}
+<section class="card">
+  <h2>Reset test data</h2>
+  <p>Start clean: payment and deposit intents, exception cases, ledger entries, request logs and webhook events from before the reset are hidden from the API and this dashboard. Nothing is deleted, and the audit log keeps every row. Your API keys, webhook endpoints, team and settings stay as they are.</p>
+  <p class="muted small">Usage quotas and limits carry on through a reset, and an idempotency key you used before it still returns its first response. A payout that can still be sent must finish first. Resets so far: {{ generation }}.</p>
+  {% if not lock %}
+  <form method="post" action="/dashboard/sandbox/reset">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Type <span class="mono">reset</span> to confirm <input name="confirm" autocomplete="off" required></label>
+    <button>Reset test data</button>
+  </form>
+  {% endif %}
+</section>
+{% endif %}
 
 <h2>Recent payouts</h2>
 <table>

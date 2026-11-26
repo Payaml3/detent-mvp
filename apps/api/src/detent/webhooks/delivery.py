@@ -107,7 +107,12 @@ def resend(conn: Connection, clock: Clock, *, org_id: str, endpoint_id: str, eve
     """Manual resend from the delivery log: a fresh chain of attempts, whatever happened before."""
     endpoints.get(conn, org_id, endpoint_id)
     found = conn.execute(
-        text("SELECT 1 FROM webhook_events WHERE org_id=:o AND id=:e"), {"o": org_id, "e": event_id}
+        text(
+            "SELECT 1 FROM webhook_events WHERE org_id=:o AND id=:e "
+            # SBX-04: an earlier generation's event is hidden
+            "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
+        ),
+        {"o": org_id, "e": event_id},
     ).one_or_none()
     if found is None:
         raise endpoints.EndpointError("not_found", "No such event.", status=404, param="event_id")
@@ -243,7 +248,9 @@ def list_deliveries(
         text(
             "SELECT d.*, e.type FROM webhook_deliveries d JOIN webhook_events e "
             "ON e.org_id = d.org_id AND e.id = d.event_id "
-            "WHERE d.org_id=:o AND d.endpoint_id=:ep AND (CAST(:after AS TEXT) IS NULL OR d.pos < "
+            "WHERE d.org_id=:o AND d.endpoint_id=:ep "
+            "AND e.generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
+            "AND (CAST(:after AS TEXT) IS NULL OR d.pos < "
             "(SELECT pos FROM webhook_deliveries WHERE org_id=:o AND id=:after)) "
             "ORDER BY d.pos DESC LIMIT :n"
         ),

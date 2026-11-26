@@ -178,7 +178,7 @@ def _object(
     if kind == "payment.status_changed" and subject_id:
         from detent.views.payments import payment_view
 
-        view = payment_view(conn, org_id, subject_id) or {"id": subject_id}
+        view = payment_view(conn, org_id, subject_id, any_generation=True) or {"id": subject_id}
         return {"object": "payment_intent", **view}, subject_id
     if kind.startswith("case.") and subject_id:
         from detent.views.cases import case_summary

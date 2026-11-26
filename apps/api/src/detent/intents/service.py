@@ -574,7 +574,7 @@ def _record(
             ch["reason"] for ch in checks if ch.get("result") in ("ESCALATE", "BLOCK") and ch.get("reason")
         ]
         open_case(conn, clock, org_id=c.org_id, payment_id=pid, reasons=reasons, rules=policy.rules)
-    view = payment_view(conn, c.org_id, pid)
+    view = payment_view(conn, c.org_id, pid, any_generation=True)  # just written: never hidden
     assert view is not None
     if c.decision_only:
         code, body = 200, {**view["decision"], "payment_id": pid, "executed": False}

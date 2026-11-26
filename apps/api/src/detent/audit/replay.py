@@ -129,7 +129,10 @@ def replay_payment(engine: Engine, clock: Clock, *, org_id: str, payment_id: str
 
     with engine.connect() as conn:
         p = conn.execute(
-            text("SELECT id, status, source FROM payment_intents WHERE org_id=:o AND id=:p"),
+            text(
+                "SELECT id, status, source FROM payment_intents WHERE org_id=:o AND id=:p AND "
+                "generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
+            ),
             {"o": org_id, "p": payment_id},
         ).one_or_none()
         if p is None:

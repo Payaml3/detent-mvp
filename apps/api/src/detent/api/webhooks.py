@@ -259,6 +259,7 @@ def resend_event(request: Request, endpoint_id: str, body: ResendIn, principal: 
 # ------------------------------------------------------------------------------------- events (API-07)
 _EVENT_SQL = (
     "SELECT payload FROM webhook_events WHERE org_id=:o "
+    "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
     "AND (CAST(:t AS TEXT) IS NULL OR type = :t) "
     "AND (CAST(:p AS TEXT) IS NULL OR payment_id = :p) "
     "AND (CAST(:test AS BOOLEAN) IS NULL OR test = :test) "
@@ -312,7 +313,10 @@ def get_event(request: Request, event_id: str, principal: Auth) -> JSONResponse:
     rt = request.app.state.runtime
     with rt.engine.connect() as conn:
         row = conn.execute(
-            text("SELECT payload FROM webhook_events WHERE org_id=:o AND id=:e"),
+            text(
+                "SELECT payload FROM webhook_events WHERE org_id=:o AND id=:e "
+                "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
+            ),
             {"o": principal.org_id, "e": event_id},
         ).one_or_none()
     if row is None:

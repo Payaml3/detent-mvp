@@ -193,8 +193,27 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 - **Sandbox controls (DSH-07):** `/dashboard/sandbox`, for account owners, admins and developers: run a scenario
   (timeout to UNKNOWN, rail failure with failover, flagged address), each one sandbox payout to a fictional payee
   through the same decision path as the API; switch rails; recent payouts with their attempts and explorer links.
-  Audited (`sandbox.scenario_run`, `sandbox.rails_mode_changed`). Reset (SBX-04) is P2 group 3b, so DSH-07 stays
-  open.
+  Audited (`sandbox.scenario_run`, `sandbox.rails_mode_changed`, `sandbox.reset`), with the reset below.
+
+## As built (P2 group 3b)
+
+- **Sandbox reset (SBX-04, C-04, D-08):** "Reset test data" on `/dashboard/sandbox` (sandbox control, typed
+  confirmation) raises `organisations.data_generation`. A trigger stamps every new root row with the organisation's
+  generation: payment and deposit intents, exception cases, journal entries, request logs, webhook events,
+  reconciliation runs and breaks (migration 0014). The API and dashboard read only the current generation, so
+  earlier rows answer 404 or drop out of lists, and nothing is deleted. Children (attempts, decisions, postings, case
+  events, deliveries) follow their root. Keys, webhook endpoints, members, rules and settings stay. Audited
+  (`sandbox.reset`, from and to generation).
+- **Refused** while a payout could still reach a rail (READY, SUBMITTED, UNKNOWN, FAILED, or an attempt CREATED,
+  SUBMITTED or UNKNOWN), so a hidden payment never sends. An ESCALATED or HELD payment waits for an approval that no
+  screen of the new generation can give, so it stays held (invariant 7). The demo organisation has its own reset
+  (CON-09, G-26) and is refused here.
+- **Not reset, on purpose:** decision history (velocity counters, first-payment and resubmission-after-block
+  checks), so a reset can't launder a block or a limit; idempotency keys, so a retry across a reset returns its
+  first response and never pays twice; daily quotas and the shared-wallet caps; account balances, which are what
+  the rails moved. Webhook deliveries already queued for earlier events still run.
+- **For DSH-09:** the console's own list queries (overview, queues) don't filter on the generation yet; the shared
+  payment and case views do. The per-organisation console must add the filter before sandbox orgs reach it.
 
 ## Needed from the founder before M8 to M11
 

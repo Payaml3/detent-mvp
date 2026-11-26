@@ -10,6 +10,8 @@ from typing import Any
 
 from sqlalchemy import Connection, text
 
+from detent.sandbox.generations import CURRENT
+
 _CASE_COLS = (
     "id, type, status, payment_id, deposit_id, tier, reasons, owner_id, backup_owner_id, deadline_at, "
     "resolution, resolution_reason, resolved_by, resolved_at, created_at"
@@ -64,7 +66,7 @@ def list_cases(
     statuses = {"open": ["OPEN", "HELD_OVERDUE"], "resolved": ["RESOLVED"]}.get(status or "")
     rows = conn.execute(
         text(
-            f"SELECT {_CASE_COLS} FROM exception_cases WHERE org_id=:o "  # noqa: S608 - constant columns
+            f"SELECT {_CASE_COLS} FROM exception_cases WHERE org_id=:o AND {CURRENT} "  # noqa: S608
             "AND (CAST(:st AS TEXT[]) IS NULL OR status = ANY(CAST(:st AS TEXT[]))) "
             "AND (CAST(:own AS TEXT) IS NULL OR owner_id = :own) "
             "AND (CAST(:tier AS INTEGER) IS NULL OR tier = :tier) "
@@ -91,10 +93,12 @@ def list_cases(
 def case_detail(conn: Connection, org_id: str, case_id: str) -> dict[str, Any] | None:
     """Raw facts first, then the rule hits, the agent's evidence and the case history (EXC-02, EXC-03)."""
     r = conn.execute(
-        text(f"SELECT {_CASE_COLS} FROM exception_cases WHERE org_id=:o AND id=:c"),  # noqa: S608
+        text(
+            f"SELECT {_CASE_COLS} FROM exception_cases WHERE org_id=:o AND id=:c AND {CURRENT}"  # noqa: S608
+        ),
         {"o": org_id, "c": case_id},
     ).one_or_none()
-    if r is None:
+    if r is None:  # missing, or from an earlier data generation (SBX-04)
         return None
     out = summary_json(r)
     out["resolution_reason"] = r.resolution_reason
