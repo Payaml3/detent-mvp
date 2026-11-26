@@ -1,13 +1,8 @@
 ---
 import config from "../../site.config.mjs";
 import Board from "./Board.astro";
-// Landing UX §3.7: who it's for, in one compact row, then the questions buyers ask first.
-const cases = [
-  { name: "Payout platforms", line: "Creator and contractor payouts, each decided before it moves.", status: "CONFIRMED", label: "EXECUTE", reason: "Routine payout within limits" },
-  { name: "Crypto service providers", line: "Withdrawals to a wallet you’ve never paid are held, not guessed.", status: "ESCALATED", label: "ESCALATE", reason: "NEW_WALLET" },
-  { name: "Brokers and prop firms", line: "Trader payouts far above their history wait for a second look.", status: "ESCALATED", label: "ESCALATE", reason: "ABOVE_NORM" },
-  { name: "Marketplaces", line: "A seller who just changed bank details doesn’t get paid on autopilot.", status: "ESCALATED", label: "ESCALATE", reason: "CHANGED_DETAILS" },
-];
+import UseCases from "./UseCases.astro";
+// Landing UX §3.7: who it's for, one platform at a time through the three layers, then the questions buyers ask first.
 const faq = [
   { q: `Does ${config.brandName} move or hold the money?`, a: `No. ${config.brandName} is agentic payment controls: it sits beside the rails and custody you already use, and your rules decide what they should do. It never holds client funds or keys.` },
   { q: "Does the AI approve payments?", a: "No. Agents prepare intents, investigate escalations and draft reconciliation fixes. Your rules make every decision, and a person approves anything the rules escalate." },
@@ -21,16 +16,11 @@ const faq = [
 ---
 <section class="section fit" data-section="use-cases" aria-labelledby="uses-title">
   <div class="wrap">
-    <h2 id="uses-title" data-reveal>For platforms that hold user balances.</h2>
-    <ul class="cases">
-      {cases.map((c, i) => (
-        <li data-card>
-          <h3>{c.name}</h3>
-          <p class="soft">{c.line}</p>
-          <p class="readout" data-ui><span class={`chip st-${c.status}`}>{c.label}</span><span class="soft code">{c.reason}</span></p>
-        </li>
-      ))}
-    </ul>
+    <div class="uc-head">
+      <h2 id="uses-title" data-reveal>For every platform that holds user balances.</h2>
+      <p class="lead soft" data-reveal>Pick a platform and watch its process run: the agent prepares the payment, your rules decide it, orchestration picks the best rail with alternatives ready, and operations reconciles and records it.</p>
+    </div>
+    <UseCases />
     <Board />
     <div class="faq" data-section="faq">
       <h2 class="faq-title" data-reveal>Questions</h2>
@@ -47,10 +37,9 @@ const faq = [
 </section>
 <style>
   h2 { margin-bottom: 40px; max-width: 18ch; }
-  .cases { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .cases li { background: var(--surface); border-radius: var(--radius); padding: 24px; display: grid; gap: 12px; align-content: start; }
-  .readout { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
-  .readout .code { font-size: 13px; font-variant-numeric: tabular-nums; }
+  .uc-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
+  .uc-head h2 { grid-column: 1 / span 6; margin: 0; }
+  .uc-head .lead { grid-column: 8 / span 5; margin: 0; }
   .faq { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-top: var(--section); }
   .faq-title { grid-column: 1 / span 4; }
   .qs { grid-column: 6 / span 7; display: grid; gap: 6px; align-content: start; }
@@ -63,6 +52,5 @@ const faq = [
   .plus::after { transform: rotate(90deg); }
   details[open] .plus::after { transform: rotate(0deg); }
   details p { padding: 0 0 24px; color: var(--text-soft); max-width: 60ch; }
-  @media (max-width: 1000px) { .cases { grid-template-columns: repeat(2, 1fr); } .faq-title, .qs { grid-column: 1 / -1; } .faq-title { margin-bottom: 0; } }
-  @media (max-width: 600px) { .cases { grid-template-columns: 1fr; } }
+  @media (max-width: 1000px) { .uc-head h2, .uc-head .lead { grid-column: 1 / -1; } .faq-title, .qs { grid-column: 1 / -1; } .faq-title { margin-bottom: 0; } }
 </style>
