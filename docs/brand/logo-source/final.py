@@ -39,7 +39,7 @@ def main(key, out):
     # baseline; the rest of the name follows at the font's own D sidebearings.
     cap, rest = w["cap"], w["rest"]
     s = cap / 40
-    x0, x1 = 5, 43  # the D's extent on the 48-unit grid
+    x0, x1 = (5.5, 43.5) if key == "R" else (5, 43)  # the D's extent on the 48-unit grid
     mx = rest["d_lsb"] - x0 * s
     ex = rest["d_lsb"] + (x1 - x0) * s + rest["d_rsb"]
     total = ex + rest["bb"][2]
@@ -52,10 +52,15 @@ def main(key, out):
         write(f"{name}.svg", svg(f"0 {-cap - pad:.2f} {total:.2f} {cap + 2 * pad:.2f}", body))
 
     # Favicon: ink follows the browser's light or dark chrome.
-    style = f"<style>.i{{fill:{G}}}@media (prefers-color-scheme:dark){{.i{{fill:{P}}}}}</style>"
+    style = (
+        f"<style>.i{{fill:{G}}}.s{{stroke:{G}}}"
+        f"@media (prefers-color-scheme:dark){{.i{{fill:{P}}}.s{{stroke:{P}}}}}</style>"
+    )
     write(
         "favicon.svg",
-        f'{HDR} viewBox="0 0 48 48">{style}' + mark(key, "X", OR).replace('fill="X"', 'class="i"') + "</svg>",
+        f'{HDR} viewBox="0 0 48 48">{style}'
+        + mark(key, "X", OR).replace('fill="X"', 'class="i"').replace('stroke="X"', 'class="s"')
+        + "</svg>",
     )
     tile = f'<rect width="48" height="48" fill="{G}"/>'
     write(

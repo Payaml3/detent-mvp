@@ -49,11 +49,12 @@ if __name__ == "__main__":
         ("A", "sg600.ttf", -0.01, {"De": -10, "rn": -5}),
         ("B", "sg700.ttf", -0.025, {"De": -15, "ke": -5}),
         ("C", "sg500.ttf", 0.0, {"De": -5}),
+        ("R", "jbm700.ttf", -0.04, {}),
     ]:
         d, w, ch, bb = word("DekernAI", font, track, kern)
         out[key] = {"d": d, "w": w, "cap": ch, "bb": bb}
         # The logo: the mark replaces the D, so set the rest of the name and the D's sidebearings.
-        d, w, ch, bb = word("ekernAI", font, -0.02, {})
+        d, w, ch, bb = word("ekernAI", font, track if key == "R" else -0.02, {})
         t = TTFont(F + font)
         gs = t.getGlyphSet()
         g = t.getBestCmap()[ord("D")]
