@@ -1,8 +1,10 @@
 /* Brand tokens (spec/07). Colours change with the palette the founder picks (B-01); the site's roles are in
    apps/site/src/styles/palettes.mjs. */
 :root {
-  --ink: #0F1629; --paper: #F6F5F0; --orange: #F2622E; --blue: #2F6BFF; --amber: #C98A00;
-  --line: #d9d7cf; --muted: #5b6275;
+  /* Palette B, Parchment and seal (B-02); the same values as the site's `b` palette. */
+  --ink: #14161F; --paper: #F4EFE6; --surface: #FFFDF8; --signal: #B3261E; --blue: #2E5AAC;
+  --brass: #C9935F; --amber: #8A5A00; --amber-fill: #E0A33A; --ok: #23714D; --danger: #B3261E;
+  --line: #D8CDB8; --muted: #4E5160;
   --font-head: "Space Grotesk", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -14,27 +16,27 @@ a { color: var(--blue); }
 .mono { font-family: var(--font-mono); font-size: .9em; }
 .muted { color: var(--muted); }
 .banner { background: var(--ink); color: var(--paper); text-align: center; font-size: 13px; padding: 4px 8px; letter-spacing: .02em; }
-.kill-bar { background: #c62828; color: #fff; text-align: center; font-weight: 600; padding: 8px; }
+.kill-bar { background: var(--danger); color: #FFFFFF; text-align: center; font-weight: 600; padding: 8px; }
 .top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 12px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
 .brand { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--ink); text-decoration: none; }
 .brand span { font-weight: 400; color: var(--muted); }
 .status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .status form { display: inline-flex; gap: 4px; align-items: center; margin: 0; }
 .ks { padding: 2px 8px; border-radius: 4px; border: 1px solid var(--line); font-size: 13px; }
-.ks.on { border-color: #c62828; color: #c62828; font-weight: 600; }
+.ks.on { border-color: var(--danger); color: var(--danger); font-weight: 600; }
 .who { color: var(--ink); text-decoration: none; }
 .role { display: inline-block; margin-left: 6px; padding: 0 6px; border: 1px solid var(--ink); border-radius: 4px; font-size: 12px; }
 main { padding: 24px; max-width: 1100px; }
 footer { padding: 24px; color: var(--muted); font-size: 13px; }
-.card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 24px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 24px; }
 .narrow { max-width: 460px; }
 label { display: block; margin: 12px 0; }
 input { display: block; width: 100%; padding: 8px; margin-top: 4px; border: 1px solid var(--line); border-radius: 6px; font: inherit; }
-button { font: inherit; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--ink); background: #fff; cursor: pointer; }
+button { font: inherit; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--ink); background: var(--surface); cursor: pointer; }
 button.primary { background: var(--ink); color: var(--paper); }
 button.link { border: none; background: none; color: var(--blue); padding: 0; }
 button:disabled { opacity: .5; cursor: not-allowed; }
-.error { color: #c62828; }
+.error { color: var(--danger); }
 .users { display: grid; gap: 8px; }
 .user { display: grid; grid-template-columns: 1fr auto; text-align: left; gap: 2px 8px; padding: 10px 12px; }
 .user .mono { grid-column: 1 / -1; color: var(--muted); }
@@ -45,7 +47,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .nav a { color: var(--ink); text-decoration: none; }
 .nav a:hover { color: var(--blue); }
 .layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 16px 0 24px; }
-table { width: 100%; border-collapse: collapse; background: #fff; margin: 8px 0 24px; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); margin: 8px 0 24px; }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
 th { font-weight: 600; font-size: 13px; color: var(--muted); }
 .num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
@@ -54,21 +56,32 @@ th { font-weight: 600; font-size: 13px; color: var(--muted); }
 .filters label { margin: 0; }
 .filters select { display: block; padding: 6px; margin-top: 4px; }
 label.inline input { display: inline; width: auto; }
-.late { color: #c62828; font-weight: 600; }
-.r-block td { background: #fdecea; }
-.r-escalate td { background: #fff6e0; }
-.note { background: #fff; border-left: 4px solid var(--amber); padding: 8px 12px; }
+.late { color: var(--danger); font-weight: 600; }
+.r-block td { background: color-mix(in srgb, var(--danger) 8%, var(--surface)); }
+.r-escalate td { background: color-mix(in srgb, var(--amber-fill) 14%, var(--surface)); }
+.note { background: var(--surface); border-left: 4px solid var(--amber-fill); padding: 8px 12px; }
 .card + .card { margin-top: 16px; }
 .timeline { padding-left: 20px; }
 section.card, details.card { margin-bottom: 16px; }
-button.danger { border-color: #c62828; color: #c62828; }
-mark { background: #ffe9a8; padding: 0 2px; } pre.doc { white-space: pre-wrap; }
+button.danger { border-color: var(--danger); color: var(--danger); }
+mark { background: color-mix(in srgb, var(--amber-fill) 35%, transparent); padding: 0 2px; } pre.doc { white-space: pre-wrap; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 12px 0 20px; }
-.stat { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
 .stat b { display: block; font-size: 24px; font-variant-numeric: tabular-nums; }
 .stat span { font-size: 12px; color: var(--muted); }
-.ok { color: #2e7d32; } .attention { color: #c62828; font-weight: 600; }
-.diff-old { color: #c62828; } .diff-new { color: #2e7d32; }
-pre.yaml { background: #fff; border: 1px solid var(--line); padding: 8px 12px; overflow-x: auto; font-size: 12px; max-height: 420px; }
+.ok { color: var(--ok); } .attention { color: var(--danger); font-weight: 600; }
+.diff-old { color: var(--danger); } .diff-new { color: var(--ok); }
+pre.yaml { background: var(--surface); border: 1px solid var(--line); padding: 8px 12px; overflow-x: auto; font-size: 12px; max-height: 420px; }
 textarea.yaml { width: 100%; min-height: 360px; font-family: ui-monospace, monospace; font-size: 12px; }
-a.button { display: inline-block; border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; background: #fff; color: inherit; text-decoration: none; font-size: 14px; }
+a.button { display: inline-block; border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; background: var(--surface); color: inherit; text-decoration: none; font-size: 14px; }
+
+/* Status labels: the word always shows; blocked, rejected and final failures also carry a cross icon,
+   so no state is told by colour alone (B-02). */
+.st { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: .01em; color: var(--muted); background: color-mix(in srgb, var(--muted) 10%, transparent); }
+.st::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.st-confirmed { color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.st-escalated, .st-held, .st-unknown, .st-failed { color: var(--amber); background: color-mix(in srgb, var(--amber-fill) 18%, transparent); }
+.st-ready, .st-submitted { color: var(--blue); background: color-mix(in srgb, var(--blue) 10%, transparent); }
+.st-blocked, .st-rejected, .st-failed_final { color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.st-blocked::before, .st-rejected::before, .st-failed_final::before { width: 8px; height: 8px; border-radius: 0;
+  clip-path: polygon(20% 0, 50% 30%, 80% 0, 100% 20%, 70% 50%, 100% 80%, 80% 100%, 50% 70%, 20% 100%, 0 80%, 30% 50%, 0 20%); }

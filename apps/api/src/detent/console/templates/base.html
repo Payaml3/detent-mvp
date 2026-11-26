@@ -13,7 +13,7 @@
   <div class="kill-bar" role="alert">Kill switch engaged: all sending is stopped and pending payments are held.</div>
   {% endif %}
   <header class="top">
-    <a class="brand" href="/console/"><svg class="mark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="currentColor"><circle cx="3.5" cy="4" r="1.6"/><circle cx="8.25" cy="4" r="1.6"/><circle cx="12" cy="4" r="1.6"/><circle cx="15.75" cy="4" r="1.6"/><circle cx="20.5" cy="4" r="1.6"/><circle cx="7.5" cy="10" r="1.7"/><circle cx="12" cy="10" r="1.7"/><circle cx="16.5" cy="10" r="1.7"/><rect x="2" y="14" width="20" height="1.6"/></g><circle cx="12" cy="20" r="2.9" fill="var(--orange)"/></svg>{{ brand }} <span>payment controls</span></a>
+    <a class="brand" href="/console/"><svg class="mark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="currentColor"><circle cx="3.5" cy="4" r="1.6"/><circle cx="8.25" cy="4" r="1.6"/><circle cx="12" cy="4" r="1.6"/><circle cx="15.75" cy="4" r="1.6"/><circle cx="20.5" cy="4" r="1.6"/><circle cx="7.5" cy="10" r="1.7"/><circle cx="12" cy="10" r="1.7"/><circle cx="16.5" cy="10" r="1.7"/><rect x="2" y="14" width="20" height="1.6"/></g><circle cx="12" cy="20" r="2.9" fill="var(--signal)"/></svg>{{ brand }} <span>payment controls</span></a>
     <div class="status">
       <span class="ks {{ 'on' if kill_switch_engaged else 'off' }}">Kill switch: {{ 'engaged' if kill_switch_engaged else 'off' }}</span>
       {% if user %}

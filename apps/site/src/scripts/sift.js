@@ -16,7 +16,7 @@ function roles() {
   const css = getComputedStyle(document.documentElement);
   const get = (n) => css.getPropertyValue(`--${n}`).trim();
   return {
-    dot: get("interactive-soft"), rule: get("text-soft"), settle: get("settle"), wait: get("wait"),
+    dot: get("interactive-soft"), rule: get("accent"), settle: get("settle"), wait: get("wait"),
     danger: get("danger"), ok: get("ok"), text: get("text"),
     additive: document.documentElement.dataset.scheme !== "light", // light dots add up on a dark page only
   };
@@ -121,11 +121,14 @@ export function mountSift(canvas) {
     if (focus.status !== "CONFIRMED") {
       ctx.globalAlpha = 0.5 + 0.3 * breathe; ctx.strokeStyle = fc; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.arc(focus.x, focus.y, 11 + 2 * breathe, 0, Math.PI * 2); ctx.stroke();
-      dot(focus.x, focus.y, 5, fc, 1);
       if (stopped) {
-        ctx.globalAlpha = 1; ctx.strokeStyle = fc; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(focus.x - 20, focus.y + 9); ctx.lineTo(focus.x + 20, focus.y + 9); ctx.stroke();
-      }
+        // a block is a cross, not only a colour (B-02); the demo's status label says BLOCKED beside it
+        ctx.globalAlpha = 1; ctx.strokeStyle = fc; ctx.lineWidth = 2.5; ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(focus.x - 5, focus.y - 5); ctx.lineTo(focus.x + 5, focus.y + 5);
+        ctx.moveTo(focus.x + 5, focus.y - 5); ctx.lineTo(focus.x - 5, focus.y + 5);
+        ctx.stroke();
+      } else dot(focus.x, focus.y, 5, fc, 1);
     }
     ctx.globalAlpha = 1;
   }
