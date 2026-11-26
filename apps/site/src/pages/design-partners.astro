@@ -6,16 +6,16 @@ import config from "../../site.config.mjs";
 ---
 <Base title="Design partners" description={`A free shadow report: ${config.brandName} decides one month of your past payouts and deposits under your rules, without executing anything.`}> {/* taste-skill-ignore: "shadow report" is a product name, not a CSS shadow */}
   <PageHead title="A free shadow report." lead="Send one month of anonymised exports. We show you what your rules would have decided, payment by payment, without executing anything."> {/* taste-skill-ignore: "shadow report" is a product name, not a CSS shadow */}
-    <div class="ctas" data-reveal><a class="button" href={config.bookingUrl}>Book a demo</a><a class="textlink" href="/access/">Request sandbox access</a></div>
+    <div class="ctas" data-reveal><a class="button" href={config.bookingUrl}>Book a demo</a><a class="textlink" href="/access/">Request access</a></div>
     <Fragment slot="fragments">
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row · fictional</p>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row</p>
         <p>Payout to Harbor Logistics GmbH, €2,400.00</p><span class="chip st-CONFIRMED">EXECUTE</span><p class="soft">Every check passed. Your team: paid.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row · fictional</p>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row</p>
         <p>Payout to Quill Studio Ltd, £820.00</p><span class="chip st-ESCALATED">ESCALATE</span><p class="soft">Bank details changed 3 days ago. Your team: paid without review.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row · fictional</p>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row</p>
         <p>Payout to Example Sanctioned Trading Co, 500.00 USDC</p><span class="chip st-BLOCKED">BLOCK</span><p class="soft">Screening hit on the address.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample deposit fix · fictional</p>
-        <p>200.00 USDC arrived on Ethereum Sepolia, expected on Base Sepolia.</p><p class="soft">Proposed fix: match to the open deposit intent.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Sample deposit fix</p>
+        <p>200.00 USDC arrived on Ethereum, expected on Base.</p><p class="soft">Proposed fix: match to the open deposit intent.</p></div>
     </Fragment>
   </PageHead>
   <section class="section"><div class="wrap">

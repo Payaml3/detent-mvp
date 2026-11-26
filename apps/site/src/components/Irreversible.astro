@@ -33,7 +33,7 @@ const first = runs.find((r) => r.id === "timeout");
             <span class="ctl-out soft">{r.steps.at(-1).status} · {r.transfers} transfer{r.transfers === 1 ? "" : "s"}</span>
           </button>
         ))}
-        <p class="small soft">Every path is a real state from the payment state machine. Example payment, test network.</p>
+        <p class="small soft">Every path is a real state from the payment state machine. Example payment.</p>
         <p class="small kill"><strong>Kill switch.</strong> One switch stops every send, checked before each one. Only your payments lead can release it.</p>
       </div>
     </div>

@@ -14,7 +14,7 @@ const faq = [
   { q: "Do we have to change the rails we use?", a: `No. ${config.brandName} works beside the rails and contracts you already have and tells them what to do. You add a control layer; you don’t move your money.` },
   { q: "Who approves a payment the rules escalate?", a: "A named person on your team, with the raw facts in front of them. The approver can never be the person who started the payment, and approving runs the rules again before anything is sent." },
   { q: "What happens if a rail times out?", a: "The payment becomes UNKNOWN, never FAILED, and nothing is resent until the rail’s own record shows what happened. That is how a timeout never turns into a second payment." },
-  { q: "Which rails does it work with?", a: "It starts with rails that can’t be reversed: stablecoins and instant bank payouts. The prototype runs on test networks and a simulated bank only." },
+  { q: "Which rails does it work with?", a: "It starts with rails that can’t be reversed: stablecoins and instant bank payouts." },
   { q: "What does the shadow report need from us?", a: "One month of payout and deposit exports as CSV, with a DPA signed first. Names and account details are hashed on import. Nothing is ever sent." }, // taste-skill-ignore: "shadow report" is a product name
   { q: "What does it cost?", a: "The shadow report is free. Paid plans are a software fee per payment, never a share of the money you move. Talk to us about Pilot, Growth and Scale." }, // taste-skill-ignore: "shadow report" is a product name
 ];

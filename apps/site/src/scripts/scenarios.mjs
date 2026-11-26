@@ -15,8 +15,8 @@ export const SCENARIOS = [
       s("ESCALATED", "FIRST_PAYMENT, ABOVE_AUTO_LIMIT: $18,500 against a $10,000 limit. Case opened, owner Sam, 2 h deadline"),
       s("ESCALATED", "approved by Sam with a reason; raw facts read first"),
       s("READY", "policy re-run", { note: "active rule version: EXECUTE" }),
-      s("SUBMITTED", "sent once on Base Sepolia", { rail: "Base Sepolia" }),
-      s("CONFIRMED", "receipt status 1 after 3 confirmations", { rail: "Base Sepolia", transfer: true }),
+      s("SUBMITTED", "sent once on Base", { rail: "Base" }),
+      s("CONFIRMED", "receipt status 1 after 3 confirmations", { rail: "Base", transfer: true }),
     ],
   },
   {
@@ -26,10 +26,10 @@ export const SCENARIOS = [
     steps: [
       s("RECEIVED", "intent received from the platform"),
       s("READY", "decision EXECUTE"),
-      s("SUBMITTED", "sent on Base Sepolia", { rail: "Base Sepolia" }),
-      s("UNKNOWN", "response lost: the outcome is unknown, so nothing is resent", { rail: "Base Sepolia" }),
-      s("UNKNOWN", "polled by transaction hash at 5 s and 15 s: no receipt yet", { rail: "Base Sepolia" }),
-      s("CONFIRMED", "receipt found: one transfer, same payment ID", { rail: "Base Sepolia", transfer: true }),
+      s("SUBMITTED", "sent on Base", { rail: "Base" }),
+      s("UNKNOWN", "response lost: the outcome is unknown, so nothing is resent", { rail: "Base" }),
+      s("UNKNOWN", "polled by transaction hash at 5 s and 15 s: no receipt yet", { rail: "Base" }),
+      s("CONFIRMED", "receipt found: one transfer, same payment ID", { rail: "Base", transfer: true }),
     ],
   },
   {
@@ -39,11 +39,11 @@ export const SCENARIOS = [
     steps: [
       s("RECEIVED", "intent received, network switch allowed"),
       s("READY", "decision EXECUTE"),
-      s("SUBMITTED", "sent on Base Sepolia", { rail: "Base Sepolia" }),
-      s("FAILED", "receipt status 0: TECHNICAL_FINAL", { rail: "Base Sepolia" }),
+      s("SUBMITTED", "sent on Base", { rail: "Base" }),
+      s("FAILED", "receipt status 0: TECHNICAL_FINAL", { rail: "Base" }),
       s("READY", "failover: attempt 2, same payment ID"),
-      s("SUBMITTED", "sent on Ethereum Sepolia", { rail: "Ethereum Sepolia" }),
-      s("CONFIRMED", "receipt status 1: one transfer", { rail: "Ethereum Sepolia", transfer: true }),
+      s("SUBMITTED", "sent on Ethereum", { rail: "Ethereum" }),
+      s("CONFIRMED", "receipt status 1: one transfer", { rail: "Ethereum", transfer: true }),
     ],
   },
   {
@@ -65,8 +65,8 @@ export const SCENARIOS = [
       s("READY", "decision EXECUTE"),
       s("HELD", "kill switch engaged by on-call: nothing is sent"),
       s("READY", "released by the payments lead; policy re-run: EXECUTE"),
-      s("SUBMITTED", "sent once on Base Sepolia", { rail: "Base Sepolia" }),
-      s("CONFIRMED", "one transfer", { rail: "Base Sepolia", transfer: true }),
+      s("SUBMITTED", "sent once on Base", { rail: "Base" }),
+      s("CONFIRMED", "one transfer", { rail: "Base", transfer: true }),
     ],
   },
 ];

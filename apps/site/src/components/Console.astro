@@ -1,6 +1,6 @@
 ---
 // The merchant's console, drawn as a working screen inside a glass window that tilts flat as it scrolls in and
-// leans toward the pointer. Sample data for a fictional merchant on test networks, labelled as such. The
+// leans toward the pointer. Sample data for an example merchant, labelled as such. The
 // numbers add up: executed + escalated + blocked = decided, hour by hour. Pick an escalation to read the
 // agent's case; the approve button is a picture of the real one, which re-runs the rules first (spec/07).
 const hours = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17"];
@@ -12,7 +12,7 @@ const totals = { executed: sum(executed), escalated: sum(escalated), blocked: su
 const decided = totals.executed + totals.escalated + totals.blocked;
 const peak = Math.max(...hours.map((_, i) => executed[i] + escalated[i] + blocked[i]));
 const cases = [
-  { id: "c1", who: "Marlow Prop Traders", amount: "$64,000.00", rail: "Base Sepolia", code: "ABOVE_NORM", wait: "12 min",
+  { id: "c1", who: "Marlow Prop Traders", amount: "$64,000.00", rail: "Base", code: "ABOVE_NORM", wait: "12 min",
     agent: "Usual payout for this trader is $4,000 to $6,500. This one is about 11 times that. Wallet unchanged since March; no screening hits.",
     checks: [["Screening list", "clear"], ["Auto limit $10,000", "over"], ["Usual size for this payee", "over"], ["Wallet details unchanged", "clear"]] },
   { id: "c2", who: "Quill Studio Ltd", amount: "£820.00", rail: "Faster Payments", code: "CHANGED_DETAILS", wait: "31 min",
@@ -22,7 +22,7 @@ const cases = [
     agent: "First payout to this payee. Name matches the account holder check. Invoice reference matches the request.",
     checks: [["Screening list", "clear"], ["Auto limit €5,000", "clear"], ["Bank details unchanged", "clear"], ["Paid before", "over"]] },
 ];
-const rails = [["Faster Payments", "ok", "Healthy"], ["SEPA Instant", "ok", "Healthy"], ["Base Sepolia", "wait", "1 UNKNOWN, checking the chain"]];
+const rails = [["Faster Payments", "ok", "Healthy"], ["SEPA Instant", "ok", "Healthy"], ["Base", "wait", "1 UNKNOWN, checking the chain"]];
 const n = (x) => x.toLocaleString("en-GB");
 ---
 <section class="section console" id="console" data-section="console" aria-labelledby="console-title">
@@ -31,11 +31,11 @@ const n = (x) => x.toLocaleString("en-GB");
       <h2 id="console-title">Your Tuesday, on one screen.</h2>
       <p class="lead">Routine payouts go straight through. The few that need judgement wait in one queue, with the agent’s notes already written and the rule that held them named.</p>
     </div>
-    <figure class="window" data-card data-console aria-label="Console illustration with sample data for a fictional merchant">
+    <figure class="window" data-card data-console aria-label="Console illustration with sample data">
       <div class="bar">
         <span class="brand"><span class="mk" aria-hidden="true"></span>Console</span>
-        <span class="merchant">Kestrel Market <span class="mut">(fictional)</span></span>
-        <span class="mut tag">Tue 24 Nov · sample data · test networks</span>
+        <span class="merchant">Kestrel Market</span>
+        <span class="mut tag">Tue 24 Nov · sample data</span>
       </div>
       <div class="body">
         <nav class="side" aria-hidden="true">
@@ -97,7 +97,7 @@ const n = (x) => x.toLocaleString("en-GB");
         </div>
       </div>
     </figure>
-    <p class="small soft foot">Illustration with sample data for a fictional merchant. The agent writes the notes; your rules make the decision, and approving re-runs them first.</p>
+    <p class="small soft foot">Illustration with sample data. The agent writes the notes; your rules make the decision, and approving re-runs them first.</p>
   </div>
 </section>
 <style>
