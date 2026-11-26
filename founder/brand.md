@@ -53,7 +53,7 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
   | Safety orange | #FF4A1F | The one action colour: primary buttons, the mark, focus (black text on it) |
   | Orange text | #C2360F | Orange links and text on light grounds |
   | Unknown amber | #F2C94C | "Unknown" status |
-  | Confirmed green | #2F9E5B | "Confirmed" status |
+  | Confirmed green | #237A46 | "Confirmed" status |
 
   Orange is the colour of the override switch: it only ever means "act here". Blocked is a graphite pill with a stop
   icon and its label, never orange and never colour alone. Every pairing passes WCAG AA (text 15.4, orange on graphite
