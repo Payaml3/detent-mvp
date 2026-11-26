@@ -43,18 +43,18 @@ test("honesty: certifications appear only as roadmap items", () => {
   }
 });
 
-test("home: category wording, the shadow report as the main action, demo and sandbox access", () => {
+test("home: category wording, the shadow report as the main action, demo and access", () => {
   const html = read(PAGES.home);
   assert.match(text(html), /agentic payment controls/i);
   const hero = html.split('data-section="hero"')[1].split("data-section=")[0];
   const buttons = [...hero.matchAll(/<a[^>]*class="([^"]*\bbutton\b[^"]*)"[^>]*>\s*([^<]+)/g)].map((m) => [m[1], m[2].trim()]);
   assert.deepEqual(buttons[0], ["button", "Get a free shadow report"], "the first hero button is the primary shadow report action");
   assert.ok(buttons.some(([cls, label]) => /secondary/.test(cls) && label === "Book a demo"), "Book a demo is the secondary button");
-  assert.match(text(html), /Request sandbox access/);
+  assert.match(text(html), /Request access/);
 });
 
 test("home: the sections of docs/design/landing-page-ux.md, in order", () => {
-  const order = ["hero", "problem", "spine", "rules", "irreversible", "roles", "offer", "use-cases", "faq", "close", "footer"];
+  const order = ["hero", "problem", "spine", "use-cases", "rules", "irreversible", "roles", "offer", "faq", "close", "footer"];
   const found = [...read(PAGES.home).matchAll(/data-section="([a-z-]+)"/g)].map((m) => m[1]);
   assert.deepEqual(found.filter((s) => order.includes(s)), order);
 });
@@ -78,11 +78,11 @@ test("results: left off the home page, with no figures, while there is no result
   assert.ok(!/data-figure=/.test(html));
 });
 
-test("developers: one request in eight languages, labelled pre-launch, in the engineering panel", () => {
+test("developers: one request in eight languages, with the sandbox, in the engineering panel", () => {
   const html = read(PAGES.home);
   const section = html.split('id="panel-engineering"')[1].split("data-section=")[0];
   for (const lang of ["cURL", "Python", "TypeScript", "Go", "Java", "C#", "PHP", "Ruby"]) assert.ok(section.includes(`>${lang}<`), lang);
-  assert.match(text(section), /pre-launch/i);
+  assert.match(text(section), /sandbox/i);
   assert.match(section, /<pre[\s\S]*payment_intents/);
 });
 
@@ -91,7 +91,7 @@ test("offer: the free shadow report, paid plans 'Talk to us', no prices", () => 
   const section = text(html.split('data-section="offer"')[1].split("data-section=")[0]);
   for (const plan of ["shadow report", "Pilot", "Growth", "Scale"]) assert.match(section, new RegExp(plan, "i"));
   assert.match(section, /Talk to us/);
-  assert.match(section, /Fictional data/i, "the sample report is labelled fictional");
+  assert.match(section, /Sample data/i, "the sample report is labelled as sample data");
   assert.ok(!/(free|Pilot|Growth|Scale)[^.]{0,40}[$£€]\s?\d/i.test(section), "no prices next to a plan");
 });
 

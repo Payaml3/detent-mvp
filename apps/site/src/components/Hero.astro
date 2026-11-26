@@ -5,9 +5,9 @@ import { PAYMENT_ID } from "../scripts/scenarios.mjs";
 // primary action, the example payment played layer by layer, and the "sift then settle" art (Q2: replaces
 // the D-21 AI-agent figure, so the first screen shows the rules deciding). Final state shows without script.
 const phases = [
-  { layer: "decision", agent: "Agent prepared $18,500.00 USDC to Bluefin Components Ltd (fictional), from invoice INV-2026-0142.", status: "ESCALATED", rule: "Your rules: escalate. First payment, above the $10,000 auto limit." },
+  { layer: "decision", agent: "Agent prepared $18,500.00 USDC to Bluefin Components Ltd, from invoice INV-2026-0142.", status: "ESCALATED", rule: "Your rules: escalate. First payment, above the $10,000 auto limit." },
   { layer: "decision", agent: "Sam, the reviewer, read the raw facts and approved with a reason.", status: "READY", rule: "Your rules ran again on the active version: execute." },
-  { layer: "orchestration", agent: "Best rail by policy: Base Sepolia (testnet). Sent once.", status: "SUBMITTED", rule: "One attempt in flight. Payment ID unchanged." },
+  { layer: "orchestration", agent: "Best rail by policy: Base. Sent once.", status: "SUBMITTED", rule: "One attempt in flight. Payment ID unchanged." },
   { layer: "orchestration", agent: "The rail’s answer was lost. Agent found the transaction on chain, awaiting confirmations.", status: "UNKNOWN", rule: "A timeout is UNKNOWN, never FAILED. Nothing is resent." },
   { layer: "orchestration", agent: "Receipt found after 3 confirmations.", status: "CONFIRMED", rule: "Transfers on the rail: 1." },
   { layer: "operations", agent: "Agent matched the ledger posting to the chain transfer.", status: "CONFIRMED", rule: "Audit chain verified. The payment replays to its decision." },
@@ -40,7 +40,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
         <a class="button" href="#shadow-report">Get a free shadow report</a> {/* taste-skill-ignore: "shadow report" is a product name */}
         <a class="button secondary" href={config.bookingUrl}>Book a demo</a>
       </div>
-      <p class="honesty small" data-reveal>Prototype · test networks only · never holds your funds or keys</p>
+      <p class="honesty small" data-reveal>Sits beside your rails · never holds your funds or keys</p>
     </div>
     <div class="cards" data-ui data-hero-cards aria-label="Example payment, step by step">
       <p class="card-top"><span class="small soft">Example payment</span><span class="mono pid">{PAYMENT_ID}</span></p>
@@ -55,7 +55,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
           </article>
         );
       })}
-      <p class="small soft foot">Fictional supplier, test network.</p>
+      <p class="small soft foot">Example payment with sample data.</p>
     </div>
   </div>
   <script type="application/json" data-hero-phases set:html={JSON.stringify(phases)} />

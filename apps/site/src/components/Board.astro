@@ -1,19 +1,19 @@
 ---
-// A live payments board, like a split-flap departures board: fictional payouts move through their real
+// A live payments board, like a split-flap departures board: example payouts move through their real
 // states (spec/02) and each status flips letter by letter when it changes. Hover or focus a row for the
-// reason. A simulation with fictional payees; without script the board shows one still moment.
+// reason. Sample data; without script the board shows one still moment.
 const rows = [
   { time: "09:41", who: "Quill Studio Ltd", amount: "£820.00", rail: "Faster Payments", status: "ESCALATED", why: "Bank details changed 3 days ago. Waiting for a reviewer." },
   { time: "09:42", who: "Harbor Logistics GmbH", amount: "€2,400.00", rail: "SEPA Instant", status: "CONFIRMED", why: "Every check passed. Sent once, settled." },
-  { time: "09:42", who: "Bluefin Components Ltd", amount: "$18,500.00", rail: "Base Sepolia", status: "SUBMITTED", why: "Approved by Sam; rules re-ran first. One attempt in flight." },
-  { time: "09:43", who: "Example Sanctioned Trading Co", amount: "500.00 USDC", rail: "Base Sepolia", status: "BLOCKED", why: "Screening hit on the address. A block is final." },
-  { time: "09:44", who: "Northwind Creators", amount: "$1,120.00", rail: "Ethereum Sepolia", status: "UNKNOWN", why: "The rail's answer was lost. Nothing is resent until the chain shows what happened." },
-  { time: "09:45", who: "Marlow Prop Traders", amount: "$64,000.00", rail: "Base Sepolia", status: "ESCALATED", why: "Far above this trader's usual payout. A second look first." },
+  { time: "09:42", who: "Bluefin Components Ltd", amount: "$18,500.00", rail: "Base", status: "SUBMITTED", why: "Approved by Sam; rules re-ran first. One attempt in flight." },
+  { time: "09:43", who: "Example Sanctioned Trading Co", amount: "500.00 USDC", rail: "Base", status: "BLOCKED", why: "Screening hit on the address. A block is final." },
+  { time: "09:44", who: "Northwind Creators", amount: "$1,120.00", rail: "Ethereum", status: "UNKNOWN", why: "The rail's answer was lost. Nothing is resent until the chain shows what happened." },
+  { time: "09:45", who: "Marlow Prop Traders", amount: "$64,000.00", rail: "Base", status: "ESCALATED", why: "Far above this trader's usual payout. A second look first." },
 ];
 const NEXT = { ESCALATED: "READY", READY: "SUBMITTED", SUBMITTED: "CONFIRMED", UNKNOWN: "CONFIRMED" };
 ---
-<figure class="board" data-board aria-label="Live payments board, simulation with fictional payees">
-  <figcaption class="top"><span>Payments today</span><span class="soft">Simulation · fictional payees · test networks</span></figcaption>
+<figure class="board" data-board aria-label="Payments board with sample data">
+  <figcaption class="top"><span>Payments today</span><span class="soft">Sample data</span></figcaption>
   <div class="head" aria-hidden="true"><span>Time</span><span>Payee</span><span class="r">Amount</span><span>Rail</span><span>Status</span></div>
   <ul>
     {rows.map((r) => (

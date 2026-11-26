@@ -1,6 +1,6 @@
 ---
 // The page's one live thing: change a rule and watch the example payment's decision change.
-// Checks, results and reason codes follow spec/04-policy.md. Pure simulation in the browser; nothing is sent.
+// Checks, results and reason codes follow spec/04-policy.md. Runs in the browser; nothing is sent.
 // Without script the default decision shows, and the controls stay hidden.
 const AMOUNT = 1850000; // minor units, USDC cents
 const fmt = (minor) => `$${(minor / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
@@ -28,7 +28,7 @@ const next = {
   <div class="wrap grid">
     <div class="head" data-reveal>
       <h2 id="rules-title">Change a rule. Watch the decision.</h2>
-      <p class="lead">The same $18,500.00 USDC payout to Bluefin Components Ltd, a fictional supplier. Your rules decide it the same way every time.</p>
+      <p class="lead">The same $18,500.00 USDC payout to Bluefin Components Ltd, an example supplier. Your rules decide it the same way every time.</p>
       <form class="controls" data-rules-controls hidden aria-label="Rules for this payment">
         <label class="slider">
           <span class="row"><span>Auto limit</span><output data-limit-out>{fmt(defaults.limit)}</output></span>
@@ -41,7 +41,7 @@ const next = {
       </form>
     </div>
     <figure class="record" data-ui data-reveal>
-      <figcaption class="top"><span class="small">Decision record</span><span class="small soft">Simulation · nothing is sent</span></figcaption>
+      <figcaption class="top"><span class="small">Decision record</span><span class="small soft">Interactive example · nothing is sent</span></figcaption>
       <p class="outcome" aria-live="polite"><span class={`chip st-${chip[start.outcome]}`} data-outcome>{start.outcome}</span><span class="amount">{fmt(AMOUNT)} <span class="soft">USDC</span></span></p>
       <p class="next" data-next>{next[start.outcome]}</p>
       <ul class="checks" data-checks>

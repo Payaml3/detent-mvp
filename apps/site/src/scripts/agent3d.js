@@ -179,7 +179,7 @@ export function mountAgent(canvas) {
   // ---- the story: one payment at a time, told in words. The robot says what it is preparing; the payment
   // travels to the D; the rules answer with a verdict. Execute settles into the point. Escalate waits, in
   // orange, for a person, and the rules run again before it settles. Block is final: the payment drops away
-  // in graphite, never orange (B-02). Fictional payees on test networks.
+  // in graphite, never orange (B-02). Example payees, sample data.
   const CASES = [
     { steps: ["read · invoice INV-2291 · €2,400.00 due today", "check · Harbor Logistics · 14 paid, same bank"], say: "propose · payout €2,400.00 to Harbor Logistics GmbH", verdict: "EXECUTE", why: "Within your limits. Sent once." },
     { steps: ["read · invoice INV-0418 · £820.00", "check · Quill Studio · bank details changed"], say: "propose · payout £820.00 to Quill Studio Ltd", verdict: "ESCALATE", why: "Bank details changed 3 days ago", after: "Approved by a person · rules ran again" },
