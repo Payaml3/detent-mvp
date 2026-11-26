@@ -47,14 +47,14 @@ proven is marked; outcomes for customers are hypotheses until a design partner c
 
 | Mode | What happens | Gate to the next mode |
 | --- | --- | --- |
-| 1 Shadow | Decisions on exported data; nothing sent | Client signs: agreement % and zero unsafe approvals |
+| 1 Shadow | Decisions on live traffic during onboarding (`client-journey.md` phase 5); nothing sent | Client signs: agreement % and zero unsafe approvals |
 | 2 Assist | Live recommendations; staff click every decision | Same, on live traffic |
 | 3 Auto | Executes within approved rules; only escalations reach humans | Same |
 | 4 Orchestrate | Routing across two or more rails | Routing add-on |
 
 ## A4. Commercial model
 
-Software fee per payment, not a share of money moved; plans: free shadow report, Pilot, Growth, Scale, and a
+Software fee per payment, not a share of money moved; plans: Pilot, Growth, Scale (entry through onboarding, B-04), and a
 routing add-on. Detail and open prices: `docs/product/business-model.md`.
 
 ## A5. AI model

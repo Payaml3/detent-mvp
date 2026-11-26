@@ -1,5 +1,7 @@
 # Free shadow report: definition (I5, O2.1)
 
+> **Superseded by B-04 (2026-11-26).** DekernAI does not offer a free pre-sale shadow report. Clients go through the onboarding process in `client-journey.md`; shadow mode is phase 5, on live traffic. The import, mapping and report rules below still apply to the shadow phase and to an optional exported month used to calibrate rule set v1.
+
 Status: Proposed. Becomes Approved when the founder merges this PR. Stories: SHD-01, SHD-02, SHD-04 (Should, slice L). Source: `docs/product/operating-model.md` (lead to shadow report), D-15, D-24.
 
 ## Promise

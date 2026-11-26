@@ -537,5 +537,20 @@
    "needed_by": "S9"
   }
  ],
- "decisions_waiting": []
+ "decisions_waiting": [
+  {
+   "id": "B-04",
+   "decision": "Clients join through DekernAI's **onboarding process**, not a free shadow report: seven phases (discovery, contract and due diligence, sandbox integration, policy setup, shadow on live traffic, go-live, scale), each with an owner and an exit check, in `docs/product/client-journey.md`. The free shadow report is withdrawn as an offer and plan (supersedes that part of D-15); Pilot, Growth and Scale with \"Talk to us\" stay. Site entry action becomes \"Book a demo\" / \"Talk to us\"",
+   "status": "Proposed",
+   "date": "2026-11-26",
+   "register": "founder/decisions.md"
+  },
+  {
+   "id": "B-05",
+   "decision": "Naming the people we serve: **client** is the company that contracts with DekernAI (contracts, rules, onboarding, console); **platform** is the same company in marketing copy (\"platforms that hold user balances\"); **users** are the client's own end customers. Never \"merchant\": it suggests card acquiring and a payment provider",
+   "status": "Proposed",
+   "date": "2026-11-26",
+   "register": "founder/decisions.md"
+  }
+ ]
 }
