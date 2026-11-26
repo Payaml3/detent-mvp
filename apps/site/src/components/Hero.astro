@@ -55,7 +55,14 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
 </section>
 
 <style>
-  .hero { position: relative; min-height: max(760px, 100svh); overflow: hidden; background: var(--bg); }
+  /* A graphite field (B-02): the page's tokens, swapped for this one band. Cards keep the light roles. */
+  :global(body:has(.hero)) { --ink: var(--text); --paper: var(--bg); --ink-soft: var(--text-soft); --ink-surface: var(--surface); }
+  :global(body:has(.hero) .nav) { --text: var(--paper); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --interactive-soft: var(--signal); }
+  .hero { position: relative; min-height: max(760px, 100svh); overflow: hidden; background: var(--ink); }
+  .hero-grid { --text: var(--paper); --bg: var(--ink); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --line: color-mix(in srgb, var(--paper) 18%, var(--ink)); color: var(--text); }
+  .cards .card { --text: var(--ink); --bg: var(--paper); --text-soft: var(--ink-soft); color: var(--text); }
+  .hero .secondary { color: var(--paper); border-color: var(--paper); background: transparent; }
+  .hero .secondary:hover { background: color-mix(in srgb, var(--paper) 12%, transparent); }
   .art { position: absolute; left: 49%; top: 4%; width: 24%; height: 86%; pointer-events: none; }
   .hero-grid { position: relative; z-index: 2; min-height: max(760px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
     column-gap: 24px; padding-top: 136px; padding-bottom: 56px; pointer-events: none; }
