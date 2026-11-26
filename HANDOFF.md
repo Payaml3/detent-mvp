@@ -153,7 +153,12 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 - **P2 group 4b: built (PR from `claude/project-thread-babje1`, 2026-11-26):** DSH-09. A dashboard member opens
   `/console/` as themselves (`console/auth.dashboard_member`), scoped to their organisation and current data
   generation; demo-only controls answer 404 (`demo_only`). See spec/08 "As built (P2 group 4b)". P2 is complete.
-- **P3 next:** docs and SDKs (DOC, SDK, WHK-02), including the SBX-01 docs page. · Model: mid-tier
+- **P3 group 1: built (PR from `claude/project-thread-babje1`, 2026-11-26):** DOC-01, DOC-02, DOC-06, SDK-03 and
+  SBX-01 criterion 1. The Mintlify site in `docs/` (`docs.json`, `.mintignore`), `tools/build_docs.py`
+  (`make docs-check`, Postman collection). See spec/08 "As built (P3 group 1)". Founder: connect Mintlify (Starter)
+  to `docs/` and set the domains (replace `SITE_DOMAIN` and `<domain>`).
+- **P3 next:** group 2, DOC-03 guides and DOC-05 "try it"; then the SDKs (SDK-01, SDK-02) and the 8-language
+  samples (DOC-04, WHK-02 criterion 0). · Model: mid-tier
 - **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items

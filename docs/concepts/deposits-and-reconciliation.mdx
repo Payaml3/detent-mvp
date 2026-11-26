@@ -1,0 +1,44 @@
+---
+title: "Deposits and reconciliation"
+description: "Credit deposits only when the money has arrived, and find every break across rails."
+---
+
+## Deposit intents
+
+`POST /v1/deposit_intents` creates deposit instructions for one of your users' accounts:
+
+```json
+{"account_ref": "acct_u1001", "currency": "USDC", "network": "base-sepolia",
+ "expected_amount": {"amount": "250.00", "currency": "USDC"}}
+```
+
+The response gives the payer what to send: a test wallet address on a chain, or a payment reference on the
+simulated bank rail. Instructions expire after 7 days by default. Creating one is idempotent, like a payment intent.
+
+## Crediting
+
+DekernAI watches each rail for money coming in. An inbound transfer is credited to the user's balance only when:
+
+- the token and network match the instructions (otherwise BLOCK);
+- the sender passes screening (otherwise BLOCK);
+- the amount is within your tolerance of the expected amount, exact by default (otherwise ESCALATE).
+
+A credited deposit posts to the ledger and sends `deposit.credited`. One that fails a check goes to a suspense
+account and opens a deposit case (`deposit.exception`), to be credited or refunded by a person.
+
+<Note>Inbound transfers need a real test network: the simulated chain has no deposits.</Note>
+
+## The ledger
+
+Every money movement is a balanced, append-only double-entry ledger entry: a payout reserves funds when it is
+submitted, settles when confirmed and is reversed if it finally fails. An UNKNOWN payout keeps its reservation.
+Corrections are new entries; nothing is edited or deleted.
+
+## Reconciliation
+
+A reconciliation run compares the ledger with what each rail recorded (chain transfers and bank statements) and
+reports the match rate and every **break**: a payout missing on the rail, an inbound transfer nobody claimed, a
+rail record the ledger never booked. Each break sends `reconciliation.break`. The reconciliation agent may draft
+a fix; your payments lead approves it in the console, and the fix is a new ledger entry.
+
+Read the results with `GET /v1/reconciliation/runs` and `GET /v1/reconciliation/breaks`.

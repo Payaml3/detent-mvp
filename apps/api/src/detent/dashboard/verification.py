@@ -150,7 +150,12 @@ def latest(conn: Connection, org_id: str) -> Any:
     return conn.execute(
         text(
             "SELECT id, requested_by, requested_at, checklist, status, decided_by, decided_at, note "
-            "FROM verification_requests WHERE org_id=:o ORDER BY requested_at DESC, id DESC LIMIT 1"
+            "FROM verification_requests WHERE org_id=:o "
+            # The open request, else the verified one, else the newest returned one. At most one is open and
+            # nothing follows a verification, so this is the latest even when IDs share an instant (a frozen
+            # clock), where they don't sort by time.
+            "ORDER BY CASE status WHEN 'requested' THEN 0 WHEN 'verified' THEN 1 ELSE 2 END, "
+            "requested_at DESC, id DESC LIMIT 1"
         ),
         {"o": org_id},
     ).one_or_none()

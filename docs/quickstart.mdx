@@ -1,0 +1,87 @@
+---
+title: "Quickstart"
+description: "Create your first payment intent and read the decision, in five minutes."
+---
+
+You need a sandbox key from the dashboard (**Keys**, with the `intents:create` and `read` scopes). Set it and the
+sandbox base URL (published at launch; `http://localhost:8000` when you run DekernAI locally):
+
+```bash
+export DEKERNAI_KEY=sk_test_...
+export DEKERNAI_BASE_URL=https://sandbox.api.<domain>
+```
+
+Your sandbox organisation comes with fictional counterparties. `cpt_lumen` (Lumen Data Services BV) is verified,
+on your allowlist and has paid before, so your default rules let a small payout to it through.
+
+## 1. Create a payout intent
+
+```bash
+curl -s "$DEKERNAI_BASE_URL/v1/payment_intents" \
+  -H "Authorization: Bearer $DEKERNAI_KEY" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -H "Content-Type: application/json" \
+  -d @payout.json
+```
+
+with `payout.json`:
+
+```json payout.json
+{
+  "kind": "payout",
+  "source": "platform",
+  "counterparty_id": "cpt_lumen",
+  "destination": {"kind": "evm_wallet", "network": "base-sepolia", "destination_id": "dst_lumen_base"},
+  "amount": {"amount": "90.00", "currency": "USDC"},
+  "reference": "QUICKSTART-1"
+}
+```
+
+The response is `201` with the payment and its decision. The decision is made synchronously:
+
+```json
+{
+  "id": "pay_01JD...",
+  "status": "SHADOWED",
+  "decision": {
+    "outcome": "EXECUTE",
+    "policy_version": 1,
+    "checks": [
+      {"check": "kyb_status", "result": "PASS"},
+      {"check": "allowlist", "result": "PASS"},
+      {"check": "screening", "result": "PASS"}
+    ]
+  },
+  "exception": null
+}
+```
+
+<Note>
+New organisations start in **shadow mode**: every payment is decided and recorded, and nothing is sent, so the
+status is `SHADOWED`. Your payments lead and compliance lead move the organisation to assist or auto mode in the
+console's **Settings**. In auto mode the same request returns `READY`, and the payout is sent on the simulated
+chain within a second.
+</Note>
+
+## 2. Read the payment
+
+```bash
+curl -s "$DEKERNAI_BASE_URL/v1/payment_intents/pay_01JD..." -H "Authorization: Bearer $DEKERNAI_KEY"
+```
+
+The detail adds every decision, the attempts on each rail and the audit events. The payment ID (`pay_...`) never
+changes, whatever happens next: retries, failover and approvals all keep it.
+
+## 3. Try the other outcomes
+
+Change the payee or the amount and send again with a new `Idempotency-Key`. In shadow mode every outcome is
+recorded and nothing else happens; the last column describes assist and auto mode.
+
+| Change | Outcome |
+|---|---|
+| `"counterparty_id": "cpt_nova"` with `"destination": {"kind": "evm_wallet", "network": "eth-sepolia", "destination_id": "dst_nova_eth"}` | ESCALATE: KYB pending, not allowlisted, a new wallet, a first payment. In assist or auto mode an exception case opens, with an owner and a deadline |
+| `"counterparty_id": "cpt_flagged"` with `"destination_id": "dst_flagged"` | BLOCK: a screening hit. A block is final |
+| `"amount": "90.13"` (auto mode) | The send times out: UNKNOWN, then CONFIRMED, with a single attempt |
+
+See [Sandbox and test values](/sandbox) for the full list, and [Webhooks](/webhooks/events) to be told about each
+change instead of polling.

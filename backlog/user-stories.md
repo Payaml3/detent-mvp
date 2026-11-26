@@ -1527,7 +1527,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 **Acceptance criteria**
 
 - [x] Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK
-- [ ] Documented in the docs and covered by tests
+- [x] Documented in the docs and covered by tests
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** RAL-11, RAL-05 · **Traces to:** D.sandbox
 
@@ -1571,7 +1571,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 **Acceptance criteria**
 
-- [ ] Mintlify (Starter) from the repo's docs/ folder; reference generated from openapi.yaml; custom domain placeholder
+- [x] Mintlify (Starter) from the repo's docs/ folder; reference generated from openapi.yaml; custom domain placeholder
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05 · **Traces to:** D.docs
 
@@ -1581,7 +1581,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 **Acceptance criteria**
 
-- [ ] Payment intents and the payment ID; decisions; payment states; policies and versions; mandates; exceptions and deadlines; deposits and reconciliation; routing and failover; audit and replay
+- [x] Payment intents and the payment ID; decisions; payment states; policies and versions; mandates; exceptions and deadlines; deposits and reconciliation; routing and failover; audit and replay
 
 **Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, BR.category
 
@@ -1623,7 +1623,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 **Acceptance criteria**
 
-- [ ] One entry per release with the API version; linked from the reference
+- [x] One entry per release with the API version; linked from the reference
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, D.standards
 
@@ -1658,7 +1658,7 @@ _Typed Python and TypeScript clients with automatic idempotency and webhook help
 
 **Acceptance criteria**
 
-- [ ] Generated in CI from openapi.yaml and linked from the docs
+- [x] Generated in CI from openapi.yaml and linked from the docs
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05 · **Traces to:** D.sdks
 

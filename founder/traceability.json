@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 95,
-   "pct": 64
+   "done": 100,
+   "pct": 67
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 257,
-   "pct": 80
+   "done": 262,
+   "pct": 82
   },
   {
    "order": 3,
@@ -40,7 +40,7 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 207,
+   "done": 208,
    "total": 244,
    "pct_done": 85
   },
@@ -54,9 +54,9 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 7,
+   "done": 11,
    "total": 23,
-   "pct_done": 30
+   "pct_done": 48
   }
  ],
  "initiatives": [
@@ -111,8 +111,8 @@
    "role": "growth",
    "stories": 6,
    "criteria": 8,
-   "criteria_done": 0,
-   "pct_done": 0
+   "criteria_done": 3,
+   "pct_done": 38
   },
   {
    "code": "DSH",
@@ -210,8 +210,8 @@
    "role": "engineer",
    "stories": 4,
    "criteria": 5,
-   "criteria_done": 4,
-   "pct_done": 80
+   "criteria_done": 5,
+   "pct_done": 100
   },
   {
    "code": "SDK",
@@ -219,8 +219,8 @@
    "role": "growth",
    "stories": 3,
    "criteria": 4,
-   "criteria_done": 0,
-   "pct_done": 0
+   "criteria_done": 1,
+   "pct_done": 25
   },
   {
    "code": "SHD",
@@ -1537,9 +1537,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 2,
-   "criteria_done": 1,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "SBX-02",
@@ -1577,9 +1577,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DOC-02",
@@ -1587,9 +1587,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DOC-03",
@@ -1627,9 +1627,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SDK-01",
@@ -1657,9 +1657,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "WEB-01",

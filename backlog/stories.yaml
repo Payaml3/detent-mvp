@@ -2009,7 +2009,7 @@ stories:
   ac:
     - "Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK"
     - "Documented in the docs and covered by tests"
-  done: [0]
+  done: [0, 1]
   pri: Must
   est: 0.5
   deps: [RAL-11, RAL-05]
@@ -2067,6 +2067,7 @@ stories:
   so: I can find anything in two clicks
   ac:
     - "Mintlify (Starter) from the repo's docs/ folder; reference generated from openapi.yaml; custom domain placeholder"
+  done: [0]
   pri: Must
   est: 0.5
   deps: [API-05]
@@ -2080,6 +2081,7 @@ stories:
   so: I understand the model before I write code
   ac:
     - "Payment intents and the payment ID; decisions; payment states; policies and versions; mandates; exceptions and deadlines; deposits and reconciliation; routing and failover; audit and replay"
+  done: [0]
   pri: Must
   est: 1.0
   deps: [DOC-01]
@@ -2134,6 +2136,7 @@ stories:
   so: I know what changed
   ac:
     - "One entry per release with the API version; linked from the reference"
+  done: [0]
   pri: Should
   est: 0.25
   deps: [DOC-01]
@@ -2176,6 +2179,7 @@ stories:
   so: I can use my usual tools
   ac:
     - "Generated in CI from openapi.yaml and linked from the docs"
+  done: [0]
   pri: Should
   est: 0.25
   deps: [API-05]

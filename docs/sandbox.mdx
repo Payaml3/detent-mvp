@@ -1,0 +1,67 @@
+---
+title: "Sandbox and test values"
+description: "Simulated rails, the values that trigger each path, quotas and resetting your test data."
+---
+
+Your sandbox organisation sends on **simulated rails** by default: a simulated chain that stands in for Base
+Sepolia and Ethereum Sepolia under the same rail IDs, and a simulated bank rail for GBP (Faster Payments-style) and
+EUR (SEPA Instant-style). A simulated payout settles in about a second and costs nothing. Simulated attempts show
+`"simulated": true` and have no explorer link.
+
+A member with the developer, admin or account owner role can move the organisation to the real test networks (Base Sepolia and Ethereum Sepolia) on the dashboard's
+**Sandbox** page. Payouts then come from a shared, rate-limited faucet wallet with a daily cap. There is never a
+mainnet, a real bank or real money.
+
+## Test values
+
+| Input | What happens |
+|---|---|
+| Amount ending in `.13` (for example `90.13`) | The rail takes the payout but the answer is lost (`timeout_after_forward`). The attempt is UNKNOWN, then CONFIRMED from the rail's evidence a few seconds later. Nothing is sent twice |
+| Amount ending in `.42` | The first rail's transaction reverts (`receipt_status_0`): the attempt FAILS with `TECHNICAL_FINAL`. If the intent sets `"allow_network_switch": true` and the payee has a verified destination on the other network, the payout fails over under the same payment ID; otherwise it is FAILED_FINAL |
+| Payee wallet `0x000000000000000000000000000000000000dEaD` (fixture payee `cpt_flagged`) | A screening hit: BLOCK `SCREENING_HIT`. A block is final |
+| Payee not on your allowlist, or a first payment to a payee | ESCALATE `NOT_ALLOWLISTED` or `FIRST_PAYMENT` |
+| An agent payout above its mandate's per-payment limit | BLOCK `MANDATE_AMOUNT_EXCEEDED` |
+
+The `.13` and `.42` values apply on the simulated chain, to amounts with nothing past the cents: `10.13` is a test
+value, `10.1301` is not. The screening, allowlist and mandate values are your rules at work, so they apply on every
+rail.
+
+## Scenarios from the dashboard
+
+On the **Sandbox** page, a member with the developer, admin or account owner role can run one payout through a
+named scenario, exactly as the API would create it:
+
+| Scenario | Payout |
+|---|---|
+| `timeout` | 90.13 USDC to `cpt_lumen`: UNKNOWN, then CONFIRMED |
+| `rail_failure` | 90.42 USDC to `cpt_lumen` with network switching allowed: failover to Ethereum Sepolia |
+| `flagged_address` | 90.00 USDC to `cpt_flagged`: BLOCK |
+
+## Fixture payees
+
+| Counterparty | Facts | With the default rules |
+|---|---|---|
+| `cpt_lumen` | Verified, allowlisted, 30 earlier payments; wallets on both networks | EXECUTE for amounts near its usual 90 USDC |
+| `cpt_bluefin` | Verified, allowlisted, never paid | ESCALATE `FIRST_PAYMENT` |
+| `cpt_nova` | KYB pending, not allowlisted, a wallet first seen 2 days ago | ESCALATE |
+| `cpt_flagged` | Its wallet is on the screening list | BLOCK `SCREENING_HIT` |
+
+All names are fictional.
+
+## Quotas
+
+| Limit | Default |
+|---|---|
+| Requests per key | 120 a minute (see [Rate limits](/limits/rate-limits)) |
+| Payments decided | 500 a day per organisation |
+| Agent investigations | 50 a day per organisation |
+
+The dashboard's **Usage** page shows where you are. An evaluation organisation that has expired gets
+`403 organisation_expired`, and its dashboard becomes read-only.
+
+## Resetting your test data
+
+**Reset sandbox data** on the dashboard's Sandbox page starts a new data generation. Earlier payments, cases,
+ledger entries, request logs and events disappear from the API, the dashboard and the console. Nothing is deleted:
+the audit log keeps everything. Keys, webhook endpoints, members and settings stay. A reset is refused while a
+payout could still be sent.

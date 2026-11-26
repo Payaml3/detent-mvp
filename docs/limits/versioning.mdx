@@ -1,0 +1,16 @@
+---
+title: "Versioning"
+description: "Dated API versions, pinned per organisation."
+---
+
+The API is versioned by date. The current version is **`2026-12-01`**.
+
+- Send `DekernAI-Version: 2026-12-01` to choose a version for one request.
+- Without the header, your organisation's pinned version applies.
+- Every response carries the `DekernAI-Version` it was answered with.
+- An unknown version gets `400 unknown_version`.
+
+A new version is only needed for a breaking change. Adding a field to a response, a new endpoint, a new event type
+or a new error code is not breaking, so build your integration to ignore fields and event types it doesn't know.
+
+Every version is listed in the [changelog](/changelog).

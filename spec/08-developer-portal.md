@@ -251,6 +251,30 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 - **Reset and the kill switch:** a sandbox reset (SBX-04) also waits for payments the kill switch holds, because
   releasing the switch would send them with no approval.
 
+## As built (P3 group 1)
+
+- **Docs site (DOC-01):** Mintlify from `docs/` (`docs/docs.json`, theme `mint`, the brand's orange and logos). The
+  API reference tab is generated from `docs/api/openapi.json`, and the error-code page is the generated
+  `docs/api/errors.md` (now with Mintlify front matter). `docs/` also holds internal documents, so
+  `docs/.mintignore` excludes `brand/`, `design/`, `product/` and `engineering-standards.md`, and
+  `tools/build_docs.py --check` (CI, `make docs-check`) fails if any page is neither in the navigation nor
+  excluded, if the navigation names a missing page, or if a page has text MDX would read as code. The site's
+  domain and the website's access link are placeholders (`sandbox.api.<domain>`, `SITE_DOMAIN`) until the founder
+  connects Mintlify and sets the domains.
+- **Pages:** Get started (overview, quickstart, sandbox and test values, authentication), the nine concept pages
+  (DOC-02), webhooks (event types, signature verification, retries and ordering), errors and limits
+  (idempotency, rate limits, versioning), Postman and OpenAPI, and the changelog (DOC-06, one entry for
+  `2026-12-01`, linked from the reference's description). Guides (DOC-03) and the 8-language samples (DOC-04)
+  come in later P3 groups; the signature page has a Python sample until then.
+- **Docs that are tested:** the quickstart's request body is read from the page and sent to the API, in shadow
+  and in auto mode, and so is its table of other outcomes; the sandbox page is checked against the simulated
+  chain's test values (SBX-01 criterion 1); the signature sample is run against the API's signing code.
+- **Postman (SDK-03):** `docs/api/postman.json`, generated from the OpenAPI file by `make openapi`, with
+  `baseUrl`, `apiKey` and `apiVersion` variables and a fresh `Idempotency-Key` on every create. CI fails if it is
+  stale.
+- **As found:** the default sandbox rate limit is 120 requests a minute per key (`API_RATE_LIMIT_PER_MINUTE`), not
+  the 60 estimated above; the docs say 120. In shadow mode an ESCALATE decision opens no exception case.
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

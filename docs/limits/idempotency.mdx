@@ -1,0 +1,25 @@
+---
+title: "Idempotency"
+description: "Send a create twice and it happens once."
+---
+
+Every `POST` that creates something needs an `Idempotency-Key` header: payment intents, deposit intents,
+decisions and webhook endpoints. Use a new random value (a UUID) for each new request, and the **same** value when
+you retry that request.
+
+| You send | You get |
+|---|---|
+| A new key | The request runs and its response is stored |
+| The same key and the same body | The stored response, again. Nothing new is created |
+| The same key and a different body | `409 idempotency_conflict` |
+| The same key on a different kind of request | `409 idempotency_key_reused` |
+| No key | `422 validation_error`, with `param` set to `Idempotency-Key` |
+
+Keys are scoped to your organisation. A sandbox reset doesn't forget them: replaying a key after a reset returns
+the original payment and never pays twice.
+
+## Retrying safely
+
+Retry a create with the same key when you get no answer, a `429`, or a `5xx`. Never retry with a new key unless
+you know the first request failed, or you may create a second payment. Payments themselves are never resent by
+you: once a payment exists, DekernAI owns retries and failover under its payment ID.

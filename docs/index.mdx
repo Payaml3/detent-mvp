@@ -1,0 +1,35 @@
+---
+title: "Overview"
+description: "Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules."
+---
+
+DekernAI sits **beside** your payment rails, starting with the ones that can't be reversed: stablecoins and
+instant bank payouts. Every payment goes through three layers:
+
+| Layer | Question | What it does |
+|---|---|---|
+| **Decision** | Should this payment happen? | Your rules return EXECUTE, ESCALATE or BLOCK, with every check and its evidence |
+| **Orchestration** | How and where does it go? | Picks a rail by your routing weights, sends exactly once, fails over only on technical errors |
+| **Operations** | What happens around it? | An exceptions queue with owners and deadlines, reconciliation across rails, an audit log you can replay |
+
+AI agents work across all three layers: they prepare payment intents, investigate escalations and draft
+reconciliation fixes. **The AI proposes; your rules decide.** A model never approves, sends or retries a payment.
+
+<Note>
+DekernAI is agentic payment controls, not a payment provider. It never holds your funds. This is the public
+**sandbox**: test networks and a simulated bank rail only. `sk_live_` keys are always refused.
+</Note>
+
+## Access
+
+Access is not self-serve. Once DekernAI has approved your company, your account owner receives an invitation to
+the dashboard, invites the team and creates sandbox keys. [Request sandbox access](https://SITE_DOMAIN/access/).
+
+## Where to go next
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="bolt" href="/quickstart">Your first payment intent in five minutes.</Card>
+  <Card title="Sandbox and test values" icon="flask" href="/sandbox">Trigger timeouts, failover, blocks and escalations.</Card>
+  <Card title="Payment states" icon="diagram-project" href="/concepts/payment-states">Why a timeout is UNKNOWN, never FAILED.</Card>
+  <Card title="API reference" icon="code" href="/api-reference">Every endpoint, generated from the OpenAPI file.</Card>
+</CardGroup>

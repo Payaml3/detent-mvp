@@ -1,0 +1,27 @@
+---
+title: "Audit and replay"
+description: "An append-only, hash-chained log of every change, and a replay that reproduces every decision."
+---
+
+## The audit log
+
+Every change is recorded as an audit event **in the same transaction** as the change itself: the intent, agent
+output, each decision with its rule version and checks, case events, approvals, state changes, rail requests and
+responses, ledger postings, the kill switch and rule changes. Each event names the actor (a member, a key's
+member, or the system) and their role.
+
+The log is append-only: the database refuses any update or delete. Each event stores a hash of the one before, so
+changing any past event breaks the chain, and verification finds it.
+
+`GET /v1/payment_intents/{id}` includes the payment's audit events, and the console shows them on each payment.
+
+## Replay
+
+`GET /v1/payment_intents/{id}/replay` re-runs every decision on the payment from its stored inputs, stored agent
+outputs and the rule version it used, step by step, and says whether it reproduced the recorded decision:
+
+```json
+{"payment_id": "pay_01JD...", "match": true, "steps": [...]}
+```
+
+Replay never calls a model: it uses the outputs that were recorded at the time. A mismatch raises an alert.

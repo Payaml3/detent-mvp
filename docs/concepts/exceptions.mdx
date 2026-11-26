@@ -1,0 +1,37 @@
+---
+title: "Exceptions and deadlines"
+description: "Every escalation is a case with an owner, a backup and a deadline. A deadline never approves anything."
+---
+
+When a decision is ESCALATE, DekernAI opens an **exception case**. Its owner is set by your rules: by default a
+reviewer owns payout cases, with your backup owner behind them, and your payments lead owns `UNKNOWN_STUCK` cases.
+
+| Field | Meaning |
+|---|---|
+| `type` | What needs a decision: a payout, a deposit, a stuck UNKNOWN payment, a reconciliation break |
+| `owner` | The person who should decide |
+| `deadline_at` | When it is due. By default 2 hours for a payout above the auto limit, 4 hours for other payouts and 1 business day for a deposit |
+| `status` | `OPEN`, `HELD_OVERDUE` or `RESOLVED` |
+
+The case shows the raw facts first (the intent, every check and its evidence), then what the investigation agent
+found, kept separate and labelled as the agent's.
+
+## Approving and rejecting
+
+A reviewer approves or rejects in the console or with `POST /v1/exceptions/{id}/approve` and
+`POST /v1/exceptions/{id}/reject`, with a `reason`. Two rules always apply:
+
+- **The person who created the payment can't approve it.**
+- **Approval re-runs the rules** with the active version. The re-run executes only if every remaining reason is one
+  the approver saw and its evidence is unchanged. A new reason, or a changed destination, opens a new case. A BLOCK
+  is never approved.
+
+## When the deadline passes
+
+Nothing is approved by waiting. An overdue case becomes `HELD_OVERDUE`: the payment stays held, the backup owner
+takes over and the counterparty is told about the delay. The case stays until a person decides it.
+
+## Getting told
+
+The `exception.created`, `exception.overdue` and `exception.resolved` webhooks follow each case, and
+`GET /v1/exceptions` lists them with filters for `status`, `owner`, `tier` and `overdue`.

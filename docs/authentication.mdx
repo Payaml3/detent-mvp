@@ -1,0 +1,42 @@
+---
+title: "Authentication"
+description: "Sandbox keys, scopes and the headers every request carries."
+---
+
+Every request carries a sandbox key as a bearer token:
+
+```http
+Authorization: Bearer sk_test_...
+```
+
+Members with the account owner, admin or developer role create keys on the dashboard's **Keys** page. A key is
+shown once, when it is created; DekernAI stores only a hash of it. Each key belongs to a named member, who is the
+actor in the audit log for everything the key does, and each key can be revoked at any time.
+
+## Scopes
+
+| Scope | Allows |
+|---|---|
+| `read` | Every `GET` |
+| `intents:create` | Creating payment and deposit intents, and decisions only (`POST /v1/decisions`) |
+| `exceptions:approve` | Approving and rejecting escalations, and confirming a send in assist mode |
+| `admin` | Creating, testing and disabling webhook endpoints, revoking mandates, and the kill switch |
+
+A request outside the key's scopes gets `403` with type `permission`. Permissions also follow the member's role:
+for example, only the payments lead can release the kill switch, and the person who created a payment can't
+approve it.
+
+## Live keys
+
+There are no live keys. A key starting with `sk_live_` always gets `403 live_mode_unavailable`.
+
+## Headers on every request
+
+| Header | Required | Meaning |
+|---|---|---|
+| `Authorization` | Yes | `Bearer sk_test_...` |
+| `Idempotency-Key` | On every `POST` that creates something | See [Idempotency](/limits/idempotency) |
+| `DekernAI-Version` | No | The API version, for example `2026-12-01`. Without it, your organisation's pinned version applies. See [Versioning](/limits/versioning) |
+
+Every response carries a `Request-Id` header. Quote it when you contact DekernAI about a request; it is also on
+the dashboard's **Request logs** page.

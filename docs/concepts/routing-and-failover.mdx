@@ -1,0 +1,46 @@
+---
+title: "Routing and failover"
+description: "The best rail by your weights, exactly once, and a different rail only after a technical failure."
+---
+
+## Routing
+
+After an EXECUTE decision, DekernAI chooses the rail:
+
+1. **Eligible rails only:** the currency matches; the network is allowed by the intent (or the agent's mandate);
+   the rail is within its limits, inside its cut-off and healthy; and the pre-funded limit has room.
+2. **Score each one** by fee, expected speed, recent success rate and liquidity headroom, with the weights you set.
+   The lowest score wins.
+3. **Record it:** every candidate, its score and why the winner won are stored on the decision (`route`).
+
+When the destination is a wallet on one network, that network is the route, unless the intent sets
+`"allow_network_switch": true` and the payee has a verified destination on another network.
+
+## Exactly once
+
+Before each send, inside a lock on the payment, DekernAI checks the kill switch, the balance and limits again. The
+rail gets an idempotency key derived from the payment and attempt, so a repeated request can't move money twice.
+
+## Retries
+
+Only a `TECHNICAL_RETRYABLE` failure (for example the rail answered 503 before accepting) is retried, by fixed
+rules, on the same rail.
+
+## Failover
+
+A payout moves to another rail only when **all** of these hold:
+
+- the attempt failed with `TECHNICAL_FINAL`, or its retries ran out;
+- the intent or mandate allows a network switch, or a person approved it;
+- another eligible rail exists.
+
+Failover keeps the payment ID; the new attempt's `attempt_no` goes up by one. There is **never** a failover from
+UNKNOWN, after a BLOCK, or after the rail rejected the payment for compliance reasons (`REJECTED_BY_RAIL`).
+
+Try it in the sandbox with an amount ending in `.42` (see [test values](/sandbox#test-values)).
+
+## The kill switch
+
+`POST /v1/kill_switch` (or the console) stops all sending at once: payments about to be sent are held, and UNKNOWN
+payments keep resolving. Your payments lead engages it (with a key that has the `admin` scope); only your payments lead can release it, with
+`DELETE /v1/kill_switch`. On release, every held payment is decided again with the active rules.
