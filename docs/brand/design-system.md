@@ -41,11 +41,13 @@ confirmed green `#237A46`, unknown amber `#F2C94C` as a fill with `#1B1405` text
 Blocked is a graphite pill with a cross icon and a white label: never orange, never colour alone.
 The console (`apps/api/src/detent/console/static/console.css`) and the favicon use the same values.
 
-## Mark: sift then settle
+## Mark: the settled D
 
-`apps/site/src/components/Mark.astro`. Five dots, then three, above a rule; one larger dot below it in
-`--settle`. It reads as many inputs weighed against the rules and one outcome settled, the meaning of
-*dēcernere* ("to sift, then decide"). The dots use `currentColor`, so the mark works on any background.
+`apps/site/src/components/Mark.astro`, and the console header. A D monogram with one point resting in its
+counter: many inputs, one outcome the rules settle on. The D uses `currentColor`, so it works on any
+background; the point is `--settle` (safety orange), and turns paper on an orange ground. Lockups, clear space
+and sizing rules are in `docs/brand/logo.md` and `apps/site/public/brand/` (logo PR #67). The "sift then settle"
+idea lives on in the site art below.
 
 ## Art
 
