@@ -136,8 +136,11 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   DSH-03, DSH-11. `detent/dashboard/` (access rules in `access.py`, screens in `routes.py` and `admin.py`),
   migration 0011. DekernAI admins come from `detent staff add`. See spec/08 "As built (P2 group 1)". Open: the email
   provider (founder item; DSH-02 criterion 2).
-- **P2 next:** group 2 (DSH-04 keys, DSH-05 logs, DSH-06 webhooks, DSH-08 usage, LED-08, SBX-02 quotas), group 3
-  (RAL-11, SBX-01, SBX-03, SBX-04, DSH-07), group 4 (DSH-09 console per organisation, DSH-10 access requests,
+- **P2 group 2: built (PR from `claude/project-thread-babje1`, 2026-11-26):** DSH-04, DSH-05, DSH-06, DSH-08,
+  LED-08. Pages in `detent/dashboard/developer.py` (key service in `keys.py`), metering and quotas in
+  `detent/sandbox/usage.py`, migration 0012. 429 `quota_exceeded` over the payment quota. See spec/08 "As built
+  (P2 group 2)". Open: SBX-02 waits for the shared testnet wallet's daily cap (group 3).
+- **P2 next:** group 3 (RAL-11, SBX-01, SBX-02 wallet cap, SBX-03, SBX-04, DSH-07), group 4 (DSH-09 console per organisation, DSH-10 access requests,
   DSH-12 verification). · Model: strongest for quotas and the rail; mid-tier for the screens
 - **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 

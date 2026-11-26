@@ -79,6 +79,12 @@ people and may change. Quote `request_id` when you contact DekernAI; it is also 
 |---|---|---|---|
 | `rate_limited` | 429 | Too many requests for this key or client address in the current window. | Wait for the seconds in `Retry-After`, then retry. |
 
+## `quota`
+
+| Code | HTTP | Meaning | What to do |
+|---|---|---|---|
+| `quota_exceeded` | 429 | The organisation used its daily sandbox quota for this kind of request (SBX-02). | Wait for the seconds in `Retry-After` (the next UTC day); the usage page shows the quotas. |
+
 ## `internal`
 
 | Code | HTTP | Meaning | What to do |

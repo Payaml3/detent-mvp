@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Request {{ row.request_id }}{% endblock %}
+{% block main %}
+<p><a href="/dashboard/logs">← Request logs</a></p>
+<h1 class="mono">{{ row.method }} {{ row.path }}</h1>
+<table>
+  <tbody>
+  <tr><th scope="row">Status</th><td class="mono">{{ row.status }}</td></tr>
+  <tr><th scope="row">Time</th><td>{{ row.at.strftime('%Y-%m-%d %H:%M:%S') }} UTC</td></tr>
+  <tr><th scope="row">Latency</th><td>{{ row.latency_ms }} ms</td></tr>
+  <tr><th scope="row">Request ID</th><td class="mono">{{ row.request_id }}</td></tr>
+  <tr><th scope="row">Key</th><td class="mono">{{ row.key_id or "" }}</td></tr>
+  <tr><th scope="row">Idempotency key</th><td class="mono">{{ row.idempotency_key or "None" }}</td></tr>
+  <tr><th scope="row">Payment</th><td class="mono">{{ row.payment_id or "None" }}</td></tr>
+  <tr><th scope="row">Request body</th><td class="muted">[redacted] Bodies are never stored.</td></tr>
+  <tr><th scope="row">Response body</th><td class="muted">[redacted] Bodies are never stored.</td></tr>
+  </tbody>
+</table>
+<p class="muted small">Quote the request ID if you contact DekernAI about this call.</p>
+{% endblock %}

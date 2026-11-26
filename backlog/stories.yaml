@@ -1141,6 +1141,7 @@ stories:
   so: per-payment pricing can be billed later, and sandbox usage shown now
   ac:
     - "Monthly counts of payments decided, agent investigations and API calls per organisation"
+  done: [0]
   pri: Could
   est: 0.25
   deps: [LED-01]
@@ -1859,6 +1860,7 @@ stories:
   ac:
     - "Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate"
     - "Only `sk_test_` keys exist in the prototype; the page labels production keys as not available in the prototype (invariant 14)"
+  done: [0, 1]
   pri: Must
   est: 0.5
   deps: [DSH-02]
@@ -1872,6 +1874,7 @@ stories:
   so: I can debug quickly
   ac:
     - "Filters by status, path, idempotency key and payment ID; detail view with redacted bodies"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [API-06, DSH-02]
@@ -1885,6 +1888,7 @@ stories:
   so: I can set up webhooks without support
   ac:
     - "All WHK features available in the UI"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [WHK-03, DSH-02]
@@ -1911,6 +1915,7 @@ stories:
   so: I know when I'll hit a limit
   ac:
     - "Calls, payments decided and agent investigations against daily quotas"
+  done: [0]
   pri: Should
   est: 0.25
   deps: [LED-08, SBX-02]

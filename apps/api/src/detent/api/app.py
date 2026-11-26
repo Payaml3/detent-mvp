@@ -33,11 +33,30 @@ from detent.intents.service import IdempotencyConflict, RequestProblem
 from detent.logging import request_id_var
 from detent.policy.screening import MockScreening
 from detent.runtime import build_runtime
+from detent.sandbox.usage import QuotaExceeded
 from detent.settings import Settings, get_settings
 
 log = logging.getLogger("detent.api")
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "console" / "static"
+
+
+def _quota(request: Request, exc: QuotaExceeded) -> Response:
+    """SBX-02: over a daily sandbox quota. Retry-After runs to the next UTC day."""
+    resp = error_response(429, "quota", "quota_exceeded", str(exc), request_id=request_id_var.get())
+    resp.headers["Retry-After"] = str(exc.retry_after)
+    return resp
+
+
+def _conflict(request: Request, exc: IdempotencyConflict) -> Response:
+    return error_response(
+        409,
+        "conflict",
+        "idempotency_conflict",
+        "This Idempotency-Key was already used with a different request body.",
+        request_id=request_id_var.get(),
+        param="Idempotency-Key",
+    )
 
 
 def create_app(
@@ -116,15 +135,8 @@ def create_app(
     def _problem(request: Request, exc: RequestProblem) -> Response:
         return _err(exc.status, "invalid_request", exc.code, exc.message, exc.param)
 
-    @app.exception_handler(IdempotencyConflict)
-    def _conflict(request: Request, exc: IdempotencyConflict) -> Response:
-        return _err(
-            409,
-            "conflict",
-            "idempotency_conflict",
-            "This Idempotency-Key was already used with a different request body.",
-            "Idempotency-Key",
-        )
+    app.add_exception_handler(QuotaExceeded, _quota)  # type: ignore[arg-type]
+    app.add_exception_handler(IdempotencyConflict, _conflict)  # type: ignore[arg-type]
 
     @app.exception_handler(v1.MissingIdempotencyKey)
     def _no_key(request: Request, exc: v1.MissingIdempotencyKey) -> Response:

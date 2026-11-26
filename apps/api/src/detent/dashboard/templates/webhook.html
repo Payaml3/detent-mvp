@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Webhook endpoint{% endblock %}
+{% block main %}
+<p><a href="/dashboard/webhooks">← Webhooks</a></p>
+<h1 class="mono">{{ ep.url }}</h1>
+<p><span class="st st-{{ 'ready' if ep.status == 'enabled' else 'rejected' }}">{{ ep.status }}</span>
+  <span class="small muted">Events: {{ ep.event_types | join(", ") }} · secret fingerprint <span class="mono">{{ ep.secret_fingerprint or "" }}</span></span></p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% set n = {"test_sent": "Test event queued (it carries \"test\": true).", "resent": "Resend queued.", "disabled": "Endpoint disabled. Nothing more is delivered to it."}.get(request.query_params.get('notice')) %}
+{% if n %}<p class="note" role="status">{{ n }}</p>{% endif %}
+{% if ep.status == 'enabled' and not lock %}
+<section class="card">
+  <form method="post" action="/dashboard/webhooks/{{ ep.id }}/test" class="inline">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><button class="primary">Send test event</button>
+  </form>
+  <form method="post" action="/dashboard/webhooks/{{ ep.id }}/disable" class="inline">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><button class="danger">Disable endpoint</button>
+  </form>
+</section>
+{% endif %}
+<h2>Delivery log</h2>
+<table>
+  <thead><tr><th>Time (UTC)</th><th>Event</th><th>Attempt</th><th>Outcome</th><th>Status code</th><th>Latency</th><th></th></tr></thead>
+  <tbody>
+  {% for d in deliveries %}
+  <tr><td class="small">{{ d.created[:19] | replace("T", " ") }}</td><td class="mono small">{{ d.event_type }}<br>{{ d.event_id }}</td><td>{{ d.attempt }}{% if d.manual %} (resend){% endif %}</td>
+    <td>{{ d.outcome }}{% if d.error %}<div class="small muted">{{ d.error }}</div>{% endif %}</td><td class="mono">{{ d.status_code or "" }}</td><td class="small">{{ d.latency_ms ~ ' ms' if d.latency_ms is not none else "" }}</td>
+    <td>{% if ep.status == 'enabled' and not lock %}<form method="post" action="/dashboard/webhooks/{{ ep.id }}/resend"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="event_id" value="{{ d.event_id }}"><button>Resend</button></form>{% endif %}</td></tr>
+  {% else %}
+  <tr><td colspan="7" class="muted">Nothing delivered yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if more %}<p class="muted small">Showing the latest 50 attempts; the API lists the rest.</p>{% endif %}
+{% endblock %}

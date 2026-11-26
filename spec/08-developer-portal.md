@@ -138,8 +138,36 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   takes away the account owner role. The last account owner can't be demoted or removed (database trigger, plus a
   lock on the organisation row against two owners demoting each other). Removing a member revokes their API keys
   at once. Members are never deleted.
-- **Not yet:** the transactional email provider (DSH-02 criterion 2 stays open), and the keys, logs, webhooks,
-  sandbox and verification pages (later P2 groups; the checklist links to them).
+- **Not yet:** the transactional email provider (DSH-02 criterion 2 stays open), and the sandbox and verification
+  pages (later P2 groups; the checklist links to them). Keys, logs, webhooks and usage: P2 group 2 below.
+
+## As built (P2 group 2)
+
+- **Keys (DSH-04):** `/dashboard/keys`, for account owners, admins and developers. A key has a name, scopes
+  (`read`, `intents:create`, `exceptions:approve`, `admin`) and an owner (the member who made it; the member's role
+  still applies to every call). The secret is shown once, on a page that is never cached; only an HMAC of it is kept.
+  Rolling makes a new key with the same owner, scopes and name; the old one works for an overlap (24 hours by
+  default, `KEY_ROLL_OVERLAP_HOURS`, 0 to 168 chosen per roll), and a rolled key can't be rolled again. Revoking is
+  immediate. Last use is written by the request log, at most once a minute per key. Each change is audited
+  (`api_key.created`, `api_key.rolled`, `api_key.revoked`). Production keys are labelled as not available.
+- **Request logs (DSH-05):** `/dashboard/logs` filters by status (a code or a class such as `4xx`), path, idempotency
+  key and payment ID over the 30-day window; the detail page shows the metadata and marks both bodies as redacted,
+  because they are never stored.
+- **Webhooks (DSH-06):** `/dashboard/webhooks` creates an endpoint (signing secret shown once), lists endpoints and
+  opens each one's delivery log with "send test event", resend per event and disable. The same services as the API;
+  audit events name the member and carry `"via": "dashboard"`.
+- **Metering (LED-08):** `usage_daily` counts API calls, payments decided (payment intents and dry-run decisions;
+  an idempotent replay is not counted) and agent investigations per organisation and UTC day, in the same
+  transaction as the work. A month is the sum of its days (`detent.sandbox.usage.monthly`).
+- **Quotas (SBX-02):** each new client or evaluation organisation gets 500 payments decided and 50 agent
+  investigations a day (`SANDBOX_DAILY_PAYMENTS`, `SANDBOX_DAILY_INVESTIGATIONS`); demo and test organisations have
+  none. The check and the count are one statement, so concurrent requests never pass the cap. Over the payment
+  quota the API answers 429 with type `quota` and code `quota_exceeded`, `Retry-After` runs to the next UTC day, and
+  nothing is created. Over the investigation quota the case still opens and the agent records `QUOTA_EXCEEDED`, so a
+  person works from the raw facts. API calls have no daily quota; the per-key rate limit applies.
+- **Usage (DSH-08):** `/dashboard/usage`, for every member: today against the quotas, and the month so far.
+- **Not yet:** the shared testnet wallet's daily outflow cap arrives with real testnet mode (SBX-03, P2 group 3),
+  so SBX-02 stays open until then.
 
 ## Needed from the founder before M8 to M11
 

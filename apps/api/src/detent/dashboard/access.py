@@ -158,9 +158,8 @@ def create_organisation(
     conn.execute(
         text(
             "INSERT INTO organisations (id, name, mode, fail_safe, kind, kyb_reference, kyb_approved_on, "
-            "expires_at, created_by, created_at) VALUES (:id, :n, 'shadow', 'manual_queue', :k, "
-            ":ref, :on, :exp, "
-            ":by, :now)"
+            "expires_at, created_by, created_at, daily_payment_quota, daily_investigation_quota) "
+            "VALUES (:id, :n, 'shadow', 'manual_queue', :k, :ref, :on, :exp, :by, :now, :qp, :qi)"
         ),
         {
             "id": org_id,
@@ -171,6 +170,8 @@ def create_organisation(
             "exp": expires_at,
             "by": staff.id,
             "now": now,
+            "qp": settings.sandbox_daily_payments,  # SBX-02
+            "qi": settings.sandbox_daily_investigations,
         },
     )
     conn.execute(text("INSERT INTO kill_switch (org_id, engaged) VALUES (:o, false)"), {"o": org_id})
