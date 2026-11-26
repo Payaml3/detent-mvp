@@ -26,7 +26,7 @@ const layers = [
     <div class="stage" aria-hidden="true"><canvas data-spine-stage></canvas><p class="small stage-cap">Scroll: one payment through the three layers</p></div>
     <ol class="cols">
       {layers.map((l, i) => (
-        <li class="col" data-reveal data-layer-status={l.status} style={`--d:${i * 90}ms`}>
+        <li class="col" data-card data-layer-status={l.status} style={`--d:${i * 90}ms`}>
           <h3><span class="word">{l.word}.</span> {l.question}</h3>
           <p class="layer">The {l.name.toLowerCase()} layer</p>
           <dl>

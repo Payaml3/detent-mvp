@@ -28,7 +28,7 @@ const ladder = [
       <p class="lead">The shadow report is free, and nothing is sent anywhere.</p> {/* taste-skill-ignore: "shadow report" is a product name */}
       <ol class="steps">
         {steps.map((s) => (
-          <li><span class="n" aria-hidden="true">{s.n}</span><div><h3>{s.title}</h3><p>{s.body}</p></div></li>
+          <li data-card><span class="n" aria-hidden="true">{s.n}</span><div><h3>{s.title}</h3><p>{s.body}</p></div></li>
         ))}
       </ol>
       <div class="actions">
@@ -52,7 +52,7 @@ const ladder = [
       <h3 class="ladder-title">Four steps, and you decide when to take each one.</h3>
       <ol>
         {ladder.map((l, i) => (
-          <li class={l.lead ? "lead-step" : ""}>
+          <li class={l.lead ? "lead-step" : ""} data-card>
             <span class="k small">Step {i + 1}</span>
             <strong>{l.step}</strong>
             <p>{l.what}</p>

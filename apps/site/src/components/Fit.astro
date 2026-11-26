@@ -24,7 +24,7 @@ const faq = [
     <h2 id="uses-title" data-reveal>For platforms that hold user balances.</h2>
     <ul class="cases">
       {cases.map((c, i) => (
-        <li data-reveal style={`--d:${i * 70}ms`}>
+        <li data-card>
           <h3>{c.name}</h3>
           <p class="soft">{c.line}</p>
           <p class="readout" data-ui><span class={`chip st-${c.status}`}>{c.label}</span><span class="soft code">{c.reason}</span></p>
