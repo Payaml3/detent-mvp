@@ -60,7 +60,7 @@ def create_app(
         redoc_url=None,
     )
     app.state.runtime = rt
-    app.state.limiter = RateLimiter()
+    app.state.limiter = RateLimiter(limit=max(1, rt.settings.api_rate_limit_per_minute))
 
     app.add_middleware(
         SessionMiddleware,

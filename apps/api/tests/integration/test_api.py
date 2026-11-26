@@ -109,3 +109,7 @@ def test_rotating_junk_tokens_still_hit_the_client_address_limit(client: TestCli
         for i in range(IP_LIMIT_FACTOR + 2)
     ]
     assert codes[-1] == 429
+
+
+def test_the_rate_limit_comes_from_settings(client: TestClient) -> None:
+    assert client.app.state.limiter.limit == 120  # type: ignore[attr-defined]
