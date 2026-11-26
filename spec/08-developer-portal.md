@@ -80,11 +80,12 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 1. **Hero:** "Every deposit and payout, decided by your rules." Category line: "Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules." The primary CTA is "Get a free shadow report"; the secondary CTA is Book a demo. The example payment plays through the three layers beside the "sift then settle" art. A small honesty line: prototype, test networks only, never holds funds or keys.
 2. **The problem:** "On rails you can't reverse, every mistake is permanent." Manual review queues, deposits credited wrong, retries that become double payments, decisions nobody can replay.
 3. **Sift. Settle. Prove.:** the three layers as one payment's life, with the same payment ID: your rules decide in each, agents do the groundwork. "Agents prepare. Your rules decide." is said here once.
+3a. **Change a rule, watch the decision:** the page's one live control. An auto-limit slider and three toggles (first payment, changed wallet, screening hit) re-decide the fictional $18,500 payout in the browser, using the spec/04 checks and reason codes. Labelled a simulation; without script the default decision shows.
 4. **Built for irreversible payments:** "A failure can retry. A rejection can't. No retry ever becomes a second payment.", with the payment states shown and the kill switch.
 5. **Measured results:** shown only once `results.json` exists, each figure labelled "test-network evaluation, [date]". Left out of the page until then.
 6. **Roles:** tabs for Payments, Compliance and Engineering. Engineering holds the 8-language code tab creating a payment intent (pre-launch label) and the sandbox access link; Compliance links to the Security page, which holds non-custodial, audit and replay, kill switch, EU hosting and the roadmap list.
-7. **The free shadow report:** what you send, what we do, what you get in 5 working days, beside a sample report labelled fictional. Paid plans (Pilot, Growth, Scale) are "Talk to us", with no prices.
-8. **Use cases and FAQ:** payout platforms, crypto service providers, brokers and prop firms, marketplaces; then 5 questions (money and custody, does the AI approve, rails, what the report needs, cost).
+7. **The free shadow report:** what you send, what we do, what you get in 5 working days, beside a sample report labelled fictional. Below it, the adoption ladder (Shadow, Assist, Auto, Orchestrate, from docs/product/product-model.md). Paid plans (Pilot, Growth, Scale) are "Talk to us", with no prices.
+8. **Use cases and FAQ:** payout platforms, crypto service providers, brokers and prop firms, marketplaces; then 8 questions (money and custody, does the AI approve, changing rails, who approves, timeouts, rails, what the report needs, cost).
 9. **Close:** "Held until it's right. Sent exactly once." with both CTAs.
 10. **Footer:** docs, status, privacy, terms, contact.
 

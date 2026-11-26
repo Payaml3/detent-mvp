@@ -13,6 +13,13 @@ const rows = [
   { who: "Payout, Harbor Logistics GmbH", amount: "€2,400.00", status: "CONFIRMED", why: "Every check passed. Your team: paid." },
 ];
 const plans = ["Pilot", "Growth", "Scale"];
+// The adoption ladder (docs/product/product-model.md): you move up a step only when you sign off on the last one.
+const ladder = [
+  { step: "Shadow", what: "Decisions on your exported month. Nothing is sent.", gate: "Free", lead: true },
+  { step: "Assist", what: "Live recommendations. Your staff click every decision.", gate: "Your sign-off on the shadow results" },
+  { step: "Auto", what: "Executes within your approved rules. Only escalations reach a person.", gate: "The same sign-off, on live traffic" },
+  { step: "Orchestrate", what: "Routing across two or more rails by your policy.", gate: "Routing add-on" },
+];
 ---
 <section class="section offer" id="shadow-report" data-section="offer" aria-labelledby="offer-title">
   <div class="wrap grid">
@@ -26,7 +33,6 @@ const plans = ["Pilot", "Growth", "Scale"];
       </ol>
       <div class="actions">
         <a class="button" href="/design-partners/">Get a free shadow report</a> {/* taste-skill-ignore: "shadow report" is a product name */}
-        <p class="small soft">Paid plans after the pilot: {plans.join(", ")}. <a class="textlink" href={config.bookingUrl}>Talk to us</a>.</p>
       </div>
     </div>
     <figure class="sample" data-ui data-reveal>
@@ -42,6 +48,20 @@ const plans = ["Pilot", "Growth", "Scale"];
         ))}
       </ul>
     </figure>
+    <div class="ladder" data-reveal>
+      <h3 class="ladder-title">Four steps, and you decide when to take each one.</h3>
+      <ol>
+        {ladder.map((l, i) => (
+          <li class={l.lead ? "lead-step" : ""}>
+            <span class="k small">Step {i + 1}</span>
+            <strong>{l.step}</strong>
+            <p>{l.what}</p>
+            <p class="gate small">{l.gate}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="small soft">Paid plans ({plans.join(", ")}) are a software fee per payment decided, never a share of the money you move. <a class="textlink" href={config.bookingUrl}>Talk to us</a>.</p>
+    </div>
   </div>
 </section>
 <style>
@@ -63,5 +83,17 @@ const plans = ["Pilot", "Growth", "Scale"];
   .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
   .rows li { display: grid; gap: 6px; justify-items: start; padding: 14px; background: var(--surface-sunk); border-radius: 8px; }
   .who { font-weight: 600; }
+  .ladder { grid-column: 1 / -1; display: grid; gap: 24px; margin-top: 72px; }
+  .ladder-title { font-size: clamp(24px, 2.2vw, 32px); letter-spacing: -0.02em; max-width: 24ch; }
+  .ladder ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .ladder li { display: grid; gap: 10px; align-content: start; padding: 24px; background: var(--surface); border-radius: var(--radius); }
+  .ladder li.lead-step { background: var(--text); color: var(--bg); }
+  .ladder li.lead-step .k, .ladder li.lead-step .gate { color: var(--bg); }
+  .ladder strong { font: 600 clamp(22px, 1.9vw, 28px)/1.1 var(--font-head); letter-spacing: -0.02em; }
+  .ladder .k { color: var(--text-soft); font-weight: 600; }
+  .ladder .gate { color: var(--text-soft); font-weight: 600; margin-top: 6px; }
+  .ladder .textlink { color: var(--interactive-soft); }
+  @media (max-width: 960px) { .ladder ol { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .ladder ol { grid-template-columns: 1fr; } }
   @media (max-width: 960px) { .head, .sample { grid-column: 1 / -1; } .sample { transform: none; } }
 </style>

@@ -1,0 +1,126 @@
+---
+// The page's one live thing: change a rule and watch the example payment's decision change.
+// Checks, results and reason codes follow spec/04-policy.md. Pure simulation in the browser; nothing is sent.
+// Without script the default decision shows, and the controls stay hidden.
+const AMOUNT = 1850000; // minor units, USDC cents
+const fmt = (minor) => `$${(minor / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+const defaults = { limit: 1000000, first: true, changed: false, screening: false };
+const decide = ({ limit, first, changed, screening }) => {
+  const checks = [
+    { code: "SCREENING_HIT", label: "Screening list", hit: screening, result: "BLOCK" },
+    { code: "ABOVE_AUTO_LIMIT", label: `Auto limit ${fmt(limit)}`, hit: AMOUNT > limit, result: "ESCALATE" },
+    { code: "CHANGED_DETAILS", label: "Wallet details unchanged", hit: changed, result: "ESCALATE" },
+    { code: "FIRST_PAYMENT", label: "Paid this supplier before", hit: first, result: "ESCALATE" },
+  ];
+  const hits = checks.filter((c) => c.hit);
+  const outcome = hits.some((c) => c.result === "BLOCK") ? "BLOCK" : hits.length ? "ESCALATE" : "EXECUTE";
+  return { checks, hits, outcome };
+};
+const start = decide(defaults);
+const chip = { EXECUTE: "CONFIRMED", ESCALATE: "ESCALATED", BLOCK: "BLOCKED" };
+const next = {
+  EXECUTE: "Sent once on the best rail by your policy. No one is asked.",
+  ESCALATE: "Held. A case opens for your reviewer with the raw facts, and the rules run again on approval.",
+  BLOCK: "Final. No person or agent can approve, retry or re-route it.",
+};
+---
+<section class="section rules" id="rules" data-section="rules" aria-labelledby="rules-title">
+  <div class="wrap grid">
+    <div class="head" data-reveal>
+      <h2 id="rules-title">Change a rule. Watch the decision.</h2>
+      <p class="lead">The same $18,500.00 USDC payout to Bluefin Components Ltd, a fictional supplier. Your rules decide it the same way every time.</p>
+      <form class="controls" data-rules-controls hidden aria-label="Rules for this payment">
+        <label class="slider">
+          <span class="row"><span>Auto limit</span><output data-limit-out>{fmt(defaults.limit)}</output></span>
+          <input type="range" name="limit" min="100000" max="5000000" step="50000" value={defaults.limit} aria-describedby="limit-note" />
+          <span class="small soft" id="limit-note">Payments above it wait for a person.</span>
+        </label>
+        <label class="toggle"><input type="checkbox" name="first" checked={defaults.first} /><span class="track" aria-hidden="true"></span><span>First payment to this supplier</span></label>
+        <label class="toggle"><input type="checkbox" name="changed" checked={defaults.changed} /><span class="track" aria-hidden="true"></span><span>Wallet changed this week</span></label>
+        <label class="toggle"><input type="checkbox" name="screening" checked={defaults.screening} /><span class="track" aria-hidden="true"></span><span>Address on the screening list</span></label>
+      </form>
+    </div>
+    <figure class="record" data-ui data-reveal>
+      <figcaption class="top"><span class="small">Decision record</span><span class="small soft">Simulation · nothing is sent</span></figcaption>
+      <p class="outcome" aria-live="polite"><span class={`chip st-${chip[start.outcome]}`} data-outcome>{start.outcome}</span><span class="amount">{fmt(AMOUNT)} <span class="soft">USDC</span></span></p>
+      <p class="next" data-next>{next[start.outcome]}</p>
+      <ul class="checks" data-checks>
+        {start.checks.map((c) => (
+          <li class={c.hit ? "hit" : "pass"}><span class="label">{c.label}</span><span class="code">{c.hit ? c.code : "pass"}</span></li>
+        ))}
+      </ul>
+      <p class="small soft foot">Rule version v3 · checks from the published policy format · one payment ID for life</p>
+    </figure>
+  </div>
+  <script type="application/json" data-rules-copy set:html={JSON.stringify({ amount: AMOUNT, chip, next })} />
+</section>
+<style>
+  .rules { background: var(--bg); }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: start; }
+  .head { grid-column: 1 / span 5; display: grid; gap: 28px; }
+  .head h2 { max-width: 14ch; }
+  .lead { color: var(--text-soft); max-width: 40ch; }
+  .controls { display: grid; gap: 14px; }
+  .controls[hidden] { display: none; }
+  .slider { display: grid; gap: 10px; padding: 20px; background: var(--surface); border-radius: var(--radius); }
+  .row { display: flex; justify-content: space-between; font-weight: 600; }
+  output { font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; accent-color: var(--interactive); height: 28px; }
+  .toggle { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: center; padding: 16px 20px; background: var(--surface); border-radius: var(--radius); cursor: pointer; }
+  .toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .track { position: relative; width: 44px; height: 26px; border-radius: 13px; background: var(--surface-sunk); transition: background 180ms var(--ease-out); }
+  .track::after { content: ""; position: absolute; left: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--text-soft); transition: transform 180ms var(--ease-out), background 180ms; }
+  .toggle input:checked + .track { background: var(--text); }
+  .toggle input:checked + .track::after { transform: translateX(18px); background: var(--bg); }
+  .toggle input:focus-visible + .track { outline: 2px solid var(--interactive); outline-offset: 3px; }
+  .record { grid-column: 7 / span 6; position: sticky; top: 112px; margin: 0; padding: 32px; background: var(--surface); border-radius: 14px; display: grid; gap: 20px; }
+  .top { display: flex; justify-content: space-between; font-weight: 600; gap: 12px; flex-wrap: wrap; }
+  .outcome { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .outcome .chip { font-size: 15px; padding: 8px 14px; }
+  .amount { font: 600 clamp(28px, 3vw, 44px)/1 var(--font-head); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .next { font-size: clamp(18px, 1.4vw, 21px); max-width: 40ch; min-height: 2.6em; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .checks li { display: flex; justify-content: space-between; gap: 16px; padding: 12px 14px; border-radius: 8px; background: var(--surface-sunk); transition: background 200ms; }
+  .checks .code { font-variant-numeric: tabular-nums; color: var(--text-soft); }
+  .checks li.hit { background: color-mix(in srgb, var(--wait) 14%, transparent); }
+  .checks li.hit .code { color: var(--wait); font-weight: 600; }
+  .checks li.hit.block { background: color-mix(in srgb, var(--danger) 14%, transparent); }
+  .checks li.hit.block .code { color: var(--danger); }
+  @media (max-width: 960px) { .head, .record { grid-column: 1 / -1; } .record { position: static; padding: 24px; } }
+</style>
+<script>
+  const root = document.querySelector("[data-section='rules']");
+  const form = root.querySelector("[data-rules-controls]");
+  const { amount, chip, next } = JSON.parse(root.querySelector("[data-rules-copy]").textContent);
+  const fmt = (m) => `$${(m / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+  const out = root.querySelector("[data-limit-out]");
+  const badge = root.querySelector("[data-outcome]");
+  const nextLine = root.querySelector("[data-next]");
+  const list = root.querySelector("[data-checks]");
+  form.hidden = false;
+  const render = () => {
+    const limit = Number(form.limit.value);
+    const checks = [
+      { code: "SCREENING_HIT", label: "Screening list", hit: form.screening.checked, block: true },
+      { code: "ABOVE_AUTO_LIMIT", label: `Auto limit ${fmt(limit)}`, hit: amount > limit },
+      { code: "CHANGED_DETAILS", label: "Wallet details unchanged", hit: form.changed.checked },
+      { code: "FIRST_PAYMENT", label: "Paid this supplier before", hit: form.first.checked },
+    ];
+    const hits = checks.filter((c) => c.hit);
+    const outcome = hits.some((c) => c.block) ? "BLOCK" : hits.length ? "ESCALATE" : "EXECUTE";
+    out.textContent = fmt(limit);
+    badge.textContent = outcome;
+    badge.className = `chip st-${chip[outcome]}`;
+    nextLine.textContent = next[outcome];
+    list.replaceChildren(...checks.map((c) => {
+      const li = document.createElement("li");
+      li.className = c.hit ? `hit${c.block ? " block" : ""}` : "pass";
+      const a = document.createElement("span"); a.className = "label"; a.textContent = c.label;
+      const b = document.createElement("span"); b.className = "code"; b.textContent = c.hit ? c.code : "pass";
+      li.append(a, b);
+      return li;
+    }));
+  };
+  form.addEventListener("input", render);
+  form.addEventListener("submit", (e) => e.preventDefault());
+</script>
