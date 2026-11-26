@@ -305,7 +305,7 @@ def payment_detail(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
-    from detent.intents.service import payment_view
+    from detent.views.payments import payment_view
 
     with rt.engine.connect() as conn:
         view = payment_view(conn, user.org_id, payment_id, detail=True)
@@ -424,63 +424,10 @@ def exceptions_queue(
 
 
 def _raw_facts(conn: Any, org_id: str, case: Any) -> dict[str, Any]:
-    """EXC-02: what the reviewer reads first, straight from the registry and the decision."""
-    from web3 import Web3
+    """EXC-02: what the reviewer reads first (shared with the API, EXC-08)."""
+    from detent.views.cases import raw_facts
 
-    from detent.domain.money import Currency, Money
-
-    p = conn.execute(
-        text(
-            "SELECT p.*, c.name AS payee, c.kyb_status, c.allowlisted, c.payment_count, "
-            "c.median_amount_minor, "
-            "c.median_currency, d.address, d.account_masked, d.network AS d_network, d.first_seen_at, "
-            "d.last_changed_at, d.last_changed_by, d.verified FROM payment_intents p "
-            "LEFT JOIN counterparties c ON c.org_id = p.org_id AND c.id = p.counterparty_id "
-            "LEFT JOIN destinations d ON d.org_id = p.org_id AND d.id = p.destination_id "
-            "WHERE p.org_id=:o AND p.id=:p"
-        ),
-        {"o": org_id, "p": case.payment_id},
-    ).one()
-    dec = conn.execute(
-        text(
-            "SELECT checks FROM decisions WHERE org_id=:o AND payment_id=:p ORDER BY decided_at DESC, id "
-            "DESC LIMIT 1"
-        ),
-        {"o": org_id, "p": case.payment_id},
-    ).scalar_one()
-    amount = Money(int(p.amount_minor), Currency(p.currency))
-    median = (
-        Money(int(p.median_amount_minor), Currency(p.median_currency))
-        if p.median_amount_minor is not None
-        else None
-    )
-    ratio = None
-    if median is not None and median.currency == amount.currency and median.amount_minor:
-        from decimal import Decimal
-
-        ratio = str((Decimal(amount.amount_minor) / Decimal(median.amount_minor)).quantize(Decimal("0.01")))
-    hits = [c for c in dec if c.get("result") in ("ESCALATE", "BLOCK")]
-    return {
-        "payee": p.payee,
-        "kyb": p.kyb_status,
-        "allowlisted": p.allowlisted,
-        "address": Web3.to_checksum_address(p.address) if p.address else None,
-        "account_masked": p.account_masked,
-        "network": p.d_network or p.network_constraint,
-        "verified": p.verified,
-        "first_seen": p.first_seen_at,
-        "last_changed": p.last_changed_at,
-        "changed_by": p.last_changed_by,
-        "amount": str(amount),
-        "median": str(median) if median else None,
-        "ratio": ratio,
-        "payment_count": p.payment_count,
-        "hits": hits,
-        "mandate": p.mandate_id,
-        "source": p.source,
-        "reference": p.reference,
-        "initiated_by": p.initiated_by,
-    }
+    return raw_facts(conn, org_id, case.payment_id)
 
 
 def _deposit_case_page(request: Request, rt: Runtime, user: ActingUser, conn: Any, case: Any) -> HTMLResponse:
@@ -865,7 +812,7 @@ def proposal_page(
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
     from detent.agents.instruction import replay_proposal
-    from detent.intents.service import payment_view
+    from detent.views.payments import payment_view
 
     with rt.engine.connect() as conn:
         try:

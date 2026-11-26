@@ -15,9 +15,10 @@ from detent.api.errors import ErrorType, error_response
 from detent.audit.log import Actor
 from detent.db.retention import REQUEST_LOG_DAYS
 from detent.exceptions.cases import CaseError, approve, reject
-from detent.intents.service import IntentRequest, payment_view, submit_intent
+from detent.intents.service import IntentRequest, submit_intent
 from detent.ledger.deposits import DepositRequest
 from detent.logging import request_id_var
+from detent.views.payments import payment_view
 
 router = APIRouter(prefix="/v1")
 
@@ -427,8 +428,6 @@ def send_payment_intent(
             return error_response(404, "not_found", exc.code, str(exc), request_id=_rid())
         return error_response(exc.status, "conflict", exc.code, str(exc), request_id=_rid())
     with rt.engine.connect() as conn:
-        from detent.intents.service import payment_view
-
         return JSONResponse(payment_view(conn, principal.org_id, payment_id))
 
 

@@ -150,6 +150,11 @@ def append(
         )
     )
     conn.execute(update(audit_heads).where(audit_heads.c.org_id == org_id).values(seq=seq, hash=h))
+    # WHK-01: the webhook events this change produces, in the same transaction and under the same
+    # organisation lock, so an event exists exactly when its change committed.
+    from detent.webhooks.events import from_audit  # deferred: the webhooks read domain views
+
+    from_audit(conn, clock, org_id=org_id, kind=kind, subject_id=subject_id, payload=payload)
     return AuditEvent(
         event_id, org_id, seq, at, actor.id, actor.role, kind, subject_id, payload, head.hash, h
     )

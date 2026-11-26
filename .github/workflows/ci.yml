@@ -63,6 +63,8 @@ jobs:
         run: |
           uv run ruff check .
           uv run ruff format --check .
+      - name: OpenAPI file is valid (API-05)
+        run: npx --yes @redocly/cli@2.80.0 lint docs/api/openapi.json
       - name: Roadmap is up to date
         run: uv run python tools/build_roadmap_page.py --check
       - name: Backlog documents are up to date

@@ -758,8 +758,8 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve`
-- [ ] Same rules as the console: re-run, separation of duties, 409 on double approval
+- [x] GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve`
+- [x] Same rules as the console: re-run, separation of duties, 409 on double approval
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** EXC-04 · **Traces to:** A2.Exceptions, D.standards
 
@@ -1311,8 +1311,8 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] Generated from FastAPI, then completed with descriptions, examples and error responses
-- [ ] Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift
+- [x] Generated from FastAPI, then completed with descriptions, examples and error responses
+- [x] Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift
 
 **Priority:** Must · **Estimate:** 1.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-02, EXC-08, LED-03 · **Traces to:** D.docs, D.sdks, D.standards
 
@@ -1332,7 +1332,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] Same event objects as webhooks; filter by type and payment ID
+- [x] Same event objects as webhooks; filter by type and payment ID
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** WHK-01 · **Traces to:** D.webhooks, D.standards
 
@@ -1346,8 +1346,8 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 
 **Acceptance criteria**
 
-- [ ] Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break)
-- [ ] Signing secret shown once; events carry `id` and a per-payment `sequence`
+- [x] Event types from spec/03-api.md (payment_intent.*, exception.*, deposit.credited, reconciliation.break)
+- [x] Signing secret shown once; events carry `id` and a per-payment `sequence`
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.webhooks
 
@@ -1367,7 +1367,7 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 
 **Acceptance criteria**
 
-- [ ] Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event'
+- [x] Outbox-based worker; exponential backoff up to 24 h; delivery log with status and response time; manual resend; 'send test event'
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** WHK-02, FND-06 · **Traces to:** D.webhooks
 
