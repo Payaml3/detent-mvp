@@ -10,6 +10,7 @@ import Results from "../components/Results.astro";
 import Roles from "../components/Roles.astro";
 import Offer from "../components/Offer.astro";
 import Fit from "../components/Fit.astro";
+import Platforms from "../components/Platforms.astro";
 import Close from "../components/Close.astro";
 import config from "../../site.config.mjs";
 // Home page structure: docs/design/landing-page-ux.md (approved in #59). Measured results appear only once a
@@ -20,6 +21,7 @@ const resultsFile = Object.keys(import.meta.glob("../data/results.json")).length
   <Hero />
   <Problem />
   <Spine />
+  <Platforms />
   <Rules />
   <Console />
   <Irreversible />

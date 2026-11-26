@@ -54,7 +54,7 @@ test("home: category wording, the shadow report as the main action, demo and acc
 });
 
 test("home: the sections of docs/design/landing-page-ux.md, in order", () => {
-  const order = ["hero", "problem", "spine", "rules", "irreversible", "roles", "offer", "use-cases", "faq", "close", "footer"];
+  const order = ["hero", "problem", "spine", "use-cases", "rules", "irreversible", "roles", "offer", "faq", "close", "footer"];
   const found = [...read(PAGES.home).matchAll(/data-section="([a-z-]+)"/g)].map((m) => m[1]);
   assert.deepEqual(found.filter((s) => order.includes(s)), order);
 });

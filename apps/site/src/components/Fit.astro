@@ -1,8 +1,7 @@
 ---
 import config from "../../site.config.mjs";
 import Board from "./Board.astro";
-import UseCases from "./UseCases.astro";
-// Landing UX §3.7: who it's for, one platform at a time through the three layers, then the questions buyers ask first.
+// The payments board, then the questions buyers ask first. Who it's for lives in Platforms.astro, higher on the page.
 const faq = [
   { q: `Does ${config.brandName} move or hold the money?`, a: `No. ${config.brandName} is agentic payment controls: it sits beside the rails and custody you already use, and your rules decide what they should do. It never holds client funds or keys.` },
   { q: "Does the AI approve payments?", a: "No. Agents prepare intents, investigate escalations and draft reconciliation fixes. Your rules make every decision, and a person approves anything the rules escalate." },
@@ -14,13 +13,8 @@ const faq = [
   { q: "What does it cost?", a: "The shadow report is free. Paid plans are a software fee per payment, never a share of the money you move. Talk to us about Pilot, Growth and Scale." }, // taste-skill-ignore: "shadow report" is a product name
 ];
 ---
-<section class="section fit" data-section="use-cases" aria-labelledby="uses-title">
+<section class="section fit" aria-label="Payments board and questions">
   <div class="wrap">
-    <div class="uc-head">
-      <h2 id="uses-title" data-reveal>For every platform that holds user balances.</h2>
-      <p class="lead soft" data-reveal>Pick a platform and watch its process run: the agent prepares the payment, your rules decide it, orchestration picks the best rail with alternatives ready, and operations reconciles and records it.</p>
-    </div>
-    <UseCases />
     <Board />
     <div class="faq" data-section="faq">
       <h2 class="faq-title" data-reveal>Questions</h2>
@@ -37,9 +31,6 @@ const faq = [
 </section>
 <style>
   h2 { margin-bottom: 40px; max-width: 18ch; }
-  .uc-head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
-  .uc-head h2 { grid-column: 1 / span 6; margin: 0; }
-  .uc-head .lead { grid-column: 8 / span 5; margin: 0; }
   .faq { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-top: var(--section); }
   .faq-title { grid-column: 1 / span 4; }
   .qs { grid-column: 6 / span 7; display: grid; gap: 6px; align-content: start; }
@@ -52,5 +43,5 @@ const faq = [
   .plus::after { transform: rotate(90deg); }
   details[open] .plus::after { transform: rotate(0deg); }
   details p { padding: 0 0 24px; color: var(--text-soft); max-width: 60ch; }
-  @media (max-width: 1000px) { .uc-head h2, .uc-head .lead { grid-column: 1 / -1; } .faq-title, .qs { grid-column: 1 / -1; } .faq-title { margin-bottom: 0; } }
+  @media (max-width: 1000px) { .faq-title, .qs { grid-column: 1 / -1; } .faq-title { margin-bottom: 0; } }
 </style>
