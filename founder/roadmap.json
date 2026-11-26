@@ -1,6 +1,6 @@
 {
  "project": "Detent",
- "current_stage": 13,
+ "current_stage": 4,
  "stages": [
   {
    "stage": 1,
@@ -40,9 +40,9 @@
    "phase": "B Define",
    "name": "Brand strategy",
    "gate": "Name, trademark and domain checked",
-   "status": "To do",
+   "status": "Current",
    "where": "P 06",
-   "evidence": "Partial: working name only, domain a placeholder (D-17, `founder/brand.md`); no trademark check",
+   "evidence": "Name Dekernai approved (B-01); domain and UK/EU/WIPO trade mark screen clean (`docs/brand/name-review-2026-11.md`); domains dekernai.com and dekernai.co.uk registered 2026-11-26; still to do: attorney clearance (legal gate), palette choice",
    "start": "2026-11-18",
    "target": ""
   },
