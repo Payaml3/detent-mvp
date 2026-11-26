@@ -82,31 +82,31 @@ const layers = [
 </section>
 <style>
   .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-bottom: 48px; }
-  .head h2 { grid-column: 1 / span 6; } .head .lead { grid-column: 8 / span 5; align-self: end; color: var(--paper-soft); }
+  .head h2 { grid-column: 1 / span 6; } .head .lead { grid-column: 8 / span 5; align-self: end; color: var(--text-soft); }
   .tablist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
-  [role="tab"] { text-align: left; padding: 22px 24px; border: 0; border-radius: var(--radius); background: var(--ink-raised); color: var(--paper-soft);
+  [role="tab"] { text-align: left; padding: 22px 24px; border: 0; border-radius: var(--radius); background: var(--surface); color: var(--text-soft);
     font: inherit; cursor: pointer; display: grid; gap: 4px; transition: background 200ms, color 200ms; }
-  [role="tab"]:hover { color: var(--paper); }
-  [role="tab"][aria-selected="true"] { background: #1F4FCC; color: var(--paper); }
+  [role="tab"]:hover { color: var(--text); }
+  [role="tab"][aria-selected="true"] { background: var(--interactive-strong); color: var(--on-interactive); }
   .tab-name { font: 600 24px/1.1 var(--font-head); letter-spacing: -0.02em; }
   .tab-q { font-size: 15px; }
   .panel[hidden] { display: none; }
   .panel { display: grid; grid-template-columns: 1.1fr 1fr 0.9fr; gap: 8px; margin-bottom: 8px; }
-  .copy, .agent { background: var(--ink-raised); border-radius: var(--radius); padding: 32px; display: grid; gap: 16px; align-content: start; }
-  .mods { color: var(--blue-soft); font-weight: 600; }
-  .blueprint { border-radius: var(--radius); background: var(--blueprint);
-    background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px); /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+  .copy, .agent { background: var(--surface); border-radius: var(--radius); padding: 32px; display: grid; gap: 16px; align-content: start; }
+  .mods { color: var(--interactive-soft); font-weight: 600; }
+  .blueprint { border-radius: var(--radius); background: var(--interactive-deep);
+    background-image: linear-gradient(color-mix(in srgb, var(--text) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--text) 7%, transparent) 1px, transparent 1px); /* taste-skill-ignore: gradients allowed by founder decision D-19 */
     background-size: 24px 24px; display: grid; place-items: center; padding: 24px; min-height: 280px; }
   .plot { width: 100%; height: auto; }
-  .plot rect, .plot circle { fill: rgba(255,255,255,.04); stroke: #CFE0FF; stroke-width: 1.4; }
-  .plot path { fill: none; stroke: #CFE0FF; stroke-width: 1.4; stroke-dasharray: 400; stroke-dashoffset: 0; }
-  .plot .brk { stroke: var(--orange); stroke-dasharray: 5 5; }
-  .plot text { fill: #E6EEFF; font: 500 12px var(--font-body); text-anchor: middle; }
+  .plot rect, .plot circle { fill: color-mix(in srgb, var(--text) 4%, transparent); stroke: var(--plot); stroke-width: 1.4; }
+  .plot path { fill: none; stroke: var(--plot); stroke-width: 1.4; stroke-dasharray: 400; stroke-dashoffset: 0; }
+  .plot .brk { stroke: var(--signal); stroke-dasharray: 5 5; }
+  .plot text { fill: var(--text); font: 500 12px var(--font-body); text-anchor: middle; }
   .panel.drawing .plot path { animation: draw 900ms var(--ease-out) both; }
   @keyframes draw { from { stroke-dashoffset: 400; } }
-  .agent { background: #121A31; border: 1px solid #2A4386; } /* taste-skill-ignore: inside a data-ui interface fragment */
-  .agent-label { display: flex; align-items: center; gap: 8px; color: var(--blue-soft); font-size: 13px; font-weight: 600; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue-soft); }
+  .agent { background: var(--surface); border: 1px solid var(--line-strong); } /* taste-skill-ignore: inside a data-ui interface fragment */
+  .agent-label { display: flex; align-items: center; gap: 8px; color: var(--interactive-soft); font-size: 13px; font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--interactive-soft); }
   .agent-msg { font-size: 16px; line-height: 1.5; }
   @media (max-width: 1000px) { .head h2, .head .lead { grid-column: 1 / -1; } .panel { grid-template-columns: 1fr; } .tablist { grid-template-columns: 1fr; } }
 </style>

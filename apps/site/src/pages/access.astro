@@ -40,14 +40,14 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
 </Base>
 <style>
   .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; }
-  .form { display: grid; gap: 18px; background: var(--ink-raised); border-radius: 14px; padding: 32px; }
+  .form { display: grid; gap: 18px; background: var(--surface); border-radius: 14px; padding: 32px; }
   label { display: grid; gap: 6px; font-weight: 500; }
-  input, select, textarea { font: inherit; color: var(--paper); background: #0B1226; border: 1px solid var(--ink-line); border-radius: 6px; padding: 12px 14px; min-height: 48px; }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--blue-soft); outline-offset: 1px; }
-  .notice { background: rgba(242, 184, 75, 0.12); color: var(--amber); border-radius: 6px; padding: 10px 14px; font-size: 15px; }
+  input, select, textarea { font: inherit; color: var(--text); background: var(--surface-sunk); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-height: 48px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--interactive-soft); outline-offset: 1px; }
+  .notice { background: color-mix(in srgb, var(--wait) 12%, transparent); color: var(--wait); border-radius: 6px; padding: 10px 14px; font-size: 15px; }
   .aside { display: grid; gap: 20px; align-content: start; }
   .aside h2 { font-size: clamp(26px, 2.4vw, 36px); }
-  .aside ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--paper-soft); font-size: 18px; }
+  .aside ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--text-soft); font-size: 18px; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 </style>
 <script>

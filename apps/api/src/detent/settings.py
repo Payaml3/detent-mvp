@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     )
 
     app_env: AppEnv = "dev"
-    brand_name: str = "Detent"  # working name; change in one place
+    brand_name: str = "Dekernai"  # brand name (B-01); change in one place
     database_url: str = "postgresql+psycopg://detent:detent@localhost:5432/detent"
 
     demo_org_id: str = "org_demo"

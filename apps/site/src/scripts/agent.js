@@ -9,6 +9,7 @@ import {
 
 const halftoneFrag = /* glsl */ `
   uniform sampler2D tScene; uniform vec2 uRes; uniform float uCell; uniform float uTime;
+  uniform vec3 uVisor; uniform vec3 uDeep; uniform vec3 uPale;
   varying vec2 vUv;
   void main() {
     vec2 px = vUv * uRes;
@@ -23,10 +24,13 @@ const halftoneFrag = /* glsl */ `
     float r = 0.52 * uCell * tone * fade * (0.96 + 0.04 * sin(uTime * 2.0 + cell.x * 0.7 + cell.y * 0.4));
     float d = length(px - centre);
     float a = smoothstep(r, r - 1.2, d) * step(0.03, lum);
-    vec3 tint = visor ? vec3(0.95, 0.38, 0.18) : mix(vec3(0.18, 0.42, 1.0), vec3(0.86, 0.91, 1.0), tone);
+    vec3 tint = visor ? uVisor : mix(uDeep, uPale, tone);
     gl_FragColor = vec4(tint, a);
   }`;
 const quadVert = /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+
+const role = (name, fallback) =>
+  new Color(getComputedStyle(document.documentElement).getPropertyValue(`--${name}`).trim() || fallback);
 
 function bust() {
   const g = new Group();
@@ -94,7 +98,11 @@ export function mountAgent(canvas) {
   const quadCam = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const halftone = new ShaderMaterial({
     vertexShader: quadVert, fragmentShader: halftoneFrag, transparent: true,
-    uniforms: { tScene: { value: target.texture }, uRes: { value: new Vector2(2, 2) }, uCell: { value: 9 }, uTime: { value: 0 } },
+    uniforms: {
+      tScene: { value: target.texture }, uRes: { value: new Vector2(2, 2) }, uCell: { value: 9 }, uTime: { value: 0 },
+      // output colours come from the palette roles; the off-screen render keeps fixed colours to find the visor
+      uVisor: { value: role("signal", "#F2622E") }, uDeep: { value: role("interactive", "#2F6BFF") }, uPale: { value: role("code", "#DCE6FF") },
+    },
   });
   quadScene.add(new Mesh(new PlaneGeometry(2, 2), halftone));
 

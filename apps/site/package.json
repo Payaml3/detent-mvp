@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test:logic": "node --test tests/logic.test.mjs",
+    "test:logic": "node --test tests/logic.test.mjs tests/palette.test.mjs",
     "test:site": "node --test tests/site.test.mjs",
     "test": "npm run test:logic && npm run build && npm run test:site"
   },

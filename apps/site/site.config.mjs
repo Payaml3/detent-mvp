@@ -1,7 +1,9 @@
-// The one place the site's name, domain and contact targets live (decisions D-16, D-17).
+// The one place the site's name, palette, domain and contact targets live (D-16, D-17, B-01).
 // Values starting with PLACEHOLDER are reported at build time in dist/placeholders.json.
 export default {
-  brandName: "Detent",
+  brandName: "Dekernai",
+  // Colour palette: one of the keys in src/styles/palettes.mjs. "current" until the founder picks a, b or c.
+  palette: "current",
   category: "agentic payment controls",
   siteUrl: "https://example.invalid",
   // Pre-launch: pages carry noindex and robots.txt blocks crawlers. Set true at launch (founder decision).

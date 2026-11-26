@@ -25,10 +25,10 @@ const problems = [
 <style>
   .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
   .head { grid-column: 1 / span 5; display: grid; gap: 28px; align-content: start; position: sticky; top: 120px; }
-  .soft-lead { color: var(--paper-soft); }
+  .soft-lead { color: var(--text-soft); }
   .list { grid-column: 7 / span 6; list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-  .list li { background: var(--ink-raised); border-radius: var(--radius); padding: 32px; display: grid; gap: 12px; transition: background 200ms; }
-  .list li:hover { background: #18233F; }
+  .list li { background: var(--surface); border-radius: var(--radius); padding: 32px; display: grid; gap: 12px; transition: background 200ms; }
+  .list li:hover { background: var(--surface-hover); }
   .list h3 { font-size: clamp(24px, 2.2vw, 32px); letter-spacing: -0.02em; }
   @media (max-width: 900px) { .head, .list { grid-column: 1 / -1; position: static; } }
 </style>

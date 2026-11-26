@@ -41,8 +41,14 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 - Use "agentic payment controls" or "payment controls". Never "payments company" or "payment provider".
 - A timeout is "unknown", never "failed"; a block is final.
 
-## Visual identity (Open)
+## Visual identity (Proposed, D-39)
 
-- Palette: options in `/mnt/project-files/brand/palette-options-draft.md` (project files), founder to choose.
-- The detent-wheel motif (D-20) no longer fits the name; proposed replacement idea: "sift then settle"
-  (many inputs filtering to one clear outcome). Decided in the design-system work.
+- Palette: **Open.** Three options (A Settled ink, B Parchment and seal, C Night console) are built as role tokens
+  in `apps/site/src/styles/palettes.mjs`, all passing WCAG AA; the site keeps the D-18 colours until the
+  founder picks one. Choosing is one line: `palette` in `apps/site/site.config.mjs`.
+- Mark: "sift then settle". Five dots, then three, above a rule; one dot settled below it in the palette's
+  `settle` colour. Replaces the detent-wheel motif (D-20).
+- Site art: payments fall as halftone dots through three rules (decision, orchestration, operations); some
+  are held, some blocked, the rest settle at one point. The example payment stops at its state's rule.
+- Type: unchanged (D-18): Space Grotesk headings, Inter body, JetBrains Mono for IDs and code.
+- Full reference: `docs/brand/design-system.md`.

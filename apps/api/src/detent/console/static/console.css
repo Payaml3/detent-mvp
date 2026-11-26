@@ -1,4 +1,5 @@
-/* Brand tokens are placeholders until the identity is done (spec/07). */
+/* Brand tokens (spec/07). Colours change with the palette the founder picks (B-01); the site's roles are in
+   apps/site/src/styles/palettes.mjs. */
 :root {
   --ink: #0F1629; --paper: #F6F5F0; --orange: #F2622E; --blue: #2F6BFF; --amber: #C98A00;
   --line: #d9d7cf; --muted: #5b6275;
@@ -15,7 +16,7 @@ a { color: var(--blue); }
 .banner { background: var(--ink); color: var(--paper); text-align: center; font-size: 13px; padding: 4px 8px; letter-spacing: .02em; }
 .kill-bar { background: #c62828; color: #fff; text-align: center; font-weight: 600; padding: 8px; }
 .top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 12px 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-.brand { font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--ink); text-decoration: none; }
+.brand { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--ink); text-decoration: none; }
 .brand span { font-weight: 400; color: var(--muted); }
 .status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .status form { display: inline-flex; gap: 4px; align-items: center; margin: 0; }
