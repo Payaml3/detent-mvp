@@ -1,4 +1,4 @@
-# Dekernai design system
+# DekernAI design system
 
 Status: palette **Graphite and safety orange (B-02)**. Roles, mark and art **Proposed (D-39)**.
 
