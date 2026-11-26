@@ -28,8 +28,8 @@ support. Every hire goes through the `hire` gate.
 
 | Process | How it runs | Built |
 | --- | --- | --- |
-| Lead to shadow report | Discovery call, demo, export received, report delivered in 5 working days | Partly: import, decide and replay exist (S7); the report format is L-slice work |
-| Client onboarding | Rail connection, policy workshop, rules signed off, shadow | Partly |
+| Lead to contract | Discovery call and demo, fit check, NDA, then due diligence and contract (`client-journey.md` phases 1 and 2) | Not software |
+| Client onboarding | Sandbox integration, policy workshop, rule set v1 signed off, shadow on live traffic, go-live, scale (`client-journey.md` phases 3 to 7; B-04) | Partly |
 | Mode gates | Weekly agreement report; client signs each move from Shadow to Assist to Auto | Partly |
 | Rule changes | Versioned; two approvers; loosening needs the compliance lead | Built (S6) |
 | Agent evaluation | Attack and regression suite per release; weekly quality sample | Built (S8) |

@@ -15,7 +15,7 @@ approves stage 3, the goal tree (`founder/goals.json`) is due under the plugin's
 | Problem | Every deposit and payout decision stays with the platform; on irreversible rails a wrong one can't be undone; rules live in code, queues and spreadsheets | Assumption (`problem-validation.md`) |
 | Unique value | Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules. AI prepares; the rules decide | Approved wording (`spec/product-definition.md`) |
 | Solution | Decision (execute, escalate, block), orchestration (best rail, exactly once, kill switch), operations (exceptions, reconciliation, audit with replay) | Built as a prototype (S0 to S8) |
-| Channels | Founder-led sales; free shadow report as the entry offer; website and sandbox for evaluation; later back-office platform partners | Proposed |
+| Channels | Founder-led sales; demo, then the onboarding process (`client-journey.md`, B-04); website and sandbox for evaluation; later back-office platform partners | Proposed |
 | Revenue | Software fee per payment decided, never a share of money moved; plans Pilot, Growth, Scale; routing add-on | Proposed (A4; D-15 for plan names) |
 | Cost structure | AI model usage, EU hosting, security assurance (pen test, then SOC 2), legal (perimeter opinion, contracts), founder time | Assumption |
 | Key metrics | Payments decided per week under DekernAI (North Star); shadow-to-pilot 40%; pilot-to-paid 60%; under 10 days from pilot signed to shadow live | Proposed (B7) |
@@ -41,8 +41,7 @@ Open: the one-line alternative the buyer names in interviews.
 
 | Plan | What it is | Unit | Price |
 | --- | --- | --- | --- |
-| Free shadow report | DekernAI decides on a 30-day export; a report of what it would have done; nothing sent | Per platform, once | Free |
-| Pilot | Shadow then Assist on live traffic, one rail, time-boxed | Flat pilot fee | Open ("Talk to us", D-15) |
+| Pilot | Onboarding phases 3 to 6 (`client-journey.md`): sandbox, policy setup, shadow then Assist on live traffic, one rail, time-boxed | Flat pilot fee | Open ("Talk to us", D-15) |
 | Growth | Assist or Auto, two or more rails, exceptions and reconciliation | Per payment decided, monthly minimum | Open |
 | Scale | Orchestrate across rails, higher volumes, assurance pack | Per payment decided, volume tiers | Open |
 | Routing add-on | Best-rail choice and failover | Per routed payment | Open |
@@ -65,10 +64,10 @@ meeting, then run `/founder:pricing-strategy` with that evidence.
 ## Go-to-market sequence (Proposed)
 
 1. Problem interviews (8), no pitching.
-2. Demo (spec/11) and the offer of a free shadow report.
-3. Shadow report delivered in 5 working days (B3).
-4. Pilot signed; shadow live in under 10 days (B7); weekly agreement report; client signs each mode move.
-5. Paid plan.
+2. Demo (spec/11) and fit check; NDA.
+3. Due diligence and contract; Pilot signed (B-04; `client-journey.md` phase 2).
+4. Onboarding: sandbox, policy setup, shadow on live traffic in under 10 days (B7); weekly agreement report; client signs each mode move.
+5. Go-live, then the paid plan and scale.
 
 ## Regulatory model
 
