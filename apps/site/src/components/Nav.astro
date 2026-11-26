@@ -20,7 +20,7 @@ const here = Astro.url.pathname;
         {links.map((l) => <li><a href={l.href} aria-current={here === l.href ? "page" : undefined}>{l.label}</a></li>)}
       </ul>
     </nav>
-    <a class="textlink nav-demo" href={`mailto:${config.salesInbox}`}>Talk to us</a>
+    <a class="textlink nav-demo" href="/access/">Request access</a>
     <a class="button nav-cta" href={config.bookingUrl}>Book a demo</a>
   </div>
 </header>

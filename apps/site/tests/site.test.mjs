@@ -43,14 +43,14 @@ test("honesty: certifications appear only as roadmap items", () => {
   }
 });
 
-test("home: category wording, Book a demo as the main action, Talk to us beside it (B-04)", () => {
+test("home: category wording, Book a demo as the main action, Request access beside it (B-04)", () => {
   const html = read(PAGES.home);
   assert.match(text(html), /agentic payment controls/i);
   const hero = html.split('data-section="hero"')[1].split("data-section=")[0];
   const buttons = [...hero.matchAll(/<a[^>]*class="([^"]*\bbutton\b[^"]*)"[^>]*>\s*([^<]+)/g)].map((m) => [m[1], m[2].trim()]);
   assert.deepEqual(buttons[0], ["button", "Book a demo"], "the first hero button is Book a demo");
-  assert.ok(buttons.some(([cls, label]) => /secondary/.test(cls) && label === "Talk to us"), "Talk to us is the secondary button");
-  assert.match(text(html), /Request access/);
+  assert.ok(buttons.some(([cls, label]) => /secondary/.test(cls) && label === "Request access"), "Request access is the secondary button");
+  assert.match(hero, /href="\/access\/"[^>]*>\s*Request access/, "Request access leads to the onboarding intake");
 });
 
 test("home: the sections of docs/design/landing-page-ux.md, in order", () => {
@@ -109,6 +109,9 @@ test("sub-pages carry their required content", () => {
   const dp = text(read(PAGES.partners));
   assert.match(dp, /seven phases/i);
   assert.match(dp, /data processing agreement/i);
+  const acc = text(read(PAGES.access));
+  for (const w of [/discovery/i, /KYB/, /registration email/i]) assert.match(acc, w);
+  assert.ok(!/simulated rails|\.13|\.42|What would you like to test/i.test(acc), "access is the onboarding intake, not a sandbox sign-up");
   const prod = text(read(PAGES.product));
   for (const w of [/decision/i, /orchestration/i, /operations/i]) assert.match(prod, w);
 });
