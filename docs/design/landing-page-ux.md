@@ -4,7 +4,7 @@ Status: **Proposed.** Becomes Approved when the founder merges the PR. Scope: th
 outline of the home page (`apps/site/src/pages/index.astro`). Visuals (palette, type, motif) come from the
 design-system work and are applied in a follow-up PR; nothing here changes code yet.
 
-Sources: `spec/08-developer-portal.md` (WEB), `founder/brand.md` (B-01 branch), `docs/product/shadow-report.md`
+Sources: `spec/08-developer-portal.md` (WEB), `founder/brand.md` (on the brand-name PR #58 branch), `docs/product/shadow-report.md`
 (I5), `docs/product/customer-discovery.md` (buying roles), decisions D-15, D-19 to D-21.
 
 ## 1. Who the page is for
