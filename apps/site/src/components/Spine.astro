@@ -23,7 +23,7 @@ const layers = [
     </div>
     <p class="pid-row" data-reveal>One payment ID for life: <span class="pid">{PAYMENT_ID}</span></p>
     <div class="stage-wrap">
-    <div class="stage" aria-hidden="true"><canvas data-spine-stage></canvas><p class="small stage-cap">Scroll: one payment through the three layers</p></div>
+    <div class="stage" aria-hidden="true"><canvas data-spine-stage></canvas>{layers.map((l, i) => <span class="stage-label small" data-stage-label={i} hidden><b>{l.word}</b> {l.name.toLowerCase()}</span>)}<p class="small stage-cap">Scroll: one payment through the three layers</p></div>
     <ol class="cols">
       {layers.map((l, i) => (
         <li class="col" data-card data-layer-status={l.status} style={`--d:${i * 90}ms`}>
@@ -52,6 +52,10 @@ const layers = [
   .stage-wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: start; }
   .stage { grid-column: 1 / span 6; position: sticky; top: 96px; height: min(78vh, 680px); border-radius: 14px; overflow: hidden; background: var(--text); }
   .stage canvas { width: 100%; height: 100%; display: block; }
+  .stage-label { position: absolute; left: 0; top: 0; padding: 4px 10px; border-radius: 999px; white-space: nowrap; pointer-events: none;
+    color: color-mix(in srgb, var(--bg) 60%, var(--text)); background: color-mix(in srgb, var(--bg) 6%, var(--text)); transition: color 300ms, background 300ms; }
+  .stage-label b { font-weight: 600; }
+  .stage-label.on { color: var(--on-signal); background: var(--signal); }
   .stage-cap { position: absolute; left: 20px; bottom: 16px; color: color-mix(in srgb, var(--bg) 70%, var(--text)); }
   .cols { grid-column: 7 / span 6; list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .col { min-height: 42vh; transition: box-shadow 300ms var(--ease-out); }
@@ -77,8 +81,8 @@ const layers = [
   const cols = [...document.querySelectorAll("[data-layer-status]")];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (canvas && getComputedStyle(canvas.parentElement).display !== "none") {
-    import("../scripts/gate3d.js").then(({ mountGate }) => {
-      const stage = mountGate(canvas);
+    import("../scripts/layers3d.js").then(({ mountLayers }) => {
+      const stage = mountLayers(canvas);
       const pick = (col) => {
         cols.forEach((c) => c.classList.toggle("on", c === col));
         stage?.setState(col.dataset.layerStatus, col.dataset.layerStatus === "CONFIRMED");
