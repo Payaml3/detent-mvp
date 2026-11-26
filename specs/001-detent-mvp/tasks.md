@@ -1,8 +1,8 @@
 ---
-description: "Task list for the Dekernai MVP, by end-to-end slice"
+description: "Task list for the DekernAI MVP, by end-to-end slice"
 ---
 
-# Tasks: Dekernai MVP
+# Tasks: DekernAI MVP
 
 **Input**: [plan.md](plan.md), [spec.md](spec.md), [data-model.md](data-model.md), [contracts/](contracts/), [slices.yaml](slices.yaml) (build order, decision D-11)
 

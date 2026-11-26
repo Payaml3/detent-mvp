@@ -9,15 +9,15 @@ Built from, in order: `problem-validation.md` → `customer-discovery.md` → `b
 
 ## Company goal (horizon June 2027)
 
-Prove that UK and EU platforms holding user balances will run their real payouts through Dekernai's payment
+Prove that UK and EU platforms holding user balances will run their real payouts through DekernAI's payment
 controls, and sign the first paid pilot.
 
 ## North Star
 
-**Real platform payments decided by Dekernai per week (shadow or live).** Baseline 0, target 5,000 a week by
+**Real platform payments decided by DekernAI per week (shadow or live).** Baseline 0, target 5,000 a week by
 30 June 2027.
 
-- **Why this metric:** it moves only when a platform trusts Dekernai with its own data, which is the riskiest
+- **Why this metric:** it moves only when a platform trusts DekernAI with its own data, which is the riskiest
   assumption (H8). Demo runs and synthetic evaluations don't count. It grows through the same path as the
   business model: shadow report, then pilot, then live modes.
 - **Why 5,000:** roughly one mid-sized design partner in Assist mode, or two or three in shadow. This is an

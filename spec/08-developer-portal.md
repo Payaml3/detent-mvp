@@ -33,7 +33,7 @@ Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and d
   - toggle real testnet mode (Should)
 - **Usage:** calls, payments decided and agent investigations against daily quotas.
 - **Console:** the back-office screens scoped to the organisation. Demo-only controls are hidden.
-- **Admin (Dekernai only):** organisations, invites, expiry extension, and the access-requests inbox (DSH-10).
+- **Admin (DekernAI only):** organisations, invites, expiry extension, and the access-requests inbox (DSH-10).
 
 ## Sandbox (SBX)
 
@@ -99,7 +99,7 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 - Prior-company figures appear only as the founder's experience on an About section.
 
 **SEO (WEB-08):**
-- Titles pair the name with the category ("Dekernai agentic payment controls" or "Dekernai payment controls").
+- Titles pair the name with the category ("DekernAI agentic payment controls" or "DekernAI payment controls").
 - Topic pages and docs target the searches buyers make: "stablecoin payout controls", "payout exception handling", "payment reconciliation across rails" and "APP fraud reimbursement".
 - Add sitemap.xml, Open Graph images, and schema.org `Organization` and `SoftwareApplication` markup.
 

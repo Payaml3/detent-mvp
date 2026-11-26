@@ -1,4 +1,4 @@
-# Dekernai MVP. Test networks and simulated rails only. See README for setup.
+# DekernAI MVP. Test networks and simulated rails only. See README for setup.
 SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)

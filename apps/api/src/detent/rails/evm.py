@@ -192,7 +192,7 @@ class EvmAdapter:
         }
         try:
             r = self._http.post(
-                self._rpc_url, json=body, timeout=self._timeout, headers={"X-Dekernai-Attempt": attempt_id}
+                self._rpc_url, json=body, timeout=self._timeout, headers={"X-DekernAI-Attempt": attempt_id}
             )
         except requests.exceptions.RequestException as exc:
             raise RailError(classify(exc), f"broadcast: {type(exc).__name__}") from exc

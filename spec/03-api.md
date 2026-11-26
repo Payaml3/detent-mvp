@@ -10,7 +10,7 @@ Base URL (placeholder): `https://sandbox.api.<domain>/v1`. Every request uses TL
 |---|---|
 | **Authentication** | Bearer test key. Keys are hashed at rest. Scopes: `read`, `intents:create`, `exceptions:approve`, `admin`. `sk_live_` keys always return 403 `live_mode_unavailable` |
 | **Idempotency** | An `Idempotency-Key` header is required on every POST that creates something. The same key with the same body returns the stored response. The same key with a different body returns 409 `idempotency_conflict` |
-| **Versioning** | `Dekernai-Version: 2026-12-01` (dated). Each organisation has a pinned default. An unknown version returns 400 `unknown_version` |
+| **Versioning** | `DekernAI-Version: 2026-12-01` (dated). Each organisation has a pinned default. An unknown version returns 400 `unknown_version` |
 | **Errors** | `{"error": {"type", "code", "message", "payment_id", "request_id", "param"}}`. Types: `invalid_request`, `authentication`, `permission`, `not_found`, `conflict`, `rate_limit`, `quota`, `internal` |
 | **Pagination** | `?limit=` (max 100) and `?starting_after=<id>`. Responses carry `{"data": [...], "has_more": bool, "next_cursor": "..."}` |
 | **Rate limits** | Per key: `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`; 429 with `Retry-After` |
@@ -50,7 +50,7 @@ Request:
 POST /v1/payment_intents
 Authorization: Bearer sk_test_...
 Idempotency-Key: 4f7c1e1a-inv-2026-0142
-Dekernai-Version: 2026-12-01
+DekernAI-Version: 2026-12-01
 Content-Type: application/json
 
 {
@@ -124,7 +124,7 @@ Event envelope:
  "sequence": 4, "data": {"object": {...payment intent...}}}
 ```
 
-The signature header is `Dekernai-Signature: t=1764756000,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>`. Reject any delivery whose timestamp is more than 300 s from now. Delivery is at least once, so deduplicate on `id`. `sequence` increases per payment.
+The signature header is `DekernAI-Signature: t=1764756000,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>`. Reject any delivery whose timestamp is more than 300 s from now. Delivery is at least once, so deduplicate on `id`. `sequence` increases per payment.
 
 ## Error codes (starter catalogue)
 

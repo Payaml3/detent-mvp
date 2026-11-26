@@ -1,4 +1,4 @@
-# Dekernai
+# DekernAI
 
 Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules.
 
@@ -44,7 +44,7 @@ The weekly review runs on the mid-tier model; its quiet-week stop keeps it cheap
 - `python tools/build_roadmap.py --check`, `python tools/build_team.py --check` and `python tools/build_traceability.py --check`: view data matches its sources.
 <!-- solo-to-scale:end -->
 
-## Dekernai specifics
+## DekernAI specifics
 
 - One slice per session in this one repository. `HANDOFF.md` names the branch to start from, the next slice and the open founder items; update it at the end of each slice.
 - Status, priorities and risks: `founder/status.md`. Decisions: product and engineering in `specs/001-detent-mvp/decisions.md` (`C-`, `G-`, `A-`, `D-`), business in `founder/decisions.md` (`B-`).
@@ -54,7 +54,7 @@ The weekly review runs on the mid-tier model; its quiet-week stop keeps it cheap
 
 ## What we are building
 
-Dekernai (brand name, B-01; formerly the working name Detent) is **agentic payment controls** for UK and EU platforms that hold user balances: one layer that decides, orchestrates and operates every deposit and payout, under the platform's own rules. It sits **beside** the platform's payment rails, starting with rails that can't be reversed: stablecoins and instant bank payouts.
+DekernAI (brand name, B-01; formerly the working name Detent) is **agentic payment controls** for UK and EU platforms that hold user balances: one layer that decides, orchestrates and operates every deposit and payout, under the platform's own rules. It sits **beside** the platform's payment rails, starting with rails that can't be reversed: stablecoins and instant bank payouts.
 
 It has three layers. AI agents work across all three, preparing intents, investigating escalations and drafting reconciliation fixes. The rules make every decision.
 
@@ -66,7 +66,7 @@ In one line: "Agentic payment controls: one layer that decides, orchestrates and
 | **2. Orchestration** | How and where does it go? Best rail by policy, exactly-once execution, failover on technical errors only, kill switch. A timeout becomes UNKNOWN, never FAILED | routing, execution, rails (spec/06) |
 | **3. Operations** | What happens around it? Exceptions queue, reconciliation across rails, audit with replay | exceptions, ledger, reconciliation, audit (spec/07) |
 
-Dekernai is **not** a payment company or payment provider. It never holds client funds or keys in production. In the prototype it holds **test-network keys only**. Use "agentic payment controls" (or "payment controls" for short) in all UI text, docs and copy, and name the three layers decision, orchestration and operations. Never write "payments company" or "payment provider" about Dekernai.
+DekernAI is **not** a payment company or payment provider. It never holds client funds or keys in production. In the prototype it holds **test-network keys only**. Use "agentic payment controls" (or "payment controls" for short) in all UI text, docs and copy, and name the three layers decision, orchestration and operations. Never write "payments company" or "payment provider" about DekernAI.
 
 The MVP has two tracks:
 1. **Prototype:** the back-office engine and console, demoed in 10 minutes (spec/11-demo-script.md).
@@ -181,7 +181,7 @@ Specifications and planning use Spec Kit (`.specify/`, `specs/<feature>/`); the 
 
 ## Open decisions (ask the founder; don't guess)
 
-- The domain (the name is Dekernai, B-01; keep it in one settings value: `BRAND_NAME`). Domain registration and trade mark clearance are open founder items.
+- The domain (the name is DekernAI, B-01; keep it in one settings value: `BRAND_NAME`). Domain registration and trade mark clearance are open founder items.
 - The transactional email provider for the dashboard.
 - The paid hosting tier for the public sandbox, which should not sleep.
 - Whether the website shows prices or "Talk to us".

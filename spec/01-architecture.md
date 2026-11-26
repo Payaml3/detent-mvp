@@ -13,7 +13,7 @@ flowchart LR
     AGENT[AI agent<br/>proposes only]
     STAFF[Payments, compliance,<br/>reviewers]
   end
-  subgraph Dekernai API app
+  subgraph DekernAI API app
     API[/v1 API/]
     INT[intents]
     MND[mandates]
@@ -108,7 +108,7 @@ sequenceDiagram
 
 ## Production custody boundary (not built in the MVP)
 
-In production, transaction signing and nonce assignment happen in the client's custody or wallet provider. Dekernai passes the payment ID and idempotency key and keeps:
+In production, transaction signing and nonce assignment happen in the client's custody or wallet provider. DekernAI passes the payment ID and idempotency key and keeps:
 
 - the state lock
 - the UNKNOWN logic

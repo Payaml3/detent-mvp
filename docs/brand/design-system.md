@@ -1,4 +1,4 @@
-# Dekernai design system
+# DekernAI design system
 
 Status: palette **Approved: B, Parchment and seal (B-02)**. Roles, mark and art **Proposed (D-39)**.
 

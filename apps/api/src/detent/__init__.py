@@ -1,1 +1,1 @@
-"""Dekernai agentic payment controls. Prototype: test networks only."""
+"""DekernAI agentic payment controls. Prototype: test networks only."""

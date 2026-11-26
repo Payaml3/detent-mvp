@@ -314,13 +314,13 @@ def render_html(data: dict[str, Any], stamp: str = "") -> str:
     )
     total, done_c = data["total_c"], data["done_c"]
     n_slices = len(data["slices"])
-    return f"""<title>Dekernai roadmap</title>
+    return f"""<title>DekernAI roadmap</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=Space+Grotesk:wght@500;600&display=swap">
 <style>{CSS}</style>
 <main>
-<header><div class="eyebrow">Agentic payment controls · prototype</div><h1>Dekernai roadmap</h1>
+<header><div class="eyebrow">Agentic payment controls · prototype</div><h1>DekernAI roadmap</h1>
 <p class="lede">Built from the repository on every handoff. Slices, acceptance criteria and the decisions waiting on you.</p></header>
 <section class="summary">
 <div class="stat"><b>{data["n_done"]} / {n_slices}</b><span>slices done</span></div>

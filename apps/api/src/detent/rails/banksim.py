@@ -93,7 +93,7 @@ class BankAdapter:
                 timeout=self._timeout,
                 headers={
                     "Idempotency-Key": attempt.idempotency_key,
-                    "X-Dekernai-Attempt": attempt.attempt_id,
+                    "X-DekernAI-Attempt": attempt.attempt_id,
                 },
             )
         except requests.exceptions.RequestException as exc:

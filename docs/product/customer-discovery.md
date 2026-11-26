@@ -62,7 +62,7 @@ Open: which role holds the budget. Interview question 9 tests it.
 - "That would be nice to have" with no past example.
 - Pain belongs to the rail provider, not the platform.
 - No one owns the decision, so no one owns the budget.
-- They want Dekernai to hold funds or act as their payment provider (out of model).
+- They want DekernAI to hold funds or act as their payment provider (out of model).
 
 ## Willingness to pay (how we test it)
 
