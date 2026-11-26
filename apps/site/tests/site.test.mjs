@@ -128,7 +128,26 @@ test("SEO: titles pair the name with 'payment controls'; sitemap, robots, OG ima
   assert.ok(existsSync(join(DIST, "og.jpg")), "the og:image file exists");
   const home = read(PAGES.home);
   assert.match(home, /"@type":"Organization"/);
+  assert.match(home, /"@type":"WebSite"/);
   assert.match(home, /"@type":"SoftwareApplication"/);
+  assert.match(home, /"logo":"https:[^"]+"/, "the organisation has a logo");
+  for (const [p, html] of allHtml()) {
+    for (const m of ["og:site_name", "og:locale", "og:image:alt"]) assert.match(html, new RegExp(`property="${m}"`), `${p}: ${m}`);
+    for (const m of ["twitter:title", "twitter:description", "twitter:image"]) assert.match(html, new RegExp(`name="${m}"`), `${p}: ${m}`);
+  }
+  assert.match(home.match(/<title>([^<]*)<\/title>/)[1], /stablecoin/i, "the home title names the rails");
+});
+
+test("404: a real not-found page with navigation, never indexed", () => {
+  const html = read("404.html");
+  assert.match(html, /<meta name="robots" content="noindex, nofollow"/);
+  assert.match(html, /href="\/product\/"/);
+});
+
+test("launch: opening the site to search also removes the noindex header in vercel.json", () => {
+  const vercel = JSON.parse(readFileSync(new URL("../vercel.json", import.meta.url), "utf8"));
+  const noindexHeader = JSON.stringify(vercel.headers ?? []).includes("noindex");
+  assert.equal(noindexHeader, !config.indexable, "X-Robots-Tag noindex must be sent exactly while config.indexable is false");
 });
 
 test("the name comes from one setting: no page source hard-codes it", () => {
