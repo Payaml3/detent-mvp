@@ -1,0 +1,11 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHead from "../components/PageHead.astro";
+import config from "../../site.config.mjs";
+// A real 404 with the site's navigation, so a broken link leads back into the site (SEO/GEO audit). Never indexed.
+---
+<Base title="Page not found" description={`This page does not exist. Find ${config.brandName} product, security and onboarding pages here.`} noindex>
+  <PageHead title="Page not found." lead="The link may be old or mistyped. Start from the home page, or see how the product works.">
+    <div class="ctas" data-reveal><a class="button" href="/">Home</a><a class="textlink" href="/product/">Product</a></div>
+  </PageHead>
+</Base>
