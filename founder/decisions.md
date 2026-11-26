@@ -11,7 +11,7 @@ Layers: Business → Product → MVP → Architecture → Tasks → Tests → Re
 
 | ID | Decision | Status | Date | Source | Affected layers |
 |---|---|---|---|---|---|
-| B-01 | The brand name is **Dekernai** (from Latin *dēcernere*, to decide), replacing the working name Detent. Primary domains dekernai.com, dekernai.ai and dekernai.io. Story rule: the client's rules decide, never the AI | Approved | 2026-11-26 | Founder, on the decision card "Lock in Dekernai as the brand name now?": "Yes, lock in Dekernai". Evidence: `docs/brand/name-review-2026-11.md` | Business, Product, Release (site, docs, console copy, `BRAND_NAME`) |
+| B-01 | The brand name is **Dekernai** (from Latin *dēcernere*, to decide), replacing the working name Detent. Domains dekernai.com (primary) and dekernai.co.uk, registered by the founder on 2026-11-26. Story rule: the client's rules decide, never the AI | Approved | 2026-11-26 | Founder, on the decision card "Lock in Dekernai as the brand name now?": "Yes, lock in Dekernai". Evidence: `docs/brand/name-review-2026-11.md` | Business, Product, Release (site, docs, console copy, `BRAND_NAME`) |
 
 ## Business decisions already in the specs register (indexed, not moved)
 
