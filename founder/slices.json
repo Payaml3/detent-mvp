@@ -1003,21 +1003,21 @@
    "epic": "DSH",
    "slice": "P2",
    "criteria": 3,
-   "done": 0
+   "done": 3
   },
   {
    "id": "DSH-02",
    "epic": "DSH",
    "slice": "P2",
    "criteria": 3,
-   "done": 0
+   "done": 2
   },
   {
    "id": "DSH-03",
    "epic": "DSH",
    "slice": "P2",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "DSH-04",
@@ -1073,7 +1073,7 @@
    "epic": "DSH",
    "slice": "P2",
    "criteria": 3,
-   "done": 0
+   "done": 3
   },
   {
    "id": "DSH-12",

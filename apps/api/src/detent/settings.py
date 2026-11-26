@@ -79,7 +79,14 @@ class Settings(BaseSettings):
     banksim_url: str = "http://localhost:8100"
     rail_timeout_seconds: float = 10.0  # how long an adapter waits for a rail's answer before UNKNOWN
     faultproxy_url: str = "http://localhost:8200"
-    email_provider: str = "outbox"
+    email_provider: str = (
+        "outbox"  # the production provider is an open founder decision; only "outbox" exists
+    )
+    # P2: where invite links point (the dashboard's public address once deployed; spec/08 dashboard.<domain>).
+    dashboard_url: str = "http://localhost:8000"
+    invite_days: int = 7  # DSH-01, DSH-11: invites are single-use and expire after 7 days
+    evaluation_days: int = 60  # DSH-03: the default expiry of an evaluation organisation
+    login_attempts_per_minute: int = 10  # per email and (times 3) per client address
     sales_inbox: str | None = None
 
     # FND-07: where this instance and its database run, as stated in the console footer and /healthz.
@@ -140,6 +147,13 @@ class Settings(BaseSettings):
             raise ValueError("WORKER_EXTRA_HANDLER_MODULES is only allowed with APP_ENV=test")
         if self.webhook_allow_private_urls and self.app_env not in ("dev", "test"):
             raise ValueError("WEBHOOK_ALLOW_PRIVATE_URLS is only allowed with APP_ENV=dev or test")
+        if self.email_provider != "outbox":
+            raise ValueError(
+                "EMAIL_PROVIDER: only 'outbox' exists; the transactional email provider is an open "
+                "founder decision"
+            )
+        if not 1 <= self.invite_days <= 30 or not 1 <= self.evaluation_days <= 365:
+            raise ValueError("INVITE_DAYS must be 1 to 30 and EVALUATION_DAYS 1 to 365")
         if self.app_env in ("demo", "sandbox"):
             for name in ("demo_password", "session_secret"):
                 val: SecretStr = getattr(self, name)

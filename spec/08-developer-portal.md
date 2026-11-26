@@ -116,6 +116,31 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 - Topic pages and docs target the searches buyers make: "stablecoin payout controls", "payout exception handling", "payment reconciliation across rails" and "APP fraud reimbursement".
 - Add sitemap.xml, Open Graph images, and schema.org `Organization` and `SoftwareApplication` markup.
 
+## As built (P2 group 1)
+
+- **Who is a DekernAI admin:** an admin of the operator organisation (`org_detent`). Only the command line creates
+  one (`detent staff add --email --name`; the password is read from the terminal). They sign in on the same page as
+  everyone else and land on `/admin/`.
+- **Organisations (DSH-01, DSH-03):** `/admin/organisations/new` creates a client organisation (KYB reference and
+  approval date required, no expiry; the database refuses anything else) or an evaluation organisation (expiry,
+  60 days by default). A new organisation starts with the fictional counterparties, the simulated rails and rule
+  set version 1 (G-18), in shadow mode. Admins extend an evaluation and suspend or reinstate an organisation with a
+  reason; each is audited in that organisation. A suspended organisation gets 403 `organisation_suspended` (an
+  expired one keeps `organisation_expired`) and a read-only dashboard.
+- **Invites and sign-up (DSH-01, DSH-02, DSH-11):** an invite stores only a SHA-256 of a 256-bit token. Opening the
+  link confirms the email; the person sets a password (argon2id, at least 12 characters, not containing the email).
+  An invite to the same address replaces the open one. Until the founder chooses an email provider, invites go to
+  the outbox and the admin sees the owner's link once on the organisation page.
+- **Sign-in:** one email signs in to one organisation. Attempts are limited per email (10 a minute) and per client
+  address (30). A new session on every sign-in; every page reloads the member, so removal or a role change takes
+  effect at once. Every form carries a per-session CSRF token; redirects after sign-in stay on site.
+- **Team (DSH-11):** owners and admins invite, change roles and remove members; only an account owner grants or
+  takes away the account owner role. The last account owner can't be demoted or removed (database trigger, plus a
+  lock on the organisation row against two owners demoting each other). Removing a member revokes their API keys
+  at once. Members are never deleted.
+- **Not yet:** the transactional email provider (DSH-02 criterion 2 stays open), and the keys, logs, webhooks,
+  sandbox and verification pages (later P2 groups; the checklist links to them).
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

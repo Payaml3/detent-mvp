@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Team{% endblock %}
+{% block main %}
+<h1>Team</h1>
+<p class="muted">Every change is recorded in the audit log. The organisation always keeps at least one account owner.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if request.query_params.get('notice') %}<p class="note" role="status">{{ {"invited": "Invite sent.", "role_changed": "Role changed.", "removed": "Member removed; their API keys are revoked.", "invite_revoked": "Invite withdrawn."}.get(request.query_params.get('notice'), "Done.") }}</p>{% endif %}
+<table>
+  <thead><tr><th>Name</th><th>Email</th><th>Role</th>{% if can_manage %}<th>Change</th>{% endif %}</tr></thead>
+  <tbody>
+  {% for m in members %}
+  <tr><td>{{ m.display_name }}{% if m.id == member.id %} (you){% endif %}</td><td>{{ m.email }}</td><td>{{ m.role }}</td>
+    {% if can_manage %}<td>
+      <form method="post" action="/dashboard/team/{{ m.id }}/role" class="inline">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <label class="sr-only" for="role-{{ m.id }}">Role for {{ m.display_name }}</label>
+        <select id="role-{{ m.id }}" name="role">{% for r in roles %}<option value="{{ r.value }}"{% if r.value == m.role %} selected{% endif %}>{{ r.value }}</option>{% endfor %}</select>
+        <button>Save</button>
+      </form>
+      {% if m.id != member.id %}
+      <form method="post" action="/dashboard/team/{{ m.id }}/remove" class="inline">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><button class="danger">Remove</button>
+      </form>{% endif %}
+    </td>{% endif %}</tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if can_manage %}
+<section class="card">
+  <h2>Invite a member</h2>
+  <p class="muted small">The invite link works once and expires in 7 days.</p>
+  <form method="post" action="/dashboard/team/invite">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Work email <input type="email" name="email" required></label>
+    <label>Role <select name="role">{% for r in roles %}<option value="{{ r.value }}"{% if r.value == 'developer' %} selected{% endif %}>{{ role_text[r] }}</option>{% endfor %}</select></label>
+    <button class="primary">Send invite</button>
+  </form>
+</section>
+{% endif %}
+{% if invites %}
+<h2>Open invites</h2>
+<table>
+  <thead><tr><th>Email</th><th>Role</th><th>Expires</th>{% if can_manage %}<th></th>{% endif %}</tr></thead>
+  <tbody>
+  {% for i in invites %}
+  <tr><td>{{ i.email }}</td><td>{{ i.role }}</td><td>{{ i.expires_at.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+    {% if can_manage %}<td><form method="post" action="/dashboard/team/invites/{{ i.id }}/revoke"><input type="hidden" name="csrf" value="{{ csrf }}"><button>Withdraw</button></form></td>{% endif %}</tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

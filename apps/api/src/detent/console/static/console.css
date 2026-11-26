@@ -191,3 +191,13 @@ td.ok { color: var(--confirm); }
 }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0ms !important; } button:active, .button:active { transform: none; } }
+
+/* Dashboard (P2): onboarding checklist, inline row forms, screen-reader text. */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.checklist { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.checklist li { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.checklist li.ok > span:first-child { color: var(--confirm); }
+form.inline { display: inline-flex; gap: 6px; align-items: center; margin: 0 6px 0 0; }
+form.inline select { width: auto; }
+fieldset { border: 0; padding: 0; margin: 0 0 12px; }
+.card form + form { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--rule); }

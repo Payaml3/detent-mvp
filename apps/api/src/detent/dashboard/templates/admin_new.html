@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}New organisation{% endblock %}
+{% block main %}
+<section class="card narrow">
+  <h1>New organisation</h1>
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="/admin/organisations">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <fieldset>
+      <legend>Kind</legend>
+      <label><input type="radio" name="kind" value="client" {{ 'checked' if form.get('kind', 'client') == 'client' }}> Client (KYB approved, no expiry)</label>
+      <label><input type="radio" name="kind" value="evaluation" {{ 'checked' if form.get('kind') == 'evaluation' }}> Evaluation (sandbox only, no KYB, expires)</label>
+    </fieldset>
+    <label>Organisation name <input name="name" value="{{ form.get('name', '') }}" maxlength="120" required></label>
+    <label>Account owner's email <input type="email" name="owner_email" value="{{ form.get('owner_email', '') }}" required></label>
+    <label>KYB approval reference (client) <input name="kyb_reference" value="{{ form.get('kyb_reference', '') }}" maxlength="100"></label>
+    <label>KYB approval date (client) <input type="date" name="kyb_approved_on" value="{{ form.get('kyb_approved_on', '') }}"></label>
+    <label>Evaluation length in days (evaluation) <input type="number" name="expires_in_days" min="1" max="365" value="{{ form.get('expires_in_days') or days }}"></label>
+    <button class="primary">Create and invite the owner</button>
+  </form>
+</section>
+{% endblock %}

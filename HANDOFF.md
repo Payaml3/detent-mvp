@@ -17,7 +17,7 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | S8 Proof and release gate | done | `main` |
 | **S9 Demo-ready prototype in the EU** | **code merged; deploy and live testnet run pending** | `main` (the live-run fixes come back as one PR) |
 | P1 Sandbox API and webhooks | **built except WHK-02's per-language tests (DOC-04, P3)** | `main` |
-| P2 Dashboard and sandbox | **next** | branch from `main` |
+| P2 Dashboard and sandbox | **in progress: group 1 of 4 built** | branch from `main` |
 | P3 Docs and SDKs, P4 Website launch | todo, in this order | |
 | L After launch (Should and Could) | todo | |
 
@@ -132,8 +132,13 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   Read-only views shared by the API, console and webhooks moved to `detent/views/`. WHK-02 stays open until the
   docs verify helpers have tests in every language (DOC-04). DNS rebinding at delivery is a known follow-up.
   See spec/03 "As built (P1 group 2)".
-- **P2 next:** DSH-01 to DSH-07, DSH-09 to DSH-12, SBX-01, SBX-02, SBX-04, RAL-11. · Model: strongest for the
-  auth and roles group (DSH-01, DSH-02), mid-tier for the screens
+- **P2 group 1: built (PR from `claude/project-thread-babje1`, 2026-11-26):** DSH-01, DSH-02 (criteria 0 and 1),
+  DSH-03, DSH-11. `detent/dashboard/` (access rules in `access.py`, screens in `routes.py` and `admin.py`),
+  migration 0011. DekernAI admins come from `detent staff add`. See spec/08 "As built (P2 group 1)". Open: the email
+  provider (founder item; DSH-02 criterion 2).
+- **P2 next:** group 2 (DSH-04 keys, DSH-05 logs, DSH-06 webhooks, DSH-08 usage, LED-08, SBX-02 quotas), group 3
+  (RAL-11, SBX-01, SBX-03, SBX-04, DSH-07), group 4 (DSH-09 console per organisation, DSH-10 access requests,
+  DSH-12 verification). · Model: strongest for quotas and the rail; mid-tier for the screens
 - **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items

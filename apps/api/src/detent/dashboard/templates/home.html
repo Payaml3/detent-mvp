@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block main %}
+<h1>{{ org.name }}</h1>
+<p class="muted">{{ 'Client organisation' if org.kind == 'client' else 'Evaluation organisation' }}{% if org.expires_at %} · expires {{ org.expires_at.strftime('%Y-%m-%d') }}{% endif %} · sandbox only</p>
+{% if welcome %}<p class="note" role="status">Welcome, {{ member.display_name }}. Your email is confirmed.</p>{% endif %}
+<section class="card">
+  <h2>Getting started</h2>
+  <ol class="checklist">
+    {% for s in steps %}
+    <li class="{{ 'ok' if s.done else '' }}"><span aria-hidden="true">{{ '✓' if s.done else '○' }}</span>
+      <a href="{{ s.href }}">{{ s.label }}</a> <span class="sr-only">{{ '(done)' if s.done else '(to do)' }}</span>
+      <span class="muted small">{{ s.detail }}</span></li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}

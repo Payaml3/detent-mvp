@@ -387,3 +387,19 @@ WHK-01:
 WHK-03:
   0: ["integration/test_webhooks.py::test_deliveries_are_signed_and_logged", "integration/test_webhooks.py::test_failures_retry_on_the_g20_schedule_then_fail",
       "integration/test_webhooks.py::test_send_test_event_and_manual_resend"]
+DSH-01:
+  0: ["integration/test_dashboard_access.py::test_admin_creates_a_client_org_only_with_kyb_and_invites_the_owner", "integration/test_dashboard_access.py::test_the_database_refuses_a_client_org_without_kyb",
+      "integration/test_dashboard_access.py::test_invites_are_single_use_and_expire"]
+  1: ["integration/test_dashboard_access.py::test_an_evaluation_org_expires_after_60_days_by_default"]
+  2: ["integration/test_dashboard_access.py::test_there_is_no_public_sign_up_route"]
+DSH-02:
+  0: ["integration/test_dashboard_access.py::test_the_invite_link_verifies_the_email_and_sets_an_argon2_password", "unit/test_dashboard_rules.py::test_passwords_are_argon2id_and_verify",
+      "unit/test_dashboard_rules.py::test_weak_passwords_are_refused"]
+  1: ["integration/test_dashboard_access.py::test_first_login_shows_the_onboarding_checklist"]
+DSH-03:
+  0: ["integration/test_dashboard_access.py::test_an_expired_evaluation_is_locked_until_extended"]
+  1: ["integration/test_dashboard_access.py::test_a_client_org_never_expires_and_suspension_is_audited"]
+DSH-11:
+  0: ["integration/test_dashboard_access.py::test_owner_invites_a_developer_who_cannot_manage_the_team", "integration/test_dashboard_access.py::test_removing_a_member_stops_their_sign_in_and_keys"]
+  1: ["unit/test_dashboard_rules.py::test_member_roles_are_the_spec_02_list", "unit/test_dashboard_rules.py::test_dashboard_permissions_follow_spec_08", "integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays"]
+  2: ["integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays", "integration/test_dashboard_access.py::test_two_owners_cannot_demote_each_other_at_once"]

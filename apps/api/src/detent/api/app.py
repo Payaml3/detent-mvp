@@ -28,6 +28,7 @@ from detent.api.middleware import request_context
 from detent.clock import Clock
 from detent.console import routes as console_routes
 from detent.console.auth import ActingUserRequired, LoginRequired
+from detent.dashboard import mount as dashboard
 from detent.intents.service import IdempotencyConflict, RequestProblem
 from detent.logging import request_id_var
 from detent.policy.screening import MockScreening
@@ -78,6 +79,7 @@ def create_app(
     app.include_router(console_routes.router)
     app.include_router(v1.router)
     app.include_router(v1_webhooks.router)
+    dashboard.install(app)
     app.state.screening = MockScreening.from_fixture()
 
     def _err(status: int, type_: str, code: str, message: str, param: str | None = None) -> Response:

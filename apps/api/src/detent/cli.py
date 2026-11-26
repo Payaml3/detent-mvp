@@ -142,6 +142,27 @@ def cmd_keys_create(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_staff_add(args: argparse.Namespace) -> int:
+    """P2: add a DekernAI admin (an admin of the operator organisation). The password is read from the
+    terminal, or from standard input when it is not a terminal; it is never an argument."""
+    import getpass
+
+    from detent.dashboard.access import AccessError, create_staff
+    from detent.db.engine import transaction
+    from detent.runtime import build_runtime
+
+    password = getpass.getpass("Password: ") if sys.stdin.isatty() else sys.stdin.readline().rstrip("\n")
+    rt = build_runtime(_load_settings())
+    try:
+        with transaction(rt.engine) as conn:
+            member = create_staff(conn, rt.clock, email=args.email, display_name=args.name, password=password)
+    except AccessError as exc:
+        print(f"detent: {exc}", file=sys.stderr)
+        return 2
+    print(f"added DekernAI admin {member.id} ({member.email}); sign in at /dashboard/login")
+    return 0
+
+
 def cmd_agent_record(args: argparse.Namespace) -> int:
     import json
     from datetime import UTC
@@ -269,6 +290,10 @@ def main(argv: list[str] | None = None) -> int:
     k.add_argument("--user", required=True)
     k.add_argument("--scopes", default="read,intents:create")
     k.set_defaults(fn=cmd_keys_create)
+    st = sub.add_parser("staff").add_subparsers(dest="staff_cmd", required=True).add_parser("add")
+    st.add_argument("--email", required=True)
+    st.add_argument("--name", required=True)
+    st.set_defaults(fn=cmd_staff_add)
     ag = sub.add_parser("agent").add_subparsers(dest="agent_cmd", required=True).add_parser("record")
     ag.add_argument("--invoice", required=True)
     ag.add_argument("--match", required=True, help="text in the invoice that selects this recording")
