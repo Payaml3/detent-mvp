@@ -52,7 +52,7 @@ class RailAdapter(Protocol):
 - `POST /payments` (idempotent), `GET /payments/{key}`, `GET /statements/{date}` (JSON, or CSV with `?format=csv`; filter with `scheme` and `account`)
 - `POST /inbound` simulates a payer paying in with a reference (tests and the demo use it; a real bank pushes this), and `GET /inbound?scheme=&after=&account=` lists inbound credits for the deposit watcher (LED-04)
 - Each organisation has its own receiving account at the simulator (its organisation ID): outgoing payments carry it as `debtor` and inbound credits as `account`, so organisations sharing one simulator never see each other's money
-- a settlement webhook to Detent
+- a settlement webhook to Dekernai
 
 The test values apply.
 
@@ -106,11 +106,11 @@ on attempt UNKNOWN:
 
 ## Fault injection (RAL-05)
 
-As built in S4: scenarios are posted to the proxy's `/__faults` endpoint (`match` is a JSON-RPC method or `"<HTTP method> <path prefix>"`, `count` is how many matching calls, `-1` until cleared, and an optional `attempt` limits it to one attempt's `X-Detent-Attempt` header). Delayed and stuck receipts are `hide_receipt` with a count; a genuine on-chain revert is produced by `low_gas_estimate` (the transfer runs out of gas, status 0, nothing moves); `duplicate_request` forwards a request twice. Demo mode refuses scenarios unless the scenario runner sends `X-Detent-Scenario-Runner: 1`.
+As built in S4: scenarios are posted to the proxy's `/__faults` endpoint (`match` is a JSON-RPC method or `"<HTTP method> <path prefix>"`, `count` is how many matching calls, `-1` until cleared, and an optional `attempt` limits it to one attempt's `X-Dekernai-Attempt` header). Delayed and stuck receipts are `hide_receipt` with a count; a genuine on-chain revert is produced by `low_gas_estimate` (the transfer runs out of gas, status 0, nothing moves); `duplicate_request` forwards a request twice. Demo mode refuses scenarios unless the scenario runner sends `X-Dekernai-Scenario-Runner: 1`.
 
-`apps/faultproxy` sits between adapters and RPC or bank endpoints. Scenarios are selected by the `X-Detent-Fault` header (tests) or by sandbox scenario config. They are never active in demo mode unless the scenario runner sets them.
+`apps/faultproxy` sits between adapters and RPC or bank endpoints. Scenarios are selected by the `X-Dekernai-Fault` header (tests) or by sandbox scenario config. They are never active in demo mode unless the scenario runner sets them.
 
-| Fault | Effect | Expected Detent behaviour |
+| Fault | Effect | Expected Dekernai behaviour |
 |---|---|---|
 | `timeout_after_forward` | Forwards the request; drops the response | Attempt UNKNOWN; resolver finds CONFIRMED; no second send |
 | `timeout_before_forward` | Never forwards; times out | Attempt UNKNOWN; resolver finds nothing and the nonce unused, so it re-broadcasts the same signed transaction (same hash); the chain then decides CONFIRMED or FAILED. Bank: the resolver re-sends with the same idempotency key, which the rail deduplicates. No new transaction is ever signed while UNKNOWN |

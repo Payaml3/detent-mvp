@@ -1,4 +1,4 @@
-# Data model: Detent MVP
+# Data model: Dekernai MVP
 
 Phase 1 of [plan.md](plan.md). The schema's source of truth is the SQL migration
 [`0001_baseline.sql`](../../apps/api/migrations/versions/0001_baseline.sql) (built and tested in M0). This page

@@ -3,12 +3,12 @@ pragma solidity 0.8.28;
 
 /// @title MockUSDC
 /// @notice A 6-decimal ERC-20 test stand-in for USDC. It is not USDC and has no value.
-///         It deploys only on the test chains Detent allows: anvil (31337), Base Sepolia (84532)
+///         It deploys only on the test chains Dekernai allows: anvil (31337), Base Sepolia (84532)
 ///         and Ethereum Sepolia (11155111) (decision D-33). Any other chain, mainnets included,
 ///         reverts in the constructor. Only the deployer can mint, so on a public test network
 ///         nobody else can create balances in it.
 contract MockUSDC {
-    string public constant name = "Detent Demo USD (test stand-in, not USDC)";
+    string public constant name = "Dekernai Demo USD (test stand-in, not USDC)";
     string public constant symbol = "tUSDC";
     uint8 public constant decimals = 6;
 

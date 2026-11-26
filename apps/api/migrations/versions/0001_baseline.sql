@@ -560,7 +560,7 @@ CREATE TABLE invites (
     created_at  TIMESTAMPTZ NOT NULL
 );
 
--- Website access requests arrive before an organisation exists; they belong to the Detent
+-- Website access requests arrive before an organisation exists; they belong to the Dekernai
 -- operator organisation (seeded as org_detent).
 CREATE TABLE leads (
     id         TEXT PRIMARY KEY CHECK (id LIKE 'lead\_%'),

@@ -7,7 +7,7 @@ users:
   - {id: usr_cl, name: "Marco (compliance lead)", role: compliance_lead}
   - {id: usr_rv, name: "Sam (reviewer)", role: reviewer}
   - {id: usr_bo, name: "Lea (backup owner)", role: backup_owner}
-  - {id: usr_oc, name: "Detent on-call", role: oncall}
+  - {id: usr_oc, name: "Dekernai on-call", role: oncall}
 counterparties:
   - id: cpt_bluefin
     contact_email: "payables@bluefin.example.invalid"   # fictional; outbox only (G-02)

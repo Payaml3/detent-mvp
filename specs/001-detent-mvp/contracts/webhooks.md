@@ -24,12 +24,12 @@ Source: [spec/03 §Webhooks](../../../spec/03-api.md#webhooks) (confirmed) and F
 ## Signature
 
 ```
-Detent-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>
+Dekernai-Signature: t=<unix seconds>,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>
 ```
 
 - Receivers reject a delivery whose `t` is more than 300 s from their clock.
 - The signing secret is shown once when the endpoint is created. It is stored **encrypted** (D-12), not
-  hashed: Detent needs the plaintext to compute each signature.
+  hashed: Dekernai needs the plaintext to compute each signature.
 - `send test event` (spec/08) delivers a signed sample event; marking it `"test": true` (G-20, Confirmed D-38).
 
 ## Delivery and retries

@@ -1,4 +1,4 @@
-# Feature Specification: Detent MVP (agentic payment controls prototype and developer portal)
+# Feature Specification: Dekernai MVP (agentic payment controls prototype and developer portal)
 
 **Feature Branch**: `spec/001-detent-mvp`
 
@@ -37,7 +37,7 @@ order, D-11) and can be demonstrated on its own.
 
 ### User Story 1 - A platform payout is decided under the client's rules (Priority: P1)
 
-The platform's backend submits a payout. Detent answers at once with execute, escalate or block and a reason for every
+The platform's backend submits a payout. Dekernai answers at once with execute, escalate or block and a reason for every
 check, under the rule version the client approved.
 
 **Why this priority**: the decision layer is the product's core claim ("the rules make every decision").
@@ -93,7 +93,7 @@ approves or rejects with a reason; approval re-runs the rules.
 
 ### User Story 4 - A timeout or failure never pays twice (Priority: P1)
 
-Rails time out, revert or reject. Detent waits for evidence, fails over only on technical failures, and the kill
+Rails time out, revert or reject. Dekernai waits for evidence, fails over only on technical failures, and the kill
 switch stops everything.
 
 **Why this priority**: L3, L4 and L5 are launch criteria; duplicates are a Sev 1.
@@ -235,7 +235,7 @@ depends on a pending decision.
 
 Roles from spec/00 and spec/02. **C** = confirmed by a source; **P** = proposed (decision ID); blank = not allowed.
 
-| Action | Payments lead | Compliance lead | Reviewer | Backup owner | On-call (Detent) | Auditor | Agent (API key + mandate) | Integrator (API key) | Detent admin |
+| Action | Payments lead | Compliance lead | Reviewer | Backup owner | On-call (Dekernai) | Auditor | Agent (API key + mandate) | Integrator (API key) | Dekernai admin |
 |---|---|---|---|---|---|---|---|---|---|
 | View console for own organisation | C | C | C | C | C | C (C-14, D-38) | | | |
 | Propose a payment intent | | | | | | | C (spec/05) | | |
