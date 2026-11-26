@@ -195,7 +195,9 @@ def set_rails_mode(conn: Connection, clock: Clock, settings: Settings, *, by: Me
 
 # A payment in one of these states can still reach a rail without anyone approving it, so a reset waits for
 # it: a hidden payment must never send. ESCALATED and HELD payments wait for an approval that no screen of
-# the new generation can give, so they stay held (invariant 7) and are hidden with the rest.
+# the new generation can give, so they stay held (invariant 7) and are hidden with the rest. The exception is
+# a payment held only by the kill switch: releasing the switch sends it back to READY with no approval, so it
+# counts as one that can still be sent.
 _SENDING = ("READY", "SUBMITTED", "UNKNOWN", "FAILED")
 # Every dashboard organisation is on test networks in the prototype, client organisations included.
 _RESETTABLE = ("client", "evaluation", "sandbox")
@@ -215,7 +217,8 @@ def reset_sandbox(conn: Connection, clock: Clock, *, by: Member, confirm: str) -
         raise AccessError("reset_not_allowed", "This organisation's data can't be reset here.", status=409)
     busy = conn.execute(
         text(
-            "SELECT count(*) FROM payment_intents p WHERE p.org_id=:o AND (p.status = ANY(:s) OR EXISTS "
+            "SELECT count(*) FROM payment_intents p WHERE p.org_id=:o AND (p.status = ANY(:s) "
+            "OR (p.status = 'HELD' AND p.held_reason = 'KILL_SWITCH_ENGAGED') OR EXISTS "
             "(SELECT 1 FROM attempts a WHERE a.org_id = p.org_id AND a.payment_id = p.id "
             "AND a.status IN ('CREATED', 'SUBMITTED', 'UNKNOWN')))"
         ),

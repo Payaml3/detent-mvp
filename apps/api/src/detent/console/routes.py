@@ -17,6 +17,8 @@ from detent.console.auth import (
     ActingUser,
     acting_user,
     check_password,
+    dashboard_member,
+    demo_only,
     list_users,
     load_user,
     require_login,
@@ -30,6 +32,7 @@ from detent.demo.generations import active_org, agent_key_for
 from detent.domain.roles import Role
 from detent.intents.registry import update_destination
 from detent.runtime import Runtime
+from detent.sandbox.generations import visible
 
 log = logging.getLogger("detent.console")
 
@@ -37,19 +40,26 @@ templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 router = APIRouter(prefix="/console")
 
 
-def _kill_switch_engaged(rt: Runtime) -> bool:
+def _kill_switch_engaged(rt: Runtime, user: ActingUser | None) -> bool:
     with rt.engine.connect() as conn:
-        repo = OrgScoped(conn, active_org(conn, rt.settings.demo_org_id))
+        org_id = user.org_id if user is not None else active_org(conn, rt.settings.demo_org_id)
+        repo = OrgScoped(conn, org_id)
         v = conn.execute(repo.select(kill_switch, kill_switch.c.engaged)).scalar_one_or_none()
     return bool(v)
 
 
 def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ctx: Any) -> HTMLResponse:
+    from detent.dashboard.web import csrf_token
+
+    member_mode = bool(user and user.via_dashboard)
     base = {
         "brand": rt.settings.brand_name,
         "user": user,
-        "kill_switch_engaged": _kill_switch_engaged(rt),
-        "demo_mode": rt.settings.is_demo,
+        "kill_switch_engaged": _kill_switch_engaged(rt, user),
+        # DSH-09: a dashboard member sees their own organisation, without the demo-only controls.
+        "dashboard": member_mode,
+        "dashboard_csrf": csrf_token(request) if member_mode else "",
+        "demo_mode": rt.settings.is_demo and not member_mode,
         "now": rt.clock.now(),
         "demo_steps": list(DEMO_STEPS),
         "hosting_region": rt.settings.hosting_region,
@@ -84,7 +94,9 @@ def logout(request: Request) -> RedirectResponse:
 
 
 @router.get("/act-as", response_class=HTMLResponse)
-def act_as_form(request: Request, rt: Runtime = Depends(runtime)) -> HTMLResponse:  # noqa: B008
+def act_as_form(request: Request, rt: Runtime = Depends(runtime)) -> Response:  # noqa: B008
+    if dashboard_member(request, rt) is not None:  # members act as themselves only (DSH-09)
+        return RedirectResponse("/console/", status_code=303)
     require_login(request)
     current = request.session.get("user_id")
     return page(
@@ -102,6 +114,8 @@ def act_as(
     user_id: str = Form(...),
     rt: Runtime = Depends(runtime),  # noqa: B008
 ) -> RedirectResponse:
+    if dashboard_member(request, rt) is not None:
+        raise HTTPException(status_code=404)
     require_login(request)
     user = load_user(rt, user_id)
     if user is None:
@@ -156,6 +170,7 @@ def advance_clock(
     user: ActingUser = Depends(require_permission("demo.clock.advance")),  # noqa: B008
 ) -> RedirectResponse:
     # Outside demo mode the control does not exist at all.
+    demo_only(user)
     if not rt.settings.is_demo or not isinstance(rt.clock, DemoClock):
         raise HTTPException(status_code=404)
     delta = DEMO_STEPS.get(step)
@@ -286,7 +301,9 @@ def payments(
             text(
                 "SELECT p.id, p.status, p.amount_minor, p.currency, p.source, p.reference, p.created_at, "
                 "c.name AS payee FROM payment_intents p LEFT JOIN counterparties c ON c.org_id = p.org_id "
-                "AND c.id = p.counterparty_id WHERE p.org_id=:o AND (CAST(:s AS text) IS NULL OR p.status "
+                "AND c.id = p.counterparty_id WHERE p.org_id=:o "
+                "AND p.generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
+                "AND (CAST(:s AS text) IS NULL OR p.status "
                 "= :s) "
                 "ORDER BY p.created_at DESC, p.id DESC LIMIT 200"
             ),
@@ -357,6 +374,9 @@ def console_send(
     """EXE-09 Assist mode: a person clicks Send (G-09: never the initiator)."""
     from detent.execution.modes import ModeError, confirm_send
 
+    with rt.engine.connect() as conn:
+        if not visible(conn, "payment_intents", user.org_id, payment_id):  # SBX-04: an earlier generation
+            raise HTTPException(status_code=404)
     try:
         confirm_send(
             rt.engine,
@@ -388,6 +408,7 @@ def exceptions_queue(
                 "LEFT JOIN users u ON u.org_id = c.org_id AND u.id = c.owner_id "
                 "LEFT JOIN payment_intents p ON p.org_id = c.org_id AND p.id = c.payment_id "
                 "WHERE c.org_id=:o AND c.status IN ('OPEN','HELD_OVERDUE') "
+                "AND c.generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
                 "AND (CAST(:own AS text) IS NULL OR c.owner_id = :own) "
                 "AND (CAST(:tier AS int) IS NULL OR c.tier = :tier) "
                 "AND (NOT :ovd OR c.deadline_at < :now OR c.status = 'HELD_OVERDUE') ORDER BY "
@@ -471,7 +492,8 @@ def case_page(
                 "exception_cases c "
                 "LEFT JOIN users u ON u.org_id = c.org_id AND u.id = c.owner_id "
                 "LEFT JOIN users b ON b.org_id = c.org_id AND b.id = c.backup_owner_id "
-                "WHERE c.org_id=:o AND c.id=:c"
+                "WHERE c.org_id=:o AND c.id=:c "
+                "AND c.generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
             ),
             {"o": user.org_id, "c": case_id},
         ).one_or_none()
@@ -513,6 +535,9 @@ def _console_resolve(
 
     if not reason.strip():
         raise HTTPException(status_code=400, detail="a reason is required")
+    with rt.engine.connect() as conn:
+        if not visible(conn, "exception_cases", user.org_id, case_id):  # SBX-04: an earlier generation
+            raise HTTPException(status_code=404)
     try:
         if action == "approve":
             approve(
@@ -739,6 +764,7 @@ def invoices(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
+    demo_only(user)
     with rt.engine.connect() as conn:
         mandates = _mandates_in_force(conn, user.org_id, rt.clock.now())
         recent = conn.execute(
@@ -757,6 +783,7 @@ async def drop_invoice(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> RedirectResponse:
+    demo_only(user)
     from starlette.concurrency import run_in_threadpool
 
     form = await request.form()
@@ -811,6 +838,7 @@ def proposal_page(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
+    demo_only(user)
     from detent.agents.instruction import replay_proposal
     from detent.views.payments import payment_view
 
@@ -858,6 +886,7 @@ async def resolve_proposal(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(require_permission("exception.approve")),  # noqa: B008
 ) -> RedirectResponse:
+    demo_only(user)
     from detent.agents.submit import NotReady, resolve_flags
 
     form = await request.form()
@@ -887,6 +916,7 @@ def submit_as_agent(
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> RedirectResponse:
     """'Submit as agent': the proposal goes through the public API with the agent's own key."""
+    demo_only(user)
     from fastapi.testclient import TestClient
 
     from detent.agents.submit import NotReady, submit_proposal
@@ -1268,6 +1298,7 @@ def demo_page(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
+    demo_only(user)
     from detent.demo.generations import current_generation
     from detent.demo.scenarios import SCENARIOS, recorded
 
@@ -1294,6 +1325,7 @@ def demo_invoice(
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> Response:
     """The $18,500 invoice as the fictional supplier sent it, for dropping on the Invoices screen."""
+    demo_only(user)
     from detent.demo.scenarios import CANONICAL_INVOICE, demo_document
 
     _demo_enabled(rt)
@@ -1312,6 +1344,7 @@ def demo_run(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> RedirectResponse:
+    demo_only(user)
     from urllib.parse import quote
 
     from detent.demo.scenarios import SCENARIOS, ScenarioError, run_scenario

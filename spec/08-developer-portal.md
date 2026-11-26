@@ -237,6 +237,20 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   (`verification.requested`, `verification.verified`, `verification.returned`). Production mode stays unavailable
   (DSH-13).
 
+## As built (P2 group 4b)
+
+- **Console per organisation (DSH-09):** a member signed in to the dashboard opens `/console/` (linked from the
+  dashboard nav) and uses the same screens as themselves, in their own organisation: overview, policy,
+  mandates, counterparties, exceptions, payments, rails, reconciliation, outbox and settings. There is no demo
+  password and no act-as; the demo-only screens and controls (the clock, the invoice agent, the scenario runner,
+  act-as) are hidden and answer 404. Reads show only the organisation's current data generation (SBX-04),
+  including the overview numbers, and an earlier generation's case can't be approved. Permissions come from the
+  member's role, as in the demo console. Writes are refused while the organisation is read-only (DSH-03) and
+  unless the request's Origin or Referer is this site (the console's forms carry no CSRF token). Every write is
+  audited with the member's ID and role. `/dashboard/policy` redirects to `/console/policy`.
+- **Reset and the kill switch:** a sandbox reset (SBX-04) also waits for payments the kill switch holds, because
+  releasing the switch would send them with no approval.
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

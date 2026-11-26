@@ -25,6 +25,7 @@ def _match_rate(conn: Connection, org_id: str) -> dict[str, Any] | None:
     r = conn.execute(
         text(
             "SELECT stats, finished_at FROM recon_runs WHERE org_id=:o AND finished_at IS NOT NULL "
+            "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
             "ORDER BY started_at DESC, id DESC LIMIT 1"
         ),
         {"o": org_id},
@@ -47,7 +48,10 @@ def overview_stats(conn: Connection, org_id: str, now: datetime) -> dict[str, An
             text(
                 "SELECT outcome, count(*) FROM (SELECT DISTINCT ON (payment_id) payment_id, outcome "
                 "FROM decisions "
-                "WHERE org_id=:o AND decided_at >= :d ORDER BY payment_id, decided_at, id) first_decisions "
+                "WHERE org_id=:o AND decided_at >= :d AND payment_id IN (SELECT id FROM payment_intents "
+                "WHERE org_id=:o AND generation = "
+                "(SELECT data_generation FROM organisations WHERE org_id = :o)) "
+                "ORDER BY payment_id, decided_at, id) first_decisions "
                 "GROUP BY outcome"
             ),
             p,
@@ -57,6 +61,7 @@ def overview_stats(conn: Connection, org_id: str, now: datetime) -> dict[str, An
         conn.execute(
             text(
                 "SELECT status, count(*) FROM payment_intents WHERE org_id=:o AND created_at >= :d "
+                "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
                 "GROUP BY status "
                 "ORDER BY status"
             ),
@@ -68,22 +73,33 @@ def overview_stats(conn: Connection, org_id: str, now: datetime) -> dict[str, An
             "SELECT count(*), count(*) FILTER (WHERE EXISTS (SELECT 1 FROM exception_cases c WHERE "
             "c.org_id = "
             "p.org_id AND c.payment_id = p.id)) FROM payment_intents p WHERE p.org_id=:o AND "
-            "p.created_at >= :d "
+            "p.created_at >= :d AND p.generation = "
+            "(SELECT data_generation FROM organisations WHERE org_id = :o) "
             "AND EXISTS (SELECT 1 FROM decisions d WHERE d.org_id = p.org_id AND d.payment_id = p.id)"
         ),
         p,
     ).one()
     oldest_unknown = conn.execute(
-        text("SELECT min(unknown_at) FROM attempts WHERE org_id=:o AND status='UNKNOWN'"), p
+        text(
+            "SELECT min(a.unknown_at) FROM attempts a JOIN payment_intents pi ON pi.org_id = a.org_id "
+            "AND pi.id = a.payment_id WHERE a.org_id=:o AND a.status='UNKNOWN' "
+            "AND pi.generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
+        ),
+        p,
     ).scalar_one()
     unknown_count = conn.execute(
-        text("SELECT count(*) FROM payment_intents WHERE org_id=:o AND status='UNKNOWN'"), p
+        text(
+            "SELECT count(*) FROM payment_intents WHERE org_id=:o AND status='UNKNOWN' "
+            "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
+        ),
+        p,
     ).scalar_one()
     cases = conn.execute(
         text(
             "SELECT count(*) FILTER (WHERE status IN ('OPEN','HELD_OVERDUE')), "
             "count(*) FILTER (WHERE status = 'HELD_OVERDUE' OR (status = 'OPEN' AND deadline_at < :now)) "
-            "FROM exception_cases WHERE org_id=:o"
+            "FROM exception_cases WHERE org_id=:o "
+            "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
         ),
         p,
     ).one()

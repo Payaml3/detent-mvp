@@ -1467,7 +1467,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Console screens reused with the organisation scope, including the policy screens (rule sets, counterparties, mandates); demo-only controls (clock, scenario runner) hidden
+- [x] Console screens reused with the organisation scope, including the policy screens (rule sets, counterparties, mandates); demo-only controls (clock, scenario runner) hidden
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** CON-04, DSH-02 · **Traces to:** D.console
 
