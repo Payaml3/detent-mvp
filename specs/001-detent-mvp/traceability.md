@@ -1095,7 +1095,7 @@ Sources: [spec/11 §11--the-10-minute-demo-matches-the-built-screens-dem-05](../
 | [DEM-01](../../backlog/user-stories.md#dem-01) | S9 | 1 | Seed is idempotent and resettable | done | `integration/test_demo_generations.py::test_seed_is_fictional_and_idempotent`<br>`integration/test_demo_generations.py::test_reset_starts_a_new_generation_and_deletes_nothing` |
 | [DEM-03](../../backlog/user-stories.md#dem-03) | S9 | 0 | Covers all three rails, at least one escalation, one block and exactly one reconciliation break | done | `chain/test_demo_scenarios.py::test_batch_moves_money_on_three_rails_with_one_break`<br>`chain/test_demo_scenarios.py::test_match_line_counts_approved_escalations` |
 | [DEM-04](../../backlog/user-stories.md#dem-04) | S9 | 0 | `detent demo check` prints USDC and gas balances per wallet and chain with faucet instructions | done | `unit/test_demo_wallets.py::test_low_balances_ask_for_a_top_up_with_faucets`<br>`unit/test_demo_wallets.py::test_unconfigured_wallets_say_what_to_set`<br>`chain/test_demo_token.py::test_deploys_on_the_sepolia_and_funds_both_wallets` |
-| [DEM-05](../../backlog/user-stories.md#dem-05) | S9 | 0 | spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask | done | `unit/test_demo_wallets.py::test_demo_script_matches_the_runner_and_ends_with_the_ask` |
+| [DEM-05](../../backlog/user-stories.md#dem-05) | S9 | 0 | spec/11-demo-script.md updated to match the built screens; ends with the onboarding ask (B-04) | done | `unit/test_demo_wallets.py::test_demo_script_matches_the_runner_and_ends_with_the_ask` |
 | [CON-09](../../backlog/user-stories.md#con-09) | S9 | 0 | Scenarios: the $18,500 invoice; forced timeout to UNKNOWN then CONFIRMED with no resend; 20-payment batch with deposits and one designed break; an attack sample; reset demo data | done | `chain/test_demo_scenarios.py::test_canonical_invoice_then_forced_timeout_pays_once`<br>`chain/test_demo_scenarios.py::test_batch_moves_money_on_three_rails_with_one_break`<br>`chain/test_demo_scenarios.py::test_attack_sample_is_refused`<br>`integration/test_demo_generations.py::test_reset_starts_a_new_generation_and_deletes_nothing` |
 | [CON-09](../../backlog/user-stories.md#con-09) | S9 | 1 | Each scenario is scripted, idempotent and uses the controllable clock | done | `integration/test_demo_generations.py::test_console_runs_a_scenario_once_per_generation`<br>`chain/test_demo_scenarios.py::test_batch_moves_money_on_three_rails_with_one_break` |
 
@@ -1108,7 +1108,7 @@ Sources: [spec/11 §11--the-10-minute-demo-matches-the-built-screens-dem-05](../
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [DEM-03](../../backlog/user-stories.md#dem-03) | S9 | 0 | Covers all three rails, at least one escalation, one block and exactly one reconciliation break | done | `chain/test_demo_scenarios.py::test_batch_moves_money_on_three_rails_with_one_break`<br>`chain/test_demo_scenarios.py::test_match_line_counts_approved_escalations` |
-| [DEM-05](../../backlog/user-stories.md#dem-05) | S9 | 0 | spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask | done | `unit/test_demo_wallets.py::test_demo_script_matches_the_runner_and_ends_with_the_ask` |
+| [DEM-05](../../backlog/user-stories.md#dem-05) | S9 | 0 | spec/11-demo-script.md updated to match the built screens; ends with the onboarding ask (B-04) | done | `unit/test_demo_wallets.py::test_demo_script_matches_the_runner_and_ends_with_the_ask` |
 
 ## FR-097 · Demo (confirmed)
 

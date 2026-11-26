@@ -4,37 +4,45 @@ import PageHead from "../components/PageHead.astro";
 import config from "../../site.config.mjs";
 const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
 ---
-<Base title="Request access" description={`Request access to ${config.brandName}: scoped API keys, simulated rails and values that trigger every path.`}>
-  <PageHead title="Request access." lead="Keys are issued after a short conversation, so we can set up an organisation with data that matches your platform.">
+<Base title="Request access" description={`Request access to ${config.brandName}: tell us about your platform and start onboarding with a discovery call.`}>
+  <PageHead title="Request access." lead="Tell us about your platform and how you pay out today. We reply to book a discovery call, the first step of onboarding.">
     <Fragment slot="fragments">
-      <div class="frag" data-ui data-reveal><p class="frag-title">API key · example</p><p class="mono">sk_••••••••••••7Q2c</p><p class="soft">Scopes: read, intents:create. Shown once.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Amount ending .13</p><span class="chip st-UNKNOWN">UNKNOWN</span><p>Times out, then confirms. Nothing is resent.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Amount ending .42</p><span class="chip st-FAILED">FAILED</span><p>Fails on the first rail, then fails over under the same payment ID.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Address ending dEaD</p><span class="chip st-BLOCKED">BLOCKED</span><p>Screening hit. Final.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 1 · Discovery</p><p>A call and a demo on your rails, volumes and the rules you run today.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 2 · Contract and KYB</p><p>Our due diligence on your business, then the contract and data processing agreement.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 3 · Registration email</p><p>Your account owner gets a single-use invite to sign up.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 4 · Your dashboard</p><p>Keys, rules, team roles and the console in one place.</p></div>
     </Fragment>
   </PageHead>
   <section class="section"><div class="wrap grid">
     <form class="form" data-reveal method="post" action={connected ? config.accessFormAction : undefined} data-access-form>
-      {!connected && <p class="notice" role="note">Preview: this form isn’t connected yet. Nothing you type is sent.</p>}
+      {!connected && <p class="notice" role="note">This form isn’t connected yet. Nothing you type is sent. Book a demo instead.</p>}
       <label>Name<input name="name" autocomplete="name" required /></label>
       <label>Work email<input name="email" type="email" autocomplete="email" required /></label>
+      <label>Job title<input name="title" autocomplete="organization-title" /></label>
       <label>Company<input name="company" autocomplete="organization" required /></label>
+      <label>Country of incorporation<input name="country" autocomplete="country-name" required /></label>
       <label>Platform type
         <select name="platform">
           <option>Payout platform</option><option>Crypto service provider</option><option>Broker or prop firm</option><option>Marketplace</option><option>Other</option>
         </select>
       </label>
-      <label>What would you like to test?<textarea name="message" rows="4"></textarea></label>
+      <label>Rails you pay out on
+        <select name="rails">
+          <option>Stablecoins</option><option>Instant bank payouts</option><option>Both</option><option>Other</option>
+        </select>
+      </label>
+      <label>How do you approve payouts today?<textarea name="message" rows="4"></textarea></label>
       <button class="button" type="submit">Request access</button>
     </form>
     <div class="aside" data-reveal>
-      <h2>What you get</h2>
+      <h2>What happens next</h2>
       <ul>
-        <li>Scoped API keys, shown once.</li>
-        <li>Simulated rails to try every path before you connect your own.</li>
-        <li>Values that trigger every path: an amount ending in .13 times out and then confirms; .42 fails over under the same payment ID; a flagged address is blocked.</li>
-        <li>Signed webhooks and request logs.</li>
+        <li>We reply to book a discovery call and a demo.</li>
+        <li>If we both want to go ahead, we run due diligence (KYB) on your business and sign the contract and data processing agreement.</li>
+        <li>Once KYB is approved, your account owner gets a registration email, signs up and invites the team.</li>
+        <li>Your rules are signed off by your compliance lead before any live payment is decided. You sign every step that moves money closer to being sent.</li>
       </ul>
+      <p class="soft">There is no public sign-up. Every account starts with onboarding. <a class="textlink" href="/design-partners/">See the seven phases</a></p>
     </div>
   </div></section>
 </Base>
@@ -56,7 +64,7 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const note = form.querySelector(".notice");
-      if (note) note.textContent = "Preview: this form isn’t connected yet, so nothing was sent.";
+      if (note) note.textContent = "This form isn’t connected yet, so nothing was sent. Book a demo instead.";
     });
   }
 </script>
