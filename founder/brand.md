@@ -61,3 +61,5 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 - Fonts (D-18): Space Grotesk, Inter, JetBrains Mono.
 - Proposed: the detent-wheel motif (D-20) no longer fits the name; replacement idea "sift then settle"
   (many inputs filtering to one clear outcome). Decided in the design-system work.
+- Logo (B-03): the **settled D**, a D monogram with one safety-orange point resting in its counter, plus the
+  wordmark in Space Grotesk Bold. Files and rules: `docs/brand/logo.md`; assets in `apps/site/public/brand/`.
