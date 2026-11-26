@@ -1,0 +1,49 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "DekernAI docs",
+  "description": "Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules.",
+  "colors": {"primary": "#C2360F", "light": "#FF4A1F", "dark": "#C2360F"},
+  "favicon": "/favicon.svg",
+  "logo": {"light": "/logo/light.svg", "dark": "/logo/dark.svg"},
+  "api": {
+    "playground": {"display": "interactive"},
+    "examples": {"languages": ["curl", "python", "javascript", "go", "java", "csharp", "php", "ruby"]}
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {"group": "Get started", "pages": ["index", "quickstart", "sandbox", "authentication"]},
+          {
+            "group": "Concepts",
+            "pages": [
+              "concepts/payment-intents",
+              "concepts/decisions",
+              "concepts/payment-states",
+              "concepts/policies",
+              "concepts/mandates",
+              "concepts/exceptions",
+              "concepts/deposits-and-reconciliation",
+              "concepts/routing-and-failover",
+              "concepts/audit-and-replay"
+            ]
+          },
+          {"group": "Webhooks", "pages": ["webhooks/events", "webhooks/signatures", "webhooks/retries"]},
+          {
+            "group": "Errors and limits",
+            "pages": ["api/errors", "limits/idempotency", "limits/rate-limits", "limits/versioning"]
+          },
+          {"group": "SDKs and tools", "pages": ["tools/postman-and-openapi"]},
+          {"group": "Changelog", "pages": ["changelog"]}
+        ]
+      },
+      {"tab": "API reference", "openapi": "api/openapi.json"}
+    ]
+  },
+  "navbar": {
+    "primary": {"type": "button", "label": "Request sandbox access", "href": "https://SITE_DOMAIN/access/"}
+  },
+  "footer": {"socials": {}}
+}

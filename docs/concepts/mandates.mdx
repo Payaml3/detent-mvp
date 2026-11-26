@@ -1,0 +1,59 @@
+---
+title: "Mandates for AI agents"
+description: "What an agent may pay, signed and checked on every payout."
+---
+
+An AI agent never pays on its own authority. It proposes a payment intent with `"source": "agent"` and a
+`mandate_id`, and the **mandate** says what that agent may pay:
+
+```json
+{
+  "mandate_id": "mnd_01JD...",
+  "agent": {"agent_id": "agt_ap_invoices", "description": "Accounts-payable agent"},
+  "scope": {
+    "payees": ["cpt_bluefin"],
+    "max_per_payment": {"amount": "20000.00", "currency": "USDC"},
+    "max_total": {"amount": "50000.00", "currency": "USDC"},
+    "networks": ["base-sepolia", "eth-sepolia"],
+    "currencies": ["USDC"],
+    "purpose": "supplier invoices"
+  },
+  "valid_from": "2026-12-01T00:00:00Z",
+  "expires_at": "2026-12-31T23:59:59Z",
+  "signature": {"alg": "HS256", "key_id": "mk_demo_1", "value": "base64..."}
+}
+```
+
+## Checked first, on every payout
+
+The mandate check runs before every other check. Any of these blocks the payout at once:
+
+| Reason | When |
+|---|---|
+| `MANDATE_MISSING` | An agent payout without a mandate |
+| `MANDATE_SIGNATURE_INVALID` | The signature does not match, or the document is not the last version issued |
+| `MANDATE_EXPIRED`, `MANDATE_REVOKED` | Outside its validity, or revoked |
+| `MANDATE_PAYEE_OUT_OF_SCOPE` | The payee is not in `scope.payees` |
+| `MANDATE_AMOUNT_EXCEEDED` | Above `max_per_payment` |
+| `MANDATE_TOTAL_EXCEEDED` | It would take the agent past `max_total` |
+| `MANDATE_NETWORK_OUT_OF_SCOPE` | The network is not in `scope.networks` |
+
+A payout inside its mandate still goes through every other rule: a mandate lets an agent ask, it never lets an
+agent skip your rules.
+
+## The signature
+
+The signature is HMAC-SHA256 over the canonical JSON of the mandate (sorted keys, no whitespace) without the
+`signature` field, with your platform's mandate key. The scope fields are chosen so a mandate can later map
+onto signed-mandate standards for agent payments.
+
+## Revoking
+
+`POST /v1/mandates/{id}/revoke` (scope `admin`) or the console's **Mandates** screen. Revocation is recorded in the
+audit log, so it can't be undone by editing data.
+
+## What agents can and can't do
+
+The agents read invoices, investigate escalations and draft reconciliation fixes. Their only write is proposing a
+payment intent. They can't approve, send, retry or change rules, and text they read (an invoice, a note, a name)
+reaches the model only as delimited data, never as instructions.

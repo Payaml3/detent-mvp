@@ -1,0 +1,45 @@
+---
+title: "Payment intents and the payment ID"
+description: "One request, one payment ID for life."
+---
+
+A **payment intent** is a request to move money: a payout to a counterparty or one of your users. You create one
+with `POST /v1/payment_intents`, and DekernAI decides it in the same request.
+
+```json
+{
+  "kind": "payout",
+  "source": "platform",
+  "counterparty_id": "cpt_lumen",
+  "destination": {"kind": "evm_wallet", "network": "base-sepolia", "destination_id": "dst_lumen_base"},
+  "amount": {"amount": "90.00", "currency": "USDC"},
+  "allow_network_switch": false,
+  "reference": "INV-2026-0142"
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `source` | `platform` when your systems create it; `agent` when an AI agent proposes it, which then needs a `mandate_id` (see [Mandates](/concepts/mandates)) |
+| `destination` | A verified destination of the counterparty, by `destination_id`. Wallets are `evm_wallet`, bank accounts `bank_account` |
+| `amount` | A decimal string and a currency (`USDC`, `GBP` or `EUR`). Amounts are never floats |
+| `allow_network_switch` | Whether a technical failure may move the payout to another network (see [Routing and failover](/concepts/routing-and-failover)) |
+| `reference`, `notes` | Your text. It is shown to reviewers as data and never read by the rules |
+
+## The payment ID
+
+The response carries an ID like `pay_01JD...`. **It never changes.** A retry, a failover to another rail and an
+approval all keep it, so you store one ID per payment and look everything up by it. Each try on a rail is an
+**attempt** under that payment, and a payment has at most one attempt in flight and at most one confirmed attempt,
+enforced by the database.
+
+## Creating safely
+
+Every create carries an `Idempotency-Key`. Sending the same request again with the same key returns the first
+response and creates nothing. See [Idempotency](/limits/idempotency).
+
+## What you get back
+
+The payment's `status`, the latest `decision` with every check, and the open `exception` case if the payment was
+escalated. `GET /v1/payment_intents/{id}` adds the full history: decisions, attempts, ledger postings and audit
+events.

@@ -1094,7 +1094,7 @@
    "epic": "SBX",
    "slice": "P2",
    "criteria": 2,
-   "done": 1
+   "done": 2
   },
   {
    "id": "SBX-02",
@@ -1122,14 +1122,14 @@
    "epic": "DOC",
    "slice": "P3",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DOC-02",
    "epic": "DOC",
    "slice": "P3",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DOC-03",
@@ -1157,7 +1157,7 @@
    "epic": "DOC",
    "slice": "P3",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SDK-01",
@@ -1178,7 +1178,7 @@
    "epic": "SDK",
    "slice": "P3",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "WEB-01",

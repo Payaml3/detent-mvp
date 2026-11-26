@@ -1,0 +1,6 @@
+# Internal documents in docs/ that must never be published on the docs site (DOC-01).
+# Only the pages in docs.json's navigation are public; tools/build_docs.py --check keeps this list complete.
+brand/
+design/
+product/
+engineering-standards.md

@@ -1,0 +1,21 @@
+---
+title: "Rate limits"
+description: "Requests per key, the headers that show them, and daily quotas."
+---
+
+Each key may make **120 requests a minute** in the sandbox. Every response says where you are:
+
+| Header | Meaning |
+|---|---|
+| `RateLimit-Limit` | Requests allowed in the current window |
+| `RateLimit-Remaining` | Requests left in it |
+| `RateLimit-Reset` | Seconds until the window resets |
+
+Over the limit, the answer is `429 rate_limited` with a `Retry-After` header in seconds. Wait that long, then retry
+with the same `Idempotency-Key`.
+
+## Daily quotas
+
+Your organisation also has daily sandbox quotas: by default 500 payments decided and 50 agent investigations a
+day. Past a quota, the answer is `429 quota_exceeded`, with `Retry-After` set to the start of the next UTC day.
+The dashboard's **Usage** page shows your usage against each quota.

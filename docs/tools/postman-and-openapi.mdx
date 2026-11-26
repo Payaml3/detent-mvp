@@ -1,0 +1,24 @@
+---
+title: "Postman and OpenAPI"
+description: "Use the API from your own tools."
+---
+
+## OpenAPI
+
+The API is described by an OpenAPI 3.1 file, generated from the code on every change:
+[download `openapi.json`](/api/openapi.json). The [API reference](/api-reference) is built from the same file.
+
+## Postman
+
+[Download the Postman collection](/api/postman.json), generated from the same OpenAPI file, and import it with
+**Import** in Postman. It has one request per endpoint, grouped like the reference, and three collection
+variables:
+
+| Variable | Set it to |
+|---|---|
+| `baseUrl` | The sandbox base URL |
+| `apiKey` | Your `sk_test_...` key |
+| `apiVersion` | `2026-12-01` |
+
+Every request that creates something sends a fresh `Idempotency-Key` (`{{$guid}}`). To retry one safely, send it
+again with the same key instead.

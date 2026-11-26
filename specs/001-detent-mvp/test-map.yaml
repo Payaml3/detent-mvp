@@ -415,6 +415,15 @@ RAL-11:
   1: ["integration/test_sandbox_rails.py::test_a_new_sandbox_organisation_pays_on_the_simulated_chain", "integration/test_sandbox_rails.py::test_moving_to_real_test_networks_needs_configuration_and_no_payout_in_flight"]
 SBX-01:
   0: ["integration/test_sandbox_rails.py::test_point_13_times_out_to_unknown_then_confirms_without_a_resend", "integration/test_sandbox_rails.py::test_point_42_reverts_on_the_first_rail_and_fails_over_under_the_same_id", "integration/test_sandbox_rails.py::test_point_42_without_a_network_switch_ends_failed", "integration/test_sandbox_rails.py::test_flagged_address_blocks_and_a_payee_off_the_allowlist_escalates", "integration/test_sandbox_rails.py::test_test_values_are_exact_cents", "integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason"]
+  1: ["integration/test_docs_examples.py::test_the_sandbox_page_lists_the_test_values_the_simulated_chain_applies"]
+DOC-01:
+  0: ["unit/test_docs_site.py::test_the_docs_site_is_complete_and_publishes_nothing_internal", "unit/test_docs_site.py::test_every_nav_section_of_the_spec_is_there", "ci:.github/workflows/ci.yml 'Docs site is complete' step", "manual:the founder connects Mintlify (Starter) to docs/ and sets the custom domain"]
+DOC-02:
+  0: ["integration/test_docs_examples.py::test_the_quickstart_request_works_as_written", "integration/test_docs_examples.py::test_the_quickstart_table_of_other_outcomes_holds", "unit/test_docs_site.py::test_the_signature_sample_matches_the_signing_code", "manual:docs/concepts/ has the nine concept pages of spec/08"]
+DOC-06:
+  0: ["manual:docs/changelog.mdx has the 2026-12-01 entry; the OpenAPI description links it", "unit/test_docs_site.py::test_the_docs_site_is_complete_and_publishes_nothing_internal"]
+SDK-03:
+  0: ["unit/test_docs_site.py::test_the_docs_site_is_complete_and_publishes_nothing_internal", "ci:.github/workflows/ci.yml 'Docs site is complete' step (docs/api/postman.json is current)"]
 SBX-02:
   0: ["integration/test_dashboard_developer.py::test_over_the_daily_payment_quota_is_429_quota_exceeded_and_nothing_is_created", "integration/test_dashboard_developer.py::test_the_quota_holds_under_concurrent_requests", "integration/test_sandbox_rails.py::test_the_shared_faucet_wallet_has_daily_caps_for_everyone_and_each_org"]
 SBX-03:

@@ -1,0 +1,39 @@
+---
+title: "Event types"
+description: "What DekernAI tells your endpoint, and the envelope every event uses."
+---
+
+Register an HTTPS endpoint with `POST /v1/webhook_endpoints` (scope `admin`, with an `Idempotency-Key`) and the
+event types you want, or `"*"` for all. The response carries the endpoint's signing secret, **once**.
+
+```json
+{"url": "https://hooks.example.com/dekernai", "event_types": ["payment_intent.confirmed", "exception.created"]}
+```
+
+## Types
+
+| Type | When |
+|---|---|
+| `payment_intent.decided` | The first decision on a payment, whatever its outcome |
+| `payment_intent.escalated` | It is waiting for a person |
+| `payment_intent.ready` | Cleared to send |
+| `payment_intent.submitted` | An attempt is on a rail |
+| `payment_intent.unknown` | The rail did not answer; see [UNKNOWN](/concepts/payment-states#unknown-is-not-failed) |
+| `payment_intent.confirmed` | The rail confirmed it |
+| `payment_intent.failed` | An attempt failed definitively |
+| `payment_intent.blocked`, `payment_intent.rejected`, `payment_intent.cancelled` | It ended without being sent |
+| `exception.created`, `exception.overdue`, `exception.resolved` | An exception case opened, passed its deadline, or was decided |
+| `deposit.credited`, `deposit.exception` | A deposit was credited, or failed a check |
+| `reconciliation.break` | A reconciliation run found a break |
+| `kill_switch.engaged`, `kill_switch.released` | The kill switch changed |
+| `webhook.test` | Sent by `POST /v1/webhook_endpoints/{id}/test` to that endpoint, whatever its types |
+
+## The envelope
+
+```json
+{"id": "evt_...", "type": "payment_intent.unknown", "created": 1764756000,
+ "sequence": 4, "data": {"object": {"id": "pay_...", "status": "UNKNOWN"}}}
+```
+
+`data.object` is the object as the API returns it. `sequence` increases per payment, so you can tell the latest
+state when events arrive out of order. Events are also available by polling: `GET /v1/events`.

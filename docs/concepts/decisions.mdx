@@ -1,0 +1,44 @@
+---
+title: "Decisions"
+description: "EXECUTE, ESCALATE or BLOCK, with every check and its evidence."
+---
+
+Every payment intent gets a **decision** from your rules before anything else happens:
+
+| Outcome | Means |
+|---|---|
+| `EXECUTE` | Every check passed. The payment moves to READY (or is only recorded in shadow mode) |
+| `ESCALATE` | A person must decide. An exception case opens with an owner and a deadline |
+| `BLOCK` | A rule forbids it. The payment is BLOCKED, and a block is final |
+
+## Every check runs
+
+Precedence is BLOCK over ESCALATE over EXECUTE, but every check runs, so a reviewer sees every reason at once.
+Each check in `decision.checks` has a `result` (`PASS`, `ESCALATE`, `BLOCK` or `NOT_EVALUATED`), a `reason` code
+when it did not pass, and the `evidence` it used:
+
+```json
+{"check": "auto_limit", "result": "ESCALATE", "reason": "ABOVE_AUTO_LIMIT",
+ "evidence": {"amount": "18500.00", "auto_limit": "10000.00"}}
+```
+
+The one exception is the mandate check for agent payouts: an invalid mandate blocks at once, because the other
+checks would be acting on a request nobody authorised.
+
+## Deterministic
+
+The same inputs and the same rule version always give the same decision. There is no model in the rules: they
+read typed fields (the intent, the counterparty's facts, the mandate, screening results, counters), never an
+agent's free text. Each decision records its `policy_version` and a hash of the rules, and can be
+[replayed](/concepts/audit-and-replay).
+
+## Fail closed
+
+If anything in the decision path fails (the database, screening, loading the rules), the outcome is ESCALATE
+`SYSTEM_UNAVAILABLE`, never EXECUTE. Your organisation's fail-safe setting then holds the payment or sends it to
+the manual queue.
+
+## Decisions only
+
+`POST /v1/decisions` runs the same rules on the same body and returns the decision without creating a payment or
+sending anything. Use it to test your rules.

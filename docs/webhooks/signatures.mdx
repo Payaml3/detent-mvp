@@ -1,0 +1,39 @@
+---
+title: "Signature verification"
+description: "Check that a delivery came from DekernAI and is recent, before you act on it."
+---
+
+Every delivery carries a signature header:
+
+```http
+DekernAI-Signature: t=1764756000,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd
+```
+
+`v1` is the hex HMAC-SHA256, with your endpoint's secret, of the timestamp, a full stop and the **raw** request
+body: `"{t}.{raw_body}"`. To verify a delivery:
+
+1. Read the raw body before any JSON parsing; a parsed and re-serialised body won't match.
+2. Split the header on commas and take `t` and every `v1` (there can be more than one).
+3. Compute the HMAC of `t + "." + raw_body` and compare it with each `v1` in constant time.
+4. Reject the delivery if no signature matches, or if `t` is more than 300 seconds from your clock.
+5. Answer `2xx` quickly, then process. Deduplicate on the event `id`.
+
+```python Python
+import hashlib
+import hmac
+import time
+
+
+def verify_webhook(secret: str, header: str, body: bytes, tolerance: int = 300) -> bool:
+    parts = [p.split("=", 1) for p in header.split(",") if "=" in p]
+    stamps = [v for k, v in parts if k == "t"]
+    sigs = [v for k, v in parts if k == "v1"]
+    if len(stamps) != 1 or not sigs or not stamps[0].isdigit():
+        return False
+    if abs(time.time() - int(stamps[0])) > tolerance:
+        return False
+    expected = hmac.new(secret.encode(), stamps[0].encode() + b"." + body, hashlib.sha256).hexdigest()
+    return any(hmac.compare_digest(expected, s) for s in sigs)
+```
+
+Samples in more languages are added with the SDKs.

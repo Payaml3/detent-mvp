@@ -1,0 +1,17 @@
+---
+title: "Changelog"
+description: "What changed in the API, by date and version."
+---
+
+<Update label="2026-12-01" description="API version 2026-12-01">
+  The first sandbox version of the DekernAI API.
+
+  - Payment intents (`POST /v1/payment_intents`), decided synchronously by your rules, and decisions only
+    (`POST /v1/decisions`).
+  - Exceptions: list, read, approve and reject.
+  - Deposit intents, reconciliation runs and breaks, mandates (list and revoke), rule versions and the kill switch.
+  - Signed webhooks with retries and a delivery log, events by polling, and replay of every decision.
+  - Request logs, rate limits and daily sandbox quotas.
+
+  See the [API reference](/api-reference). Versioning is described in [Versioning](/limits/versioning).
+</Update>

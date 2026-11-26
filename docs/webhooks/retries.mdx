@@ -1,0 +1,25 @@
+---
+title: "Retries and ordering"
+description: "At-least-once delivery, the retry schedule and what to do with duplicates."
+---
+
+A delivery is an HTTPS `POST` of the event, with a 10-second timeout and no redirects. Any `2xx` answer is
+success. Anything else (another status, a timeout, a connection error) is retried after **1 minute, 5 minutes,
+30 minutes, 2 hours, 6 hours and 24 hours**, and then marked failed.
+
+## At least once
+
+The same event can arrive more than once, for example when DekernAI sent it but did not record your answer.
+Deduplicate on the event `id`.
+
+## Ordering
+
+Events can arrive out of order, especially across retries. Each event's `sequence` increases per payment: keep the
+highest you have processed and ignore anything lower, or read the payment with `GET /v1/payment_intents/{id}` for
+its current state.
+
+## Seeing and resending deliveries
+
+`GET /v1/webhook_endpoints/{id}/deliveries` lists every attempt with its status code, response time and outcome;
+the dashboard's **Webhooks** page shows the same. `POST /v1/webhook_endpoints/{id}/resend` with an `event_id` sends
+one event again.
