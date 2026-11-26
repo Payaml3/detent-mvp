@@ -1,8 +1,7 @@
-// The hero's live scene: "Agents prepare. Your rules decide." An AI agent, a sphere of particles that
-// ripples while it works, prepares payments and streams them toward the D of the Route mark (B-03), the rules.
+// The hero's live scene: "Agents prepare. Your rules decide." An AI agent, a small robot of particles whose
+// head follows the pointer and whose visor scans while it works, prepares payments and streams them toward the D of the Route mark (B-03), the rules.
 // Each payment lands in the D and settles; the orange point is the one outcome the rules settle on and
-// pulses with each sent example payment. The agent leans toward the pointer and its surface swells
-// toward it; the D turns to face it and parts around it. Orange never marks a block (B-02).
+// pulses with each sent example payment. The robot looks toward the pointer; the D turns to face it and parts around it. Orange never marks a block (B-02).
 // three.js is bundled with the site; colours come from the palette roles. Original work.
 import * as THREE from "three";
 import { POINT, inD, inPoint } from "./markShape.js";
@@ -70,24 +69,54 @@ export function mountAgent(canvas) {
   rules.add(d.pts);
   const PX = (POINT.cx - 24) * S, PY = (24 - POINT.cy) * S;
 
-  // ---- the agent: a sphere of particles, upper left, rippling while it works ----
-  const A_AT = new THREE.Vector3(-4, 19, 0), AR = 9, AN = 2600;
-  const agent = new THREE.Group(); agent.position.copy(A_AT); scene.add(agent);
-  const a = cloud(AN, 1.15, map);
-  const dirs = [];
-  for (let i = 0; i < AN; i++) {
-    const y = 1 - (i / (AN - 1)) * 2, r = Math.sqrt(1 - y * y), th = i * 2.39996323;
-    dirs.push(new THREE.Vector3(Math.cos(th) * r, y, Math.sin(th) * r));
-    const k = Math.random() < 0.06 ? signal : paper.clone().multiplyScalar(0.45 + Math.random() * 0.55);
-    a.col.set([k.r, k.g, k.b], i * 3);
+  // ---- the agent: a small robot built from particles, upper left. Its head turns to follow the pointer,
+  // its eyes blink, a scan line crosses its visor while it works, and it hands payments over from its hand.
+  const A_AT = new THREE.Vector3(-5, 17, 0), AS = 1.12;
+  const agent = new THREE.Group(); agent.position.copy(A_AT); agent.scale.setScalar(AS); scene.add(agent);
+  const head = new THREE.Group(); head.position.set(0, 2, 0); agent.add(head);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const shade = (lo = 0.45, hi = 1) => paper.clone().multiplyScalar(rnd(lo, hi));
+  // a point on a rounded box (superellipsoid) surface
+  const box = (hx, hy, hz, n = 5) => {
+    const v = new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize();
+    const k = Math.pow(Math.pow(Math.abs(v.x / hx), n) + Math.pow(Math.abs(v.y / hy), n) + Math.pow(Math.abs(v.z / hz), n), -1 / n);
+    return v.multiplyScalar(k);
+  };
+  const disc = (r) => { const a = rnd(0, Math.PI * 2), q = Math.sqrt(Math.random()) * r; return [Math.cos(a) * q, Math.sin(a) * q]; };
+  const HX = 7.5, HY = 6, HZ = 6;
+  const headPts = [], headCol = [], visor = [];
+  for (let i = 0; i < 2300; i++) {
+    const p = box(HX, HY, HZ);
+    const onVisor = p.z > HZ * 0.55 && Math.abs(p.y) < 2.8 && Math.abs(p.x) < HX * 0.8;
+    if (onVisor) { p.z -= 0.5; visor.push(headPts.length); headCol.push(paper.clone().multiplyScalar(0.18)); }
+    else headCol.push(shade(0.5, 1));
+    headPts.push(p);
   }
-  agent.add(a.pts);
-  // two thin orbit rings around the agent
-  const ringMat = new THREE.LineBasicMaterial({ color: paper, transparent: true, opacity: 0.22 });
-  const ringGeo = new THREE.BufferGeometry().setFromPoints(new THREE.EllipseCurve(0, 0, AR * 1.55, AR * 1.55).getPoints(96).map((p) => new THREE.Vector3(p.x, 0, p.y)));
-  const ring1 = new THREE.LineLoop(ringGeo, ringMat), ring2 = new THREE.LineLoop(ringGeo, ringMat);
-  ring1.rotation.set(1.2, 0.3, 0); ring2.rotation.set(-0.9, 0.8, 0.4);
-  agent.add(ring1, ring2);
+  for (const side of [-1, 1]) for (let i = 0; i < 110; i++) { const [a, b] = disc(2.1); headPts.push(new THREE.Vector3(side * (HX + rnd(0.2, 1)), a, b)); headCol.push(shade(0.6, 1)); } // ears
+  for (let i = 0; i < 70; i++) { headPts.push(new THREE.Vector3(rnd(-0.15, 0.15), HY + rnd(0, 3.6), rnd(-0.15, 0.15))); headCol.push(shade(0.5, 0.8)); } // antenna
+  const tipAt = headPts.length;
+  for (let i = 0; i < 60; i++) { const v = new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize().multiplyScalar(rnd(0.3, 1)); headPts.push(v.add(new THREE.Vector3(0, HY + 4.3, 0))); headCol.push(signal.clone()); }
+  const h = cloud(headPts.length, 1.05, map);
+  headPts.forEach((p, i) => { h.pos.set([p.x, p.y, p.z], i * 3); h.col.set([headCol[i].r, headCol[i].g, headCol[i].b], i * 3); });
+  head.add(h.pts);
+  // the eyes: two bright discs on the visor, in their own group so they can blink and glance
+  const eyes = new THREE.Group(); eyes.position.set(0, 0.3, HZ - 0.1); head.add(eyes);
+  const e = cloud(360, 1.15, map);
+  for (let i = 0; i < 360; i++) { const [a, b] = disc(1.35); e.pos.set([(i % 2 ? 2.9 : -2.9) + a, b, rnd(0, 0.4)], i * 3); e.col.set([paper.r, paper.g, paper.b], i * 3); }
+  eyes.add(e.pts);
+  // neck, body with a chest light, and the right arm reaching toward the rules
+  const bodyPts = [], bodyCol = [];
+  for (let i = 0; i < 160; i++) { const a = rnd(0, Math.PI * 2); bodyPts.push(new THREE.Vector3(Math.cos(a) * 2.2, rnd(-6.8, -4.2), Math.sin(a) * 2.2)); bodyCol.push(shade(0.35, 0.6)); }
+  for (let i = 0; i < 1700; i++) { const p = box(8.5, 5.5, 5, 4).add(new THREE.Vector3(0, -12.5, 0)); if (p.y < -16.5) continue; bodyPts.push(p); bodyCol.push(shade(0.45, 0.95)); }
+  const chestAt = bodyPts.length;
+  for (let i = 0; i < 140; i++) { const a = rnd(0, Math.PI * 2), q = rnd(1.1, 1.6); bodyPts.push(new THREE.Vector3(Math.cos(a) * q, -11.5 + Math.sin(a) * q, 5.2)); bodyCol.push(signal.clone()); }
+  const SHOULDER = new THREE.Vector3(8.8, -9.5, 0), HAND = new THREE.Vector3(14.5, -11, 5);
+  for (let i = 0; i < 260; i++) { const u = Math.random(); const p = SHOULDER.clone().lerp(HAND, u); const [a, b] = disc(1.1); bodyPts.push(p.add(new THREE.Vector3(0, a, b))); bodyCol.push(shade(0.45, 0.9)); }
+  for (let i = 0; i < 120; i++) { bodyPts.push(new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize().multiplyScalar(rnd(0.8, 1.6)).add(HAND)); bodyCol.push(shade(0.7, 1)); }
+  const b = cloud(bodyPts.length, 1.05, map);
+  bodyPts.forEach((p, i) => { b.pos.set([p.x, p.y, p.z], i * 3); b.col.set([bodyCol[i].r, bodyCol[i].g, bodyCol[i].b], i * 3); });
+  agent.add(b.pts);
+  const AR = 9; // the agent's reach, for the label
 
   // ---- the stream: payments the agent prepares, flying to the rules ----
   const SN = 360;
@@ -96,11 +125,10 @@ export function mountAgent(canvas) {
   scene.add(s.pts);
   const tmp = new THREE.Vector3();
   function launch(f) {
-    const dir = new THREE.Vector3(1, -0.6, 0.2).normalize().add(new THREE.Vector3((Math.random() - 0.5) * 0.9, (Math.random() - 0.5) * 0.9, (Math.random() - 0.5) * 0.9)).normalize();
-    agent.localToWorld(f.from.copy(dir).multiplyScalar(AR)); // world space
+    agent.localToWorld(f.from.copy(HAND).add(tmp.set(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)))); // world space, from the hand
     const h = home[Math.floor(Math.random() * DN * 0.88)];
     rules.localToWorld(f.to.copy(h));
-    f.mid.copy(f.from).lerp(f.to, 0.5).add(tmp.set((Math.random() - 0.3) * 14, 12 + Math.random() * 10, (Math.random() - 0.5) * 16));
+    f.mid.copy(f.from).lerp(f.to, 0.5).add(tmp.set((Math.random() - 0.3) * 10, 6 + Math.random() * 8, (Math.random() - 0.5) * 16));
     f.held = Math.random() < 0.14; // escalated: waits at the rules, in orange, for a person
     f.u = 0;
   }
@@ -139,19 +167,25 @@ export function mountAgent(canvas) {
     look.y += (aim.y - look.y) * Math.min(1, dt * 2.5);
     if (near) { ray.setFromCamera(ndc, camera); ray.ray.intersectPlane(plane, hit); }
 
-    // the agent leans toward the pointer and turns slowly while it works
-    agent.position.set(A_AT.x + look.x * 4, A_AT.y - look.y * 3, 0);
-    agent.rotation.y = t * 0.25 + look.x * 0.6;
-    agent.rotation.x = look.y * 0.4;
-    ring1.rotation.z = t * 0.4; ring2.rotation.z = -t * 0.3;
-    if (near) { toward.copy(hit); agent.worldToLocal(toward); toward.normalize(); }
-    for (let i = 0; i < AN; i++) {
-      const v = dirs[i];
-      let r = AR + Math.sin(v.y * 6 + t * 2.2) * 0.35 + Math.sin(v.x * 5 - t * 1.7) * 0.3; // thinking ripples
-      if (near) { const dot = v.x * toward.x + v.y * toward.y + v.z * toward.z; if (dot > 0.6) r += (dot - 0.6) * 9; }
-      a.pos[i * 3] = v.x * r; a.pos[i * 3 + 1] = v.y * r; a.pos[i * 3 + 2] = v.z * r;
+    // the agent: the body turns a little, the head follows the pointer, the eyes blink and glance
+    agent.position.set(A_AT.x + look.x * 1.5, A_AT.y - look.y * 1 + Math.sin(t * 1.6) * 0.35, 0);
+    agent.rotation.y = 0.35 + look.x * 0.25;
+    head.rotation.y = look.x * 0.65; head.rotation.x = look.y * 0.35; head.rotation.z = Math.sin(t * 0.9) * 0.04;
+    const blink = (t % 3.8) > 3.62 ? 0.12 : 1;
+    eyes.scale.y += (blink - eyes.scale.y) * Math.min(1, dt * 30);
+    eyes.position.x = look.x * 0.6; eyes.position.y = 0.3 - look.y * 0.4;
+    // a scan line crosses the visor while it works
+    const scan = ((t * 0.6) % 1) * HX * 1.8 - HX * 0.9;
+    for (const i of visor) {
+      const k = Math.max(0, 1 - Math.abs(h.pos[i * 3] - scan) / 0.9);
+      const c = 0.18 + k * 0.6;
+      h.col[i * 3] = paper.r * c + signal.r * k * 0.2; h.col[i * 3 + 1] = paper.g * c; h.col[i * 3 + 2] = paper.b * c;
     }
-    a.geo.attributes.position.needsUpdate = true;
+    // the antenna tip and chest light breathe; both flare when a payment is sent
+    const glow = 0.55 + 0.45 * Math.sin(t * 3) + pulse * 0.8;
+    for (let i = tipAt; i < headPts.length; i++) h.col.set([signal.r * glow, signal.g * glow, signal.b * glow], i * 3);
+    for (let i = chestAt; i < chestAt + 140; i++) b.col.set([signal.r * glow, signal.g * glow, signal.b * glow], i * 3);
+    h.geo.attributes.color.needsUpdate = true; b.geo.attributes.color.needsUpdate = true;
 
     // the rules turn to face the pointer and part around it
     rules.rotation.y = -0.25 + look.x * 0.45;
@@ -192,7 +226,7 @@ export function mountAgent(canvas) {
 
   // captions that travel with the scene: "AI agent prepares" under the agent, "Your rules decide" under the D
   const labels = [...document.querySelectorAll("[data-art-label]")];
-  const anchor = { agent: new THREE.Vector3(0, -AR * 1.75, 0), rules: new THREE.Vector3(0, -22.5 * S, 0) };
+  const anchor = { agent: new THREE.Vector3(0, -18.5, 0), rules: new THREE.Vector3(0, -22.5 * S, 0) };
   const proj = new THREE.Vector3();
   function placeLabels() {
     if (!labels.length) return;
