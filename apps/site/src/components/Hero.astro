@@ -21,7 +21,11 @@ const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
 const category = config.category.charAt(0).toUpperCase() + config.category.slice(1);
 ---
 <section class="hero" data-section="hero" aria-labelledby="hero-title">
-  <canvas class="art" aria-hidden="true" data-hero-sift data-art={config.heroArt ?? "mark"}></canvas>
+  <canvas class="art" aria-hidden="true" data-hero-sift data-art={config.heroArt ?? "agent"}></canvas>
+  {(config.heroArt ?? "agent") === "agent" && <>
+    <span class="art-label small" data-art-label="agent" aria-hidden="true" hidden>AI agent prepares</span>
+    <span class="art-label small" data-art-label="rules" aria-hidden="true" hidden>Your rules decide</span>
+  </>}
   <div class="wrap hero-grid">
     <div class="intro">
       <h1 id="hero-title" class="headline">
@@ -66,6 +70,9 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   .hero::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.09; mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
   .art { z-index: 1; }
+  .art-label { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; white-space: nowrap; font-weight: 600; letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--paper) 78%, var(--ink)); padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--paper) 8%, transparent); }
+  .art-label[data-art-label="rules"] { color: var(--signal); background: color-mix(in srgb, var(--signal) 12%, transparent); }
   .hero-grid { --text: var(--paper); --bg: var(--ink); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --line: color-mix(in srgb, var(--paper) 18%, var(--ink)); color: var(--text); }
   .cards .card { --text: var(--ink); --bg: var(--paper); --text-soft: var(--ink-soft); color: var(--text); }
   .hero .secondary { color: var(--paper); border-color: var(--paper); background: transparent; }
@@ -105,7 +112,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   }
   @media (max-width: 680px) {
-    .art { display: none; }
+    .art, .art-label { display: none; }
     .hero-grid { padding-top: 112px; }
     .intro, .cards { grid-column: 1 / -1; }
     .headline { font-size: clamp(28px, 7.8vw, 52px); }
@@ -123,7 +130,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   const cards = Object.fromEntries([...root.querySelectorAll("[data-card]")].map((c) => [c.dataset.card, c]));
   let sift = null;
   const canvas = document.querySelector("[data-hero-sift]");
-  if (canvas && getComputedStyle(canvas).display !== "none") (canvas.dataset.art === "layers" ? import("../scripts/gate3d.js").then((m) => m.mountGate(canvas)) : import("../scripts/mark3d.js").then((m) => m.mountMark(canvas))).then((art) => { sift = art; sift?.setState(phases.at(-1).status, true); });
+  if (canvas && getComputedStyle(canvas).display !== "none") (canvas.dataset.art === "layers" ? import("../scripts/gate3d.js").then((m) => m.mountGate(canvas)) : canvas.dataset.art === "mark" ? import("../scripts/mark3d.js").then((m) => m.mountMark(canvas)) : import("../scripts/agent3d.js").then((m) => m.mountAgent(canvas))).then((art) => { sift = art; sift?.setState(phases.at(-1).status, true); });
   else canvas?.remove();
   const show = (i) => {
     const p = phases[i];
