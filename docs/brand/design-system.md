@@ -1,6 +1,6 @@
 # DekernAI design system
 
-Status: palette **Approved: B, Parchment and seal (B-02)**. Roles, mark and art **Proposed (D-39)**.
+Status: palette **Graphite and safety orange (B-02)**. Roles, mark and art **Proposed (D-39)**.
 
 ## Colour roles
 
@@ -21,8 +21,8 @@ palette misses WCAG AA on a pair the site renders.
 | `--settle` | The settled dot in the mark and the art |
 | `--accent` | Decoration only: the art's rule lines, hairlines, ornaments. Never text |
 
-Status colours keep their meaning in every palette: confirmed is green (link blue in B, per B-02), waiting is amber, blocked is red.
-A block is never told by colour alone (B-02): the status label always shows, and BLOCKED, REJECTED and
+Status colours keep their meaning in every palette: confirmed is green, waiting is amber, blocked is red (graphite in the live palette, where orange means action).
+A block is never told by colour alone: the status label always shows, and BLOCKED, REJECTED and
 FAILED_FINAL carry a cross icon in place of the dot, on the site, in the console and in the art.
 
 ## Palettes
@@ -31,12 +31,14 @@ FAILED_FINAL carry a cross icon in place of the dot, on the site, in the console
 |---|---|---|---|---|
 | `current` | Detent colours (D-18), kept as a reference | dark | orange `#F2622E` | blue `#2F6BFF` |
 | `a` | Settled ink | dark | sift teal `#14B8A6` | verdict blue `#2F5BEA` |
-| **`b`** | **Parchment and seal: chosen (B-02), live** | light | seal red `#B3261E` | link blue `#2E5AAC` |
+| **`graphite`** | **Graphite and safety orange (B-02), live** | light | safety orange `#FF4A1F` | orange text `#C2360F` |
 | `c` | Night console | dark | decision violet `#6D5BFF` | clear cyan `#22D3EE` |
 
-Palette B in full: ink `#14161F`, parchment `#F4EFE6`, surface `#FFFDF8`, seal red `#B3261E`, brass
-`#C9935F` (accent and strong lines), link blue `#2E5AAC`, unknown amber `#E0A33A` as a fill with `#8A5A00`
-for amber text (the lighter amber fails WCAG AA as text on parchment), and link blue `#2E5AAC` also marks CONFIRMED (B-02).
+The live palette in full (values in `design/tokens.json`): graphite `#18191B` (text, blocked), steel `#232427`,
+paper `#F3F3F1` (page), white surfaces, safety orange `#FF4A1F` as a fill only with `#0A0A0A` text on it (the
+call to action, the console's primary button, focus, the settled dot), `#C2360F` for orange text and links,
+confirmed green `#237A46`, unknown amber `#F2C94C` as a fill with `#1B1405` text (`#7A5600` as amber text).
+Blocked is a graphite pill with a cross icon and a white label: never orange, never colour alone.
 The console (`apps/api/src/detent/console/static/console.css`) and the favicon use the same values.
 
 ## Mark: sift then settle

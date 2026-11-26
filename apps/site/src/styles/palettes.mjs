@@ -1,7 +1,7 @@
 // Colour roles for the design system (B-01). Components use only these role tokens (`--bg`,
 // `--signal`, ...), never raw hex, so a palette is one object here and one value in site.config.mjs.
-// The founder chose B, Parchment and seal (B-02); site.config.mjs selects it. "current" (the D-18 colours),
-// A and C stay as references and keep passing the same checks. tests/palette.test.mjs checks every palette against WCAG AA.
+// The founder chose Graphite and safety orange (B-02); site.config.mjs selects `graphite`. "current" (the D-18 colours),
+// A and C (the earlier options) stay as references and keep passing the same checks. tests/palette.test.mjs checks every palette against WCAG AA.
 //
 // Roles
 //   bg, bgAlt, surface, surfaceSunk, surfaceHover  page and panel backgrounds, darkest to lightest step
@@ -16,6 +16,8 @@
 //   settle                                           the settled dot in the "sift then settle" mark
 //   accent                                           decoration only (rules, hairlines, ornaments), never text
 //   scheme                                           "dark" or "light"; the canvas art blends to suit it
+
+import tokens from "../../../../design/tokens.json" with { type: "json" };
 
 export const palettes = {
   current: {
@@ -42,18 +44,13 @@ export const palettes = {
     code: "#DCE6FF", codeKey: "#A9C2FF", plot: "#CFE0FF",
     settle: "#14B8A6", accent: "#14B8A6",
   },
-  b: {
-    label: "B · Parchment and seal",
+  graphite: {
+    label: "Graphite and safety orange (B-02)",
     scheme: "light",
-    bg: "#F4EFE6", bgAlt: "#EDE6D8", surface: "#FFFDF8", surfaceSunk: "#EAE2D2", surfaceHover: "#E3D9C6",
-    line: "#D8CDB8", lineStrong: "#C9935F",
-    text: "#14161F", textSoft: "#4E5160",
-    signal: "#B3261E", signalHover: "#C7342B", signalPress: "#931E18", onSignal: "#FFFFFF",
-    interactive: "#2E5AAC", interactiveStrong: "#2E5AAC", interactiveSoft: "#2E5AAC", onInteractive: "#FFFFFF", interactiveDeep: "#DCE3F0",
-    ok: "#2E5AAC", wait: "#8A5A00", // B-02: confirmed uses link blue; amber #E0A33A fails AA as text
-    danger: "#B3261E", dangerLine: "#D99A94",
-    code: "#14161F", codeKey: "#2E5AAC", plot: "#5A4A30",
-    settle: "#B3261E", accent: "#C9935F",
+    // Live. Values live in design/tokens.json (`site`), the one source shared with the console.
+    // Safety orange #FF4A1F is fill only (black text on it); orange as text or a link is #C2360F.
+    // Blocked is graphite with a cross icon and a label, never orange and never colour alone.
+    ...tokens.site,
   },
   c: {
     label: "C · Night console",

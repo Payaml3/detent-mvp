@@ -2,10 +2,11 @@
 // Values starting with PLACEHOLDER are reported at build time in dist/placeholders.json.
 export default {
   brandName: "DekernAI",
-  // Colour palette: one of the keys in src/styles/palettes.mjs. The founder chose B, Parchment and seal (B-02).
-  palette: "b",
+  // Colour palette: one of the keys in src/styles/palettes.mjs. The founder chose Graphite and safety orange (B-02).
+  palette: "graphite",
   category: "agentic payment controls",
-  siteUrl: "https://example.invalid",
+  // Primary domain (B-01, registered 2026-11-26). www.dekernai.com and dekernai.co.uk redirect here in Vercel.
+  siteUrl: "https://dekernai.com",
   // Pre-launch: pages carry noindex and robots.txt blocks crawlers. Set true at launch (founder decision).
   indexable: false,
   bookingUrl: "PLACEHOLDER:booking-url",

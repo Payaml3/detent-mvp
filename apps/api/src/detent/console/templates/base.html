@@ -12,40 +12,61 @@
   {% if kill_switch_engaged %}
   <div class="kill-bar" role="alert">Kill switch engaged: all sending is stopped and pending payments are held.</div>
   {% endif %}
-  <header class="top">
-    <a class="brand" href="/console/"><svg class="mark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="currentColor"><circle cx="3.5" cy="4" r="1.6"/><circle cx="8.25" cy="4" r="1.6"/><circle cx="12" cy="4" r="1.6"/><circle cx="15.75" cy="4" r="1.6"/><circle cx="20.5" cy="4" r="1.6"/><circle cx="7.5" cy="10" r="1.7"/><circle cx="12" cy="10" r="1.7"/><circle cx="16.5" cy="10" r="1.7"/><rect x="2" y="14" width="20" height="1.6"/></g><circle cx="12" cy="20" r="2.9" fill="var(--signal)"/></svg>{{ brand }} <span>payment controls</span></a>
-    <div class="status">
-      <span class="ks {{ 'on' if kill_switch_engaged else 'off' }}">Kill switch: {{ 'engaged' if kill_switch_engaged else 'off' }}</span>
-      {% if user %}
-      <form method="post" action="/console/kill_switch/{{ 'release' if kill_switch_engaged else 'engage' }}">
-        <button class="{{ '' if kill_switch_engaged else 'danger' }}" title="{{ 'Payments lead only' if kill_switch_engaged else 'Stops all sending; holds pending payments' }}">{{ 'Release' if kill_switch_engaged else 'Engage kill switch' }}</button>
-      </form>
-      {% endif %}
-      {% if demo_mode %}
-      <form class="clock" method="post" action="/console/clock/advance">
-        <span class="mono" title="Demo clock">{{ now.strftime('%Y-%m-%d %H:%M') }} UTC</span>
-        {% for s in demo_steps %}<button name="step" value="{{ s }}" {{ 'disabled' if not user }}>+{{ s }}</button>{% endfor %}
-      </form>
-      {% endif %}
-      {% if user %}
-      <a class="who" href="/console/act-as">Acting as <strong>{{ user.display_name }}</strong> <span class="role">{{ user.role.value }}</span></a>
-      <form method="post" action="/console/logout"><button class="link">Log out</button></form>
-      {% endif %}
-    </div>
-  </header>
+  {% set mark %}<svg class="mark" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><g fill="currentColor"><circle cx="3.5" cy="4" r="1.6"/><circle cx="8.25" cy="4" r="1.6"/><circle cx="12" cy="4" r="1.6"/><circle cx="15.75" cy="4" r="1.6"/><circle cx="20.5" cy="4" r="1.6"/><circle cx="7.5" cy="10" r="1.7"/><circle cx="12" cy="10" r="1.7"/><circle cx="16.5" cy="10" r="1.7"/><rect x="2" y="14" width="20" height="1.6"/></g><circle cx="12" cy="20" r="2.9" fill="var(--ornament)"/></svg>{% endset %}
   {% if user %}
-  <nav class="nav" aria-label="Console">
-    {% for href, label in [("/console/", "Overview"), ("/console/payments", "Payments"), ("/console/exceptions", "Exceptions"), ("/console/invoices", "Invoices"),
-                           ("/console/reconciliation", "Reconciliation"), ("/console/rails", "Rails"), ("/console/policy", "Policy"),
-                           ("/console/mandates", "Mandates"), ("/console/counterparties", "Counterparties"), ("/console/outbox", "Outbox"),
-                           ("/console/audit", "Audit"), ("/console/evaluation", "Evaluation"), ("/console/settings", "Settings"),
-                           ("/console/demo", "Demo")] %}
-    <a href="{{ href }}">{{ label }}</a>
-    {% endfor %}
-  </nav>
+  {% set here = request.url.path if request is defined else '' %}
+  <div class="shell">
+    <aside class="side">
+      <a class="brand" href="/console/">{{ mark }}{{ brand }}</a>
+      <div class="scope">payment controls</div>
+      <nav class="nav" aria-label="Console">
+        {% for group, links in [
+             (None, [("/console/", "Overview")]),
+             ("Decision", [("/console/invoices", "Invoices"), ("/console/policy", "Policy"), ("/console/mandates", "Mandates"),
+                           ("/console/counterparties", "Counterparties"), ("/console/exceptions", "Exceptions")]),
+             ("Orchestration", [("/console/payments", "Payments"), ("/console/rails", "Rails")]),
+             ("Operations", [("/console/reconciliation", "Reconciliation"), ("/console/outbox", "Outbox"), ("/console/audit", "Audit")]),
+             ("Prototype", [("/console/evaluation", "Evaluation"), ("/console/settings", "Settings"), ("/console/demo", "Demo")])] %}
+        {% if group %}<div class="nav-group">{{ group }}</div>{% endif %}
+        {% for href, label in links %}
+        {% set current = (here == href) if href == "/console/" else here.startswith(href) %}
+        <a href="{{ href }}"{% if current %} aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
+        {% endfor %}
+      </nav>
+      <div class="side-foot">
+        <a class="who" href="/console/act-as" title="Switch user"><span class="avatar" aria-hidden="true">{{ user.display_name[:1] }}</span><span class="name">Acting as <strong>{{ user.display_name }}</strong></span> <span class="role">{{ user.role.value }}</span></a>
+        <form method="post" action="/console/logout"><button class="link">Log out</button></form>
+      </div>
+    </aside>
+    <div class="canvas">
+      <div class="titlebar">
+        {% if demo_mode %}
+        <form class="clock" method="post" action="/console/clock/advance">
+          <span class="mono" title="Demo clock">{{ now.strftime('%Y-%m-%d %H:%M') }} UTC</span>
+          {% for s in demo_steps %}<button name="step" value="{{ s }}">+{{ s }}</button>{% endfor %}
+        </form>
+        {% endif %}
+        <span class="ks {{ 'on' if kill_switch_engaged else 'off' }}">Kill switch: {{ 'engaged' if kill_switch_engaged else 'off' }}</span>
+        <form method="post" action="/console/kill_switch/{{ 'release' if kill_switch_engaged else 'engage' }}">
+          <button class="{{ '' if kill_switch_engaged else 'danger' }}" title="{{ 'Payments lead only' if kill_switch_engaged else 'Stops all sending; holds pending payments' }}">{{ 'Release' if kill_switch_engaged else 'Engage kill switch' }}</button>
+        </form>
+      </div>
+      <main>{% block main %}{% endblock %}</main>
+      <footer>Fictional demo data. {{ brand }} agentic payment controls (prototype): decision, orchestration and operations.
+        <span class="regions">Hosted in {{ hosting_region }} · database in {{ database_region }}.</span></footer>
+    </div>
+  </div>
+  {% else %}
+  <div class="gate">
+    <main>
+      <a class="brand" href="/console/">{{ mark }}{{ brand }}</a>
+      {% if demo_mode %}<p class="mono" title="Demo clock">{{ now.strftime('%Y-%m-%d %H:%M') }} UTC</p>{% endif %}
+      {% block gate %}{{ self.main() }}{% endblock %}
+      <footer>Fictional demo data. {{ brand }} agentic payment controls (prototype): decision, orchestration and operations.
+        <span class="regions">Hosted in {{ hosting_region }} · database in {{ database_region }}.</span></footer>
+    </main>
+  </div>
   {% endif %}
-  <main>{% block main %}{% endblock %}</main>
-  <footer>Fictional demo data. {{ brand }} agentic payment controls (prototype): decision, orchestration and operations.
-    <span class="regions">Hosted in {{ hosting_region }} · database in {{ database_region }}.</span></footer>
 </body>
 </html>
