@@ -33,7 +33,8 @@ On stablecoins and instant bank payouts a wrong decision can't be reversed. Toda
 | **Platform integrator** (client developer) | Calls the API, receives webhooks, uses the sandbox |
 | **Auditor** | Reads the audit log, replays payments, exports evidence |
 | **On-call engineer** (DekernAI) | Can engage the kill switch; handles Sev 1 incidents |
-| **DekernAI admin** (founder or sales) | Creates sandbox organisations after a demo; issues invites |
+| **Account owner** (client) | Receives the registration email after KYB; invites the team, assigns roles, requests verification and production |
+| **DekernAI admin** (founder or sales) | Approves KYB, creates the client organisation and invites its account owner; verifies integrations |
 | **Prospect** | Reads the website, books a demo, requests sandbox access |
 
 ## MVP definition
@@ -45,7 +46,7 @@ In under 10 minutes, a head of payments can:
 3. watch a forced timeout resolve without a second payment
 4. read the results report
 
-Then a developer can get sandbox keys (sales-led), follow the quickstart and trigger every path with test values.
+Then a client's developer, invited by their account owner after KYB, can get sandbox keys, follow the quickstart and trigger every path with test values.
 
 ## Launch criteria (from mvp-scope)
 

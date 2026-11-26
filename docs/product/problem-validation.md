@@ -35,7 +35,7 @@ at least 5 of 8 interviewed platforms describing it unprompted, with a recent co
 
 1. **H1 and H3 together: is the pain big enough to pay for?** If irreversible payouts are a worry but rare, or
    review is cheap, there's no budget. Test first.
-2. **H8: will they share data for a shadow report?** The whole go-to-market (free shadow report, then Pilot)
+2. **H8: will they go through onboarding (KYB, then sandbox)?** The whole go-to-market (onboarding, then Pilot, B-04)
    depends on it.
 3. **Who owns the budget** (payments lead, compliance or finance). See `customer-discovery.md`.
 4. **Regulatory perimeter:** that "payment controls beside the rails, never holding funds or keys" stays
@@ -47,13 +47,13 @@ at least 5 of 8 interviewed platforms describing it unprompted, with a recent co
 | Experiment | Tests | Cost | Pass signal |
 | --- | --- | --- | --- |
 | 8 problem interviews with heads of payments or payments ops (script in `customer-discovery.md`) | H1 to H7 | Founder time only | 5 of 8 describe H1 and H2 unprompted, with a recent example |
-| Ask each interviewee for a 30-day anonymised payout export for a free shadow report | H8, H3 | Founder time; uses the existing S7 import and replay | 3 of 8 agree to share an export |
+| Ask each interviewee whether they would start KYB and a sandbox integration after a demo | H8, H3 | Founder time | 3 of 8 agree to start onboarding |
 | 10-minute demo (spec/11) after the problem interview, never before | H6, H7 | The S9 deployed prototype | 3 of 8 ask for a pilot or a next meeting with compliance |
 | Perimeter opinion from UK counsel (and FCA PASS if useful) | Feasibility | Spend: needs the `spend` gate | Written view that the model needs no licence |
 
 ## Decision rule
 
-- **Passed:** at least 5 of 8 confirm H1 and H2 with examples, and at least 3 agree to a shadow report.
+- **Passed:** at least 5 of 8 confirm H1 and H2 with examples, and at least 3 agree to start onboarding.
 - **Pivot:** pain is real but sits in a different segment (for example only crypto service providers) or a
   different job (for example reconciliation only). Narrow the ICP and re-run.
 - **Kill or rethink:** fewer than 3 of 8 recognise the pain, or nobody will share data.

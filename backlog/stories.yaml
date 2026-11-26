@@ -15,11 +15,11 @@ epics:
   CON: {name: "Back-office console", goal: "The screens where the 10-minute demo happens", track: prototype, layer: "All three (console)"}
   EVL: {name: "Evaluation harness", goal: "Measured proof: attacks, faults, interpretation and agreement, gated in CI and published as a results report", track: prototype, layer: "All three (proof)"}
   DEM: {name: "Demo data and scenarios", goal: "Fictional, repeatable demo data and a one-click scenario runner", track: prototype, layer: "All three (demo)"}
-  SHD: {name: "Shadow mode", goal: "Run decisions on a prospect's exported data and produce the free shadow report", track: prototype, layer: "Decision (shadow mode)"}
+  SHD: {name: "Shadow mode", goal: "Decide a client's payments without sending any (the shadow phase of onboarding, or an exported month to calibrate rule set v1) and report agreement", track: prototype, layer: "Decision (shadow mode)"}
   OPS: {name: "Operational controls", goal: "The operating-model processes that need software: incidents, independence check, recovery", track: prototype, layer: "Operations"}
   API: {name: "Public sandbox API", goal: "A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI", track: portal, layer: "All three (public API)"}
   WHK: {name: "Webhooks", goal: "Signed, retried, logged event delivery", track: portal, layer: "All three (public API)"}
-  DSH: {name: "Developer dashboard", goal: "Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console per organisation", track: portal, layer: "All three (developer access)"}
+  DSH: {name: "Developer dashboard", goal: "KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox controls, integration verification, usage and the console per organisation", track: portal, layer: "All three (developer access)"}
   SBX: {name: "Sandbox", goal: "Developers trigger every path with test values, inside quotas", track: portal, layer: "All three (developer access)"}
   DOC: {name: "Docs portal", goal: "Concepts, guides and reference with tested samples in 8 languages", track: portal, layer: "All three (developer access)"}
   SDK: {name: "SDKs", goal: "Typed Python and TypeScript clients with automatic idempotency and webhook helpers", track: portal, layer: "All three (developer access)"}
@@ -1549,8 +1549,8 @@ stories:
   epic: SHD
   title: Shadow CSV import
   as: payments lead
-  want: to upload a month of payout and deposit exports with our actual decisions
-  so: DekernAI can show what it would have decided on our real data
+  want: to upload a month of payout and deposit exports with our actual decisions during onboarding
+  so: we can calibrate rule set v1 against what we actually decided
   ac:
     - "Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed"
   pri: Should
@@ -1560,10 +1560,10 @@ stories:
   ms: L
 - id: SHD-02
   epic: SHD
-  title: Shadow report
+  title: Shadow-phase report
   as: payments lead
-  want: a report of what would have been auto-approved, escalated and blocked, agreement with our decisions, unsafe approvals and routing savings
-  so: we can judge the value before any pilot
+  want: a weekly report of what would have been auto-approved, escalated and blocked, agreement with our decisions, unsafe approvals and routing savings
+  so: we can sign the move from Shadow to Assist on evidence
   ac:
     - "Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF"
   pri: Should
@@ -1589,7 +1589,7 @@ stories:
   title: Anonymise on import
   as: compliance lead
   want: names and addresses hashed with a per-import salt
-  so: sharing a shadow export doesn't expose personal data
+  so: an exported month used for calibration doesn't expose personal data
   ac:
     - "Raw names and account identifiers never stored; hashes are consistent within one import"
   pri: Should
@@ -1795,12 +1795,13 @@ stories:
 # ---------------- DSH Developer dashboard ----------------
 - id: DSH-01
   epic: DSH
-  title: Admin creates organisations and invites
+  title: Admin creates the client organisation after KYB and invites the account owner
   as: DekernAI admin
-  want: to create an organisation after a demo and invite its developers
-  so: sandbox access stays sales-led
+  want: to create a client's organisation once their KYB is approved and send the account owner a registration email
+  so: only a client we have checked can get access
   ac:
-    - "Admin screen: organisation name, expiry (default 60 days), invite emails; invite links are single-use and expire in 7 days"
+    - "Admin screen: organisation name, KYB approval reference and date (required for a client organisation), account owner email; the invite link is single-use and expires in 7 days"
+    - "An evaluation organisation (no KYB, sandbox only) can be created with an expiry (default 60 days, DSH-03)"
     - "No public sign-up route exists"
   pri: Must
   est: 0.5
@@ -1809,12 +1810,13 @@ stories:
   ms: P2
 - id: DSH-02
   epic: DSH
-  title: Accept invite and verify email
-  as: platform integrator
-  want: to verify my email, set a password and see my test keys
-  so: I can start integrating straight after the demo
+  title: Account owner signs up from the registration email
+  as: account owner
+  want: to verify my email, set a password and land in my organisation's dashboard
+  so: my team can start onboarding straight after KYB approval
   ac:
-    - "Email verification link; password hashed with argon2; first login shows the keys page"
+    - "Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role"
+    - "First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification"
     - "Emails go through a transactional email provider in production and the outbox in development"
   pri: Must
   est: 0.5
@@ -1823,12 +1825,13 @@ stories:
   ms: P2
 - id: DSH-03
   epic: DSH
-  title: Organisation expiry and extension
+  title: Evaluation expiry and client suspension
   as: DekernAI admin
-  want: sandbox access to expire unless I extend it
+  want: evaluation organisations to expire unless I extend them, and to suspend a client organisation when needed
   so: access is reviewed and can't linger
   ac:
     - "After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend"
+    - "Client organisations have no expiry; admin can suspend one (same 403 and read-only), with the reason audited"
   pri: Must
   est: 0.25
   deps: [DSH-01]
@@ -1842,6 +1845,7 @@ stories:
   so: I can manage credentials safely
   ac:
     - "Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate"
+    - "Only `sk_test_` keys exist in the prototype; the page labels production keys as not available in the prototype (invariant 14)"
   pri: Must
   est: 0.5
   deps: [DSH-02]
@@ -1906,7 +1910,7 @@ stories:
   want: the back-office console inside the dashboard, scoped to my organisation
   so: I see my sandbox payments the way an operations team would
   ac:
-    - "Console screens reused with the organisation scope; demo-only controls (clock, scenario runner) hidden"
+    - "Console screens reused with the organisation scope, including the policy screens (rule sets, counterparties, mandates); demo-only controls (clock, scenario runner) hidden"
   pri: Must
   est: 0.5
   deps: [CON-04, DSH-02]
@@ -1925,6 +1929,51 @@ stories:
   deps: [DSH-01]
   trace: [D.sales_led, D.ops_pages]
   ms: P2
+
+- id: DSH-11
+  epic: DSH
+  title: Team invites, roles and permissions
+  as: account owner
+  want: to invite my team by email and give each person a role
+  so: each person can do only their part of onboarding and operations
+  ac:
+    - "Owner and admin roles can invite, change roles and remove members; invites are single-use and expire in 7 days"
+    - "Roles: account owner, admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor (spec/02); permissions follow spec/08; two-person rules still apply"
+    - "An organisation always keeps at least one account owner; every change writes an audit event"
+  pri: Must
+  est: 0.5
+  deps: [DSH-02]
+  trace: [D.sales_led, B3.onboarding]
+  ms: P2
+- id: DSH-12
+  epic: DSH
+  title: Integration checklist and verification
+  as: account owner
+  want: to see which sandbox checks my integration has passed and ask DekernAI to verify it
+  so: we know when we are ready for production
+  ac:
+    - "Checklist filled from sandbox evidence: every test value triggered (spec/06), a signed webhook received and acknowledged, idempotent retry used, an UNKNOWN resolved without a resend"
+    - "The owner requests verification when every item passes; a DekernAI admin verifies or returns it with a note; both are audited"
+  pri: Must
+  est: 0.5
+  deps: [DSH-07, DSH-11]
+  trace: [D.sandbox, B3.onboarding]
+  ms: P2
+- id: DSH-13
+  epic: DSH
+  title: Enable production mode
+  as: account owner
+  want: to switch my organisation to production once we are verified
+  so: we can start on live payments under our own rules
+  ac:
+    - "Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1"
+    - "Production starts in Shadow mode (B-04; open question to the founder in client-journey.md); moves to Assist and Auto follow SHD-03"
+    - "In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14)"
+  pri: Could
+  est: 0.25
+  deps: [DSH-12]
+  trace: [B3.onboarding, A3.gates]
+  ms: L
 
 # ---------------- SBX Sandbox ----------------
 - id: SBX-01
@@ -2124,16 +2173,16 @@ stories:
   ms: P4
 - id: WEB-02
   epic: WEB
-  title: Product, Security and Design partners pages
+  title: Product, Security and Onboarding pages
   as: prospect
-  want: deeper pages on the product, security and the shadow-report offer
+  want: deeper pages on the product, security and how onboarding works
   so: I can take it to my compliance team
   ac:
     - "Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned')"
-    - "Design partners page explains the free shadow report and data handling"
+    - "Onboarding page explains the seven onboarding phases and data handling (B-04)"
   pri: Must
   est: 0.75
-  done: [0, 1]
+  done: [0]
   deps: [WEB-01]
   trace: [D.site, D.honesty, B3.lead_shadow, B5.hosting]
   ms: P4

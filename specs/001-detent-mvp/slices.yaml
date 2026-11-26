@@ -105,9 +105,9 @@ slices:
 
 - id: P2
   name: "Dashboard and sandbox"
-  goal: "Sales-led onboarding through to triggering every test value."
-  exit: "Admin invites a developer, who verifies, gets keys, triggers every test value and sees results in their own console; an expired organisation is locked."
-  stories: [DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-08, DSH-09, DSH-10,
+  goal: "KYB-gated onboarding: owner sign-up, team and roles, through to triggering every test value and integration verification."
+  exit: "Admin invites an account owner after KYB, who signs up, invites a developer with a role; the developer gets keys, triggers every test value and sees results in their own console; DekernAI verifies the integration; an expired evaluation organisation is locked."
+  stories: [DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-08, DSH-09, DSH-10, DSH-11, DSH-12,
             SBX-01, SBX-02, SBX-03, SBX-04, RAL-11, LED-08]
 
 - id: P3
@@ -124,7 +124,7 @@ slices:
 
 - id: L
   name: "After launch (Should and Could)"
-  goal: "Shadow mode and operations hardening; first shadow report from a CSV export."
-  exit: "The first free shadow report is produced from a CSV export."
+  goal: "Shadow mode and operations hardening; the shadow-phase report and production-mode request."
+  exit: "A shadow-phase report is produced from a CSV export and the mode-gate sign-off is recorded."
   stories: [SHD-01, SHD-02, SHD-03, SHD-04, RAL-08, RAL-09, RAL-10, EXE-10, OPS-01, OPS-03, OPS-04, AUD-03,
-            CON-10, DEM-06, EXC-09, INT-05]
+            CON-10, DEM-06, EXC-09, INT-05, DSH-13]

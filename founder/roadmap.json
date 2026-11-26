@@ -448,10 +448,10 @@
    "id": "P2",
    "name": "Dashboard and sandbox",
    "status": "",
-   "goal": "Sales-led onboarding through to triggering every test value.",
-   "exit": "Admin invites a developer, who verifies, gets keys, triggers every test value and sees results in their own console; an expired organisation is locked.",
-   "stories": 16,
-   "criteria": 20,
+   "goal": "KYB-gated onboarding: owner sign-up, team and roles, through to triggering every test value and integration verification.",
+   "exit": "Admin invites an account owner after KYB, who signs up, invites a developer with a role; the developer gets keys, triggers every test value and sees results in their own console; DekernAI verifies the integration; an expired evaluation organisation is locked.",
+   "stories": 18,
+   "criteria": 29,
    "criteria_done": 0
   },
   {
@@ -472,16 +472,16 @@
    "exit": "The site is live with dated results, booking and the access form; the honesty checklist is signed off by the founder.",
    "stories": 8,
    "criteria": 11,
-   "criteria_done": 8
+   "criteria_done": 7
   },
   {
    "id": "L",
    "name": "After launch (Should and Could)",
    "status": "",
-   "goal": "Shadow mode and operations hardening; first shadow report from a CSV export.",
-   "exit": "The first free shadow report is produced from a CSV export.",
-   "stories": 16,
-   "criteria": 20,
+   "goal": "Shadow mode and operations hardening; the shadow-phase report and production-mode request.",
+   "exit": "A shadow-phase report is produced from a CSV export and the mode-gate sign-off is recorded.",
+   "stories": 17,
+   "criteria": 23,
    "criteria_done": 0
   }
  ],

@@ -19,7 +19,7 @@ controls, and sign the first paid pilot.
 
 - **Why this metric:** it moves only when a platform trusts DekernAI with its own data, which is the riskiest
   assumption (H8). Demo runs and synthetic evaluations don't count. It grows through the same path as the
-  business model: shadow report, then pilot, then live modes.
+  business model: onboarding (KYB, sign-up, sandbox, policy), then shadow, then live modes (B-04).
 - **Why 5,000:** roughly one mid-sized design partner in Assist mode, or two or three in shadow. This is an
   **assumption**; revisit at the end of C1 with the volumes interviewees report.
 - **Guardrail metrics (never traded for growth):** 0 unauthorised executions, 0 wrong credits, 0 duplicates
@@ -32,7 +32,7 @@ The holidays fall inside this cycle; interview targets assume about four working
 | Objective | Owner | Key results | Key actions |
 | --- | --- | --- | --- |
 | **O1 Prove the pain with real platforms** | research | O1.1 8 problem interviews logged (proves stage 2) · O1.2 5 confirm H1 and H2 unprompted (proves stage 1) · O1.3 3 platforms agree to share a 30-day export | I1 list 20 ICP leads, book 8 calls · I2 run the script, log within 24 h · I3 synthesise after 5 · I4 ask every interviewee for an export |
-| **O2 Turn interest into the first design partner** | product | O2.1 1 free shadow report delivered on a real export · O2.2 3 follow-up demos from the deployed EU instance · O2.3 founder decides stages 3 and 5 (proves stage 3) | I5 shadow report format (SHD) · I6 second meeting with compliance and demo · I7 test a pilot fee range · I8 founder decides the strategy docs |
+| **O2 Turn interest into the first design partner** | product | O2.1 1 design partner through KYB and signed up in the dashboard (B-04) · O2.2 3 follow-up demos from the deployed EU instance · O2.3 founder decides stages 3 and 5 (proves stage 3) | I5 shadow report format (SHD) · I6 second meeting with compliance and demo · I7 test a pilot fee range · I8 founder decides the strategy docs |
 | **O3 Make the product demo-ready and integrable** | engineer | O3.1 spec/11 runs end to end on the deployed EU instance (proves stage 16) · O3.2 P1 criteria from 2 to 16 of 16 | I9 founder items for S9 · I10 deploy and live testnet run (DEM) · I11 P1 story groups (API) |
 
 ## How the tree connects

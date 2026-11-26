@@ -30,9 +30,9 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | A3.assist | Product model A3 | Mode 2 Assist: live recommendations, staff click every decision | mvp | EXE-09 |
 | A3.auto | Product model A3 | Mode 3 Auto: executes within approved rules, only escalations reach humans | mvp | EXE-09 |
 | A3.orchestrate | Product model A3 | Mode 4 Orchestrate: routing across 2+ rails | mvp | EXE-09, RAL-06 |
-| A3.gates | Product model A3 | Signed gate between modes (agreement %, zero unsafe approvals) | partly | CON-10, SHD-03 |
+| A3.gates | Product model A3 | Signed gate between modes (agreement %, zero unsafe approvals) | partly | CON-10, SHD-03, DSH-13 |
 | A4.fee | Product model A4 | Software fee per payment, not a share of money moved (usage metering) | partly | LED-08 |
-| A4.plans | Product model A4 | Plans: free shadow report, Pilot, Growth, Scale, routing add-on | partly | SHD-02, WEB-01 |
+| A4.plans | Product model A4 | Plans: Pilot, Growth, Scale, routing add-on (no free shadow report, B-04) | partly | SHD-02, WEB-01 |
 | A5.proposes | Product model A5 | The LLM proposes; the policy layer decides; uncertain fields flagged, never guessed | mvp | MND-02, AGT-01, AGT-02, CON-05, EVL-04 |
 | A5.tools | Product model A5 | Agent tools are read-only; nothing that moves money | mvp | AGT-03, EXC-03 |
 | A5.injection | Product model A5 | Free text is data, never instructions; tested by attack suite | mvp | AGT-04, EVL-02 |
@@ -57,8 +57,8 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | B1.client_dd | Operating model B1 | Own due diligence on each client | later | — |
 | B1.independence | Operating model B1 | No former-employer documents, names or designs; dated design log | mvp | DEM-01, OPS-02 |
 | B2.org | Operating model B2 | Organisation by stage and hiring priority | non-software | — |
-| B3.lead_shadow | Operating model B3 | Lead to shadow report process (report in 5 working days) | partly | DEM-05, SHD-01, SHD-02, WEB-02 |
-| B3.onboarding | Operating model B3 | Client onboarding: rail connection, policy workshop, rules signed off, shadow | partly | POL-07, RAL-09, DSH-01 |
+| B3.lead_shadow | Operating model B3 | Lead to contract: discovery, demo, NDA, KYB and contract (B-04) | partly | DEM-05, SHD-01, SHD-02, WEB-02 |
+| B3.onboarding | Operating model B3 | Client onboarding (B-04): KYB, owner sign-up, team and roles, sandbox integration and verification, policy sign-off, shadow, go-live | partly | POL-07, RAL-09, DSH-01, DSH-11, DSH-12, DSH-13 |
 | B3.mode_gates | Operating model B3 | Weekly agreement report; client signs each mode move | partly | EXE-09, SHD-03 |
 | B3.rule_changes | Operating model B3 | Rule changes versioned, two approvers, loosening needs compliance lead | mvp | FND-04, POL-01, POL-07, CON-06 |
 | B3.agent_eval | Operating model B3 | Attack and regression suite per release; weekly quality sample | mvp | EXC-09, EVL-01, EVL-07 |
@@ -90,7 +90,7 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | B7.automation | Operating model B7 | KPI: share decided without a human >= 70% | mvp | CON-02, EVL-06 |
 | B7.recon | Operating model B7 | KPI: automatic match rate >= 99% | mvp | LED-06 |
 | B7.reliability | Operating model B7 | KPI: uptime and p95 latency | partly | EVL-08, WEB-07 |
-| B7.commercial | Operating model B7 | KPI: shadow-to-pilot 40%, pilot-to-paid 60% | non-software | — |
+| B7.commercial | Operating model B7 | KPI: demo-to-contract (Open), pilot-to-paid 60% | non-software | — |
 | B7.speed | Operating model B7 | KPI: <10 days pilot signed to shadow live | non-software | — |
 | B7.economics | Operating model B7 | KPI: gross margin, NRR | non-software | — |
 | B8.milestones | Operating model B8 | Quarterly milestones and gates | non-software | — |
@@ -110,11 +110,11 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | D.docs | Developer portal 3 | Docs portal structure, concepts, guides, reference, changelog | mvp | API-05, DOC-01, DOC-02, DOC-03, DOC-05, DOC-06 |
 | D.samples | Developer portal 3 | Code samples in 8 languages, tested in CI | mvp | DOC-04, WEB-04 |
 | D.sdks | Developer portal 3 | Python and TypeScript SDKs, Postman, OpenAPI download | mvp | API-05, SDK-01, SDK-02, SDK-03 |
-| D.sales_led | Developer portal 4 | Sales-led access: org created by admin, invite, email verify, expiry | mvp | DSH-01, DSH-02, DSH-03, DSH-10, DOC-05, WEB-06 |
+| D.sales_led | Developer portal 4 | KYB-gated access: org created by admin after KYB, owner invite, email verify, team and roles, evaluation expiry | mvp | DSH-01, DSH-02, DSH-03, DSH-10, DSH-11, DOC-05, WEB-06 |
 | D.keys | Developer portal 4 | Test keys: create, roll, revoke, shown once, hashed, scoped; live disabled | mvp | API-01, DSH-04 |
 | D.logs | Developer portal 4 | Request logs with idempotency key and payment ID | mvp | API-06, DSH-05 |
 | D.webhooks | Developer portal 4/6 | Webhooks: endpoints, secret, test event, delivery log, HMAC signature, retries | mvp | API-07, WHK-01, WHK-02, WHK-03, DSH-06 |
-| D.sandbox | Developer portal 4/5 | Sandbox controls, test values, simulated and real test-network rails | mvp | MND-02, RAL-11, DSH-07, SBX-01, SBX-03, SBX-04 |
+| D.sandbox | Developer portal 4/5 | Sandbox controls, test values, simulated and real test-network rails | mvp | MND-02, RAL-11, DSH-07, DSH-12, SBX-01, SBX-03, SBX-04 |
 | D.usage | Developer portal 4 | Usage against quotas | mvp | LED-08, DSH-08 |
 | D.console | Developer portal 4 | Back-office console inside the dashboard | mvp | DSH-09 |
 | D.abuse | Developer portal 5 | Abuse limits: rate limits, daily caps, wallet limits, expiring keys | mvp | AGT-06, API-04, DSH-03, SBX-02 |

@@ -182,22 +182,22 @@ The founder runs spec/11 against the deployed EU instance.
 
 ### User Story 10 - A developer integrates against the sandbox (Priority: P3)
 
-After a demo, a developer receives an invite, gets test keys, creates intents, receives signed webhooks and triggers
+After KYB approval, the account owner signs up and invites the team; a developer gets test keys, creates intents, receives signed webhooks and triggers
 every path with test values; docs, SDKs and the website support them.
 
 **Independent Test**: an external client completes the quickstart in 5 minutes and triggers each test value.
 
 **Acceptance Scenarios**:
 
-1. **Given** an invite, **When** the developer verifies their email, **Then** they land on the Keys page and can create an `sk_test_` key, shown once.
+1. **Given** an invite, **When** the account owner verifies their email, **Then** they land on the onboarding checklist, can invite a developer with a role, and the developer can create an `sk_test_` key, shown once.
 2. **Given** an amount ending in `.13`, **When** submitted, **Then** the payment goes UNKNOWN then CONFIRMED.
-3. **Given** an expired organisation, **When** any call is made, **Then** it gets 403 `organisation_expired`.
+3. **Given** an expired evaluation organisation or a suspended client organisation, **When** any call is made, **Then** it gets 403 `organisation_expired`.
 
 ---
 
-### User Story 11 - A shadow report from a CSV export (Priority: P4, after launch)
+### User Story 11 - A shadow-phase report during onboarding (Priority: P4, after launch)
 
-A prospect's exported payouts are decided in shadow mode and summarised, without sending anything.
+During onboarding, a client's payments (live in the shadow phase, or an exported month for calibration) are decided in shadow mode and summarised, without sending anything.
 
 ---
 
@@ -274,7 +274,7 @@ user and role in the audit log (FND-04); permissions are checked on the server (
 | W-08 | Rule change | Draft (payments lead or compliance lead) → diff and loosening detector → second different approver (compliance lead if loosening; always, C-06 proposed) → attestation → active; previous superseded | Same person twice → refused |
 | W-09 | Deposit | Deposit intent → watcher records inbound transfer → confirmations → match → deposit checks → credit once → ledger | Mismatch or flagged sender → deposit exception |
 | W-10 | Reconciliation | Run → match postings to chain and bank records → breaks → reconciliation agent drafts fix (fixed set) → payments lead approves → adjustment entry | Rejected fix → stays open |
-| W-11 | Sandbox onboarding | Access request or demo → admin creates organisation (60 days) → invite (single use, 7 days) → verify email, set password → keys → quickstart | Expired organisation → read-only, 403 |
+| W-11 | Client onboarding | KYB approved → admin creates organisation → owner invite (single use, 7 days) → verify email, set password → invite team, assign roles → keys → quickstart → integration checklist → verification → production (after the MVP; starts in Shadow) | Expired organisation → read-only, 403 |
 | W-12 | Mode change | Proposed by one lead → approved by the other → audited → applies at the next send-lock read (G-16 proposed) | |
 
 State machines for payments, attempts, cases, deposits, rule versions, mandates, reconciliation breaks,
@@ -416,7 +416,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 
 **Shadow**
 
-- **FR-098**: (Should) A CSV export can be decided in shadow mode, anonymised on import, and summarised in a shadow report; (Could) a mode-gate report and sign-off.
+- **FR-098**: (Should) A CSV export can be decided in shadow mode, anonymised on import, and summarised in a shadow-phase report (onboarding, B-04); (Could) a mode-gate report and sign-off, and a production-mode request that starts in Shadow and issues no live keys in the prototype.
 
 **Operations**
 
@@ -436,7 +436,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 
 **Dashboard**
 
-- **FR-105**: Sales-led access: the admin creates organisations (60-day expiry) and single-use invites (7 days); developers verify email and set a password; keys, logs, webhooks, sandbox controls, usage and the per-organisation console; an access-requests inbox.
+- **FR-105**: KYB-gated access: after KYB the admin creates the client organisation and invites the account owner (single use, 7 days; evaluation organisations expire after 60 days); the owner verifies email, sets a password, invites the team and assigns roles; integration verification by DekernAI; keys, logs, webhooks, sandbox controls, usage and the per-organisation console with policy screens; an access-requests inbox.
 
 **Sandbox**
 

@@ -2,7 +2,7 @@
 
 **Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** how developers and buyers reach all three layers (dashboard, sandbox, docs, SDKs, website).
 
-Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and docs are public. **Sandbox keys are not self-serve.** A developer gets keys only after contacting sales by email or booking a demo; the admin then creates the organisation and sends an invite.
+Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and docs are public. **Access is not self-serve.** A client gets access only through onboarding (`docs/product/client-journey.md`, B-04): once DekernAI has approved the client's KYB, the admin creates the organisation and sends the account owner a registration email. The owner then invites their own team.
 
 ## Surfaces (domains are placeholders until the name is final)
 
@@ -16,11 +16,23 @@ Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and d
 
 ## Dashboard (DSH)
 
-- **Sales-led access:**
+- **KYB-gated access (DSH-01, DSH-02, DSH-03):**
   - There is no public sign-up route.
-  - The admin creates an organisation (name, expiry 60 days by default) and invites emails.
+  - After KYB is approved, the admin creates the client organisation (name, KYB reference and date) and invites the account owner. A client organisation does not expire; the admin can suspend it.
+  - An evaluation organisation (sandbox only, no KYB) can still be created, with an expiry of 60 days by default.
   - An invite link is single-use and lasts 7 days.
-  - The developer verifies their email and sets a password (argon2), then lands on the Keys page.
+  - The account owner verifies their email and sets a password (argon2), then lands on the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification.
+- **Team, roles and permissions (DSH-11):** the account owner (and admins) invite members by email, assign and change roles, and remove members. Roles: account owner, admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor (spec/02). At least one account owner always remains; every change is audited.
+
+  | Role | Can |
+  |---|---|
+  | Account owner, admin | Team and roles, keys, webhooks, settings, request verification and production |
+  | Developer | Keys, request logs, webhooks, sandbox controls |
+  | Payments lead, compliance lead | Policy (rule sets need two approvers, spec/04), mandates, mode moves, sign-offs |
+  | Reviewer, backup owner | Exceptions queue in the console |
+  | Auditor | Read-only: audit, replay, export |
+- **Integration verification (DSH-12):** a checklist filled from sandbox evidence (every test value, a signed webhook acknowledged, an idempotent retry, an UNKNOWN resolved without a resend). The owner requests verification; a DekernAI admin verifies it or returns it with a note.
+- **Production mode (DSH-13, after the MVP):** enabled by the account owner only once the integration is verified and rule set v1 is signed off; it starts in Shadow. In the prototype it is shown as not available, and no `sk_live_` key exists (invariant 14).
 - **Keys:**
   - `sk_test_` keys only.
   - Create, roll (with an overlap window) and revoke.
@@ -32,8 +44,8 @@ Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and d
   - force a scenario for the next payment
   - toggle real testnet mode (Should)
 - **Usage:** calls, payments decided and agent investigations against daily quotas.
-- **Console:** the back-office screens scoped to the organisation. Demo-only controls are hidden.
-- **Admin (DekernAI only):** organisations, invites, expiry extension, and the access-requests inbox (DSH-10).
+- **Console and policy:** the back-office screens scoped to the organisation, including the policy screens (rule sets, counterparties, mandates). Demo-only controls are hidden.
+- **Admin (DekernAI only):** organisations (with the KYB reference), owner invites, evaluation expiry and client suspension, integration verification, and the access-requests inbox (DSH-10).
 
 ## Sandbox (SBX)
 

@@ -1173,11 +1173,11 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 ## SHD · Shadow mode
 
-_Run decisions on a prospect's exported data and produce the free shadow report_ · layer: Decision (shadow mode) · track: prototype · 4 stories · 2.25 days
+_Decide a client's payments without sending any (the shadow phase of onboarding, or an exported month to calibrate rule set v1) and report agreement_ · layer: Decision (shadow mode) · track: prototype · 4 stories · 2.25 days
 
 ### SHD-01 · Shadow CSV import
 
-**As a** payments lead, **I want** to upload a month of payout and deposit exports with our actual decisions, **so that** DekernAI can show what it would have decided on our real data.
+**As a** payments lead, **I want** to upload a month of payout and deposit exports with our actual decisions during onboarding, **so that** we can calibrate rule set v1 against what we actually decided.
 
 **Acceptance criteria**
 
@@ -1185,9 +1185,9 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 **Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** POL-08 · **Traces to:** MVP.shadow_csv, A3.shadow, A6.shadow_first, A7.beta, B3.lead_shadow
 
-### SHD-02 · Shadow report
+### SHD-02 · Shadow-phase report
 
-**As a** payments lead, **I want** a report of what would have been auto-approved, escalated and blocked, agreement with our decisions, unsafe approvals and routing savings, **so that** we can judge the value before any pilot.
+**As a** payments lead, **I want** a weekly report of what would have been auto-approved, escalated and blocked, agreement with our decisions, unsafe approvals and routing savings, **so that** we can sign the move from Shadow to Assist on evidence.
 
 **Acceptance criteria**
 
@@ -1207,7 +1207,7 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 ### SHD-04 · Anonymise on import
 
-**As a** compliance lead, **I want** names and addresses hashed with a per-import salt, **so that** sharing a shadow export doesn't expose personal data.
+**As a** compliance lead, **I want** names and addresses hashed with a per-import salt, **so that** an exported month used for calibration doesn't expose personal data.
 
 **Acceptance criteria**
 
@@ -1373,37 +1373,40 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 
 ## DSH · Developer dashboard
 
-_Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console per organisation_ · layer: All three (developer access) · track: portal · 10 stories · 3.5 days
+_KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox controls, integration verification, usage and the console per organisation_ · layer: All three (developer access) · track: portal · 13 stories · 4.75 days
 
-### DSH-01 · Admin creates organisations and invites
+### DSH-01 · Admin creates the client organisation after KYB and invites the account owner
 
-**As a** DekernAI admin, **I want** to create an organisation after a demo and invite its developers, **so that** sandbox access stays sales-led.
+**As a** DekernAI admin, **I want** to create a client's organisation once their KYB is approved and send the account owner a registration email, **so that** only a client we have checked can get access.
 
 **Acceptance criteria**
 
-- [ ] Admin screen: organisation name, expiry (default 60 days), invite emails; invite links are single-use and expire in 7 days
+- [ ] Admin screen: organisation name, KYB approval reference and date (required for a client organisation), account owner email; the invite link is single-use and expires in 7 days
+- [ ] An evaluation organisation (no KYB, sandbox only) can be created with an expiry (default 60 days, DSH-03)
 - [ ] No public sign-up route exists
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-01 · **Traces to:** D.sales_led, B3.onboarding
 
-### DSH-02 · Accept invite and verify email
+### DSH-02 · Account owner signs up from the registration email
 
-**As a** platform integrator, **I want** to verify my email, set a password and see my test keys, **so that** I can start integrating straight after the demo.
+**As a** account owner, **I want** to verify my email, set a password and land in my organisation's dashboard, **so that** my team can start onboarding straight after KYB approval.
 
 **Acceptance criteria**
 
-- [ ] Email verification link; password hashed with argon2; first login shows the keys page
+- [ ] Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role
+- [ ] First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification
 - [ ] Emails go through a transactional email provider in production and the outbox in development
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led
 
-### DSH-03 · Organisation expiry and extension
+### DSH-03 · Evaluation expiry and client suspension
 
-**As a** DekernAI admin, **I want** sandbox access to expire unless I extend it, **so that** access is reviewed and can't linger.
+**As a** DekernAI admin, **I want** evaluation organisations to expire unless I extend them, and to suspend a client organisation when needed, **so that** access is reviewed and can't linger.
 
 **Acceptance criteria**
 
 - [ ] After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend
+- [ ] Client organisations have no expiry; admin can suspend one (same 403 and read-only), with the reason audited
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.abuse
 
@@ -1414,6 +1417,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 **Acceptance criteria**
 
 - [ ] Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate
+- [ ] Only `sk_test_` keys exist in the prototype; the page labels production keys as not available in the prototype (invariant 14)
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-02 · **Traces to:** D.keys
 
@@ -1463,7 +1467,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 **Acceptance criteria**
 
-- [ ] Console screens reused with the organisation scope; demo-only controls (clock, scenario runner) hidden
+- [ ] Console screens reused with the organisation scope, including the policy screens (rule sets, counterparties, mandates); demo-only controls (clock, scenario runner) hidden
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** CON-04, DSH-02 · **Traces to:** D.console
 
@@ -1476,6 +1480,41 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 - [ ] Form fields: name, work email, company, role, use case; stored; admin list with status; email to the sales inbox
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.ops_pages
+
+### DSH-11 · Team invites, roles and permissions
+
+**As a** account owner, **I want** to invite my team by email and give each person a role, **so that** each person can do only their part of onboarding and operations.
+
+**Acceptance criteria**
+
+- [ ] Owner and admin roles can invite, change roles and remove members; invites are single-use and expire in 7 days
+- [ ] Roles: account owner, admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor (spec/02); permissions follow spec/08; two-person rules still apply
+- [ ] An organisation always keeps at least one account owner; every change writes an audit event
+
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-02 · **Traces to:** D.sales_led, B3.onboarding
+
+### DSH-12 · Integration checklist and verification
+
+**As a** account owner, **I want** to see which sandbox checks my integration has passed and ask DekernAI to verify it, **so that** we know when we are ready for production.
+
+**Acceptance criteria**
+
+- [ ] Checklist filled from sandbox evidence: every test value triggered (spec/06), a signed webhook received and acknowledged, idempotent retry used, an UNKNOWN resolved without a resend
+- [ ] The owner requests verification when every item passes; a DekernAI admin verifies or returns it with a note; both are audited
+
+**Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-07, DSH-11 · **Traces to:** D.sandbox, B3.onboarding
+
+### DSH-13 · Enable production mode
+
+**As a** account owner, **I want** to switch my organisation to production once we are verified, **so that** we can start on live payments under our own rules.
+
+**Acceptance criteria**
+
+- [ ] Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1
+- [ ] Production starts in Shadow mode (B-04; open question to the founder in client-journey.md); moves to Assist and Auto follow SHD-03
+- [ ] In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14)
+
+**Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** DSH-12 · **Traces to:** B3.onboarding, A3.gates
 
 ## SBX · Sandbox
 
@@ -1639,14 +1678,14 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Priority:** Must · **Estimate:** 1.5 d · **Milestone:** P4 Website launch · **Depends on:** none · **Traces to:** D.site, D.honesty, BR.category, A4.plans
 
-### WEB-02 · Product, Security and Design partners pages
+### WEB-02 · Product, Security and Onboarding pages
 
-**As a** prospect, **I want** deeper pages on the product, security and the shadow-report offer, **so that** I can take it to my compliance team.
+**As a** prospect, **I want** deeper pages on the product, security and how onboarding works, **so that** I can take it to my compliance team.
 
 **Acceptance criteria**
 
 - [x] Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned')
-- [x] Design partners page explains the free shadow report and data handling
+- [ ] Onboarding page explains the seven onboarding phases and data handling (B-04)
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** D.site, D.honesty, B3.lead_shadow, B5.hosting
 

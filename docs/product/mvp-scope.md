@@ -15,7 +15,7 @@ In under 10 minutes, a head of payments can:
 3. watch a forced timeout resolve without a second payment;
 4. read the results report.
 
-Then a developer can get sandbox keys (sales-led), follow the quickstart and trigger every path with test
+Then a client's developer, invited by their account owner after KYB, can get sandbox keys, follow the quickstart and trigger every path with test
 values.
 
 ## Launch criteria
@@ -37,10 +37,10 @@ values.
 
 | Must have (MVP) | Should have (L slice) | Won't have in the MVP |
 | --- | --- | --- |
-| Decision, orchestration and operations layers (S0 to S8) | Shadow-mode CSV import and the first shadow report | Real rails, banks or open banking |
+| Decision, orchestration and operations layers (S0 to S8) | Shadow-mode CSV import and the shadow-phase report (onboarding, B-04) | Real rails, banks or open banking |
 | Demo-ready prototype in the EU on Base Sepolia and Ethereum Sepolia (S9) | Scenario packs per platform type | The client's custody provider |
 | Sandbox API and webhooks (P1) | Operations hardening | Real screening vendors |
-| Dashboard and sandbox, sales-led access (P2) | | Card and voucher rails |
+| Dashboard and sandbox, KYB-gated access, team and roles, integration verification (P2) | | Card and voucher rails |
 | Docs and SDKs, Python and TypeScript (P3) | | Machine-learning risk scores; treasury rebalancing |
 | Website launch with honesty rules (P4) | | Certifications; multi-tenant production use; single sign-on |
 

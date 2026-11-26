@@ -32,8 +32,8 @@ Founder's flow (2026-11-26), with policy sign-off and shadow kept before any liv
 3. **Sign up.** The account owner verifies their email, sets a password and lands in the client dashboard.
 4. **One dashboard** holds everything for that client: the developer portal (keys, request logs, webhooks,
    docs), sandbox controls, the policy engine (rule sets, counterparties, mandates) and the console.
-5. **Team.** The account owner invites team members and assigns roles and permissions (the spec/02 roles: admin,
-   payments lead, compliance lead, reviewer, backup owner, on-call, auditor; plus a developer role, new). Two-person rules still apply (spec/04, spec/07).
+5. **Team.** The account owner invites team members and assigns roles and permissions (spec/02 and spec/08: account owner,
+   admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor). Two-person rules still apply (spec/04, spec/07).
 6. **Sandbox integration.** Engineers use sandbox keys (`sk_test_`) and trigger every test value. The client
    marks the integration ready; DekernAI verifies it against the integration checklist.
 7. **Production mode.** Once DekernAI has verified the integration **and** the client's compliance lead has
@@ -52,20 +52,22 @@ Founder's flow (2026-11-26), with policy sign-off and shadow kept before any liv
 - **Targets (B7):** "under 10 days from pilot signed to shadow live" now reads as phase 2 exit to phase 5
   start.
 
-## Conflicts with the current specs (to resolve before P2 is built)
+## Where it is specified
 
-- **spec/08 sales-led access:** today an admin invites developers directly and an organisation expires after
-  60 days. The flow above has the admin invite only the account owner, after KYB, who then invites the team;
-  a client organisation has no expiry (expiry stays for trial or evaluation organisations).
-- **Roles:** spec/08 and P2 have no team management by the client; roles exist in the console (FND-04, C-14)
-  but are assigned by DekernAI. The flow above needs owner-managed invites and role assignment (new DSH work).
-- **Production credentials:** the MVP runs on test networks only and rejects `sk_live_` keys (invariant 14).
-  Production mode and live keys are post-MVP; in the MVP the dashboard shows production as "not available in
-  the prototype".
+- spec/08 (dashboard access, team and roles, integration verification, production mode), spec/02 (roles),
+  spec/00 (personas), `specs/001-detent-mvp/spec.md` (W-11, FR-105).
+- Stories: DSH-01 to DSH-03 rewritten; DSH-11 team and roles, DSH-12 integration verification (P2);
+  DSH-13 production mode (slice L, Could). P1 (API keys) is unchanged: live keys already return
+  `live_mode_unavailable`.
+- Production mode and live keys are after the MVP: the prototype runs on test networks only (invariant 14).
+
+## Open question for the founder
+
+- **Does production start in Shadow?** This journey (B-04) says yes: production begins in phase 5 with nothing
+  sent, then Assist, then Auto. The founder's flow says the client "enables production mode and starts". If
+  production should send from day one (straight to Assist), phase 5 moves before production, on sandbox or
+  exported data.
 
 ## Follow-ups (not in this change)
 
-- Site copy, nav, CTA and the design-partners page, with spec/08 §7, `specs/002-marketing-site` FR-210,
-  `founder/landing-page.md` and `docs/design/landing-page-ux.md`: done in the landing redesign work.
-- Backlog: reword the SHD epic and stories from "free shadow report" to "shadow phase" in
-  `backlog/stories.yaml`, then regenerate.
+- Site copy, nav, CTA and the Onboarding page: PR #74 (landing redesign).

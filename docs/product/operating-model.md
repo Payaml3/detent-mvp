@@ -29,7 +29,7 @@ support. Every hire goes through the `hire` gate.
 | Process | How it runs | Built |
 | --- | --- | --- |
 | Lead to contract | Discovery call and demo, fit check, NDA, then due diligence and contract (`client-journey.md` phases 1 and 2) | Not software |
-| Client onboarding | Sandbox integration, policy workshop, rule set v1 signed off, shadow on live traffic, go-live, scale (`client-journey.md` phases 3 to 7; B-04) | Partly |
+| Client onboarding | KYB approved, owner registration email and sign-up, team and roles, sandbox integration and DekernAI verification, policy workshop and rule set v1 signed off, production in Shadow, go-live, scale (`client-journey.md` phases 3 to 7; B-04) | Partly: P2 builds sign-up, team, roles and verification (DSH-01 to DSH-12) |
 | Mode gates | Weekly agreement report; client signs each move from Shadow to Assist to Auto | Partly |
 | Rule changes | Versioned; two approvers; loosening needs the compliance lead | Built (S6) |
 | Agent evaluation | Attack and regression suite per release; weekly quality sample | Built (S8) |
@@ -76,7 +76,7 @@ Per-client fail-safe: hold or manual queue, never execute unchecked.
 | Automation | Share decided without a human | 70% or more |
 | Reconciliation | Automatic match rate | 99% or more |
 | Reliability | Uptime and p95 latency | B5 targets |
-| Commercial | Shadow-to-pilot; pilot-to-paid | 40%; 60% |
+| Commercial | Demo-to-contract; pilot-to-paid | Open; 60% |
 | Speed | Pilot signed to shadow live | Under 10 days |
 | Economics | Gross margin, net revenue retention | Open |
 
