@@ -77,7 +77,7 @@ def test_deploys_on_the_sepolia_and_funds_both_wallets(anvil: str, network: str)
     address = deploy_token(_settings(network, anvil, sender_key, payer_key), network)
     t = _token(anvil, address)
     assert t.functions.symbol().call() == "tUSDC"
-    assert t.functions.name().call() == "Detent Demo USD (test stand-in, not USDC)"
+    assert t.functions.name().call() == "DekernAI Demo USD (test stand-in, not USDC)"
     assert t.functions.minter().call() == sender
 
     s = _settings(network, anvil, sender_key, payer_key, token=address)

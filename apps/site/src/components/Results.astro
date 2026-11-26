@@ -22,13 +22,13 @@ const gate = [
     </div>
     {results.published ? (
       <dl class="ledger">
-        {results.figures.map((f) => <div data-figure data-reveal><dt>{f.value}</dt><dd>{f.caption}</dd></div>)}
+        {results.figures.map((f) => <div data-figure data-card><dt>{f.value}</dt><dd>{f.caption}</dd></div>)}
       </dl>
     ) : (
       <div class="gate">
         <p class="gate-title" data-reveal>What every release must pass before it ships:</p>
         <dl class="ledger">
-          {gate.map((g) => <div data-reveal><dt>{g.value}</dt><dd>{g.caption}</dd></div>)}
+          {gate.map((g) => <div data-card><dt>{g.value}</dt><dd>{g.caption}</dd></div>)}
         </dl>
         <p class="small soft" data-reveal>These are release-gate thresholds, not results.</p>
       </div>
@@ -38,12 +38,12 @@ const gate = [
 <style>
   .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
   .head { grid-column: 1 / span 5; display: grid; gap: 24px; align-content: center; }
-  .head .lead { color: var(--paper-soft); }
+  .head .lead { color: var(--text-soft); }
   .gate { grid-column: 7 / span 6; display: grid; gap: 20px; }
   .gate-title { font-weight: 600; }
   .ledger { margin: 0; display: grid; gap: 8px; }
-  .ledger div { display: grid; grid-template-columns: minmax(250px, 1fr) 1.5fr; align-items: baseline; gap: 24px; background: var(--ink-raised); border-radius: var(--radius); padding: 22px 28px; }
-  .ledger dt { font: 600 clamp(48px, 5vw, 84px)/1 var(--font-head); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; color: var(--paper); text-align: right; }
+  .ledger div { display: grid; grid-template-columns: minmax(250px, 1fr) 1.5fr; align-items: baseline; gap: 24px; background: var(--surface); border-radius: var(--radius); padding: 22px 28px; }
+  .ledger dt { font: 600 clamp(48px, 5vw, 84px)/1 var(--font-head); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; color: var(--text); text-align: right; }
   .ledger dd { margin: 0; font-size: 17px; }
   @media (max-width: 900px) { .head, .gate { grid-column: 1 / -1; } .ledger div { grid-template-columns: 1fr; gap: 8px; } .ledger dt { text-align: left; } }
 </style>

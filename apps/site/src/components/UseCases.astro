@@ -1,45 +1,268 @@
 ---
-const cases = [
-  { name: "Payout platforms", line: "Creator and contractor payouts, each decided before it moves.", status: "EXECUTE", reason: "Routine payout within limits", amount: "€2,400.00 · SEPA Instant" },
-  { name: "Crypto service providers", line: "Withdrawals to wallets you have never paid before are held, not guessed.", status: "ESCALATE", reason: "NEW_WALLET: first seen 2 days ago", amount: "300.00 USDC · Ethereum Sepolia" },
-  { name: "Brokers and prop firms", line: "Trader payouts far above their history wait for a second look.", status: "ESCALATE", reason: "ABOVE_NORM: 4.1× the median", amount: "£4,100.00 · Faster Payments" },
-  { name: "Marketplaces", line: "A seller who just changed bank details doesn’t get paid on autopilot.", status: "ESCALATE", reason: "CHANGED_DETAILS: 3 days ago", amount: "£820.00 · Faster Payments" },
+// Use cases: every platform that holds user balances and moves money in and out. Pick one and watch the
+// three layers run its process: the agent prepares the payment and your rules decide it (decision), the
+// best rail is chosen with alternatives ready (orchestration), and everything around it is reconciled and
+// recorded (operations). Sample data. The agent proposes; the rules decide (invariant 5). Orange never marks
+// a block (B-02). Without script every case is shown, one after another.
+type Check = [string, "ok" | "flag"];
+type Rail = [string, "chosen" | "fallback" | "option" | "excluded", string];
+const cases: { id: string; name: string; tag: string; flow: string; pay: string; agent: string; checks: Check[];
+  verdict: "EXECUTE" | "ESCALATE" | "BLOCK"; why: string; rails: Rail[]; ops: [string, string][]; auto: string }[] = [
+  { id: "brokers", name: "Brokers and trading apps", tag: "Withdrawals", flow: "Client withdrawal to bank",
+    pay: "£12,400.00 · client A-2291 → own bank account",
+    agent: "Prepared the withdrawal from settled cash. No open margin positions; the destination is the client’s verified account.",
+    checks: [["Settled cash covers it", "ok"], ["Destination owned by the client", "ok"], ["Market-spike pause is off", "ok"]],
+    verdict: "EXECUTE", why: "Within your limits",
+    rails: [["Faster Payments", "chosen", "instant, under its limit"], ["CHAPS", "fallback", "on a technical error only"], ["Bacs", "excluded", "too slow for your withdrawal promise"]],
+    ops: [["Reconcile", "Bank confirmation matched to the ledger posting"], ["Client money", "Daily check of client balances against the bank"], ["Audit", "The decision replays exactly as it ran"]],
+    auto: "Withdrawals inside your limits go out on their own. A market spike pauses them with one switch." },
+  { id: "wealth", name: "Investment and wealth", tag: "Transfers out", flow: "ISA transfer out",
+    pay: "£48,000.00 · client W-0817 → receiving provider",
+    agent: "Read the transfer request and matched it to the client’s ISA. Units were sold yesterday; the cash settles today.",
+    checks: [["Cash has settled", "ok"], ["Receiving account matches the form", "ok"], ["Above your £25,000 review line", "flag"]],
+    verdict: "ESCALATE", why: "A second look above your review line",
+    rails: [["CHAPS", "chosen", "same day, high value"], ["Faster Payments", "fallback", "if CHAPS has a technical fault"], ["Bacs", "excluded", "misses the transfer deadline"]],
+    ops: [["Exceptions", "A named approver sees the raw facts; approving runs the rules again"], ["Reconcile", "Matched to the provider’s confirmation"], ["Audit", "Who approved, when, and why"]],
+    auto: "The agent gathers the form, the holding and the cash. A person only signs off what crosses your line." },
+  { id: "crypto", name: "Crypto exchanges and wallets", tag: "Stablecoins", flow: "Stablecoin withdrawal",
+    pay: "2,500.00 USDC · client C-5530 → 0x7a…e41",
+    agent: "Prepared the withdrawal. Travel-rule data arrived with the request. This is the first payout to this address.",
+    checks: [["Address screening clear", "ok"], ["Travel-rule data complete", "ok"], ["First payout to this address", "flag"]],
+    verdict: "ESCALATE", why: "New wallet, held for a person",
+    rails: [["USDC on Base", "chosen", "the client’s network, lowest fee"], ["USDC on Ethereum", "fallback", "if Base is degraded"], ["USDC on Solana", "excluded", "the address is EVM only"]],
+    ops: [["Confirm", "Settled on the chain’s receipt; a timeout stays UNKNOWN and is never resent"], ["Deposits", "Mismatched deposits get a drafted fix for a person"], ["Audit", "Screening result and approver on the record"]],
+    auto: "Screening, travel rule and routing run on every withdrawal. Only new or unusual destinations wait." },
+  { id: "payroll", name: "Payroll and contractor platforms", tag: "Global payouts", flow: "Contractor payroll run",
+    pay: "€184,300.00 · 212 workers in 14 countries",
+    agent: "Prepared the run from the approved payroll file. Three workers changed their bank details this cycle.",
+    checks: [["Total matches the approved file", "ok"], ["Before the 14:00 CET cut-off", "ok"], ["Changed bank details on 3 workers", "flag"]],
+    verdict: "ESCALATE", why: "209 sent, 3 held for a check",
+    rails: [["SEPA Instant", "chosen", "workers in the euro area"], ["Faster Payments", "chosen", "workers in the UK"], ["USDC on Base", "option", "workers who opted in"], ["SWIFT", "fallback", "where no instant rail reaches"]],
+    ops: [["Status", "Each worker’s status flows back to payroll"], ["Exceptions", "The 3 held payments wait; the other 209 are not delayed"], ["Reconcile", "One report across every rail and currency"]],
+    auto: "One file in, every worker paid on the best local rail. Only the changed details wait for a person." },
+  { id: "marketplaces", name: "Marketplaces and gig platforms", tag: "Seller payouts", flow: "Weekly seller payout",
+    pay: "$3,870.00 · seller S-4410 → bank account",
+    agent: "Prepared the weekly payout. One order of $420.00 is under a buyer dispute.",
+    checks: [["Seller identity checks current", "ok"], ["Payout destination unchanged", "ok"], ["$420.00 under dispute", "flag"]],
+    verdict: "EXECUTE", why: "Pays $3,450.00, holds the disputed $420.00",
+    rails: [["RTP", "chosen", "instant in the US"], ["Same-day ACH", "fallback", "on a technical error only"], ["Push to card", "option", "if the seller chooses card"]],
+    ops: [["Holds", "The disputed amount is released when the dispute closes"], ["Reconcile", "Marketplace ledger matched to every rail"], ["Audit", "Why each dollar moved or waited"]],
+    auto: "Payouts split themselves: the clean part goes now, the disputed part waits on its own." },
+  { id: "igaming", name: "iGaming and betting", tag: "Player withdrawals", flow: "Player withdrawal",
+    pay: "£2,000.00 · player P-9932 → account they deposited from",
+    agent: "Prepared the withdrawal. The player deposited £6,500.00 this week, above their affordability band.",
+    checks: [["Back to the deposit account", "ok"], ["Source of funds on file", "ok"], ["Above the affordability band", "flag"]],
+    verdict: "ESCALATE", why: "Affordability check first",
+    rails: [["Faster Payments", "chosen", "to the account they paid in from"], ["Push to card", "fallback", "card deposits return to the card"], ["Stablecoins", "excluded", "not allowed by your rules"]],
+    ops: [["Exceptions", "The safer-gambling team gets the case with the facts"], ["Reconcile", "Player wallet matched to the bank"], ["Audit", "A record ready for your regulator"]],
+    auto: "Closed-loop withdrawals run on their own. Affordability and source-of-funds flags reach the right team." },
+  { id: "neobanks", name: "Neobanks and EMIs", tag: "Outbound transfers", flow: "Outbound transfer",
+    pay: "£9,800.00 · customer N-1207 → new payee",
+    agent: "Prepared the transfer. The payee was added 4 minutes ago, and the reference reads like an impersonation scam.",
+    checks: [["Balance covers it", "ok"], ["Payee added under an hour ago", "flag"], ["Confirmation of Payee: partial match", "flag"]],
+    verdict: "ESCALATE", why: "Held: possible APP fraud",
+    rails: [["Faster Payments", "chosen", "once the hold clears"], ["CHAPS", "fallback", "on a technical error only"], ["Bacs", "excluded", "too slow for this customer promise"]],
+    ops: [["Exceptions", "The customer is warned; a person reviews before anything moves"], ["Safeguarding", "Safeguarded funds reconciled every day"], ["Audit", "Each step on the record for a reimbursement claim"]],
+    auto: "Ordinary transfers flow. A new payee with a weak name match waits, and the customer hears why." },
+  { id: "remittance", name: "Remittance and FX apps", tag: "Corridors", flow: "Corridor payout",
+    pay: "£500.00 → ₱36,120.00 · sender R-3381 → family account in Manila",
+    agent: "Prepared the payout at the locked rate. The recipient has a bank account and a mobile wallet on file.",
+    checks: [["Sanctions screening clear", "ok"], ["Within the corridor limit", "ok"], ["Rate lock still valid", "ok"]],
+    verdict: "EXECUTE", why: "Within your limits",
+    rails: [["Local instant bank rail", "chosen", "cheapest at this amount"], ["Mobile wallet", "fallback", "if the bank rail is down"], ["SWIFT", "excluded", "slower and dearer here"]],
+    ops: [["FX", "Rate and margin posted to the ledger"], ["Reconcile", "Partner confirmation matched to the payout"], ["Audit", "Screening and route on the record"]],
+    auto: "Each corridor picks its own best rail, and fails over only when that rail has a technical fault." },
+  { id: "treasury", name: "B2B treasury and AP", tag: "Supplier payments", flow: "Supplier payment",
+    pay: "$18,500.00 · invoice INV-2026-0142 → Bluefin Components Ltd",
+    agent: "Matched the invoice to the purchase order and the goods receipt. The supplier changed bank details 2 days ago.",
+    checks: [["Invoice matches order and receipt", "ok"], ["Within the approver’s limit", "ok"], ["Bank details changed 2 days ago", "flag"]],
+    verdict: "ESCALATE", why: "Changed details, a second look first",
+    rails: [["USDC on Base", "chosen", "the supplier’s preferred rail"], ["Wire", "fallback", "on a technical error only"], ["ACH", "excluded", "misses the due date"]],
+    ops: [["Exceptions", "The approver confirms the new details; the initiator can’t approve"], ["Reconcile", "Payment matched back to the invoice"], ["Audit", "Invoice, rules and approval in one record"]],
+    auto: "Three-way match and routing are automatic. Changed bank details always get a person." },
+  { id: "creators", name: "Creator and affiliate platforms", tag: "Batch payouts", flow: "Monthly creator payout",
+    pay: "$1,120.00 · Northwind Creators → card",
+    agent: "Prepared the monthly payout from the earnings statement. The tax form on file is current.",
+    checks: [["Tax form on file", "ok"], ["Earnings match the statement", "ok"], ["Above the minimum payout", "ok"]],
+    verdict: "EXECUTE", why: "Within your limits",
+    rails: [["Push to card", "chosen", "the creator’s choice"], ["ACH", "fallback", "on a technical error only"], ["USDC on Base", "option", "for creators who opt in"]],
+    ops: [["Batch", "Every creator in the batch tracked on their own"], ["Reconcile", "Statement, payout and rail matched"], ["Audit", "Tax form and payout on one record"]],
+    auto: "The batch runs itself. A missing tax form holds one creator, not the whole run." },
 ];
+const railWord = { chosen: "Chosen", fallback: "Fallback", option: "Option", excluded: "Not allowed" };
+const verdictStatus = { EXECUTE: "CONFIRMED", ESCALATE: "ESCALATED", BLOCK: "BLOCKED" };
 ---
-<section class="section uses" data-section="use-cases" aria-labelledby="uses-title">
-  <div class="wrap">
-    <h2 id="uses-title" data-reveal>For platforms that hold user balances.</h2>
-    <div class="stack">
-      {cases.map((c, i) => (
-        <details class="case" open={i === 0} data-reveal>
-          <summary><span class="name">{c.name}</span></summary>
-          <div class="body">
-            <p class="line">{c.line}</p>
-            <div class="readout" data-ui>
-              <span class="small soft">Example decision</span>
-              <span class={`chip st-${c.status === "EXECUTE" ? "CONFIRMED" : "ESCALATED"}`}>{c.status}</span>
-              <span>{c.reason}</span>
-              <span class="soft">{c.amount}</span>
-            </div>
-          </div>
-        </details>
-      ))}
-    </div>
+<div class="uc" data-uc>
+  <div class="tabs" role="tablist" aria-label="Use cases" data-uc-tabs hidden>
+    {cases.map((c, i) => (
+      <button type="button" role="tab" id={`uc-tab-${c.id}`} aria-controls={`uc-${c.id}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+        <span class="t-name">{c.name}</span><span class="t-tag">{c.tag}</span>
+      </button>
+    ))}
   </div>
-</section>
+  <div class="panels">
+    {cases.map((c, i) => (
+      <article class="panel" id={`uc-${c.id}`} role="tabpanel" aria-labelledby={`uc-tab-${c.id}`} data-uc-panel data-on={i === 0 ? "" : undefined}>
+        <header class="p-head">
+          <div><p class="p-kicker">{c.name}</p><h3>{c.flow}</h3></div>
+          <p class="p-pay">{c.pay}</p>
+        </header>
+        <ol class="lanes">
+          <li class="lane" style="--n:0">
+            <p class="l-name"><b>Decision</b> should it happen?</p>
+            <p class="agent"><span class="who">Agent</span>{c.agent}</p>
+            <ul class="checks">
+              {c.checks.map(([label, r], k) => <li class={r} style={`--k:${k}`}><span class="mark" aria-hidden="true">{r === "ok" ? "✓" : "!"}</span>{label}</li>)}
+            </ul>
+            <p class="verdict"><span class={`chip st-${verdictStatus[c.verdict]}`}>{c.verdict}</span><span>Your rules: {c.why.toLowerCase()}</span></p>
+          </li>
+          <li class="lane" style="--n:1">
+            <p class="l-name"><b>Orchestration</b> how and where?</p>
+            <ul class="rails">
+              {c.rails.map(([name, state, note], k) => (
+                <li class={`rail ${state}`} style={`--k:${k}`}>
+                  <span class="track" aria-hidden="true"><i></i></span>
+                  <span class="r-name">{name}</span>
+                  <span class="r-state">{railWord[state]}</span>
+                  <span class="r-note">{note}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+          <li class="lane" style="--n:2">
+            <p class="l-name"><b>Operations</b> what happens around it?</p>
+            <ul class="ops">
+              {c.ops.map(([k2, v], k) => <li style={`--k:${k}`}><b>{k2}</b><span>{v}</span></li>)}
+            </ul>
+          </li>
+        </ol>
+        <p class="auto"><span class="auto-k">Automated</span>{c.auto}</p>
+      </article>
+    ))}
+  </div>
+  <p class="small soft foot">Sample data. The agent prepares and proposes; your rules decide, and a person approves anything they escalate.</p>
+</div>
+<script>
+  const root = document.querySelector<HTMLElement>("[data-uc]");
+  if (root) {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>("[role=tab]")];
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-uc-panel]")];
+    root.querySelector<HTMLElement>("[data-uc-tabs]")!.hidden = false;
+    root.classList.add("uc-live");
+    let at = 0, touched = false, timer = 0;
+    const show = (i: number, focus = false) => {
+      at = (i + tabs.length) % tabs.length;
+      tabs.forEach((t, k) => { t.setAttribute("aria-selected", String(k === at)); t.tabIndex = k === at ? 0 : -1; });
+      panels.forEach((p, k) => { if (k === at) { p.removeAttribute("data-on"); void p.offsetWidth; p.setAttribute("data-on", ""); } else p.removeAttribute("data-on"); });
+      if (focus) tabs[at].focus();
+    };
+    const stop = () => { touched = true; clearInterval(timer); };
+    tabs.forEach((t, k) => t.addEventListener("click", () => { stop(); show(k); }));
+    root.querySelector("[role=tablist]")!.addEventListener("keydown", (e) => {
+      const k = (e as KeyboardEvent).key;
+      const d = k === "ArrowDown" || k === "ArrowRight" ? 1 : k === "ArrowUp" || k === "ArrowLeft" ? -1 : 0;
+      if (d) { e.preventDefault(); stop(); show(at + d, true); }
+    });
+    root.addEventListener("pointerenter", stop, { once: true });
+    // until someone picks one, the cases take turns while the section is on screen
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      new IntersectionObserver(([e]) => {
+        clearInterval(timer);
+        if (e.isIntersecting && !touched) timer = window.setInterval(() => show(at + 1), 7000);
+      }, { threshold: 0.4 }).observe(root);
+    }
+    show(0);
+  }
+</script>
 <style>
-  h2 { margin-bottom: 40px; }
-  .stack { display: grid; gap: 8px; }
-  .case { background: var(--ink-raised); border-radius: var(--radius); overflow: hidden; transition: background 200ms; }
-  .case[open] { background: #1F4FCC; }
-  summary { list-style: none; cursor: pointer; padding: 24px 32px; }
-  summary::-webkit-details-marker { display: none; }
-  .name { font: 600 clamp(36px, 5.4vw, 84px)/1 var(--font-head); letter-spacing: -0.04em; display: block; transition: transform 300ms var(--ease-out); }
-  summary:hover .name { transform: translateX(8px); }
-  .body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 0 32px 32px; align-items: end; }
-  .line { font-size: var(--t-lead); max-width: 34ch; }
-  .readout { background: rgba(7, 12, 26, 0.55); border-radius: 8px; padding: 16px 18px; display: grid; grid-template-columns: auto auto 1fr; gap: 6px 12px; align-items: center; }
-  .readout > :first-child { grid-column: 1 / -1; }
-  .readout > :last-child { grid-column: 1 / -1; }
-  @media (max-width: 800px) { .body { grid-template-columns: 1fr; } summary, .body { padding-left: 20px; padding-right: 20px; } }
+  .uc { display: grid; grid-template-columns: minmax(220px, 3.2fr) 8.8fr; gap: 16px; align-items: start; }
+  .uc:not(.uc-live) { grid-template-columns: 1fr; }
+  .uc:not(.uc-live) .panels { display: grid; gap: 16px; }
+  .tabs { display: grid; gap: 2px; position: sticky; top: 96px; }
+  .tabs button { all: unset; cursor: pointer; display: grid; gap: 2px; padding: 11px 14px; border-radius: 8px; border-left: 2px solid transparent; transition: background 160ms, border-color 160ms; }
+  .tabs button:hover { background: var(--surface); }
+  .tabs button:focus-visible { outline: 2px solid var(--interactive); outline-offset: 2px; }
+  .tabs button[aria-selected="true"] { background: var(--surface); border-left-color: var(--signal); }
+  .t-name { font: 600 16px/1.3 var(--font-head); letter-spacing: -0.005em; }
+  .t-tag { font-size: 13px; color: var(--text-soft); }
+  .foot { grid-column: 1 / -1; margin-top: 4px; }
+
+  /* the machine: a dark panel where the three layers run the process */
+  .panel { --pp: color-mix(in srgb, var(--paper) 72%, var(--ink)); --pl: color-mix(in srgb, var(--paper) 14%, var(--ink));
+    background: var(--ink); color: var(--paper); border-radius: 16px; padding: clamp(20px, 2.4vw, 32px); display: grid; gap: 22px;
+    box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--ink) 60%, transparent); }
+  .uc-live .panel:not([data-on]) { display: none; }
+  .p-head { display: flex; justify-content: space-between; align-items: end; gap: 16px 32px; flex-wrap: wrap; }
+  .p-kicker { font-size: 13px; color: var(--pp); margin: 0 0 4px; }
+  .p-head h3 { font: 600 clamp(24px, 2.2vw, 32px)/1.15 var(--font-head); letter-spacing: -0.015em; margin: 0; }
+  .p-pay { font: 500 13px/1.4 var(--font-mono); color: var(--paper); background: var(--pl); padding: 7px 11px; border-radius: 6px; margin: 0; }
+  .lanes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1.15fr 1fr 0.9fr; gap: 12px; counter-reset: lane; position: relative; }
+  .lane { background: color-mix(in srgb, var(--paper) 5%, var(--ink)); border: 1px solid var(--pl); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; position: relative; }
+  .lane + .lane::before { content: ""; position: absolute; left: -13px; top: 30px; width: 12px; height: 2px; background: var(--signal); }
+  .l-name { margin: 0; font-size: 13px; color: var(--pp); }
+  .l-name b { display: block; font: 600 17px/1.2 var(--font-head); color: var(--paper); margin-bottom: 2px; }
+  .agent { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp); border-left: 2px solid var(--pl); padding-left: 10px; }
+  .who { display: block; font: 600 11px/1.6 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--paper); }
+  .checks, .rails, .ops { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+  .checks li { display: flex; gap: 9px; align-items: baseline; font-size: 14px; line-height: 1.4; }
+  .mark { flex: none; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font: 700 11px/1 var(--font-body); transform: translateY(3px); }
+  .checks .ok .mark { background: color-mix(in srgb, var(--ok) 30%, var(--ink)); color: var(--paper); }
+  .checks .flag .mark { background: var(--signal); color: var(--on-signal); }
+  .verdict { margin: 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--pp); }
+  .verdict .chip { color: var(--on-signal); }
+  .verdict .st-CONFIRMED { background: var(--ok); color: var(--paper); }
+  .verdict .st-ESCALATED { background: var(--signal); color: var(--on-signal); }
+  .verdict .st-BLOCKED { background: var(--paper); color: var(--ink); }
+
+  .rail { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 12px 10px 14px; border-radius: 8px; border: 1px solid var(--pl); position: relative; overflow: hidden; }
+  .r-name { font-weight: 600; font-size: 14px; }
+  .r-state { font: 600 11px/1.9 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--pp); }
+  .r-note { grid-column: 1 / -1; font-size: 13px; color: var(--pp); }
+  .track { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--pl); }
+  .rail.chosen { border-color: color-mix(in srgb, var(--ok) 60%, var(--ink)); background: color-mix(in srgb, var(--ok) 12%, var(--ink)); }
+  .rail.chosen .track { background: var(--ok); }
+  .rail.chosen .r-state { color: var(--paper); }
+  .rail.fallback .track { background: repeating-linear-gradient(var(--paper) 0 4px, transparent 4px 8px); opacity: 0.6; }
+  .rail.option { border-style: dashed; }
+  .rail.excluded { opacity: 0.55; }
+  .rail.excluded .r-name { text-decoration: line-through; text-decoration-thickness: 1px; }
+  .rail.excluded .r-state::before { content: "✕ "; }
+  .rail.chosen .track i { position: absolute; left: 0; width: 3px; height: 40%; background: var(--paper); opacity: 0; }
+
+  .ops li { display: grid; gap: 2px; padding: 10px 0; border-top: 1px solid var(--pl); font-size: 14px; line-height: 1.45; }
+  .ops li:first-child { border-top: 0; padding-top: 0; }
+  .ops b { font: 600 11px/1.6 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+  .ops span { color: var(--pp); }
+  .auto { margin: 0; display: flex; gap: 12px; align-items: baseline; font-size: 15px; line-height: 1.5; padding-top: 18px; border-top: 1px solid var(--pl); }
+  .auto-k { flex: none; font: 600 11px/1.6 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--on-signal); background: var(--signal); padding: 2px 8px; border-radius: 4px; }
+
+  /* when a case opens, the layers run in order: lanes rise, checks tick, the verdict lands, the rail lights */
+  @media (prefers-reduced-motion: no-preference) {
+    .uc-live .panel[data-on] .lane { animation: rise 520ms var(--ease-out) both; animation-delay: calc(var(--n) * 420ms); }
+    .uc-live .panel[data-on] .checks li { animation: rise 360ms var(--ease-out) both; animation-delay: calc(250ms + var(--k) * 160ms); }
+    .uc-live .panel[data-on] .verdict { animation: pop 420ms var(--ease-out) both; animation-delay: 780ms; }
+    .uc-live .panel[data-on] .rail { animation: rise 380ms var(--ease-out) both; animation-delay: calc(560ms + var(--k) * 110ms); }
+    .uc-live .panel[data-on] .rail.chosen .track i { animation: flow 1.6s linear infinite; animation-delay: 1.1s; }
+    .uc-live .panel[data-on] .ops li { animation: rise 380ms var(--ease-out) both; animation-delay: calc(980ms + var(--k) * 120ms); }
+    .uc-live .panel[data-on] .lane + .lane::before { animation: wire 400ms var(--ease-out) both; animation-delay: calc(var(--n) * 420ms); transform-origin: left; }
+    .uc-live .panel[data-on] .auto { animation: rise 420ms var(--ease-out) both; animation-delay: 1.3s; }
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { 0% { opacity: 0; transform: scale(0.9); } 60% { opacity: 1; transform: scale(1.04); } 100% { transform: none; } }
+  @keyframes wire { from { transform: scaleX(0); } to { transform: none; } }
+  @keyframes flow { 0% { top: -40%; opacity: 1; } 100% { top: 100%; opacity: 1; } }
+  /* the excluded rail keeps its lower opacity after rising */
+  .uc-live .panel[data-on] .rail.excluded { animation-name: rise-dim; }
+  @keyframes rise-dim { from { opacity: 0; transform: translateY(10px); } to { opacity: 0.55; transform: none; } }
+
+  @media (max-width: 1100px) { .lanes { grid-template-columns: 1fr 1fr; } .lane:nth-child(3) { grid-column: 1 / -1; } .lane:nth-child(3)::before { display: none; } }
+  @media (max-width: 860px) {
+    .uc { grid-template-columns: 1fr; }
+    .tabs { position: static; display: flex; overflow-x: auto; gap: 6px; padding-bottom: 6px; scrollbar-width: none; }
+    .tabs button { flex: none; border-left: 0; border-bottom: 2px solid transparent; background: var(--surface); }
+    .tabs button[aria-selected="true"] { border-bottom-color: var(--signal); }
+    .t-tag { display: none; }
+    .lanes { grid-template-columns: 1fr; }
+    .lane + .lane::before { display: none; }
+  }
 </style>

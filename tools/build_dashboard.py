@@ -2,7 +2,7 @@
 
 The startup dashboard: one page with tabs (Overview, Needs you, Goals, Documents, Progress trace, Roadmap, Scope and
 journey, Team and board, Agent activity, Decisions, Approvals inbox, Costs), built from the repo and GitHub.
-The dashboard workflow rebuilds it on every merge to main and every hour, and serves it at the host in
+The dashboard workflow rebuilds it on every merge to main and every three hours, and serves it at the host in
 founder/dashboard.json behind a login: Cloudflare Pages behind Cloudflare Access (the default), or a Vercel
 project behind Vercel Authentication on all deployments. The Claude page from publish-views is the backup.
 
@@ -42,9 +42,11 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _s2s as s  # noqa: E402
 import approval  # noqa: E402
+import autopilot  # noqa: E402
 import build_roadmap  # noqa: E402
 import build_team  # noqa: E402
 import build_traceability  # noqa: E402
+import theme  # noqa: E402
 import control  # noqa: E402
 import doctor  # noqa: E402
 import finance  # noqa: E402
@@ -151,8 +153,8 @@ def repo_data(root: Path, cfg_dash: dict[str, Any]) -> dict[str, Any]:
                       "role": roles.get(code, "engineer"), "stories": len(stories),
                       "slices": sorted({str(st.get("slice", "")) for st in stories if st.get("slice")})})
     memos = [d for d in documents(root, ["founder/board/*.md"]) if not d["path"].endswith("README.md")]
-    beats = {r: {k: ((pol.get("roles") or {}).get(r) or {}).get(k) for k in ("enabled", "cron", "monthly_budget_usd")}
-             for r in heartbeat.BUDGET_ROLES}
+    beats = {r: {**{k: ((pol.get("roles") or {}).get(r) or {}).get(k) for k in ("enabled", "cron", "monthly_budget_usd")},
+                 "rubric": heartbeat.rubric(pol, r)} for r in heartbeat.BUDGET_ROLES}
     return {
         "goals": goals.build(root),
         "documents": grouped_documents(root, cfg_dash.get("documents") or DEFAULT_DOCS),
@@ -165,9 +167,77 @@ def repo_data(root: Path, cfg_dash: dict[str, Any]) -> dict[str, Any]:
         "memos": memos,
         "epics": epics,
         "decisions": s.decisions(root, cfg),
+        "next": next_directions(root),
+        "profiles": {r: role_profile(root, r, pol) for r in tickets.ROLES},
+        "evals": eval_cases(root),
+        "gates": sorted(str(k)[:40] for k, v in approval.policy(root)["gates"].items()
+                        if isinstance(v, dict) and v.get("mode") != "allow")[:30],
         "approved_words": cfg.get("approved_words") or ["Approved"],
         "reports_to": dict(tickets.REPORTS_TO),
     }
+
+
+PROFILE_SECTIONS = {"skills": "Skills", "model": "Model", "tools": "Tools", "never": "Never", "owns": "Owns",
+                    "approval": "Needs the founder's approval for"}
+
+
+def role_profile(root: Path, role: str, pol: dict[str, Any]) -> dict[str, Any]:
+    """What an agent is made of, from its generated .codex/agents/<role>.toml (the same text as the Claude agent):
+    owns, skills, model guidance, tools and never-rules, plus the autopilot's model for it."""
+    text = s.read(root / ".codex" / "agents" / f"{role}.toml")
+    out: dict[str, Any] = {"run_model": autopilot.model_of(autopilot.settings(pol), role)}
+    for key, head in PROFILE_SECTIONS.items():
+        m = re.search(rf"^## {head}\n(.*?)(?=^## |^\'\'\'|\Z)", text, re.M | re.S)
+        lines = [ln.strip() for ln in (m.group(1) if m else "").splitlines() if ln.strip()]
+        items = [clip(ln[2:], 140) for ln in lines if ln.startswith("- ")] or [clip(" ".join(lines), 200)] if lines else []
+        out[key] = items[:8]
+    return out
+
+
+def eval_cases(root: Path) -> list[dict[str, str]]:
+    """evals/<role>/<case>.md: a past ticket with a known-good result, re-run before changing a role's model.
+    The first heading is the title; the `Ticket:` line names the past ticket."""
+    out = []
+    for p in sorted((root / "evals").glob("*/*.md")):
+        role, case = p.parent.name, p.stem
+        if role not in tickets.ROLES or not heartbeat.EVAL_CASE.match(case):
+            continue
+        text = s.read(p)
+        title = next((ln.lstrip("# ").strip() for ln in text.splitlines() if ln.startswith("# ")), case)
+        ticket = re.search(r"^Ticket:\s*#?(\d{1,7})", text, re.M)
+        out.append({"role": role, "case": case, "title": clip(title, 120), "path": p.relative_to(root).as_posix(),
+                    "ticket": ticket.group(1) if ticket else ""})
+    return out[:100]
+
+
+def eval_results(runs: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """The latest re-run of each eval case, keyed role/case: when, which model, and checks passed."""
+    out: dict[str, dict[str, Any]] = {}
+    for r in runs:
+        if r.get("eval"):
+            out[f'{r["role"]}/{r["eval"]}'] = {"at": r["at"], "model": r["model"], "checks": r.get("checks"),
+                                               "passed": bool(r.get("checks") and r["checks"][0] == r["checks"][1])}
+    return out
+
+
+WHY_LATER = ("not possible", "needs a credential", "out of scope")
+
+
+def next_directions(root: Path) -> list[dict[str, str]]:
+    """founder/next.md as rows: version, what, why later (one of WHY_LATER, else ""), how, source. At most 60."""
+    out = []
+    for table in s.tables(s.read(root / "founder" / "next.md")):
+        for r in table:
+            what = " ".join((r.get("what") or "").split())
+            if not what:
+                continue
+            ver = " ".join((r.get("version") or "").split()).lower()
+            why = " ".join((r.get("why later") or "").split()).lower()
+            out.append({"version": ver if re.fullmatch(r"v\d{1,2}|always", ver) else "later",
+                        "what": clip(what, 160), "why": next((w for w in WHY_LATER if why.startswith(w)), ""),
+                        "how": clip(" ".join((r.get("how") or "").split()), 240),
+                        "source": clip(" ".join((r.get("source") or "").split()), 60)})
+    return out[:60]
 
 
 # --- the roadmap timeline (Gantt) -----------------------------------------------------------------------
@@ -313,7 +383,12 @@ def costs(hub: tickets.Hub, root: Path, month: str, now: dt.datetime | None = No
     total = round(sum(totals.values()), 4)
     today = (now or dt.datetime.now(dt.timezone.utc)).date()
     ccap, _, cbase = heartbeat.standing(hub, root, pol, heartbeat.COMPANY, month, totals)
-    return {"month": month, "roles": roles, "entries": runs[-200:], "total": total,
+    auto = pol.get("autopilot") if isinstance(pol.get("autopilot"), dict) else {}
+    cap_runs = auto.get("max_runs_per_day", 12)
+    autopilot = {"enabled": auto.get("enabled") is True,
+                 "cap": cap_runs if isinstance(cap_runs, int) and not isinstance(cap_runs, bool) else 12,
+                 "runs_today": sum(1 for r in runs if r["at"][:10] == today.isoformat())}
+    return {"month": month, "roles": roles, "entries": runs[-200:], "total": total, "autopilot": autopilot,
             "company": {"cap": ccap, "base": cbase or None, "used": total},
             "forecast": heartbeat.forecast(total, month, today),
             "cap_total": round(sum(r["cap"] or 0 for r in roles), 4),
@@ -338,7 +413,7 @@ def trends(runs: list[dict[str, Any]], activity: list[dict[str, Any]], merged: l
     """The last `days` days, one row per day: runs (worked, other), success rate, agent actions, merges."""
     today = (now or dt.datetime.now(dt.timezone.utc)).date()
     keys = [(today - dt.timedelta(days=days - 1 - i)).isoformat() for i in range(days)]
-    rows = {k: {"date": k, "worked": 0, "other": 0, "tried": 0, "actions": 0, "merged": 0} for k in keys}
+    rows = {k: {"date": k, "worked": 0, "other": 0, "tried": 0, "actions": 0, "merged": 0, "graded": 0, "passed": 0} for k in keys}
     for r in runs:
         d = when_of(r.get("at"))
         row = rows.get(d.date().isoformat()) if d else None
@@ -346,6 +421,9 @@ def trends(runs: list[dict[str, Any]], activity: list[dict[str, Any]], merged: l
             continue
         row["worked" if r.get("outcome") == "worked" else "other"] += 1
         row["tried"] += 1 if r.get("outcome") and r.get("outcome") != "no-work" else 0
+        if r.get("checks") and not r.get("eval"):
+            row["graded"] += 1
+            row["passed"] += 1 if r["checks"][0] == r["checks"][1] else 0
     for a in activity:
         d = when_of(a.get("at"))
         if d and d.date().isoformat() in rows:
@@ -358,6 +436,7 @@ def trends(runs: list[dict[str, Any]], activity: list[dict[str, Any]], merged: l
     for k in keys:
         row = rows[k]
         row["success"] = round(row["worked"] / row["tried"], 4) if row["tried"] else None
+        row["pass_rate"] = round(row["passed"] / row["graded"], 4) if row["graded"] else None
         out.append(row)
     return {"days": out}
 
@@ -475,7 +554,8 @@ def github_data(root: Path, cfg_dash: dict[str, Any], month: str, now: dt.dateti
             ctl = {"all": None, "roles": {}, "url": "", "unknown": True}
         return {"ok": True, "control": ctl, "repo": repo, "activity": activity[-limit:], "tickets": open_tickets,
                 "approvals": approvals(hub, root), "costs": c, "merged": merged,
-                "trends": trends(recent_runs + c["entries"], activity, merged, now)}
+                "trends": trends(recent_runs + c["entries"], activity, merged, now),
+                "eval_results": eval_results(recent_runs + c["entries"])}
     except (subprocess.CalledProcessError, FileNotFoundError, ValueError, KeyError, TypeError) as exc:
         return {"ok": False, "repo": repo, "why": f"GitHub unavailable or unexpected reply ({type(exc).__name__})"}
 
@@ -518,6 +598,7 @@ def build(root: Path, offline: bool = False, now: dt.datetime | None = None) -> 
         "links": {"portfolio": https_url(cfg_dash.get("portfolio_url")),
                   "portfolio_name": " ".join(str(cfg_dash.get("portfolio_name") or "").split())[:80]},
         "repo": repo_data(root, cfg_dash),
+        "theme": theme.build(cfg_dash),
         "setup": setup(root, offline, now),
         "github": {"ok": False, "why": "built offline"} if offline else github_data(root, cfg_dash, month, now),
     }
@@ -547,7 +628,11 @@ def money(root: Path, data: dict[str, Any], month: str) -> dict[str, Any]:
 def page(data: dict[str, Any]) -> str:
     name = data["project"]["name"] or "Startup"
     before, _, after = s.read(PAGE).partition("__S2S_DATA__")
-    return before.replace("__S2S_TITLE__", html.escape(f"{name} dashboard")) + embed(data) + after
+    before = before.replace("__S2S_TITLE__", html.escape(f"{name} dashboard"))
+    style = theme.css(data.get("theme") or {})
+    if style:
+        before = before.replace("</head>", style + "</head>", 1)
+    return before + embed(data) + after
 
 
 def clip(text: Any, n: int = 300) -> str:

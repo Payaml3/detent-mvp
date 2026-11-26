@@ -1,4 +1,4 @@
-# Detent Agentic Payment Controls Constitution
+# DekernAI Agentic Payment Controls Constitution
 
 ## Core Principles
 
@@ -68,7 +68,7 @@ Rationale: AGENTS.md "How to work a story" and "Non-negotiable invariants".
 
 ### VII. Honesty, independence and no invented rules
 
-- Detent is "agentic payment controls" software; never a "payments company" or "payment provider".
+- DekernAI is "agentic payment controls" software; never a "payments company" or "payment provider".
 - No client logos, testimonials, customer counts, volume figures, certification badges or
   licence claims; measured results are dated and labelled "test-network evaluation on synthetic
   data"; prototype surfaces are labelled.

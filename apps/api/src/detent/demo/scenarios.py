@@ -37,7 +37,7 @@ REGISTRY_FILE = REPO_ROOT / "fixtures" / "counterparties.yaml"
 CANONICAL_INVOICE = REPO_ROOT / "fixtures" / "invoices" / "inv-canonical-18500-usdc.txt"
 INJECTION_INVOICE = REPO_ROOT / "fixtures" / "invoices" / "inv-injection-body.txt"
 MANDATE_ID = "mnd_demo_ap_agent"
-RUNNER_HEADER = {"x-detent-scenario-runner": "1"}
+RUNNER_HEADER = {"x-dekernai-scenario-runner": "1"}
 P08_AMOUNT_HEX = "047ed160"  # 75.42 USDC = 75,420,000 units: the only transfer whose first rail reverts
 
 

@@ -1,7 +1,7 @@
 [project]
 name = "banksim"
 version = "0.0.1"
-description = "Detent banksim (stub until M3; see spec/06-rails-and-faults.md)"
+description = "DekernAI banksim (stub until M3; see spec/06-rails-and-faults.md)"
 requires-python = ">=3.12,<3.13"
 dependencies = ["fastapi>=0.115", "uvicorn[standard]>=0.32"]
 

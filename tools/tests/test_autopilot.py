@@ -171,7 +171,10 @@ def test_notify_mentions_the_founder_once_per_new_item_and_sends_one_digest_a_da
     assert sent["digest"] and "Daily digest: 2 things" in fake.comments[n][-1]["body"]
     fake.comments[n][-1]["created_at"] = NOW.isoformat()
     assert not notify.push(root, h, items, NOW.replace(hour=7), "auto")["digest"]  # once a day
-    assert not notify.push(root, h, items, NOW.replace(hour=9), "auto")["digest"]  # only at the digest hour
+    assert not notify.push(root, h, items, NOW.replace(hour=9), "auto")["digest"]  # still once a day
+    assert not notify.push(root, h, items, NOW.replace(day=25, hour=6), "auto")["digest"]  # not before its hour
+    fake.comments[n][-1]["created_at"] = NOW.replace(day=25).isoformat()
+    assert notify.push(root, h, items, NOW.replace(day=25, hour=9), "auto")["digest"]  # the first run after it
     assert notify.push(root, h, [], NOW, "auto")["new"] == 0
     assert "Nothing waits on you." in fake.issues[n]["body"]
 
@@ -188,3 +191,64 @@ def test_a_ticket_blocked_for_a_day_shows_in_needs_you() -> None:
     blocked = [x for x in needs["items"] if x["kind"] == "blocked"]
     assert [x["number"] for x in blocked] == [7] and "on #6" in blocked[0]["detail"]
     assert needs["counts"]["blocked"] == 1
+
+
+def test_due_asks_the_founder_once_for_a_plan_nobody_requested(root: Path, fake: Fake) -> None:
+    (root / "founder/gates.json").write_text(json.dumps({"founders": [], "gates": {
+        "plan": {"mode": "ask", "what": "Start a plan", "paths": []}}}), encoding="utf-8")
+    pol = json.loads((root / "founder/heartbeats.json").read_text())
+    parent = ticket(fake, "chief-of-staff", ["stage:13", "initiative:I1", "kr:O1.2"])
+    body = tickets.ticket_body("engineer", "goal", "", "", parent, [], "chief-of-staff")
+    fake.make("child", body, ["ticket", "role:engineer"])
+    roles, why = autopilot.due(hub(root), root, pol, NOW)
+    plans = [n for n in fake.issues if "gate:plan" in fake.names(n)]
+    assert len(plans) == 1 and f"plan: asked the founder to approve #{parent}'s plan" in why
+    assert "engineer" not in {r["role"] for r in roles}  # still waits for the approval
+    autopilot.due(hub(root), root, pol, NOW)
+    assert len([n for n in fake.issues if "gate:plan" in fake.names(n)]) == 1  # once
+
+
+def test_the_goal_tree_gap_is_covered_by_its_label(root: Path) -> None:
+    (root / "founder/goals.json").write_text("{}", encoding="utf-8")
+    (root / "founder/playbook.md").write_text(PLAYBOOK.replace("| Passed |", "| Passed |\n| 3 | B | Business model | P | ok |  | Passed |"),
+                                              encoding="utf-8")
+    keys = [g["key"] for g in autopilot.gaps(root, [{"labels": [{"name": "stage:13"}]}], NOW.date())]
+    assert keys == ["goal-tree"]
+    assert autopilot.gaps(root, [{"labels": [{"name": "stage:13"}, {"name": "goal-tree"}]}], NOW.date()) == []
+
+
+def run(role: str, outcome: str, minutes_ago: float, ticket: int | None = None) -> dict[str, object]:
+    at = (NOW - dt.timedelta(minutes=minutes_ago)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return {"role": role, "outcome": outcome, "ticket": ticket, "at": at, "usd": 0.0, "session": ""}
+
+
+def test_an_escalated_ticket_does_not_start_its_role_again(root: Path, fake: Fake) -> None:
+    pol = json.loads((root / "founder/heartbeats.json").read_text())
+    ticket(fake, "engineer", [tickets.ESCALATED + "founder"])
+    roles, why = autopilot.due(hub(root), root, pol, NOW)
+    assert "engineer" not in {r["role"] for r in roles}
+    assert "engineer: nothing ready" in why
+
+
+def test_a_ticket_that_just_stalled_waits_before_a_retry() -> None:
+    runs = [run("engineer", "blocked", 30, 7), run("engineer", "worked", 20, 8), run("engineer", "failed", 600, 9),
+            run("qa", "blocked", 10, 8)]
+    assert autopilot.stalled(runs, "engineer", NOW) == {7}  # 8 worked last; 9 stalled too long ago
+
+
+def test_a_role_whose_last_run_did_nothing_waits_an_hour() -> None:
+    assert autopilot.idle_recently([run("qa", "worked", 90, 3), run("qa", "no-work", 20)], "qa", NOW)
+    assert not autopilot.idle_recently([run("qa", "no-work", 90)], "qa", NOW)
+    assert not autopilot.idle_recently([run("qa", "no-work", 20), run("qa", "worked", 5, 3)], "qa", NOW)
+
+
+def test_every_run_today_counts_toward_the_cap() -> None:
+    runs = [run("qa", "no-work", 10), run("engineer", "worked", 20, 1), run("qa", "no-work", 60 * 24)]
+    assert autopilot.runs_today(None, NOW, runs) == 2  # type: ignore[arg-type]
+
+
+def test_finish_does_not_count_a_run_twice_when_the_agent_logged_a_wrong_link() -> None:
+    runs = [run("qa", "worked", 3, 30)]
+    assert autopilot.logged_lately(runs, "qa", "https://github.com/o/r/actions/runs/9", NOW)
+    assert not autopilot.logged_lately(runs, "engineer", "https://github.com/o/r/actions/runs/9", NOW)
+    assert not autopilot.logged_lately([run("qa", "worked", 120, 30)], "qa", "https://github.com/o/r/actions/runs/9", NOW)

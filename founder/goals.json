@@ -1,6 +1,205 @@
 {
   "about": "The company goal, this quarter's objectives and their key results. Only the founder edits this file (the decision gate); agents propose new values with `python tools/goals.py update <key result> --value N` in a pull request. Objective ids look like O1, key result ids like O1.1. status: planned, active, achieved or cancelled. Progress is how far current has moved from baseline (0 if unset) to target. Slices and epics in slices.json name an objective with \"objective\": \"O1\"; tickets carry the label goal:O1.",
-  "goal": "",
-  "horizon": "",
-  "objectives": []
+  "goal": "Prove that UK and EU platforms holding user balances will run their real payouts through DekernAI's payment controls, and sign the first paid pilot",
+  "horizon": "2027-06",
+  "objectives": [
+    {
+      "id": "O1",
+      "title": "Prove the pain with real platforms",
+      "cycle": "C1",
+      "owner": "research",
+      "status": "planned",
+      "why": "Stages 1 and 2 have no evidence yet (status risk 1). Source: docs/product/problem-validation.md, customer-discovery.md.",
+      "key_results": [
+        {
+          "id": "O1.1",
+          "metric": "Problem interviews with ICP payments leads, notes logged",
+          "unit": "interviews",
+          "baseline": 0,
+          "target": 8,
+          "current": 0,
+          "stage": 2
+        },
+        {
+          "id": "O1.2",
+          "metric": "Interviews confirming H1 and H2 unprompted, with a recent example",
+          "unit": "interviews",
+          "baseline": 0,
+          "target": 5,
+          "current": 0,
+          "stage": 1
+        },
+        {
+          "id": "O1.3",
+          "metric": "Platforms agreeing to share a 30-day anonymised export",
+          "unit": "platforms",
+          "baseline": 0,
+          "target": 3,
+          "current": 0
+        }
+      ]
+    },
+    {
+      "id": "O2",
+      "title": "Turn interest into the first design partner",
+      "cycle": "C1",
+      "owner": "product",
+      "status": "planned",
+      "why": "The business model rests on shadow report to pilot. Source: docs/product/business-model.md.",
+      "key_results": [
+        {
+          "id": "O2.1",
+          "metric": "Free shadow reports delivered on a real export",
+          "unit": "reports",
+          "baseline": 0,
+          "target": 1,
+          "current": 0
+        },
+        {
+          "id": "O2.2",
+          "metric": "Follow-up demos (spec/11) given from the deployed EU instance",
+          "unit": "demos",
+          "baseline": 0,
+          "target": 3,
+          "current": 0,
+          "owner": "growth"
+        },
+        {
+          "id": "O2.3",
+          "metric": "Strategy stages decided by the founder: business model, product and operating model",
+          "unit": "stages",
+          "baseline": 0,
+          "target": 2,
+          "current": 0,
+          "stage": 3,
+          "owner": "founder"
+        }
+      ]
+    },
+    {
+      "id": "O3",
+      "title": "Make the product demo-ready and integrable",
+      "cycle": "C1",
+      "owner": "engineer",
+      "status": "planned",
+      "why": "Approved scope D-37: S9 then P1. Source: docs/product/mvp-scope.md.",
+      "key_results": [
+        {
+          "id": "O3.1",
+          "metric": "spec/11 runs end to end on the deployed EU instance on both Sepolias",
+          "unit": "runs",
+          "baseline": 0,
+          "target": 1,
+          "current": 0,
+          "stage": 16
+        },
+        {
+          "id": "O3.2",
+          "metric": "P1 Sandbox API and webhooks acceptance criteria done",
+          "unit": "criteria",
+          "baseline": 2,
+          "target": 16,
+          "current": 2
+        }
+      ]
+    }
+  ],
+  "north_star": {
+    "metric": "Real platform payments decided by DekernAI per week (shadow or live)",
+    "unit": "payments",
+    "baseline": 0,
+    "target": 5000,
+    "current": 0,
+    "by": "2027-06-30",
+    "why": "Proposed. Counts value delivered on customers' own data, not demo runs: a payment only counts once a design partner's real export or live traffic is decided under their rules. Target is an assumption to revisit after discovery."
+  },
+  "cycles": [
+    {
+      "id": "C1",
+      "start": "2026-11-30",
+      "end": "2027-01-10"
+    }
+  ],
+  "initiatives": [
+    {
+      "id": "I1",
+      "title": "Build a list of 20 ICP payments leads from the founder's network (no former-employer clients) and book 8 calls",
+      "key_result": "O1.1",
+      "owner": "research",
+      "status": "planned"
+    },
+    {
+      "id": "I2",
+      "title": "Run the 25-minute problem interview script and log each one in docs/product/customer-discovery.md within 24 hours",
+      "key_result": "O1.1",
+      "owner": "research",
+      "status": "planned"
+    },
+    {
+      "id": "I3",
+      "title": "Synthesise after 5 interviews: mark H1 to H8 confirmed or disproved; update the ICP",
+      "key_result": "O1.2",
+      "owner": "research",
+      "status": "planned"
+    },
+    {
+      "id": "I4",
+      "title": "Ask every interviewee for a 30-day anonymised payout export at the end of the call",
+      "key_result": "O1.3",
+      "owner": "research",
+      "status": "planned"
+    },
+    {
+      "id": "I5",
+      "title": "Define the shadow report format and produce it from an export with the existing import, decide and replay",
+      "key_result": "O2.1",
+      "owner": "product",
+      "status": "planned",
+      "epic": "SHD"
+    },
+    {
+      "id": "I6",
+      "title": "Book a second meeting with compliance for each platform that shares an export, and demo from the deployed instance",
+      "key_result": "O2.2",
+      "owner": "growth",
+      "status": "planned"
+    },
+    {
+      "id": "I7",
+      "title": "Test a pilot fee range in second meetings, then run pricing-strategy with the evidence",
+      "key_result": "O2.3",
+      "owner": "product",
+      "status": "planned"
+    },
+    {
+      "id": "I8",
+      "title": "Founder reviews and decides stages 3 and 5 from the strategy docs (Passed, Deferred or changes)",
+      "key_result": "O2.3",
+      "owner": "founder",
+      "status": "planned"
+    },
+    {
+      "id": "I9",
+      "title": "Close the S9 founder items: Render and Neon accounts, ANTHROPIC_API_KEY, funded Sepolia wallets",
+      "key_result": "O3.1",
+      "owner": "founder",
+      "status": "planned"
+    },
+    {
+      "id": "I10",
+      "title": "Deploy to the EU region and run the live testnet demo; fix mismatches in spec/11",
+      "key_result": "O3.1",
+      "owner": "engineer",
+      "status": "planned",
+      "epic": "DEM"
+    },
+    {
+      "id": "I11",
+      "title": "Build P1 story groups: keys and scopes, errors, versions, rate limits, request logs, then webhooks",
+      "key_result": "O3.2",
+      "owner": "engineer",
+      "status": "planned",
+      "epic": "API"
+    }
+  ]
 }

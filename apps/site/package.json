@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test:logic": "node --test tests/logic.test.mjs",
+    "test:logic": "node --test tests/logic.test.mjs tests/palette.test.mjs",
     "test:site": "node --test tests/site.test.mjs",
     "test": "npm run test:logic && npm run build && npm run test:site"
   },
@@ -16,7 +16,7 @@
     "@fontsource-variable/space-grotesk": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "astro": "^5.18.2",
-    "three": "^0.187.0"
+    "three": "^0.170.0"
   },
   "engines": {
     "node": ">=22"

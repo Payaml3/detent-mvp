@@ -1,35 +1,46 @@
 ---
 import config from "../../site.config.mjs";
 import { PAYMENT_ID } from "../scripts/scenarios.mjs";
-// The example payment, phase by phase. Shown in final form without script; played in order with it.
+// Landing UX (docs/design/landing-page-ux.md §3.1): headline A, the category line, Book a demo as the
+// primary action and Talk to us beside it (B-04), the example payment played layer by layer, and the "sift then settle" art (Q2: replaces
+// the D-21 AI-agent figure, so the first screen shows the rules deciding). Final state shows without script.
 const phases = [
-  { layer: "decision", agent: "Instruction agent proposed $18,500.00 USDC to Bluefin Components Ltd (fictional), from invoice INV-2026-0142.", status: "ESCALATED", rule: "Rules: escalate. First payment, above the $10,000 auto limit." },
-  { layer: "decision", agent: "Sam, the reviewer, read the raw facts and approved with a reason.", status: "READY", rule: "Rules ran again on the active version: execute." },
-  { layer: "orchestration", agent: "Best rail by policy: Base Sepolia (testnet). Sent once.", status: "SUBMITTED", rule: "One attempt in flight. Payment ID unchanged." },
-  { layer: "orchestration", agent: "The rail’s answer was lost. Investigation agent: transaction seen on chain, awaiting confirmations.", status: "UNKNOWN", rule: "Rules: a timeout is UNKNOWN, never FAILED. Nothing is resent." },
+  { layer: "decision", agent: "Agent prepared $18,500.00 USDC to Bluefin Components Ltd, from invoice INV-2026-0142.", status: "ESCALATED", rule: "Your rules: escalate. First payment, above the $10,000 auto limit." },
+  { layer: "decision", agent: "Sam, the reviewer, read the raw facts and approved with a reason.", status: "READY", rule: "Your rules ran again on the active version: execute." },
+  { layer: "orchestration", agent: "Best rail by policy: Base. Sent once.", status: "SUBMITTED", rule: "One attempt in flight. Payment ID unchanged." },
+  { layer: "orchestration", agent: "The rail’s answer was lost. Agent found the transaction on chain, awaiting confirmations.", status: "UNKNOWN", rule: "A timeout is UNKNOWN, never FAILED. Nothing is resent." },
   { layer: "orchestration", agent: "Receipt found after 3 confirmations.", status: "CONFIRMED", rule: "Transfers on the rail: 1." },
-  { layer: "operations", agent: "Reconciliation agent matched the ledger posting to the chain transfer.", status: "CONFIRMED", rule: "Audit chain verified. The payment replays to its decision." },
+  { layer: "operations", agent: "Agent matched the ledger posting to the chain transfer.", status: "CONFIRMED", rule: "Audit chain verified. The payment replays to its decision." },
 ];
 const cards = [
-  { id: "decision", name: "Decision", question: "Should this payment happen?" },
-  { id: "orchestration", name: "Orchestration", question: "How and where should it execute?" },
-  { id: "operations", name: "Operations", question: "How is it monitored, reconciled and proven?" },
+  { id: "decision", word: "Sift", name: "Decision", question: "Should this payment happen?" },
+  { id: "orchestration", word: "Settle", name: "Orchestration", question: "How and where does it go?" },
+  { id: "operations", word: "Prove", name: "Operations", question: "Can you show what happened?" },
 ];
 const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
+const category = config.category.charAt(0).toUpperCase() + config.category.slice(1);
 ---
 <section class="hero" data-section="hero" aria-labelledby="hero-title">
-  <canvas class="agent" aria-hidden="true" data-agent></canvas>
+  <canvas class="art" aria-hidden="true" data-hero-sift data-art={config.heroArt ?? "agent"}></canvas>
+  {(config.heroArt ?? "agent") === "agent" && <>
+    <span class="art-label small" data-art-label="agent" aria-hidden="true" hidden>AI agent prepares</span>
+    <span class="art-label small" data-art-label="rules" aria-hidden="true" hidden>Your rules decide</span>
+    <span class="art-label art-bubble small" data-art-label="bubble" aria-hidden="true" hidden><span data-bubble-text></span><i aria-hidden="true"></i></span>
+    <span class="art-label art-verdict small" data-art-label="verdict" data-verdict aria-hidden="true" hidden></span>
+    {["read", "check", "propose"].map((tool) => <span class="art-tool" data-art-tool data-tool={tool} aria-hidden="true" hidden>{tool}</span>)}
+  </>}
   <div class="wrap hero-grid">
     <div class="intro">
       <h1 id="hero-title" class="headline">
-        <span class="line"><span>Every payout decided,</span></span>
-        <span class="line"><span>sent once, reconciled.</span></span>
+        <span class="line"><span>Every deposit and payout,</span></span>
+        <span class="line"><span>decided by your rules.</span></span>
       </h1>
-      <p class="lead" data-reveal>{config.category.charAt(0).toUpperCase() + config.category.slice(1)} across any rail. AI agents do the work in every layer; your rules make every decision.</p>
+      <p class="lead" data-reveal>{category}: one layer that decides, orchestrates and operates every deposit and payout, under your rules.</p>
       <div class="actions" data-reveal>
         <a class="button" href={config.bookingUrl}>Book a demo</a>
-        <a class="textlink" href="/access/">Request sandbox access</a>
+        <a class="button secondary" href={`mailto:${config.salesInbox}`}>Talk to us</a>
       </div>
+      <p class="honesty small" data-reveal>Sits beside your rails · never holds your funds or keys</p>
     </div>
     <div class="cards" data-ui data-hero-cards aria-label="Example payment, step by step">
       <p class="card-top"><span class="small soft">Example payment</span><span class="mono pid">{PAYMENT_ID}</span></p>
@@ -37,57 +48,98 @@ const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
         const f = finalFor(c.id);
         return (
           <article class="card" data-card={c.id}>
-            <p class="card-name">{c.name}</p>
+            <p class="card-name"><span class="word">{c.word}</span><span class="soft">{c.name}</span></p>
             <h2 class="card-q">{c.question}</h2>
             <p class="card-agent"><span class="agent-dot" aria-hidden="true"></span><span data-agent-line>{f.agent}</span></p>
             <p class="card-rule"><span class={`chip st-${f.status}`} data-chip>{f.status}</span><span data-rule-line>{f.rule}</span></p>
           </article>
         );
       })}
-      <p class="small soft foot">AI agents prepare. Your rules decide. Fictional supplier, test network.</p>
+      <p class="small soft foot">Example payment with sample data.</p>
     </div>
   </div>
   <script type="application/json" data-hero-phases set:html={JSON.stringify(phases)} />
 </section>
 
 <style>
-  .hero { position: relative; min-height: max(780px, 100svh); overflow: hidden; background:
-    radial-gradient(55% 65% at 52% 58%, rgba(47, 107, 255, 0.30), transparent 70%), /* taste-skill-ignore: gradients allowed by founder decision D-19 */
-    radial-gradient(35% 35% at 10% 95%, rgba(242, 98, 46, 0.10), transparent 70%), var(--ink-deep); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
-  .agent { position: absolute; left: 24%; top: 22%; width: 44%; height: 84%; }
-  .hero-grid { position: relative; z-index: 2; min-height: max(780px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
-    column-gap: 24px; padding-top: 128px; padding-bottom: 48px; pointer-events: none; }
+  /* A graphite field (B-02): the page's tokens, swapped for this one band. Cards keep the light roles. */
+  :global(body:has(.hero)) { --ink: var(--text); --paper: var(--bg); --ink-soft: var(--text-soft); --ink-surface: var(--surface); }
+  :global(body:has(.hero) .nav) { --text: var(--paper); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --interactive-soft: var(--signal); }
+  .hero { position: relative; min-height: max(760px, 100svh); overflow: hidden; background: var(--ink); isolation: isolate; }
+  /* cinematic light: one soft falloff behind the stack, and film grain over the whole field */
+  .hero::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(60% 70% at 72% 38%, color-mix(in srgb, var(--paper) 9%, transparent), transparent 70%),
+      radial-gradient(30% 30% at 70% 88%, color-mix(in srgb, var(--signal) 14%, transparent), transparent 70%); }
+  .hero::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.09; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .art { z-index: 1; }
+  .art-label { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; white-space: nowrap; font-weight: 600; letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--paper) 78%, var(--ink)); padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--paper) 8%, transparent); }
+  .art-bubble { font: 500 12px/1.45 var(--font-mono); border-radius: 10px 10px 10px 2px; padding: 8px 12px; min-height: 1.4em; white-space: normal; width: 210px;
+    background: color-mix(in srgb, var(--paper) 10%, var(--ink)); border: 1px solid color-mix(in srgb, var(--paper) 20%, var(--ink)); color: var(--paper); }
+  .art-bubble i { display: inline-block; width: 7px; height: 13px; margin-left: 2px; vertical-align: -2px; background: var(--signal); animation: caret 1s steps(1) infinite; }
+  @keyframes caret { 50% { opacity: 0; } }
+  .art-verdict { opacity: 0; transition: opacity 240ms; white-space: normal; width: max-content; max-width: 260px; text-align: center; border-radius: 10px; padding: 8px 12px; font-weight: 500; line-height: 1.35; }
+  .art-verdict :global(b) { display: block; font-weight: 700; letter-spacing: 0.04em; }
+  .art-verdict.on { opacity: 1; }
+  .art-label { transition: opacity 240ms; }
+  .art-label.off { opacity: 0; }
+  .art-verdict[data-kind="EXECUTE"], .art-verdict[data-kind="APPROVED"] { background: var(--ok); color: var(--paper); }
+  .art-verdict[data-kind="ESCALATE"] { background: var(--signal); color: var(--on-signal); }
+  .art-verdict[data-kind="BLOCK"] { background: var(--paper); color: var(--ink); }
+  .art-verdict[data-kind="BLOCK"] :global(b)::before { content: "✕ "; }
+  .art-tool { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; font: 500 11px/1 var(--font-mono); letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--paper) 70%, var(--ink)); padding: 3px 7px; border-radius: 4px; transition: background 200ms, color 200ms; }
+  .art-tool.on { color: var(--ink); background: var(--paper); }
+  .art-tool.on[data-tool="propose"] { background: var(--signal); color: var(--on-signal); }
+  .art-label[data-art-label="rules"] { color: var(--signal); background: color-mix(in srgb, var(--signal) 12%, transparent); }
+  .hero-grid { --text: var(--paper); --bg: var(--ink); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --line: color-mix(in srgb, var(--paper) 18%, var(--ink)); color: var(--text); }
+  .cards .card { --text: var(--ink); --bg: var(--paper); --text-soft: var(--ink-soft); color: var(--text); }
+  .hero .secondary { color: var(--paper); border-color: var(--paper); background: transparent; }
+  .hero .secondary:hover { background: color-mix(in srgb, var(--paper) 12%, transparent); }
+  .art { position: absolute; right: 0; top: 0; width: 58%; height: 74%; pointer-events: none; }
+  .hero-grid { position: relative; z-index: 2; min-height: max(760px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 1fr auto; column-gap: 24px; row-gap: 56px; padding-top: 136px; padding-bottom: 48px; pointer-events: none; }
   .hero-grid > * { pointer-events: auto; }
-  .intro { grid-column: 1 / span 6; display: grid; gap: 28px; align-content: start; }
-  .headline { font-size: clamp(42px, 5.4vw, 88px); line-height: 0.98; }
+  .intro { grid-column: 1 / span 7; display: grid; gap: 28px; align-content: start; }
+  .headline { font-size: clamp(44px, 4.6vw, 80px); line-height: 0.98; }
+  .line > span { white-space: nowrap; }
   .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
-  .line > span { display: inline-block; white-space: nowrap; animation: rise 900ms var(--ease-out) both; }
+  .line > span { display: inline-block; animation: rise 900ms var(--ease-out) both; }
   .line:nth-child(2) > span { animation-delay: 110ms; }
   @keyframes rise { from { transform: translateY(105%); } }
-  .lead { max-width: 30ch; }
-  .actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
-  .cards { grid-column: 9 / span 4; align-self: center; display: grid; gap: 8px; }
-  .card-top { display: grid; gap: 2px; padding: 0 4px 4px; }
-  .pid { color: var(--paper-soft); word-break: break-all; }
-  .card { background: rgba(20, 29, 54, 0.92); border: 1px solid var(--ink-line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; /* taste-skill-ignore: inside a data-ui interface fragment */
-    transition: border-color 300ms, background 300ms, transform 300ms var(--ease-out); }
-  .card.active { border-color: var(--blue); background: rgba(23, 40, 92, 0.86); transform: translateX(-6px); }
-  .card-name { font-size: 12px; font-weight: 600; color: var(--blue-soft); letter-spacing: 0.01em; }
+  .lead { max-width: 36ch; color: var(--text-soft); }
+  .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .honesty { color: var(--text-soft); letter-spacing: 0.01em; }
+  .cards { grid-column: 1 / -1; align-self: end; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .card-top, .foot { grid-column: 1 / -1; display: flex; gap: 12px; align-items: baseline; }
+  .card-top { padding: 0 4px 4px; }
+  .pid { color: var(--text-soft); word-break: break-all; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; /* taste-skill-ignore: inside a data-ui interface fragment */
+    transition: border-color 300ms, transform 300ms var(--ease-out), opacity 300ms; }
+  .card.idle { --text: var(--ink-soft); }
+  .card.active { border-color: var(--interactive); transform: translateX(-6px); }
+  .card-name { display: flex; gap: 8px; align-items: baseline; font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
+  .word { color: var(--interactive); font: 600 15px/1 var(--font-head); }
   .card-q { font: 600 18px/1.2 var(--font-head); letter-spacing: -0.01em; }
-  .card-agent { display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start; color: var(--paper); }
-  .agent-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--orange); }
-  .card-rule { display: grid; gap: 6px; justify-items: start; color: var(--paper-soft); }
+  .card-agent { display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start; color: var(--text); }
+  .agent-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--text-soft); }
+  .card-rule { display: grid; gap: 6px; justify-items: start; color: var(--text-soft); }
   .foot { padding: 4px; }
   @media (max-width: 1100px) {
-    .agent { left: 30%; width: 70%; height: 70%; top: 10%; }
-    .intro { grid-column: 1 / span 8; }
-    .cards { grid-column: 1 / span 7; margin-top: 48vh; align-self: start; }
+    .art { width: 60%; height: 52%; top: 10%; opacity: 0.55; }
+    .intro { grid-column: 1 / span 9; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   }
   @media (max-width: 680px) {
-    .agent { left: 0; width: 100%; top: 400px; height: 300px; }
+    .art, .art-label, .art-tool { display: none; }
+    .hero-grid { padding-top: 112px; }
     .intro, .cards { grid-column: 1 / -1; }
-    .headline { font-size: 8.2vw; }
-    .cards { margin-top: 310px; }
+    .headline { font-size: clamp(28px, 7.8vw, 52px); }
+    .line, .line > span { display: inline; animation: none; white-space: normal; }
+    .line + .line::before { content: " "; }
+    .actions .button { width: 100%; justify-content: center; }
+    .cards { margin-top: 48px; }
   }
 </style>
 
@@ -96,13 +148,16 @@ const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
   const phases = JSON.parse(document.querySelector("[data-hero-phases]").textContent);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const cards = Object.fromEntries([...root.querySelectorAll("[data-card]")].map((c) => [c.dataset.card, c]));
-  const blank = { decision: null, orchestration: null, operations: null };
+  let sift = null;
+  const canvas = document.querySelector("[data-hero-sift]");
+  if (canvas && getComputedStyle(canvas).display !== "none") (canvas.dataset.art === "layers" ? import("../scripts/gate3d.js").then((m) => m.mountGate(canvas)) : canvas.dataset.art === "mark" ? import("../scripts/mark3d.js").then((m) => m.mountMark(canvas)) : import("../scripts/agent3d.js").then((m) => m.mountAgent(canvas))).then((art) => { sift = art; sift?.setState(phases.at(-1).status, true); });
+  else canvas?.remove();
   const show = (i) => {
     const p = phases[i];
     for (const [id, card] of Object.entries(cards)) {
       card.classList.toggle("active", id === p.layer);
-      const latest = [...phases.slice(0, i + 1)].reverse().find((x) => x.layer === id) || blank[id];
-      card.style.opacity = latest ? "1" : "0.72";
+      const latest = [...phases.slice(0, i + 1)].reverse().find((x) => x.layer === id);
+      card.classList.toggle("idle", !latest && id !== p.layer);
       if (!latest) continue;
       card.querySelector("[data-agent-line]").textContent = latest.agent;
       card.querySelector("[data-rule-line]").textContent = latest.rule;
@@ -110,14 +165,11 @@ const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
       chip.textContent = latest.status;
       chip.className = `chip st-${latest.status}`;
     }
+    sift?.setState(p.status, p.status === "CONFIRMED");
   };
   if (!reduce) {
     let i = 0;
     const tick = () => { show(i); const last = i === phases.length - 1; i = last ? 0 : i + 1; setTimeout(tick, last ? 5200 : 2600); };
     tick();
   }
-  const canvas = document.querySelector("[data-agent]");
-  const gl = canvas && (() => { try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; } })();
-  if (gl) import("../scripts/agent.js").then(({ mountAgent }) => mountAgent(canvas));
-  else canvas?.remove();
 </script>

@@ -1,0 +1,74 @@
+---
+// The create-payment-intent request in eight languages, with the decision that comes back (DOC/WEB).
+const body = `{
+  "kind": "payout",
+  "source": "platform",
+  "counterparty_id": "cpt_bluefin",
+  "destination": { "kind": "evm_wallet", "network": "base", "address": "0x5aAe8Bc3d27F1E6a904C2b7D5e31F0A9c4B19F3c" },
+  "amount": { "amount": "18500.00", "currency": "USDC" },
+  "reference": "INV-2026-0142"
+}`;
+const url = "https://api.example.invalid/v1/payment_intents";
+const samples = [
+  { lang: "cURL", code: `curl ${url} \\\n  -H "Authorization: Bearer $API_KEY" \\\n  -H "Idempotency-Key: inv-2026-0142" \\\n  -H "Content-Type: application/json" \\\n  -d '${body.replace(/\n\s*/g, " ")}'` },
+  { lang: "Python", code: `import os, requests\n\nr = requests.post(\n    "${url}",\n    headers={"Authorization": f"Bearer {os.environ['API_KEY']}",\n             "Idempotency-Key": "inv-2026-0142"},\n    json={"kind": "payout", "source": "platform", "counterparty_id": "cpt_bluefin",\n          "destination": {"kind": "evm_wallet", "network": "base",\n                          "address": "0x5aAe8Bc3d27F1E6a904C2b7D5e31F0A9c4B19F3c"},\n          "amount": {"amount": "18500.00", "currency": "USDC"},\n          "reference": "INV-2026-0142"},\n)\nprint(r.json()["status"])  # ESCALATED` },
+  { lang: "TypeScript", code: `const res = await fetch("${url}", {\n  method: "POST",\n  headers: {\n    Authorization: \`Bearer \${process.env.API_KEY}\`,\n    "Idempotency-Key": "inv-2026-0142",\n    "Content-Type": "application/json",\n  },\n  body: JSON.stringify(${body.replace(/\n/g, "\n  ")}),\n});\nconsole.log((await res.json()).status); // ESCALATED` },
+  { lang: "Go", code: `body := strings.NewReader(\`${body}\`)\nreq, _ := http.NewRequest("POST", "${url}", body)\nreq.Header.Set("Authorization", "Bearer "+os.Getenv("API_KEY"))\nreq.Header.Set("Idempotency-Key", "inv-2026-0142")\nreq.Header.Set("Content-Type", "application/json")\nres, err := http.DefaultClient.Do(req)` },
+  { lang: "Java", code: `var req = HttpRequest.newBuilder(URI.create("${url}"))\n    .header("Authorization", "Bearer " + System.getenv("API_KEY"))\n    .header("Idempotency-Key", "inv-2026-0142")\n    .header("Content-Type", "application/json")\n    .POST(HttpRequest.BodyPublishers.ofString(BODY))\n    .build();\nvar res = HttpClient.newHttpClient().send(req, HttpResponse.BodyHandlers.ofString());` },
+  { lang: "C#", code: `using var http = new HttpClient();\nhttp.DefaultRequestHeaders.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("API_KEY")}");\nhttp.DefaultRequestHeaders.Add("Idempotency-Key", "inv-2026-0142");\nvar res = await http.PostAsync("${url}",\n    new StringContent(Body, Encoding.UTF8, "application/json"));` },
+  { lang: "PHP", code: `$ch = curl_init("${url}");\ncurl_setopt_array($ch, [\n  CURLOPT_POST => true,\n  CURLOPT_RETURNTRANSFER => true,\n  CURLOPT_HTTPHEADER => [\n    "Authorization: Bearer " . getenv("API_KEY"),\n    "Idempotency-Key: inv-2026-0142",\n    "Content-Type: application/json",\n  ],\n  CURLOPT_POSTFIELDS => $body,\n]);\n$res = json_decode(curl_exec($ch), true);` },
+  { lang: "Ruby", code: `require "net/http"\nuri = URI("${url}")\nreq = Net::HTTP::Post.new(uri, "Content-Type" => "application/json",\n  "Authorization" => "Bearer #{ENV.fetch('API_KEY')}",\n  "Idempotency-Key" => "inv-2026-0142")\nreq.body = BODY\nres = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |h| h.request(req) }` },
+];
+const response = `{
+  "id": "pay_01JDQ3H7ZK4M9V2B8XWT6CNR5E",
+  "status": "ESCALATED",
+  "decision": {
+    "outcome": "ESCALATE",
+    "policy_version": 1,
+    "checks": [
+      { "check": "kyb_status", "result": "PASS" },
+      { "check": "screening", "result": "PASS" },
+      { "check": "first_payment", "result": "ESCALATE",
+        "reason": "FIRST_PAYMENT" },
+      { "check": "auto_limit", "result": "ESCALATE",
+        "reason": "ABOVE_AUTO_LIMIT" }
+    ]
+  }
+}`;
+---
+<div class="code" data-tabs-code>
+  <div class="langs" role="tablist" aria-label="Language">
+    {samples.map((s, i) => <button type="button" role="tab" aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1} data-lang={i}>{s.lang}</button>)}
+  </div>
+  {samples.map((s, i) => <pre data-code={i} hidden={i !== 0}><code>{s.code}</code></pre>)}
+  <div class="response" data-ui>
+    <p class="small soft">Response · 201</p>
+    <pre><code>{response}</code></pre>
+  </div>
+</div>
+<style>
+  .code { display: grid; gap: 8px; min-width: 0; }
+  .langs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .langs button { border: 0; border-radius: 6px; padding: 8px 13px; background: var(--surface); color: var(--text-soft); font: 500 14px var(--font-body); cursor: pointer; transition: background 160ms, color 160ms; }
+  .langs button:hover { color: var(--text); }
+  .langs button[aria-selected="true"] { background: var(--text); color: var(--bg); }
+  pre { margin: 0; background: var(--surface-sunk); border-radius: var(--radius); padding: 22px; overflow-x: auto; font: 13px/1.6 var(--font-mono); color: var(--code); }
+  .response { background: var(--surface-sunk); border-radius: var(--radius); padding: 16px 20px; display: grid; gap: 8px; }
+  .response pre { background: transparent; padding: 0; color: var(--code-key); }
+</style>
+<script>
+  const root = document.querySelector("[data-tabs-code]");
+  const tabs = [...root.querySelectorAll('[role="tab"]')];
+  const pres = [...root.querySelectorAll("[data-code]")];
+  const select = (i) => {
+    tabs.forEach((t, k) => { t.setAttribute("aria-selected", String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    pres.forEach((p, k) => (p.hidden = k !== i));
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => select(i));
+    t.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { e.preventDefault(); select((i + 1) % tabs.length); tabs[(i + 1) % tabs.length].focus(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); const j = (i + tabs.length - 1) % tabs.length; select(j); tabs[j].focus(); }
+    });
+  });
+</script>

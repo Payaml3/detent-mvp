@@ -15,7 +15,7 @@
   /* Tokens come from DESIGN.md in the solo-to-scale plugin repo; CI checks they match. Light here, dark twice below (system setting, then the toggle). */
   --paper: #fafafa; --surface: #ffffff; --sunk: #f2f2f2; --ink: #171717; --muted: #666666; --line: #ebebeb; --line-strong: #c9c9c9;
   --accent: #171717; --on-accent: #ffffff; --on-status: #ffffff; --link: #0068d6; --done: #1a7f37; --progress: #ab570a; --todo: #6e6e6e; --waiting: #cb2a2f;
-  --g-business: #ab570a; --g-product: #7928ca; --g-technical: #0068d6;
+  --g-business: #ab570a; --g-product: #7928ca; --g-technical: #0068d6; --series: #0068d6;
   --shadow: 0 1px 1px rgba(0,0,0,.02), 0 2px 2px rgba(0,0,0,.04); --radius: 8px;
   --body: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -25,7 +25,7 @@
   :root:not([data-theme="light"]) {
     --paper: #000000; --surface: #0a0a0a; --sunk: #1a1a1a; --ink: #ededed; --muted: #a1a1a1; --line: #2e2e2e; --line-strong: #454545;
     --accent: #ededed; --on-accent: #0a0a0a; --on-status: #0a0a0a; --link: #52a8ff; --done: #62c073; --progress: #f2a33a; --todo: #8f8f8f; --waiting: #ff6166;
-    --g-business: #f2a33a; --g-product: #bf7af0; --g-technical: #52a8ff;
+    --g-business: #f2a33a; --g-product: #bf7af0; --g-technical: #52a8ff; --series: #3d95f5;
     --shadow: none;
     color-scheme: dark;
   }
@@ -33,7 +33,7 @@
 :root[data-theme="dark"] {
   --paper: #000000; --surface: #0a0a0a; --sunk: #1a1a1a; --ink: #ededed; --muted: #a1a1a1; --line: #2e2e2e; --line-strong: #454545;
   --accent: #ededed; --on-accent: #0a0a0a; --on-status: #0a0a0a; --link: #52a8ff; --done: #62c073; --progress: #f2a33a; --todo: #8f8f8f; --waiting: #ff6166;
-  --g-business: #f2a33a; --g-product: #bf7af0; --g-technical: #52a8ff;
+  --g-business: #f2a33a; --g-product: #bf7af0; --g-technical: #52a8ff; --series: #3d95f5;
   --shadow: none;
   color-scheme: dark;
 }
@@ -75,7 +75,7 @@ h3 { font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px
 .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; align-items: start; }
 .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
 .tile .k { font-size: .8rem; color: var(--muted); }
-.tile .v { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.25; margin-top: 2px; }
+.tile .v { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.03em; line-height: 1.25; margin-top: 2px; }
 .tile .s { font-size: .8rem; color: var(--muted); }
 .tile.alert { border-color: var(--waiting); } .tile.alert .v { color: var(--waiting); }
 .table-wrap { overflow-x: auto; }
@@ -124,7 +124,7 @@ ul.list li:last-child { border-bottom: 0; }
 .gantt { position: relative; min-width: 680px; --lab: 220px; font-size: .85rem; padding-top: 20px; }
 @media (max-width: 760px) { .gantt { --lab: 140px; min-width: 560px; } }
 .g-row { display: grid; grid-template-columns: var(--lab) minmax(0, 1fr); align-items: center; min-height: 30px; border-bottom: 1px solid var(--line); }
-.g-row:hover .g-lab, .g-row:hover { background: var(--sunk); }
+@media (hover: hover) and (pointer: fine) { .g-row:hover .g-lab, .g-row:hover { background: var(--sunk); } }
 .g-lab { position: sticky; left: 0; z-index: 2; background: var(--surface); padding: 4px 10px 4px 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .g-lab small { color: var(--muted); font-family: var(--mono); font-size: .72rem; margin-right: 6px; }
 .g-row.g-group { min-height: 34px; } .g-row.g-group .g-lab { font-weight: 600; }
@@ -250,7 +250,7 @@ a.act:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .rung .pill { margin-top: 2px; }
 .s-passed { color: var(--done); } .s-deferred { color: var(--progress); } .s-notpassed { color: var(--waiting); }
 .track .ph span em { font-style: normal; }
-a.tile { display: block; color: inherit; text-decoration: none; } a.tile:hover { border-color: var(--line-strong); }
+a.tile { display: block; color: inherit; text-decoration: none; } @media (hover: hover) and (pointer: fine) { a.tile:hover { border-color: var(--line-strong); } }
 a.tile:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .grid.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .hub { display: block; width: 100%; max-width: 600px; height: auto; margin: 4px auto 0; overflow: visible; }
@@ -298,7 +298,6 @@ a.tile:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .facts dt { color: var(--muted); } .facts dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; }
 .facts dd.bad { color: var(--waiting); } .facts dd.warnv { color: var(--progress); }
 .charts.c1 { grid-template-columns: 1fr; gap: 14px; }
-.charts.c1 .chart { max-width: 440px; height: 56px; }
 
 @media (max-width: 760px) { .grid.g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .jhead { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 14px; }
@@ -307,7 +306,7 @@ a.tile:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .jwarn { color: var(--waiting); font-size: .85rem; margin: 0 0 12px; }
 .jmap { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
 .jp a { display: flex; flex-direction: column; gap: 4px; height: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); color: inherit; text-decoration: none; background: var(--surface); }
-.jp a:hover { border-color: var(--line-strong); } .jp a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .jp a:hover { border-color: var(--line-strong); } } .jp a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .jp.on a { border: 2px solid var(--accent); padding: 9px; background: var(--sunk); }
 .jp.next a, .jp.part a { color: var(--muted); }
 .jp.gap a { border-color: var(--waiting); }
@@ -355,14 +354,12 @@ a.tile:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .spark { display: block; width: 96px; height: 24px; }
 .spark polyline { fill: none; stroke: var(--link); stroke-width: 1.5; }
 .spark circle { fill: var(--link); }
-.chart { display: block; width: 100%; height: 64px; }
-.chart rect.a { fill: var(--done); } .chart rect.b { fill: var(--line); } .chart rect.c { fill: var(--progress); }
 .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
 .charts .k { font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
 .lvl-escalated { color: var(--waiting); font-weight: 600; } .lvl-overdue { color: var(--progress); font-weight: 600; }
 .meta .stale { color: var(--waiting); font-weight: 600; }
 .bars { display: block; width: 100%; max-width: 560px; height: 72px; }
-.bars rect { fill: var(--progress); } .bars line { stroke: var(--waiting); stroke-dasharray: 4 3; stroke-width: 1; }
+.bars path { fill: var(--series); } .bars line { stroke: var(--muted); stroke-dasharray: 4 3; stroke-width: 1; }
 .agent a.open { align-self: flex-start; font-size: .85rem; font-weight: 600; }
 .agentpage { scroll-margin-top: 56px; border: 1px solid var(--line-strong); box-shadow: 0 2px 2px rgba(0,0,0,.04), 0 8px 16px -4px rgba(0,0,0,.06); border-radius: 12px; padding: 14px; margin-bottom: 18px; background: var(--surface); }
 .agentpage .head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
@@ -415,17 +412,165 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
   header { padding-top: 24px; }
 }
 
+/* Header buttons, the stat strip on inner tabs, and the search palette (⌘K). */
+.hbtns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.theme svg { flex: none; }
+.theme kbd { font: 500 .7rem var(--mono); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; background: var(--sunk); }
+.theme[aria-pressed="true"] { border-color: var(--accent); }
+@media (max-width: 599px) { .hbtns { flex-wrap: nowrap; gap: 6px; } .theme span, .theme kbd { display: none; } .theme { padding: 0 10px; } }
+.strip { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font: .78rem/1.4 var(--mono); }
+.strip a { color: var(--muted); text-decoration: none; display: inline-flex; gap: 6px; align-items: baseline; }
+.strip a b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; } .strip a.alert b { color: var(--waiting); }
+@media (hover: hover) and (pointer: fine) { .strip a:hover span { color: var(--ink); } }
+.veil { position: fixed; inset: 0; z-index: 10; background: color-mix(in srgb, var(--paper) 55%, transparent); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); display: flex; justify-content: center; align-items: flex-start; padding: 12vh 16px 16px; }
+@keyframes fadein { from { opacity: 0; } }
+.palette { width: 100%; max-width: 620px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; box-shadow: 0 2px 2px rgba(0,0,0,.04), 0 16px 32px -8px rgba(0,0,0,.18); overflow: hidden; }
+.palette input { width: 100%; height: 48px; border: 0; border-bottom: 1px solid var(--line); padding: 0 16px; font: inherit; font-size: 1rem; background: transparent; color: var(--ink); outline: none; }
+.palette ul { list-style: none; margin: 0; padding: 6px; max-height: 52vh; overflow-y: auto; }
+.palette li { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: .9rem; overflow-wrap: anywhere; }
+.palette li[aria-selected="true"] { background: var(--sunk); box-shadow: inset 2px 0 0 var(--accent); }
+.palette li.empty { cursor: default; }
+.palette .ext { color: var(--muted); }
+/* Panel heads with a count or state on the right. */
+.phead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.phead h2 { margin: 0; }
+.pmeta { font: .75rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* The agents as compact rows; the whole row opens the agent's record. */
+.arows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.arow { display: grid; grid-template-columns: 32px minmax(140px, 1.2fr) 150px minmax(0, 2fr) 120px 90px 150px; gap: 12px; align-items: center; padding: 10px 12px; border-top: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: .88rem; transition: background-color 150ms ease; }
+.arow:first-child { border-top: 0; }
+.arow.head { background: var(--sunk); color: var(--muted); font-size: .75rem; padding-top: 7px; padding-bottom: 7px; }
+.arow .c-who b { display: block; font-weight: 600; } .arow .slug { font: .72rem var(--mono); color: var(--muted); }
+.arow .c-on { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--link); }
+.arow .c-wake, .arow .c-grade, .arow .c-spend { font: .78rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.arow .c-grade { text-align: right; } .arow .c-spend .bar { margin-top: 4px; }
+@media (hover: hover) and (pointer: fine) { a.arow:hover { background: var(--sunk); } }
+a.arow:focus-visible { outline: 2px solid var(--link); outline-offset: -2px; }
+a.arow:active { transform: scale(0.99); }
+.arow.ghost > * { opacity: .55; }
+.arow.ghost > .avatar { outline: 1px dashed var(--line-strong); outline-offset: 2px; }
+@media (max-width: 899px) {
+  .arow { grid-template-columns: 32px minmax(0, 1fr) auto; grid-template-areas: "av who state" "av on on" "av wake spend"; row-gap: 4px; }
+  .arow.head { display: none; }
+  .arow > .avatar { grid-area: av; align-self: start; } .arow .c-who { grid-area: who; } .arow .c-state { grid-area: state; }
+  .arow .c-on { grid-area: on; } .arow .c-wake { grid-area: wake; } .arow .c-grade { display: none; } .arow .c-spend { grid-area: spend; text-align: right; }
+}
+/* Ghost nodes in the org chart: a role that is off. */
+.org .node.ghost { border-style: dashed; opacity: .6; box-shadow: none; }
+/* One agent's schema: Trigger → Agent → Output and grade. Every value carries a mono label naming its source. */
+.schema { display: grid; grid-template-columns: minmax(0, 1fr) 18px minmax(0, 1.15fr) 18px minmax(0, 1.2fr); align-items: stretch; margin: 4px 0 16px; }
+.schema .snode { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); padding: 14px; display: flex; flex-direction: column; gap: 3px; min-width: 0; font-size: .88rem; }
+.schema .snode.key { border-color: var(--line-strong); }
+.schema .snode.ghost { border-style: dashed; box-shadow: none; background: transparent; }
+.schema .snode.ghost > * { opacity: .65; }
+.schema .sh { font-weight: 600; font-size: .95rem; letter-spacing: -0.01em; margin-bottom: 4px; }
+.schema .joint { align-self: center; height: 1px; background: var(--line-strong); position: relative; }
+.schema .joint::after { content: ""; position: absolute; right: 0; top: -3px; border: 3.5px solid transparent; border-left: 5px solid var(--line-strong); border-right: 0; }
+.src { font: .7rem/1.5 var(--mono); color: var(--muted); margin-top: 8px; overflow-wrap: anywhere; }
+.snode .src:first-of-type { margin-top: 0; }
+.rubric { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.rubric li { display: flex; gap: 8px; align-items: flex-start; }
+.chip { flex: none; min-width: 20px; height: 20px; border-radius: 5px; border: 1px solid var(--line-strong); font: 500 .7rem/18px var(--mono); text-align: center; color: var(--muted); }
+.chk { font-family: var(--mono); color: var(--waiting); } .chk.ok { color: var(--done); }
+@media (max-width: 899px) {
+  .schema { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 16px auto 16px auto; }
+  .schema .joint { justify-self: center; width: 1px; height: 100%; }
+  .schema .joint::after { right: -3px; top: auto; bottom: 0; border: 3.5px solid transparent; border-top: 5px solid var(--line-strong); border-bottom: 0; }
+}
+/* The next-directions rail on the Roadmap: one column per version. */
+.rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 4px; }
+.rcol { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rver { font: 600 .8rem var(--mono); color: var(--muted); padding-bottom: 6px; border-bottom: 2px solid var(--line-strong); }
+.rcard { border: 1px solid var(--line); border-radius: var(--radius); background: var(--sunk); padding: 12px; display: flex; flex-direction: column; gap: 6px; font-size: .88rem; }
+@media (max-width: 599px) { .rail { grid-auto-flow: row; grid-auto-columns: auto; } }
+/* A file's raw text behind a disclosure. */
+details.source summary { cursor: pointer; font-weight: 600; list-style-position: outside; }
+details.source summary code { font: .85rem var(--mono); }
+details.source[open] summary { margin-bottom: 12px; }
+/* The team hub: hovering an agent brings it forward. */
+@media (hover: hover) and (pointer: fine) { .hub .node { transition: opacity 150ms ease; } .hub:has(.node:hover) .node:not(:hover) { opacity: .4; } }
+/* Compact density. */
+:root[data-density="compact"] body { font-size: 14px; }
+:root[data-density="compact"] main { padding-top: 14px; }
+:root[data-density="compact"] section { gap: 12px; }
+:root[data-density="compact"] .panel { padding: 14px; }
+:root[data-density="compact"] .tile { padding: 10px 12px; }
+:root[data-density="compact"] .tile .v { font-size: 1.35rem; }
+:root[data-density="compact"] td, :root[data-density="compact"] th { padding-top: 5px; padding-bottom: 5px; }
+:root[data-density="compact"] .arow { padding-top: 6px; padding-bottom: 6px; }
+:root[data-density="compact"] .grid { gap: 8px; }
+@media (prefers-reduced-motion: reduce) { .veil, .palette { animation: none; } }
+@media print { .hbtns, nav .strip { display: none; } }
+
+/* v2.14: attached cards, the company system, evals, run notes and the tab bar's stats. */
+.schemawrap { margin: 4px 0 16px; } .schemawrap .schema { margin: 0; }
+.attach { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 18px; }
+.schemawrap > .attach::before { content: ""; position: absolute; left: 50%; top: -18px; height: 18px; border-left: 1px dashed var(--line-strong); }
+.att { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 12px; font-size: .85rem; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.att .sh { font-weight: 600; font-size: .9rem; }
+.attl { margin: 2px 0 0; padding-left: 16px; } .attl li { margin: 2px 0; overflow-wrap: anywhere; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.tag { font: .75rem/1.6 var(--mono); padding: 0 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--sunk); overflow-wrap: anywhere; }
+.list.evals li { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.list.evals small, .ev small { display: block; color: var(--muted); font-size: .75rem; }
+.ev { text-align: right; flex: none; }
+.rnote { display: inline-block; max-width: 32ch; overflow-wrap: anywhere; font-size: .85rem; }
+.goalline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: inherit; text-decoration: none; }
+.goalline .k { font: .75rem/1.4 var(--mono); color: var(--muted); } .goalline b { font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; }
+@media (hover: hover) and (pointer: fine) { .goalline:hover { border-color: var(--line-strong); } }
+.schema.sys .fact { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
+.schema.sys .fact:first-of-type { border-top: 0; }
+.schema.sys .fact b { font-size: 1.1rem; font-weight: 600; } .schema.sys .fact .src { grid-column: 1 / -1; margin: 0; }
+@media (hover: hover) and (pointer: fine) { .schema.sys a.fact:hover span { text-decoration: underline; } }
+.schema.sys .frame { border-style: solid; outline: 1px dashed var(--line-strong); outline-offset: 4px; }
+.crew { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 4px; } .crew a { border-radius: 30%; } .crew a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.attach.mini { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; margin-top: 4px; }
+nav .strip { max-width: 1180px; margin: 0 auto; padding: 0 22px 8px; gap: 4px 16px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+nav .strip::-webkit-scrollbar { display: none; }
+nav .strip a { flex: none; }
+.led { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--todo); margin-right: 6px; vertical-align: 1px; }
+.crew .avatar::before { display: none; }
+.led.on { background: var(--done); animation: ledpulse 2.4s ease-in-out infinite; } .led.capped { background: var(--progress); }
+@keyframes ledpulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .led.on { animation: none; } }
+@media (min-width: 1000px) {
+  nav { display: flex; flex-direction: column; }
+  nav .strip { flex-direction: column; flex-wrap: nowrap; margin: auto 0 0; padding: 14px 22px 22px; border-top: 1px solid var(--line); gap: 8px; overflow: visible; }
+  nav .strip a { justify-content: space-between; }
+}
+
+/* v2.14.1: charts by the dataviz rules (HTML columns, legend, hover and focus on a whole day, a table twin) and press feedback. */
+.dchart { min-width: 0; }
+.dplot { position: relative; display: flex; align-items: flex-end; gap: 2px; height: 64px; border-bottom: 1px solid var(--line); }
+.charts.c1 .dplot { height: 56px; } .charts.c1 .dchart { max-width: 440px; }
+.dday { position: relative; flex: 1 1 0; height: 100%; display: flex; align-items: flex-end; justify-content: center; outline: none; border-radius: 4px 4px 0 0; }
+.dstack { width: 100%; max-width: 24px; display: flex; flex-direction: column-reverse; gap: 2px; }
+.dstack i { display: block; flex-basis: 0; min-height: 1px; } .dstack i:last-child { border-radius: 4px 4px 0 0; }
+.s-a { background: var(--series); } .s-b { background: var(--line-strong); } .s-c { background: var(--series); } .s-w { background: var(--miss, var(--waiting)); }
+.dday::after { content: none; position: absolute; bottom: calc(100% + 6px); left: 0; z-index: 3; white-space: nowrap; pointer-events: none; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: var(--paper); font: .75rem/1.4 var(--body); }
+.dday.r::after { left: auto; right: 0; }
+@media (hover: hover) and (pointer: fine) { .dday:hover { background: var(--sunk); } .dday:hover::after { content: attr(data-tip); } }
+.dday:focus-visible { background: var(--sunk); box-shadow: inset 0 0 0 2px var(--link); } .dday:focus-visible::after, .dday:active::after { content: attr(data-tip); }
+.daxis { display: flex; justify-content: space-between; font: .7rem/1.6 var(--mono); color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 0 0 6px; font-size: .75rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 5px; } .legend .sw { width: 8px; height: 8px; border-radius: 2px; }
+details.numbers { margin-top: 14px; } details.numbers summary { cursor: pointer; font-size: .85rem; color: var(--link); }
+.goalline, .schema.sys a.fact, .crew a { transition: border-color 150ms ease, transform 160ms var(--ease-out); }
+.goalline:active { transform: scale(0.995); } .crew a:active, .schema.sys a.fact:active { transform: scale(0.97); }
+@media (forced-colors: active) { .dstack i { forced-color-adjust: none; border: 1px solid CanvasText; } }
 </style>
 </head>
 <body>
 <header>
   <p class="back" id="back" hidden></p>
   <div class="top"><h1 id="title"></h1>
-  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark"><svg class="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/></svg><span>Theme</span></button></div>
+  <div class="hbtns"><button class="theme" id="find" type="button" aria-label="Search the dashboard" aria-keyshortcuts="Control+K Meta+K /"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg><span>Search</span><kbd id="find-key">⌘K</kbd></button>
+  <button class="theme" id="density" type="button" aria-pressed="false" aria-label="Compact layout"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg><span>Compact</span></button>
+  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark"><svg class="sun" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/></svg><svg class="moon" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/></svg><span>Theme</span></button></div></div>
   <p id="oneline"></p>
   <div class="meta" id="meta"></div>
 </header>
-<nav aria-label="Dashboard tabs"><div class="tabs" role="tablist" id="tabs"></div></nav>
+<nav aria-label="Dashboard tabs"><div class="tabs" role="tablist" id="tabs"></div><div class="strip" id="strip" aria-label="Today"></div></nav>
 <main id="main"></main>
 <script type="application/json" id="s2s-data">__S2S_DATA__</script>
 <script>
@@ -465,7 +610,8 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
   }
   function panel(title, note) {
     var p = el("div", { cls: "panel" });
-    if (title) p.appendChild(el("h2", { text: title }));
+    if (Array.isArray(title)) p.appendChild(el("div", { cls: "phead" }, el("h2", { text: title[0] }), title[1] ? el("span", { cls: "pmeta", text: title[1] }) : null));
+    else if (title) p.appendChild(el("h2", { text: title }));
     if (note) p.appendChild(el("p", { cls: "note", text: note }));
     for (var i = 2; i < arguments.length; i++) add(p, arguments[i]);
     return p;
@@ -551,28 +697,24 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
   }
   function tile(k, v, sub) { return el("div", { cls: "tile" }, el("div", { cls: "k", text: k }), el("div", { cls: "v", text: v }), sub ? el("div", { cls: "s", text: sub }) : null); }
   function usd(x) { return "$" + (Number(x) || 0).toFixed(2); }
-  // A 14-day bar chart: one bar per day, stacked from parts [{v, cls}], with every value in the label.
-  function dayChart(title, rows, parts, fmt) {
-    var NS = "http://www.w3.org/2000/svg", W = 280, H = 64, n = rows.length || 1, bw = W / n, hi = 0;
+  // A 14-day column chart in HTML: one column per day, stacked from parts [{v, cls}] with parts[0] on the baseline.
+  // Each day is a full-height hover and focus target whose label carries its numbers; a legend names every part.
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function dayText(d) { var m = /^\d{4}-(\d{2})-(\d{2})$/.exec(String(d || "")); return m ? +m[2] + " " + MONTHS[+m[1] - 1] : String(d || ""); }
+  function legend(items) { return el("div", { cls: "legend" }, items.map(function (l) { return el("span", null, el("i", { cls: "sw s-" + l[0], "aria-hidden": "true" }), l[1]); })); }
+  function dayChart(title, rows, parts, fmt, keys) {
+    var hi = 0, n = rows.length;
     rows.forEach(function (r) { var s = 0; parts.forEach(function (p) { s += Number(p(r).v) || 0; }); hi = Math.max(hi, s); });
-    var svg = document.createElementNS(NS, "svg");
-    svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("class", "chart"); svg.setAttribute("role", "img");
-    svg.setAttribute("aria-label", title + ", last " + n + " days: " + rows.map(function (r) { return String(r.date).slice(5) + " " + fmt(r); }).join(", "));
-    rows.forEach(function (r, i) {
-      var y = H, base = document.createElementNS(NS, "rect");
-      // a hairline under every day, so a quiet day still reads as a day
-      base.setAttribute("x", (i * bw + 1).toFixed(1)); base.setAttribute("width", Math.max(1, bw - 2).toFixed(1));
-      base.setAttribute("y", (H - 1).toFixed(1)); base.setAttribute("height", "1"); base.setAttribute("class", "b"); svg.appendChild(base);
-      parts.forEach(function (p) {
-        var part = p(r), v = Number(part.v) || 0; if (!v || !hi) return;
-        var h = Math.max(1, v / hi * (H - 2)), rect = document.createElementNS(NS, "rect");
-        y -= h; rect.setAttribute("x", (i * bw + 1).toFixed(1)); rect.setAttribute("width", Math.max(1, bw - 2).toFixed(1));
-        rect.setAttribute("y", y.toFixed(1)); rect.setAttribute("height", h.toFixed(1)); rect.setAttribute("class", part.cls);
-        var tip = document.createElementNS(NS, "title"); tip.textContent = r.date + ": " + fmt(r); rect.appendChild(tip);
-        svg.appendChild(rect);
-      });
-    });
-    return el("div", null, el("div", { cls: "k", text: title }), svg);
+    var plot = el("div", { cls: "dplot", role: "list", "aria-label": title + ", last " + n + " days, oldest first" }, rows.map(function (r, i) {
+      var segs = parts.map(function (p) { return p(r); }).filter(function (x) { return Number(x.v) > 0; });
+      var sum = segs.reduce(function (a, x) { return a + Number(x.v); }, 0), tip = dayText(r.date) + ": " + fmt(r);
+      return el("div", { cls: "dday" + (i >= n / 2 ? " r" : ""), role: "listitem", tabindex: "0", "aria-label": tip, "data-tip": tip },
+        sum ? el("div", { cls: "dstack", style: "height:" + Math.max(3, Math.round(1000 * sum / hi) / 10) + "%" },
+          segs.map(function (x) { return el("i", { cls: "s-" + x.cls, style: "flex-grow:" + Number(x.v) }); })) : null);
+    }));
+    if (!hi) return el("div", { cls: "dchart" }, el("div", { cls: "k", text: title }), el("p", { cls: "empty", style: "margin:4px 0 0", text: "None in the last " + n + " days." }));
+    return el("div", { cls: "dchart" }, el("div", { cls: "k", text: title }), keys ? legend(keys) : null, plot,
+      n ? el("div", { cls: "daxis", "aria-hidden": "true" }, el("span", { text: dayText(rows[0].date) }), el("span", { text: dayText(rows[n - 1].date) })) : null);
   }
   function minutesAgo(iso) { var t = Date.parse(iso || ""); return isNaN(t) ? null : Math.max(0, Math.round((Date.now() - t) / 60000)); }
   function days(iso) {
@@ -743,6 +885,9 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
     return "";
   }
   // One record per role: heartbeat, tickets, latest activity, spend and stories. State: working, blocked, idle or off.
+  // The autopilot's daily run cap: a role with a ready ticket waits for the next run, or for tomorrow when the cap is used.
+  var AUTO = (function (a) { a = a || {}; return { enabled: !!a.enabled, cap: a.cap, used: a.runs_today || 0,
+    capped: !!a.enabled && typeof a.cap === "number" && (a.runs_today || 0) >= a.cap }; })(costs.autopilot);
   function agents() {
     var beats = R.heartbeats || {}, spend = {}, keys = {};
     (costs.roles || []).forEach(function (r) { spend[r.role] = r; });
@@ -758,12 +903,15 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
       var last = activity.filter(function (a) { return a.role === k; })[0];
       var stories = (team.tasks || []).filter(function (t) { return t.kind === "story" && t.role === k; });
       var why = pausedWhy(k);
-      var state = why ? "paused" : blocked.length ? "blocked" : claimed.length ? "working" : b.enabled ? "idle" : "off";
+      var ready = mine.filter(function (t) { return !t.claimed && !t.blocked; });
+      var state = why ? "paused" : blocked.length ? "blocked" : claimed.length ? "working" :
+        !b.enabled ? "off" : ready.length && AUTO.enabled ? (AUTO.capped ? "capped" : "queued") : "idle";
       return { role: k, paused: why, b: b, mine: mine, claimed: claimed, blocked: blocked, last: last, c: spend[k] || {}, state: state,
         stories: stories, storiesDone: stories.filter(function (t) { return t.status === "done"; }).length };
     });
   }
-  var STATE_WORDS = { working: "working", blocked: "blocked", idle: "idle", off: "heartbeat off", paused: "paused by you" };
+  var STATE_WORDS = { working: "working", blocked: "blocked", idle: "idle", off: "heartbeat off", paused: "paused by you",
+    queued: "queued for the next run", capped: "waiting: run cap" };
   function statePill(state) { return pill(STATE_WORDS[state], state === "working" ? "done" : state === "blocked" || state === "paused" ? "blocked" : "todo"); }
   var CTL = (G.ok && G.control) || {};
   function pausedWhy(role) { return role === "board" ? null : ((CTL.roles || {})[role] || CTL.all || null); }
@@ -775,26 +923,86 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
   }
   function reportsTo(role) { var b = (R.reports_to || {})[role]; return !b ? "?" : b === "founder" ? "you" : roleName(b); }
   function reviewPill(t) { return t.escalated_to ? [" ", pill("escalated to " + (t.escalated_to === "founder" ? "you" : t.escalated_to), "waiting")] : t.review ? [" ", pill("review: " + t.review, "proposed")] : null; }
+  // One compact row per agent; the whole row opens its record. A role whose heartbeat is off is drawn as a ghost.
   function agentCard(a) {
-    var info = ROLE_INFO[a.role], cap = a.c.cap || a.b.monthly_budget_usd || 0, used = a.c.used || 0, p = cap ? used / cap : 0;
-    var work = a.claimed.concat(a.blocked).slice(0, 3).map(function (t) { return el("div", null, link("#" + t.number + " " + t.title, t.url), t.blocked ? [" ", pill("blocked", "blocked")] : null); });
-    return el("div", { cls: "agent" },
-      el("div", { cls: "top" }, avatar(a.role, a.state),
-        el("div", { style: "min-width:0" }, el("b", { text: roleName(a.role) }),
-          el("span", { cls: "badge", text: "AI agent" }), " ", statePill(a.state),
-          el("div", { cls: "slug", text: "solo-to-scale:" + a.role }))),
-      info ? el("p", { cls: "owns", text: info[2] }) : null,
-      el("dl", null,
-        el("dt", { text: "Working on" }), el("dd", null, !G.ok ? "?" : work.length ? work : el("span", { cls: "empty", text: "no claimed ticket" })),
-        el("dt", { text: "Reports to" }), el("dd", { text: reportsTo(a.role) }),
-        el("dt", { text: "Heartbeat" }), el("dd", { text: a.b.enabled ? cronText(a.b.cron) + (nextRun(a.b.cron) ? ", next " + nextRun(a.b.cron) : "") : "off" }),
-        el("dt", { text: "Last active" }), el("dd", { text: !G.ok ? "?" : a.last ? a.last.action + " #" + a.last.ticket + (ago(a.last.at) ? ", " + ago(a.last.at) : "") : "no activity yet" }),
-        a.stories.length ? [el("dt", { text: "Stories" }), el("dd", null, a.storiesDone + " of " + a.stories.length + " done", bar(a.storiesDone, a.stories.length))] : null,
-        el("dt", { text: "Spend" }), el("dd", null, G.ok ? usd(used) + (cap ? " of " + usd(cap) : ", no budget") : "?", G.ok && cap ? bar(used, cap, p >= 1 ? "x" : p >= 0.8 ? "w" : "") : null),
-        G.ok && a.c.stats && a.c.stats.runs ? [el("dt", { text: "Runs" }), el("dd", { text: a.c.stats.runs + " this month, " + pctText2(a.c.stats.success) + " worked" })] : null),
-      a.paused ? el("p", { cls: "why", style: "margin:0", text: "Paused: " + a.paused }) : null,
-      el("div", { style: "display:flex;gap:10px;align-items:center;flex-wrap:wrap" },
-        el("a", { cls: "open", href: "#agent/" + encodeURIComponent(a.role), text: "Open " + roleName(a.role) + "'s record" }), G.ok ? controls(a) : null));
+    var cap = a.c.cap || a.b.monthly_budget_usd || 0, used = a.c.used || 0, p = cap ? used / cap : 0, st = a.c.stats || {};
+    var t = a.blocked[0] || a.claimed[0];
+    return el("a", { cls: "arow" + (a.state === "off" ? " ghost" : ""), href: "#agent/" + encodeURIComponent(a.role), "aria-label": "Open " + roleName(a.role) + "'s record" },
+      avatar(a.role, a.state),
+      el("span", { cls: "c-who" }, el("b", { text: roleName(a.role) }), el("span", { cls: "slug", text: a.role })),
+      el("span", { cls: "c-state" }, statePill(a.state)),
+      el("span", { cls: "c-on" }, !G.ok ? "?" : t ? "#" + t.number + " " + t.title : el("span", { cls: "empty", text: "no ticket" })),
+      el("span", { cls: "c-wake", text: a.b.enabled ? (nextRun(a.b.cron) ? "next " + nextRun(a.b.cron) : cronText(a.b.cron)) : "off" }),
+      el("span", { cls: "c-grade", title: "Runs that passed every rubric check" }, !G.ok ? "?" : st.graded ? pctText2(st.pass_rate) : "–"),
+      el("span", { cls: "c-spend" }, G.ok ? usd(used) + (cap ? " / " + usd(cap) : "") : "?", G.ok && cap ? bar(used, cap, p >= 1 ? "x" : p >= 0.8 ? "w" : "") : null));
+  }
+  function agentRows(list) {
+    var head = el("div", { cls: "arow head", "aria-hidden": "true" }, el("span"), el("span", { text: "Agent" }), el("span", { text: "State" }),
+      el("span", { text: "Working on" }), el("span", { text: "Heartbeat" }), el("span", { text: "Checks passed" }), el("span", { text: "Spend this month" }));
+    return el("div", { cls: "arows" }, head, list.map(agentCard));
+  }
+  // A mono label naming where a value comes from, so the founder knows which file to edit.
+  function src(text) { return el("div", { cls: "src", text: text }); }
+  // How one agent runs, as a diagram: what wakes it, the agent itself, and what it produces and how that is graded.
+  function schemaPanel(a) {
+    var role = a.role, info = ROLE_INFO[role], st = a.c.stats || {}, rub = a.b.rubric || [];
+    var cap = a.c.cap || a.b.monthly_budget_usd || 0, t = a.blocked[0] || a.claimed[0];
+    var graded = (costs.entries || []).filter(function (e) { return e.role === role && e.checks; }), lastG = graded[graded.length - 1];
+    var trig = el("div", { cls: "snode" + (a.b.enabled ? "" : " ghost") }, el("div", { cls: "sh", text: "Trigger" }),
+      src("founder/heartbeats.json · cron"), el("b", { text: a.b.enabled ? cronText(a.b.cron) : "Heartbeat off" }),
+      a.b.enabled && nextRun(a.b.cron) ? el("div", { cls: "note", style: "margin:0", text: "Next run " + nextRun(a.b.cron) }) : null,
+      src("autopilot"), el("div", { text: AUTO.enabled ? "On: it starts when a ticket is ready" + (AUTO.capped ? "; today's run cap is used" : "") : "Off: it runs on its schedule only" }),
+      src("monthly_budget_usd"), el("div", { text: cap ? usd(cap) + " a month" : "Not set, so it never runs" }));
+    var mid = el("div", { cls: "snode key" }, el("div", { cls: "sh", text: "Agent" }),
+      src("solo-to-scale:" + role), el("b", { text: roleName(role) }), info ? el("div", { cls: "note", style: "margin:0", text: info[2] }) : null,
+      src("reports to"), el("div", { text: reportsTo(role) }),
+      src("working on · GitHub"), el("div", null, !G.ok ? "?" : t ? [link("#" + t.number + " " + t.title, t.url), t.blocked ? [" ", pill("blocked", "blocked")] : null] : el("span", { cls: "empty", text: "no claimed ticket" })));
+    var out = el("div", { cls: "snode" }, el("div", { cls: "sh", text: "Output and grade" }),
+      src("rubric · founder/heartbeats.json, or the default"),
+      rub.length ? el("ol", { cls: "rubric" }, rub.map(function (c, i) { return el("li", null, el("span", { cls: "chip", text: String(i + 1) }), el("span", { text: c })); })) : el("p", { cls: "empty", text: "No rubric." }),
+      src("cost log · heartbeat end --checks"),
+      el("div", null, !G.ok ? "?" : st.graded ? [el("b", { text: pctText2(st.pass_rate) }), " of " + st.graded + " graded run" + (st.graded > 1 ? "s" : "") + " passed every check" + (lastG ? "; the last scored " + lastG.checks[0] + "/" + lastG.checks[1] : "")] : el("span", { cls: "empty", text: "No graded runs yet." })));
+    return el("div", { cls: "schema", role: "group", "aria-label": "How " + roleName(role) + " runs" }, trig, el("i", { cls: "joint", "aria-hidden": "true" }), mid, el("i", { cls: "joint", "aria-hidden": "true" }), out);
+  }
+
+  // What the agent is made of, as cards attached under the agent node: from its agent file and the autopilot.
+  function attachCards(role) {
+    var p = (R.profiles || {})[role] || {};
+    function items(list, empty) { return list && list.length ? el("ul", { cls: "attl" }, list.map(function (x) { return el("li", { text: x }); })) : empty ? el("p", { cls: "empty", text: empty }) : null; }
+    function card(h, from, body) { return el("div", { cls: "att", role: "listitem" }, el("div", { cls: "sh", text: h }), src(from), body); }
+    return el("div", { cls: "attach", role: "list", "aria-label": "What " + roleName(role) + " is made of" },
+      card("Model", "autopilot · agent file", [el("b", { text: p.run_model || "the session's choice" }), items(p.model)]),
+      card("Access", "agent file · Tools", items(p.tools, "Not recorded.")),
+      card("Skills", "agent file · Skills", p.skills && p.skills.length ? el("div", { cls: "tags" }, p.skills.map(function (x) { return el("span", { cls: "tag", text: x }); })) : el("p", { cls: "empty", text: "Not recorded." })),
+      card("Never", "agent file · Never", items(p.never, "Not recorded.")),
+      card("Asks you first", "agent file · approvals", items(p.approval, "Nothing listed.")));
+  }
+  // Eval cases: past tickets with a known-good result, and each one's latest re-run.
+  function evalPanel(role) {
+    var cases = (R.evals || []).filter(function (c) { return c.role === role; }), res = (G.ok && G.eval_results) || {};
+    return panel(["Evals", cases.length + " case" + (cases.length === 1 ? "" : "s")], "Past tickets with a known-good result. Re-run them before you change this agent's model (evals/README.md).",
+      cases.length ? el("ul", { cls: "list evals" }, cases.map(function (c) {
+        var r = res[role + "/" + c.case];
+        return el("li", null, el("div", null, el("b", { text: c.title }), el("small", { text: c.path + (c.ticket ? " · from #" + c.ticket : "") })),
+          !G.ok ? el("span", { cls: "empty", text: "?" }) : r ? el("span", { cls: "ev" }, r.checks ? el("span", { cls: "chk" + (r.passed ? " ok" : ""), text: r.checks[0] + "/" + r.checks[1] }) : pill("not graded", "todo"),
+            el("small", { text: when(r.at) + (r.model ? " · " + r.model : "") })) : pill("not run yet", "todo"));
+      })) : el("p", { cls: "empty", text: "No eval cases yet. Add three to five past tickets as evals/" + role + "/<case>.md." }));
+  }
+  // Graded runs per day over the trend window, from the cost log; eval re-runs stay out.
+  function passRows(role) {
+    var days = (G.ok && G.trends && G.trends.days) || [];
+    if (!role) return days;
+    var by = {}; days.forEach(function (d) { by[d.date] = { date: d.date, graded: 0, passed: 0, pass_rate: null }; });
+    (costs.entries || []).forEach(function (e) {
+      var r = by[String(e.at).slice(0, 10)]; if (!r || e.role !== role || !e.checks || e.eval) return;
+      r.graded += 1; r.passed += e.checks[0] === e.checks[1] ? 1 : 0;
+    });
+    return days.map(function (d) { var r = by[d.date]; r.pass_rate = r.graded ? r.passed / r.graded : null; return r; });
+  }
+  function passChart(rows) {
+    return dayChart("Graded runs", rows, [function (r) { return { v: r.passed, cls: "a" }; }, function (r) { return { v: (r.graded || 0) - (r.passed || 0), cls: "w" }; }],
+      function (r) { return r.graded ? r.passed + " of " + r.graded + " passed every check (" + Math.round(100 * r.passed / r.graded) + "%)" : "no graded runs"; },
+      [["a", "passed every check"], ["w", "missed a check"]]);
   }
 
   // --- one agent's record: its runs, outcomes, time and spend this month ------------------------------------
@@ -812,9 +1020,12 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
     svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.setAttribute("class", "bars"); svg.setAttribute("role", "img");
     svg.setAttribute("aria-label", "Spend per day in " + month + ": " + (Object.keys(per).map(function (k) { return k + ": " + usd(per[k]); }).join(", ") || "none") + (cap ? ". Budget pace " + usd(cap / days) + " a day" : ""));
     Object.keys(per).forEach(function (k) {
-      var r = document.createElementNS(NS, "rect"), h = Math.max(1, per[k] / hi * (H - 4));
-      r.setAttribute("x", ((k - 1) * bw + 1).toFixed(1)); r.setAttribute("width", Math.max(1, bw - 2).toFixed(1));
-      r.setAttribute("y", (H - h).toFixed(1)); r.setAttribute("height", h.toFixed(1)); svg.appendChild(r);
+      // a column with a rounded data end and a square foot on the baseline, 2px apart, never wider than 24px
+      var w = Math.min(24, Math.max(1, bw - 2)), x = (k - 1) * bw + (bw - w) / 2, h = Math.max(1, per[k] / hi * (H - 4)), y = H - h, rr = Math.min(4, w / 2, h);
+      var path = document.createElementNS(NS, "path"), tip = document.createElementNS(NS, "title");
+      path.setAttribute("d", "M" + x.toFixed(1) + " " + H + "V" + (y + rr).toFixed(1) + "Q" + x.toFixed(1) + " " + y.toFixed(1) + " " + (x + rr).toFixed(1) + " " + y.toFixed(1)
+        + "H" + (x + w - rr).toFixed(1) + "Q" + (x + w).toFixed(1) + " " + y.toFixed(1) + " " + (x + w).toFixed(1) + " " + (y + rr).toFixed(1) + "V" + H + "Z");
+      tip.textContent = month + "-" + (k < 10 ? "0" : "") + k + ": " + usd(per[k]); path.appendChild(tip); svg.appendChild(path);
     });
     if (cap) {
       var y = (H - (cap / days) / hi * (H - 4)).toFixed(1), ln = document.createElementNS(NS, "line");
@@ -827,6 +1038,8 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
       { h: "When", k: function (r) { return r.at; }, f: function (r) { return when(r.at); } },
       withRole ? { h: "Role", f: function (r) { return el("span", { cls: "who", text: r.role }); } } : null,
       { h: "Outcome", k: function (r) { return r.outcome; }, f: function (r) { return outcomePill(r.outcome); } },
+      { h: "Checks", num: true, k: function (r) { return r.checks ? r.checks[0] / r.checks[1] : null; }, f: function (r) { return r.checks ? el("span", { cls: "chk" + (r.checks[0] === r.checks[1] ? " ok" : ""), text: r.checks[0] + "/" + r.checks[1] }) : ""; } },
+      { h: "Note", f: function (r) { return el("span", { cls: "rnote" }, r.eval ? pill("eval: " + r.eval, "proposed") : null, r.eval && r.note ? " " : null, r.note || ""); } },
       { h: "Ticket", num: true, k: function (r) { return r.ticket || null; }, f: function (r) { return r.ticket ? "#" + r.ticket : ""; } },
       { h: "Objective", f: function (r) { return r.objective || ""; } },
       { h: "Time", num: true, k: function (r) { return r.seconds; }, f: function (r) { return dur(r.seconds); } },
@@ -835,7 +1048,7 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
       { h: "Model", f: function (r) { return r.model || ""; } },
       { h: "Session", f: function (r) { return safeHref(r.session) ? link("open", r.session) : ""; } }].filter(Boolean),
       runs, "No runs recorded this month.",
-      { filters: [withRole ? { label: "Roles", f: function (r) { return r.role; } } : null, { label: "Outcomes", f: function (r) { return r.outcome || "not recorded"; } }].filter(Boolean) });
+      { filters: [withRole ? { label: "Roles", f: function (r) { return r.role; } } : null, { label: "Outcomes", f: function (r) { return r.outcome || "not recorded"; } }].filter(Boolean), search: "Search notes, tickets and models" });
   }
   function agentPage(role) {
     var a = agents().filter(function (x) { return x.role === role; })[0];
@@ -849,14 +1062,19 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
         el("div", null, el("h2", { text: roleName(role) + "'s record" }), el("span", { cls: "badge", text: "AI agent" }), " ", statePill(a.state),
           el("div", { cls: "note", text: (info ? info[2] + ". " : "") + "Heartbeat " + (a.b.enabled ? cronText(a.b.cron) : "off") + "." })),
         G.ok ? controls(a) : null, el("a", { cls: "close", href: "#team", text: "Close" })),
+      el("div", { cls: "schemawrap" }, schemaPanel(a), attachCards(role)),
       !G.ok ? ghMissing() : [
         el("div", { cls: "grid" },
           tile("Runs in " + (costs.month || "this month"), String(st.runs || 0), (oc.worked || 0) + " worked, " + (oc.failed || 0) + " failed, " + (oc["no-work"] || 0) + " with nothing to do"),
           tile("Worked", pctText2(st.success), "of the runs that had work"),
+          tile("Checks passed", pctText2(st.pass_rate), st.graded ? "every check, in " + st.passed + " of " + st.graded + " graded runs" : "no graded runs yet"),
           tile("Typical run", st.median_seconds === null || st.median_seconds === undefined ? "n/a" : dur(st.median_seconds), "median time"),
           tile("Spend", usd(used), cap ? "of " + usd(cap) + " (" + Math.round(100 * used / cap) + "%)" : "no budget set"),
           tile("Cost per worked run", st.usd_per_worked === null || st.usd_per_worked === undefined ? "n/a" : usd(st.usd_per_worked))),
-        panel("Spend per day", "Bars are each day's spend; the dashed line is the budget spread evenly over the month.", dailyBars(a.c.daily, cap, costs.month)),
+        el("div", { cls: "cols2" },
+          panel("Spend per day", "Bars are each day's spend; the dashed line is the budget spread evenly over the month.", dailyBars(a.c.daily, cap, costs.month)),
+          panel("Checks passed per day", "Each graded run this month, by day, against its rubric.", st.graded ? passChart(passRows(role)) : el("p", { cls: "empty", text: "No graded runs yet: heartbeat end --checks records them." }))),
+        evalPanel(role),
         panel("Runs", "Every heartbeat run and session this month, newest first, from the cost log.", runTable(runs, false)),
         panel("Tickets", null, a.mine.length ? el("ul", { cls: "list" }, a.mine.map(function (t) { return el("li", null, link("#" + t.number + " " + t.title, t.url), " ", t.blocked ? pill("blocked", "blocked") : t.claimed ? pill("claimed", "progress") : pill("ready", "todo"), reviewPill(t), t.goal ? " " + t.goal : ""); })) : el("p", { cls: "empty", text: "No open tickets." })),
         panel("Recent activity", null, mine.length ? el("ul", { cls: "list" }, mine.map(activityItem)) : el("p", { cls: "empty", text: "No activity yet." }))],
@@ -871,7 +1089,7 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
       el("div", { cls: "stem" }),
       node(avatar("chief-of-staff", cos ? cos.state : null), "Claude, AI coordinator", "AI core · " + (cos ? STATE_WORDS[cos.state] : "not scheduled")),
       el("div", { cls: "stem" }),
-      el("div", { cls: "row" }, rest.map(function (a) { return node(avatar(a.role, a.state), roleName(a.role), (ROLE_INFO[a.role] ? ROLE_INFO[a.role][1] + " · " : "") + STATE_WORDS[a.state]); })),
+      el("div", { cls: "row" }, rest.map(function (a) { return node(avatar(a.role, a.state), roleName(a.role), (ROLE_INFO[a.role] ? ROLE_INFO[a.role][1] + " · " : "") + STATE_WORDS[a.state], a.state === "off" ? "ghost" : null); })),
       (team.board || []).length ? el("div", { cls: "board" }, el("div", { cls: "k", text: "The advisory board: AI advisors, advice only, no vote" }),
         team.board.map(function (b) { return node(avatar(b.id), b.name + " advisor", b.lens + " lens"); })) : null);
   }
@@ -903,7 +1121,7 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
           { h: "What", f: function (r) { return [r.url ? link(r.title, r.url) : r.title, r.detail ? el("div", { cls: "why", text: r.detail }) : null]; } },
           { h: "Waiting", num: true, k: function (r) { return r.age_days; }, f: function (r) { return needAge(r); } },
           { h: "", k: function (r) { return { escalated: 0, overdue: 1, "new": 2 }[r.level]; }, f: function (r) { return r.level === "new" ? "" : el("span", { cls: "lvl-" + r.level, text: r.level }); } },
-          { h: "", f: function (r) { return r.kind === "approval" && r.url ? actions({ url: r.url }) : ""; } }], NEEDS, "Nothing waiting on you.",
+          { h: "", f: function (r) { return r.kind === "approval" && r.url ? actions({ url: r.url }) : safeHref(r.url) ? el("a", { cls: "act", href: r.url, target: "_blank", rel: "noopener noreferrer", text: "Open" }) : ""; } }], NEEDS, "Nothing waiting on you.",
           { search: "Search", filters: [{ label: "Kinds", f: function (r) { return NEED_WORDS[r.kind] || r.kind; } }] })),
       (NEED.stuck || []).length ? panel("Stuck work", "Claimed tickets with no update for " + (NEED.stale_hours || 48) + " hours (set stale_hours in founder/dashboard.json), and agents whose last run failed.",
         el("ul", { cls: "list" }, NEED.stuck.map(function (x) {
@@ -912,15 +1130,31 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
             el("a", { href: "#agent/" + encodeURIComponent(x.role), text: "Open " + roleName(x.role) + "'s record" }));
         }))) : null];
   }
+  function runsChart(rows) {
+    return dayChart("Agent runs", rows, [function (r) { return { v: r.worked, cls: "a" }; }, function (r) { return { v: r.other, cls: "b" }; }],
+      function (r) { return r.worked + r.other ? r.worked + " worked of " + (r.worked + r.other) + " runs" : "no runs"; }, [["a", "worked"], ["b", "other outcomes"]]);
+  }
+  // The numbers behind the trend charts, as a table: every value is readable without hovering.
+  function trendTable(rows) {
+    return el("details", { cls: "numbers" }, el("summary", { text: "Show the numbers" }), table([
+      { h: "Day", k: function (r) { return r.date; }, f: function (r) { return dayText(r.date); } },
+      { h: "Runs", num: true, k: function (r) { return r.worked + r.other; }, f: function (r) { return String(r.worked + r.other); } },
+      { h: "Worked", num: true, k: function (r) { return r.worked; }, f: function (r) { return String(r.worked); } },
+      { h: "Graded", num: true, k: function (r) { return r.graded || 0; }, f: function (r) { return String(r.graded || 0); } },
+      { h: "Passed", num: true, k: function (r) { return r.passed || 0; }, f: function (r) { return String(r.passed || 0); } },
+      { h: "Actions", num: true, k: function (r) { return r.actions; }, f: function (r) { return String(r.actions); } },
+      { h: "Merged", num: true, k: function (r) { return r.merged; }, f: function (r) { return String(r.merged); } }], rows.slice().reverse(), ""));
+  }
   function trendPanel() {
     var rows = (G.ok && G.trends && G.trends.days) || [];
     if (!rows.length) return null;
     var any = rows.some(function (r) { return r.worked || r.other || r.actions || r.merged; });
-    return panel("Last 14 days", any ? "One bar per day, oldest on the left. Hover or tap a bar for its numbers." : "No runs, agent actions or merges in the last 14 days.", any ? el("div", { cls: "charts" },
-      dayChart("Agent runs (green: worked)", rows, [function (r) { return { v: r.worked, cls: "a" }; }, function (r) { return { v: r.other, cls: "b" }; }], function (r) { return r.worked + " worked of " + (r.worked + r.other); }),
-      dayChart("Runs that worked, of those with work", rows, [function (r) { return { v: r.success === null ? 0 : r.success, cls: "a" }; }], function (r) { return r.success === null ? "no runs with work" : Math.round(100 * r.success) + "%"; }),
+    return panel("Last 14 days", any ? "One column per day, oldest on the left. Hover, tap or tab to a day for its numbers, or open the table below." : "No runs, agent actions or merges in the last 14 days.", any ? el("div", { cls: "charts" },
+      runsChart(rows),
+      rows.some(function (r) { return r.graded; }) ? passChart(rows) : null,
       dayChart("Agent actions", rows, [function (r) { return { v: r.actions, cls: "c" }; }], function (r) { return r.actions + " actions"; }),
-      dayChart("Pull requests merged", rows, [function (r) { return { v: r.merged, cls: "c" }; }], function (r) { return r.merged + " merged"; })) : null);
+      dayChart("Pull requests merged", rows, [function (r) { return { v: r.merged, cls: "c" }; }], function (r) { return r.merged + " merged"; })) : null,
+      any ? trendTable(rows) : null);
   }
 
   // --- tabs ---------------------------------------------------------------------------------------------
@@ -1060,6 +1294,7 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
     var lead = cur ? leadOf(cur) : null;
     var crew = agents(), busy = crew.filter(function (a) { return a.state === "working" || a.state === "blocked"; });
     var blockers = [];
+    if (AUTO.capped && crew.some(function (a) { return a.state === "capped"; })) blockers.push(el("li", null, pill("run cap", "todo"), " Today's " + AUTO.cap + " agent runs are used; ready work waits until midnight UTC"));
     crew.forEach(function (a) { a.blocked.forEach(function (t) { blockers.push(el("li", null, avatar(a.role, null, true), roleName(a.role) + " is blocked on ", link("#" + t.number + " " + t.title, t.url))); }); });
     (road.blockers || []).forEach(function (b) { blockers.push(el("li", null, pill("founder item", "todo"), " ", b.item)); });
     if (waiting.length) blockers.push(el("li", null, pill("approval", "waiting"), " ", el("a", { href: "#needs", text: waiting.length + " approval" + (waiting.length > 1 ? "s" : "") + " waiting for you" })));
@@ -1287,16 +1522,19 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
             el("dt", { text: "Agents working" }), el("dd", { text: G.ok ? working + " of " + crewAll.length + (blocked ? ", " + blocked + " blocked" : "") : "?" }))),
         days.length ? el("div", { cls: "charts c1" },
           dayChart("Pull requests merged", days, [function (r) { return { v: r.merged, cls: "c" }; }], function (r) { return r.merged + " merged"; }),
-          days.some(function (r) { return r.worked || r.other; }) ? dayChart("Agent runs (green: worked)", days, [function (r) { return { v: r.worked, cls: "a" }; }, function (r) { return { v: r.other, cls: "b" }; }], function (r) { return r.worked + " worked of " + (r.worked + r.other); })
+          days.some(function (r) { return r.worked || r.other; }) ? runsChart(days)
             : el("div", null, el("div", { cls: "k", text: "Agent runs" }), el("p", { cls: "empty", style: "margin:4px 0 0", text: "No agent runs in the last 14 days." })))
           : el("p", { cls: "empty", text: "Charts appear once GitHub data is available." })),
       el("p", { cls: "note", style: "margin:10px 0 0" }, el("a", { href: "#roadmap", text: "Slices and the timeline in Roadmap" })));
 
     var nWork = crewAll.filter(function (a) { return a.state === "working"; }).length, nBlock = crewAll.filter(function (a) { return a.state === "blocked" || a.state === "paused"; }).length;
-    var teamPanel = crewAll.length ? panel("Your AI team", G.ok ? nWork + " working, " + nBlock + " blocked or paused, " + (crewAll.length - nWork - nBlock) + " idle or off. Every node is an AI agent. Moving dots: agents working with the AI coordinator; red: blocked and asking for help; curved lines: handoffs in the last 2 days." : "GitHub data missing: showing heartbeats only.",
+    var nWait = crewAll.filter(function (a) { return a.state === "queued" || a.state === "capped"; }).length;
+    var teamPanel = crewAll.length ? panel("Your AI team", G.ok ? nWork + " working, " + nBlock + " blocked or paused, " + (nWait ? nWait + " waiting for a run, " : "") + (crewAll.length - nWork - nBlock - nWait) + " idle or off. "
+      + (AUTO.capped ? "Today's " + AUTO.cap + " autopilot runs are used: the agents start again at midnight UTC (autopilot.max_runs_per_day in founder/heartbeats.json). " : "") + "Every node is an AI agent. Moving dots: agents working with the AI coordinator; red: blocked and asking for help; curved lines: handoffs in the last 2 days." : "GitHub data missing: showing heartbeats only.",
       el("div", { cls: "teamgrid" }, teamHub(crewAll), teamNow(crewAll)),
       el("p", { cls: "note", style: "margin:4px 0 0" }, el("a", { href: "#team", text: "Every agent's card in Team and board" }), " · ", el("a", { href: "#activity", text: "what they did, in Agent activity" }))) : null;
-    return [G.ok ? null : ghMissing(), setupPanel(), tiles,
+    return [G.ok ? null : ghMissing(), setupPanel(), goalLine(), tiles,
+      systemPanel(crewAll),
       teamPanel,
       el("div", { cls: "cols2" },
         panel("Needs you", "Oldest and most blocking first.", needs.length ? el("ul", { cls: "list" }, needs) : el("p", { cls: "empty", text: "Nothing waiting on you." }),
@@ -1304,6 +1542,40 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
         cycle),
       delivery,
       journeyPanel()];
+  }
+
+  // The company's goal in one line, above the numbers.
+  function goalLine() {
+    var ns = GOALS.north_star, g = GOALS.goal || (ns && ns.metric);
+    return el("a", { cls: "goalline", href: "#goals" }, el("span", { cls: "k", text: "Company goal" }),
+      g ? el("b", { text: g }) : el("span", { cls: "empty", text: "Not set yet: okr-plan drafts it once the business model is approved." }),
+      ns && ns.target !== undefined ? el("span", { cls: "muted", text: num(ns.current, ns.unit) + " of " + num(ns.target, ns.unit) + (ns.by ? " by " + ns.by : "") }) : null);
+  }
+  // The whole company as one system: what starts work, the AI team inside the repo, and what comes out and how it is graded.
+  function systemPanel(crew) {
+    var days = ((G.ok && G.trends && G.trends.days) || []).slice(-7);
+    function sum(k) { return days.reduce(function (a, r) { return a + (r[k] || 0); }, 0); }
+    var merged = sum("merged"), graded = sum("graded"), passed = sum("passed");
+    var beating = crew.filter(function (a) { return a.b.enabled; }).length, skills = {};
+    Object.keys(R.profiles || {}).forEach(function (r) { (R.profiles[r].skills || []).forEach(function (x) { skills[x] = 1; }); });
+    var budget = (costs.roles || []).reduce(function (a, r) { return a + (r.cap || 0); }, 0);
+    var open = (R.decisions || []).filter(function (d) { return d.has_status && /open|proposed/i.test(d.status || ""); }).length;
+    function fact(k, v, from, href) { return el(href ? "a" : "div", { cls: "fact", href: href || null }, el("b", { text: v }), el("span", { text: k }), src(from)); }
+    var trig = el("div", { cls: "snode" }, el("div", { cls: "sh", text: "What starts work" }),
+      fact("autopilot", AUTO.enabled ? (AUTO.capped ? "Capped today" : "On") : "Off", "founder/heartbeats.json · autopilot", "#team"),
+      fact("agents on a schedule", beating + " of " + crew.length, "heartbeat cron", "#team"),
+      fact("waiting for your /approve", G.ok ? String(waiting.length) : "?", "approvals · GitHub", "#approvals"));
+    var team = el("div", { cls: "snode key frame" }, el("div", { cls: "sh", text: "Your AI team" }), src("in the repo · " + (G.repo || "GitHub")),
+      el("div", { cls: "crew" }, crew.map(function (a) { return el("a", { href: "#agent/" + encodeURIComponent(a.role), title: roleName(a.role) + ": " + STATE_WORDS[a.state], "aria-label": roleName(a.role) + ", " + STATE_WORDS[a.state] }, avatar(a.role, a.state)); })),
+      el("div", { cls: "attach mini" },
+        fact("skills", String(Object.keys(skills).length), "agent files"), fact("gates", String((R.gates || []).length), "founder/gates.json", "#approvals"),
+        fact("budgets a month", usd(budget), "heartbeats.json", "#costs"), fact("decisions on record", String((R.decisions || []).length), "registers", "#decisions")));
+    var out = el("div", { cls: "snode" }, el("div", { cls: "sh", text: "What comes out" }),
+      fact("pull requests merged, 7 days", G.ok ? String(merged) : "?", "GitHub", "#activity"),
+      fact("graded runs passed every check", G.ok ? (graded ? Math.round(100 * passed / graded) + "%" : "n/a") : "?", graded ? passed + " of " + graded + " · cost log" : "cost log · no graded runs", "#costs"),
+      fact("decisions open or proposed", String(open), "registers", "#decisions"));
+    return panel(["How the company runs", "live"], "Work starts on the left, the agents do it inside the repo, and the right is what shipped and how well. Each box links to its tab.",
+      el("div", { cls: "schema sys", role: "group", "aria-label": "How the company runs" }, trig, el("i", { cls: "joint", "aria-hidden": "true" }), team, el("i", { cls: "joint", "aria-hidden": "true" }), out));
   }
 
   // --- setup: what tools/doctor.py found, until everything is set up ---------------------------------------
@@ -1587,6 +1859,23 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
       undated ? el("p", { cls: "note", text: how }) : null);
   }
 
+  // founder/next.md as a version rail: v1, v2, ... then "always", each item with why it waits and how it would be done.
+  var WHY_STATE = { "not possible": "blocked", "needs a credential": "waiting", "out of scope": "todo" };
+  function nextPanel() {
+    var rows = R.next || [], by = {}, order = [];
+    var note = "Everything deliberately left for later, by version, with why it waits and how it would be done. Source: founder/next.md; record-decision adds to it.";
+    if (!rows.length) return panel("Next directions", note, el("p", { cls: "empty", text: "Nothing deferred yet." }));
+    rows.forEach(function (r) { if (!by[r.version]) { by[r.version] = []; order.push(r.version); } by[r.version].push(r); });
+    function rank(v) { var m = /^v(\d+)$/.exec(v); return m ? +m[1] : v === "always" ? 1000 : 999; }
+    order.sort(function (a, b) { return rank(a) - rank(b); });
+    return panel(["Next directions", rows.length + " planned"], note, el("div", { cls: "rail" }, order.map(function (v) {
+      return el("div", { cls: "rcol" }, el("div", { cls: "rver", text: v }), by[v].map(function (r) {
+        return el("div", { cls: "rcard" }, el("b", { text: r.what }), r.why ? el("div", null, pill(r.why, WHY_STATE[r.why] || "todo")) : null,
+          r.how ? el("p", { cls: "note", style: "margin:0" }, el("b", { text: "How: " }), r.how) : null, r.source ? src(r.source) : null);
+      }));
+    })));
+  }
+
   function roadmapTab() {
     var sDone = slices.filter(function (x) { return String(x.status).toLowerCase() === "done"; }).length;
     return [
@@ -1596,6 +1885,7 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
         tile("Decisions waiting", String((road.decisions_waiting || []).length), "Proposed or Open"),
         tile("Stuck", G.ok ? String((NEED.stuck || []).length) : "?", "no update in " + (NEED.stale_hours || 48) + "h, or the last run failed")),
       gantt(),
+      nextPanel(),
       panel("Slices", "Shippable increments, each with an exit check.", table([
         { h: "Slice", f: function (r) { return r.id; } }, { h: "Name", f: function (r) { return r.name; } },
         { h: "Status", f: function (r) { return pill(r.status, /done/i.test(r.status) ? "done" : /todo|planned/i.test(r.status) ? "todo" : "progress"); } },
@@ -1623,28 +1913,21 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
     if (page.focus) page.focus({ preventScroll: true });
   }
   function teamTab() {
-    var beats = R.heartbeats || {}, byRole = {};
-    openTickets.forEach(function (t) { var r = byRole[t.role] = byRole[t.role] || { open: 0, claimed: 0, blocked: 0 }; r.open++; if (t.claimed) r.claimed++; if (t.blocked) r.blocked++; });
-    var spend = {}; (costs.roles || []).forEach(function (r) { spend[r.role] = r; });
-    var roles = Object.keys(beats).map(function (k) { return { role: k, b: beats[k] || {}, t: byRole[k] || { open: 0, claimed: 0, blocked: 0 }, c: spend[k] || {} }; });
-    var list = agents();
+    var list = agents(), n = function (st) { return list.filter(function (a) { return a.state === st; }).length; };
+    var meta = [n("working") + " working", n("blocked") ? n("blocked") + " blocked" : "", n("off") ? n("off") + " off" : ""].filter(Boolean).join(" · ");
     return [agentSlot,
       panel("Org chart", "You chair the company. Claude runs the operating system as the AI coordinator; each role below is an AI agent with its own heartbeat, budget and tickets.", orgChart(list)),
-      panel("AI agents", "One card per agent: what it's working on, when it next wakes, what it last did, and its spend this month.", list.length ? el("div", { cls: "agents" }, list.map(agentCard)) : el("p", { cls: "empty", text: "No roles in founder/heartbeats.json yet." })),
-      panel("The team in a table", "Heartbeats and budgets come from founder/heartbeats.json; tickets from GitHub.", table([
-        { h: "Role", k: function (r) { return r.role; }, f: function (r) { return [avatar(r.role, null, true), el("span", null, roleName(r.role) + " "), el("span", { cls: "who muted", text: r.role })]; } },
-        { h: "Heartbeat", f: function (r) { return pill(r.b.enabled ? "on" : "off", r.b.enabled ? "done" : "todo"); } },
-        { h: "Schedule (UTC)", f: function (r) { return el("span", { cls: "who", title: cronText(r.b.cron), text: r.b.cron || "-" }); } },
-        { h: "Budget", num: true, f: function (r) { return r.b.monthly_budget_usd ? usd(r.b.monthly_budget_usd) : "not set"; } },
-        { h: "Spent", num: true, f: function (r) { return G.ok ? usd(r.c.used) : "?"; } },
-        { h: "Open tickets", num: true, f: function (r) { return G.ok ? r.t.open + (r.t.claimed ? " (" + r.t.claimed + " claimed)" : "") + (r.t.blocked ? ", " + r.t.blocked + " blocked" : "") : "?"; } }], roles)),
-      panel("The advisory board", "Advisors advise and have no vote; you decide.", el("div", { cls: "grid" }, (team.board || []).map(function (b) {
+      panel(["AI agents", list.length ? meta : ""], "One row per agent. Open one to see how it runs, the checks its work is graded on, and every run. Schedules and budgets come from founder/heartbeats.json, tickets from GitHub, runs and checks from the cost log.",
+        list.length ? agentRows(list) : el("p", { cls: "empty", text: "No roles in founder/heartbeats.json yet." }),
+        G.ok && !safeHref(CTL.url) ? el("p", { cls: "note", style: "margin:10px 0 0", text: "Pause and resume: run `python tools/control.py issue` once to create the agent-controls issue." }) : null),
+      panel(["The advisory board", (team.board || []).length + " advisors"], "Advisors advise and have no vote; you decide.", el("div", { cls: "grid" }, (team.board || []).map(function (b) {
         return el("div", { cls: "tile" }, el("div", { cls: "top", style: "display:flex;gap:8px;align-items:center" }, avatar(b.id),
           el("div", null, el("div", { style: "font-weight:600", text: b.name + " advisor" }), el("span", { cls: "badge", text: "AI advisor" }))),
           el("div", { cls: "k", style: "margin-top:6px", text: b.lens + " lens" }), el("div", { cls: "s", text: "Asks: " + b.asks }));
       }))),
       panel("Board memos", null, docViewer(R.memos || [], "No memos in founder/board/ yet.")),
-      panel("founder/team.md", null, R.team_doc ? markdown(R.team_doc) : el("p", { cls: "empty", text: "founder/team.md is missing." }))];
+      el("details", { cls: "panel source" }, el("summary", null, "Source: ", el("code", { text: "founder/team.md" }), el("span", { cls: "note", text: " the roster, epic owners, schedule and rules, as written" })),
+        R.team_doc ? markdown(R.team_doc) : el("p", { cls: "empty", text: "founder/team.md is missing." }))];
   }
 
   function activityItem(r) {
@@ -1730,6 +2013,16 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
         { h: "Runs", num: true, k: function (r) { return (r.stats || {}).runs || 0; }, f: function (r) { return String((r.stats || {}).runs || 0); } },
         { h: "Worked", num: true, k: function (r) { return (r.stats || {}).success; }, f: function (r) { return pctText2((r.stats || {}).success); } },
         { h: "State", f: function (r) { if (!r.cap) return ""; var p = r.used / r.cap; return p >= 1 ? pill("stopped", "stopped") : p >= 0.8 ? pill("over 80%", "waiting") : pill("ok", "done"); } }], roles, "No costs or budgets yet.")),
+      panel("Checks passed, by role", "The share of this month's graded runs that passed every rubric check. Eval re-runs are left out.", (function () {
+        var graded = (costs.roles || []).filter(function (r) { return (r.stats || {}).graded; });
+        return graded.length ? table([
+          { h: "Role", f: function (r) { return el("a", { href: "#agent/" + encodeURIComponent(r.role), text: roleName(r.role) }); } },
+          { h: "Graded", num: true, k: function (r) { return r.stats.graded; }, f: function (r) { return String(r.stats.graded); } },
+          { h: "Passed", num: true, k: function (r) { return r.stats.passed; }, f: function (r) { return String(r.stats.passed); } },
+          { h: "Rate", num: true, k: function (r) { return r.stats.pass_rate; }, f: function (r) { return el("span", { cls: "chk" + (r.stats.pass_rate >= 0.8 ? " ok" : ""), text: pctText2(r.stats.pass_rate) }); } },
+          { h: "", f: function (r) { return bar(r.stats.passed, r.stats.graded, r.stats.pass_rate >= 0.8 ? "" : "w"); } }], graded, "")
+          : el("p", { cls: "empty", text: "No graded runs this month: heartbeat end --checks records them." });
+      })()),
       panel("Where the money went", "This month's spend by objective (the ticket's goal label), by model and by outcome.", el("div", { cls: "cols" },
         groupTable("By objective", by.objective), groupTable("By model", by.model), groupTable("By outcome", by.outcome))),
       panel("Run log", "Each heartbeat run and each session handoff, with its outcome, time and a link to the session. Costs are measured from the transcript where possible.", runTable(entries.slice().reverse(), true))];
@@ -1743,9 +2036,12 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
   (function freshness() {
     var meta = document.getElementById("meta"), m = minutesAgo(D.built);
     var ageText = m === null ? "" : m < 1 ? "just now" : m < 120 ? m + " minutes ago" : Math.round(m / 60) + " hours ago";
-    meta.appendChild(el("span", { cls: m !== null && m > 120 ? "stale" : "", text: "Built " + (ageText || when(D.built) + " UTC") }));
-    meta.appendChild(document.createTextNode(" (" + when(D.built) + " UTC) from " + (D.commit ? "commit " + D.commit : "the repo") +
-      (G.ok ? " and GitHub (" + G.repo + ")" : "; GitHub data missing") + ". Rebuilt on merges, approvals and comments, and every hour."));
+    meta.appendChild(el("span", { cls: m !== null && m > 240 ? "stale" : "", text: "Built " + (ageText || when(D.built) + " UTC") }));
+    var repoOk = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(String(G.repo || "")) && /^[0-9a-f]{4,40}$/.test(String(D.commit || ""));
+    meta.appendChild(document.createTextNode(" (" + when(D.built) + " UTC) from " + (D.commit ? "commit " : "the repo")));
+    if (D.commit) meta.appendChild(repoOk ? el("a", { href: "https://github.com/" + G.repo + "/commit/" + D.commit, target: "_blank", rel: "noopener noreferrer", text: D.commit }) : document.createTextNode(D.commit));
+    ((D.theme || {}).warnings || []).forEach(function (w) { meta.appendChild(el("span", { cls: "stale", text: " Theme: " + w + "." })); });
+    meta.appendChild(document.createTextNode((G.ok ? " and GitHub (" + G.repo + ")" : "; GitHub data missing") + ". Rebuilt on merges, approvals and comments, and every three hours."));
     var rb = safeHref(D.rebuild_url);
     if (rb) { meta.appendChild(document.createTextNode(" ")); meta.appendChild(el("a", { href: rb, target: "_blank", rel: "noopener noreferrer", text: "Rebuild now" })); }
   })();
@@ -1794,6 +2090,80 @@ a.tile:active, .jp a:active { transform: scale(0.99); }
     select(next, true); buttons[next].focus(); e.preventDefault();
   });
   window.addEventListener("hashchange", function () { select(location.hash.slice(1), false); });
+  // The day's numbers in the sticky tab bar, so they stay in view on every tab, led by the autopilot's light.
+  var strip = document.getElementById("strip");
+  (function () {
+    var working = agents().filter(function (a) { return a.state === "working"; }).length;
+    var led = AUTO.capped ? "capped" : AUTO.enabled ? "on" : "off";
+    strip.appendChild(el("a", { href: "#team", cls: "auto", title: "Autopilot: " + (led === "on" ? "agents start themselves when a ticket is ready" : led === "capped" ? "today's run cap is used" : "off; agents run on their schedules") },
+      el("span", null, el("i", { cls: "led " + led, "aria-hidden": "true" }), "Autopilot"), el("b", { text: led === "on" ? "on" : led === "capped" ? "capped" : "off" })));
+    [["needs", "Needs you", String(NEEDS.length), NEEDS.length ? "alert" : ""], ["approvals", "Approvals", String(waiting.length), ""],
+     ["team", "Agents working", G.ok ? String(working) : "?", ""], ["costs", "AI spend", G.ok ? usd(costs.total) : "?", ""]].forEach(function (x) {
+      strip.appendChild(el("a", { href: "#" + x[0], cls: x[3] }, el("span", { text: x[1] }), el("b", { text: x[2] })));
+    });
+  })();
+
+  // ⌘K (or Ctrl+K, or /): jump to a tab, an agent, a ticket, a decision or something waiting on you.
+  var pal = null;
+  function palItems() {
+    var items = TABS.map(function (t) { return { kind: "Tab", text: t[1], go: "#" + t[0] }; });
+    agents().forEach(function (a) { items.push({ kind: "Agent", text: roleName(a.role) + " (" + a.role + ")", go: "#agent/" + encodeURIComponent(a.role) }); });
+    NEEDS.forEach(function (x) { items.push({ kind: "Needs you", text: x.title, go: safeHref(x.url) || "#needs" }); });
+    openTickets.forEach(function (t) { items.push({ kind: "Ticket", text: "#" + t.number + " " + t.title, go: safeHref(t.url) || "#roadmap" }); });
+    (R.decisions || []).forEach(function (d) { items.push({ kind: "Decision", text: d.id + " " + d.decision + (d.status ? " · " + d.status : ""), go: "#decisions" }); });
+    return items;
+  }
+  function openPalette() {
+    if (pal) { pal.input.focus(); return; }
+    var items = palItems(), shown = [], cur = 0, back = document.activeElement;
+    var input = el("input", { type: "search", placeholder: "Jump to a tab, agent, ticket or decision", "aria-label": "Search the dashboard", autocomplete: "off", "aria-controls": "pal-list" });
+    var list = el("ul", { id: "pal-list", role: "listbox", "aria-label": "Results" });
+    var box = el("div", { cls: "palette", role: "dialog", "aria-modal": "true", "aria-label": "Search" }, input, list,
+      el("p", { cls: "note", style: "margin:0;padding:8px 12px" }, "↑ ↓ to move, Enter to open, Esc to close"));
+    var veil = el("div", { cls: "veil", on: { click: function (e) { if (e.target === veil) close(); } } }, box);
+    function go(it) { close(); if (/^#/.test(it.go)) location.hash = it.go.slice(1); else window.open(it.go, "_blank", "noopener,noreferrer"); }
+    function draw() {
+      var terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+      shown = items.filter(function (it) { var h = (it.kind + " " + it.text).toLowerCase(); return terms.every(function (w) { return h.indexOf(w) >= 0; }); }).slice(0, 40);
+      cur = Math.min(cur, Math.max(0, shown.length - 1)); list.textContent = "";
+      if (!shown.length) list.appendChild(el("li", { cls: "empty", text: "Nothing matches." }));
+      shown.forEach(function (it, i) {
+        list.appendChild(el("li", { role: "option", id: "pal-" + i, "aria-selected": i === cur ? "true" : "false", on: { click: function () { go(it); }, mousemove: function () { if (cur !== i) { cur = i; mark(); } } } },
+          el("span", { cls: "badge", text: it.kind }), " ", el("span", { text: it.text }), /^#/.test(it.go) ? null : el("span", { cls: "ext", text: " ↗" })));
+      });
+      mark();
+    }
+    function mark() {
+      Array.prototype.forEach.call(list.children, function (li, i) { if (li.getAttribute("role")) li.setAttribute("aria-selected", i === cur ? "true" : "false"); });
+      if (shown.length) { input.setAttribute("aria-activedescendant", "pal-" + cur); var li = list.children[cur]; if (li && li.scrollIntoView) li.scrollIntoView({ block: "nearest" }); }
+    }
+    function close() { document.body.removeChild(veil); pal = null; if (back && back.focus) back.focus(); }
+    input.addEventListener("input", function () { cur = 0; draw(); });
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { close(); e.preventDefault(); }
+      else if (e.key === "ArrowDown") { cur = Math.min(cur + 1, shown.length - 1); mark(); e.preventDefault(); }
+      else if (e.key === "ArrowUp") { cur = Math.max(cur - 1, 0); mark(); e.preventDefault(); }
+      else if (e.key === "Enter" && shown[cur]) { go(shown[cur]); e.preventDefault(); }
+      else if (e.key === "Tab") { input.focus(); e.preventDefault(); }
+    });
+    document.body.appendChild(veil); pal = { input: input }; draw(); input.focus();
+  }
+  document.getElementById("find").addEventListener("click", openPalette);
+  document.addEventListener("keydown", function (e) {
+    var typing = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target || {}).tagName || "") || (e.target && e.target.isContentEditable);
+    if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) { openPalette(); e.preventDefault(); }
+    else if (e.key === "/" && !typing && !pal) { openPalette(); e.preventDefault(); }
+  });
+  if (!/Mac|iPhone|iPad/.test(navigator.platform || "")) document.getElementById("find-key").textContent = "Ctrl K";
+
+  // Compact density: tighter panels and rows for a desktop read; remembered per browser.
+  var dens = document.getElementById("density");
+  function setDensity(on) { if (on) document.documentElement.setAttribute("data-density", "compact"); else document.documentElement.removeAttribute("data-density"); dens.setAttribute("aria-pressed", on ? "true" : "false"); }
+  try { setDensity(localStorage.getItem("s2s-density") === "compact"); } catch (e) { setDensity(false); }
+  dens.addEventListener("click", function () {
+    var on = dens.getAttribute("aria-pressed") !== "true"; setDensity(on);
+    try { localStorage.setItem("s2s-density", on ? "compact" : "comfortable"); } catch (e) { /* private window */ }
+  });
   select(location.hash.slice(1), false); edges();
   var themeBtn = document.getElementById("theme");
   function getTheme() { try { return localStorage.getItem("s2s-theme"); } catch (e) { return null; } }

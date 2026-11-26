@@ -31,7 +31,7 @@ from detent.policy.schema import MoneyMap, RuleSet, RuleSetError, load_ruleset
 from detent.policy.store import active_policy
 
 DEFAULT_ATTESTATION = (
-    "The client approves these rules and keeps its AML accountability. Detent applies them as written."
+    "The client approves these rules and keeps its AML accountability. DekernAI applies them as written."
 )
 
 

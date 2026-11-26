@@ -37,7 +37,7 @@ def summary(root: Path, source: str) -> list[str]:
         handoff = (root / "HANDOFF.md").read_text(encoding="utf-8")
     except OSError:
         handoff = ""
-    lines = ["Detent session context (from HANDOFF.md):"]
+    lines = ["DekernAI session context (from HANDOFF.md):"]
     lines += [ln for ln in section(handoff, "Where we are") if ln.startswith("|")]
     nxt = [ln for ln in section(handoff, "Next slice") if ln.strip()]
     if nxt:

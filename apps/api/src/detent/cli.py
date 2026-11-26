@@ -252,7 +252,7 @@ def cmd_demo_run(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="detent", description="Detent agentic payment controls (prototype)")
+    p = argparse.ArgumentParser(prog="detent", description="DekernAI agentic payment controls (prototype)")
     sub = p.add_subparsers(dest="cmd", required=True)
     sub.add_parser("check-config").set_defaults(fn=cmd_check_config)
     a = sub.add_parser("api")

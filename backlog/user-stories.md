@@ -278,7 +278,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 
 ### POL-08 · Decision-only API
 
-**As a** platform integrator, **I want** POST /v1/decisions to get a decision without Detent executing anything, **so that** I can use Detent before my own payout process, and shadow mode can reuse the same engine.
+**As a** platform integrator, **I want** POST /v1/decisions to get a decision without DekernAI executing anything, **so that** I can use DekernAI before my own payout process, and shadow mode can reuse the same engine.
 
 **Acceptance criteria**
 
@@ -502,7 +502,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 ### EXE-08 · Kill switch
 
-**As a** payments lead, **I want** a kill switch that I or Detent's on-call engineer can pull, and that only I can release, **so that** we can stop all sending at once during an incident.
+**As a** payments lead, **I want** a kill switch that I or DekernAI's on-call engineer can pull, and that only I can release, **so that** we can stop all sending at once during an incident.
 
 **Acceptance criteria**
 
@@ -1177,7 +1177,7 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 ### SHD-01 · Shadow CSV import
 
-**As a** payments lead, **I want** to upload a month of payout and deposit exports with our actual decisions, **so that** Detent can show what it would have decided on our real data.
+**As a** payments lead, **I want** to upload a month of payout and deposit exports with our actual decisions, **so that** DekernAI can show what it would have decided on our real data.
 
 **Acceptance criteria**
 
@@ -1191,7 +1191,7 @@ _Run decisions on a prospect's exported data and produce the free shadow report_
 
 **Acceptance criteria**
 
-- [ ] Sections: decision mix, agreement, unsafe approvals (approved by Detent but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF
+- [ ] Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF
 
 **Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** SHD-01, RAL-06 · **Traces to:** A3.shadow, B3.lead_shadow, A4.plans
 
@@ -1291,7 +1291,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] `Detent-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400
+- [ ] `DekernAI-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.standards
 
@@ -1353,11 +1353,11 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 
 ### WHK-02 · Signed webhooks
 
-**As a** platform integrator, **I want** an HMAC-SHA256 signature over timestamp and body with a 5-minute window, **so that** I can trust that events come from Detent.
+**As a** platform integrator, **I want** an HMAC-SHA256 signature over timestamp and body with a 5-minute window, **so that** I can trust that events come from DekernAI.
 
 **Acceptance criteria**
 
-- [ ] `Detent-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)
+- [ ] `DekernAI-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** WHK-01 · **Traces to:** D.webhooks
 
@@ -1377,7 +1377,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 ### DSH-01 · Admin creates organisations and invites
 
-**As a** Detent admin, **I want** to create an organisation after a demo and invite its developers, **so that** sandbox access stays sales-led.
+**As a** DekernAI admin, **I want** to create an organisation after a demo and invite its developers, **so that** sandbox access stays sales-led.
 
 **Acceptance criteria**
 
@@ -1399,7 +1399,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 ### DSH-03 · Organisation expiry and extension
 
-**As a** Detent admin, **I want** sandbox access to expire unless I extend it, **so that** access is reviewed and can't linger.
+**As a** DekernAI admin, **I want** sandbox access to expire unless I extend it, **so that** access is reviewed and can't linger.
 
 **Acceptance criteria**
 
@@ -1469,7 +1469,7 @@ _Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console
 
 ### DSH-10 · Access requests inbox
 
-**As a** Detent admin, **I want** website access requests stored as leads and emailed to the sales inbox, **so that** I can follow up and approve companies.
+**As a** DekernAI admin, **I want** website access requests stored as leads and emailed to the sales inbox, **so that** I can follow up and approve companies.
 
 **Acceptance criteria**
 
@@ -1702,7 +1702,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 ### WEB-08 · SEO basics
 
-**As a** founder, **I want** titles, meta, sitemap, Open Graph and structured data paired with the category, **so that** "Detent payment controls" and our topic searches find us.
+**As a** founder, **I want** titles, meta, sitemap, Open Graph and structured data paired with the category, **so that** "DekernAI payment controls" and our topic searches find us.
 
 **Acceptance criteria**
 

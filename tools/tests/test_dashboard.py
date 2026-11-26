@@ -17,6 +17,7 @@ sys.path.insert(0, str(TOOLS))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import approval  # noqa: E402
 import build_dashboard as bd  # noqa: E402
+import theme  # noqa: E402
 import heartbeat  # noqa: E402
 import tickets  # noqa: E402
 from test_heartbeat import Fake  # noqa: E402
@@ -309,7 +310,13 @@ def test_the_page_has_the_inbox_charts_and_freshness_and_rebuilds_on_activity():
     wf = Path(__file__).resolve().parents[2] / ".github" / "workflows" / "dashboard.yml"
     if wf.exists():
         text = wf.read_text(encoding="utf-8")
-        assert "issue_comment:" in text and "sleep 60" in text and "cancel-in-progress: true" in text
+        assert "issue_comment:" in text and "sleep" not in text and "cancel-in-progress: false" in text
+        assert "github.event.sender.type != 'Bot'" in text, "agents' ticket events must not rebuild it"
+    agents = wf.parent / "agents.yml"
+    if agents.exists():
+        text = agents.read_text(encoding="utf-8")
+        assert "11,41 8-19 * * *" in text and "startsWith(github.event.comment.body, '/approve')" in text
+        assert "gh workflow run dashboard.yml" in text and "gh workflow run needs-you.yml" in text
 
 
 def test_the_stage_ladder_shows_every_gate_with_its_evidence(root, fake):
@@ -552,3 +559,120 @@ def test_the_overview_shows_the_journey_simply_and_the_rest_moves_to_its_tabs(ro
     # the journey: 7 phases in plain words, the current phase's stages, the gate, who leads, what blocks it
     assert '"Your journey"' in html and "You are here" in html and "Is the problem real?" in html
     assert '"Done when"' in html and '"Led by"' in html and '"Blocking this stage"' in html and '"Next"' in html
+
+
+def test_the_autopilot_run_cap_shows_on_the_team(root, fake):
+    pol = json.loads((root / "founder/heartbeats.json").read_text(encoding="utf-8"))
+    pol["autopilot"] = {"enabled": True, "max_runs_per_day": 2}
+    (root / "founder/heartbeats.json").write_text(json.dumps(pol), encoding="utf-8")
+    log = fake.make("Cost log 2026-11", "", [heartbeat.COST_LOG])
+    day = NOW.date().isoformat()
+    for at in (f"{day}T08:00:00Z", f"{day}T09:00:00Z", "2026-11-01T09:00:00Z"):
+        fake.comments[log].append({"body": heartbeat.cost_entry("qa", 0.1, "2026-11", "measured", None, "run", {"outcome": "worked"}),
+                                   "created_at": at})
+    c = data_of(bd.page(bd.build(root, now=NOW)))["github"]["costs"]
+    assert c["autopilot"] == {"enabled": True, "cap": 2, "runs_today": 2}
+    html = bd.PAGE.read_text(encoding="utf-8")
+    assert 'capped: "waiting: run cap"' in html and "AUTO.capped" in html
+
+
+def test_next_directions_rubrics_and_the_new_views_reach_the_page(root, fake):
+    (root / "founder" / "next.md").write_text(
+        "# Next directions\n\n| Version | What | Why later | How | Source |\n| --- | --- | --- | --- | --- |\n"
+        "| v2 | Card payments | Not possible today | A provider partnership | B-05 |\n"
+        "| V1 | Email invoices </script><img src=x onerror=alert(2)> | needs a credential | Provider key in the vault | B-04 |\n"
+        "| someday | Mobile app | because | | |\n| v1 |  | out of scope | nothing to show | |\n", encoding="utf-8")
+    pol = json.loads((root / "founder/heartbeats.json").read_text(encoding="utf-8"))
+    pol["roles"]["qa"]["rubric"] = ["Ran every level", "Wrote a go or no-go"]
+    (root / "founder/heartbeats.json").write_text(json.dumps(pol), encoding="utf-8")
+    page = bd.page(bd.build(root, now=NOW))
+    repo = data_of(page)["repo"]
+    assert [(r["version"], r["why"]) for r in repo["next"]] == [("v2", "not possible"), ("v1", "needs a credential"), ("later", "")]
+    assert "</script><img" not in page and "<img" not in page.split('id="s2s-data">')[1].split("</script>")[0], "hostile text stays escaped"
+    assert repo["heartbeats"]["qa"]["rubric"] == ["Ran every level", "Wrote a go or no-go"]
+    assert repo["heartbeats"]["engineer"]["rubric"] == heartbeat.DEFAULT_RUBRIC["engineer"]
+    html = bd.PAGE.read_text(encoding="utf-8")
+    for part in ("function schemaPanel", "function agentRows", "function nextPanel", "function openPalette", 'id="find"',
+                 'id="density"', 'id="strip"', '{ h: "Checks"', 'el("details", { cls: "panel source" }', '" ghost"'):
+        assert part in html, part
+    assert "nextPanel()," in html[html.index("  function roadmapTab() {"):], "the version rail sits on the Roadmap"
+
+
+def test_profiles_evals_and_daily_pass_rate_reach_the_page(root, fake):
+    (root / ".codex" / "agents").mkdir(parents=True, exist_ok=True)
+    (root / ".codex/agents/engineer.toml").write_text(
+        "name = \"engineer\"\ndeveloper_instructions = '''\n# Engineers\n\n## Owns\n- code and tests\n\n## Skills\n- claim\n- handoff\n\n"
+        "## Tools\nEdit, test and git in this repository only.\n\n## Never\n- push to the default branch\n\n"
+        "## Needs the founder's approval for\n- every merge\n'''\n", encoding="utf-8")
+    (root / "evals" / "engineer").mkdir(parents=True)
+    (root / "evals/engineer/invoice-export.md").write_text("# Export invoices as CSV\n\nTicket: #41\n", encoding="utf-8")
+    (root / "evals/engineer/Bad Name.md").write_text("# no\n", encoding="utf-8")
+    (root / "evals/stranger").mkdir()
+    (root / "evals/stranger/x.md").write_text("# no\n", encoding="utf-8")
+    repo = data_of(bd.page(bd.build(root, now=NOW)))["repo"]
+    eng = repo["profiles"]["engineer"]
+    assert eng["skills"] == ["claim", "handoff"] and eng["never"] == ["push to the default branch"]
+    assert eng["tools"] == ["Edit, test and git in this repository only."] and eng["approval"] == ["every merge"]
+    assert "run_model" in eng and repo["profiles"]["qa"]["skills"] == []
+    assert repo["evals"] == [{"role": "engineer", "case": "invoice-export", "title": "Export invoices as CSV",
+                              "path": "evals/engineer/invoice-export.md", "ticket": "41"}]
+    day = NOW.date().isoformat()
+    runs = [{"role": "qa", "at": day + "T10:00:00Z", "outcome": "worked", "checks": [3, 3], "model": "m"},
+            {"role": "qa", "at": day + "T11:00:00Z", "outcome": "worked", "checks": [1, 3], "model": "m"},
+            {"role": "qa", "at": day + "T12:00:00Z", "outcome": "worked", "checks": [3, 3], "eval": "smoke", "model": "m2"}]
+    row = bd.trends(runs, [], [], NOW)["days"][-1]
+    assert (row["graded"], row["passed"], row["pass_rate"]) == (2, 1, 0.5)
+    assert bd.eval_results(runs) == {"qa/smoke": {"at": day + "T12:00:00Z", "model": "m2", "checks": [3, 3], "passed": True}}
+
+
+def test_the_v2_14_views_are_on_the_page():
+    html = bd.PAGE.read_text(encoding="utf-8")
+    for part in ("function attachCards", "function evalPanel", "function passChart", "function systemPanel", "function goalLine",
+                 '{ h: "Note"', 'cls: "led "', "prefers-reduced-motion: reduce) { .led.on", 'panel("Checks passed, by role"'):
+        assert part in html, part
+    assert '<nav aria-label="Dashboard tabs"><div class="tabs" role="tablist" id="tabs"></div><div class="strip" id="strip"' in html, \
+        "the day's numbers sit in the sticky tab bar"
+    assert "goalLine(), tiles," in html and "systemPanel(crewAll)," in html, "the Overview opens with the goal and the system"
+
+
+def test_charts_follow_the_dataviz_rules():
+    html = bd.PAGE.read_text(encoding="utf-8")
+    for part in ("function legend", 'tabindex: "0", "aria-label": tip', "function trendTable", "max-width: 24px", "border-radius: 4px 4px 0 0",
+                 ".s-a { background: var(--series); }", "--series: #0068d6;", "--series: #3d95f5;"):
+        assert part in html, part
+    assert "(green: " not in html, "a chart names its parts in a legend, not by colour in the title"
+    assert "animation: enter 180ms" not in html and "animation: fadein 150ms" not in html, "the keyboard-opened palette doesn't animate"
+    assert ".tile .v { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric" not in html
+
+
+DETENT_LIKE = {"light": {"paper": "#F3F3F1", "ink": "#18191B", "link": "#C2360F", "series": "#237A46", "miss": "#C2360F"},
+               "dark": {"paper": "#18191B", "surface": "#232427", "ink": "#F3F3F1", "link": "#FF4A1F", "series": "#3c9a62", "miss": "#FF4A1F"}}
+
+
+def test_a_startup_themes_its_dashboard_from_its_brand(root, fake):
+    cfg = json.loads((root / "founder/dashboard.json").read_text(encoding="utf-8")) if (root / "founder/dashboard.json").exists() else {}
+    cfg["theme"] = DETENT_LIKE
+    (root / "founder/dashboard.json").write_text(json.dumps(cfg), encoding="utf-8")
+    page = bd.page(bd.build(root, now=NOW))
+    style = page.split('<style id="s2s-theme">')[1].split("</style>")[0]
+    assert ":root { --ink: #18191b; --link: #c2360f; --miss: #c2360f; --paper: #f3f3f1; --series: #237a46; }" in style
+    assert ':root[data-theme="dark"] {' in style and "--series: #3c9a62;" in style and "prefers-color-scheme: dark" in style
+    assert page.index('id="s2s-theme"') < page.index("</head>") and data_of(page)["theme"]["warnings"] == []
+
+
+def test_a_theme_that_charts_cannot_read_is_not_applied():
+    out = theme.build({"theme": {"light": {"series": "#1a7f37", "miss": "#cb2a2f", "ink": "red", "nope": "#000000"},
+                                 "dark": {"ink": "#2a2a2a"}}})
+    assert out["light"] == {} and out["dark"] == {}
+    text = " ".join(out["warnings"])
+    assert "deutan" in text and "ignored ink, nope" in text and "ink on paper" in text
+    assert theme.css(out) == "" and theme.css({}) == ""
+    assert theme.build({"theme": "blue"}) == {"light": {}, "dark": {}, "warnings": []}
+    assert round(theme.delta_e("#1a7f37", "#cb2a2f", "deutan"), 1) == 5.1, "matches the dataviz validator"
+    hostile = theme.css({"light": {"ink": "#000000;}</style><script>"}})
+    assert "<script>" not in hostile
+
+
+def test_the_page_honours_the_miss_token_and_shows_theme_warnings():
+    html = bd.PAGE.read_text(encoding="utf-8")
+    assert ".s-w { background: var(--miss, var(--waiting)); }" in html and '" Theme: " + w' in html

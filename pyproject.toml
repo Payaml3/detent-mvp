@@ -1,7 +1,7 @@
 [project]
 name = "detent-workspace"
 version = "0.0.0"
-description = "Detent agentic payment controls (working name): development workspace"
+description = "DekernAI agentic payment controls : development workspace"
 requires-python = ">=3.12,<3.13"
 dependencies = []
 
@@ -40,7 +40,7 @@ line-length = 110
 target-version = "py312"
 extend-exclude = [
   "chain/lib", "chain/out", "chain/cache", "tools/build_backlog.py", "*.md", ".specify", ".claude",  # supplied or vendored; specs are prose
-  # Plugin-owned (solo-to-scale): every upgrade rewrites these from the plugin's templates, so Detent's lint
+  # Plugin-owned (solo-to-scale): every upgrade rewrites these from the plugin's templates, so DekernAI's lint
   # rules don't apply. The plugin tests them; tools/tests runs them here too.
   "tools/_s2s.py", "tools/approval.py", "tools/build_dashboard.py", "tools/build_portfolio.py",
   "tools/build_roadmap.py", "tools/build_team.py", "tools/build_traceability.py", "tools/check_governance.py",

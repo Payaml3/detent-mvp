@@ -1,7 +1,7 @@
 [project]
 name = "detent"
 version = "0.1.0"
-description = "Detent agentic payment controls: API, console and worker (prototype, test networks only)"
+description = "DekernAI agentic payment controls: API, console and worker (prototype, test networks only)"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "fastapi>=0.115",

@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
-  title: Detent payment controls API (sandbox)
+  title: DekernAI payment controls API (sandbox)
   version: "2026-12-01"
   summary: Agentic payment controls - decision, orchestration and operations. Test networks only.
   description: |
-    Contract for spec/03-api.md. Detent is the working name. Sandbox, pre-launch: every key is an `sk_test_` key and
+    Contract for spec/03-api.md. DekernAI is the brand name (B-01, 26 Nov 2026; it replaced the working name Detent). Sandbox, pre-launch: every key is an `sk_test_` key and
     every rail is a test network or a simulator. `sk_live_` keys always get 403 `live_mode_unavailable`.
 
     Items marked PROPOSED depend on a pending decision in specs/001-detent-mvp/decisions.md.
@@ -27,7 +27,7 @@ paths:
       operationId: createPaymentIntent
       summary: Create a payout intent; it is decided synchronously (INT-01, INT-02)
       x-scope: intents:create
-      parameters: [{$ref: "#/components/parameters/IdempotencyKey"}, {$ref: "#/components/parameters/DetentVersion"}]
+      parameters: [{$ref: "#/components/parameters/IdempotencyKey"}, {$ref: "#/components/parameters/DekernAIVersion"}]
       requestBody:
         required: true
         content: {application/json: {schema: {$ref: "#/components/schemas/PaymentIntentCreate"}}}
@@ -299,7 +299,7 @@ components:
     bearerAuth: {type: http, scheme: bearer, description: "sk_test_ keys only; hashed at rest; scopes read, intents:create, exceptions:approve, admin"}
   parameters:
     IdempotencyKey: {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 255}}
-    DetentVersion: {name: Detent-Version, in: header, required: false, schema: {type: string, example: "2026-12-01"}}
+    DekernAIVersion: {name: DekernAI-Version, in: header, required: false, schema: {type: string, example: "2026-12-01"}}
     PaymentId: {name: id, in: path, required: true, schema: {type: string, pattern: "^pay_"}}
     ExceptionId: {name: id, in: path, required: true, schema: {type: string, pattern: "^exc_"}}
     Limit: {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}

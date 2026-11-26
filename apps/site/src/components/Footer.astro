@@ -1,18 +1,20 @@
 ---
 import config from "../../site.config.mjs";
+import Logo from "./Logo.astro";
 const year = 2026;
 ---
 <footer class="footer" data-section="footer">
   <div class="tiles wrap">
     <div class="tile statement">
       <p>{config.brandName} is {config.category} software: one layer that decides, orchestrates and operates every deposit and payout, under your rules.</p>
-      <p class="small soft">© {year} {config.brandName} (working name). Pre-launch software. It never holds client funds or keys.</p>
+      <p class="small soft">© {year} {config.brandName}. Agentic payment controls. It never holds client funds or keys.</p>
     </div>
     <nav class="tile" aria-label="Footer">
       <ul>
         <li><a href="/product/">Product</a></li>
         <li><a href="/security/">Security</a></li>
-        <li><a href="/design-partners/">Design partners</a></li>
+        <li><a href="/design-partners/">Onboarding</a></li>
+        <li><a href={config.bookingUrl}>Book a demo</a></li>
         <li><span class="soon">Docs <span class="soft small">(at launch)</span></span></li>
         <li><span class="soon">Status <span class="soft small">(at launch)</span></span></li>
       </ul>
@@ -22,14 +24,14 @@ const year = 2026;
         <li><a href="/privacy/">Privacy</a></li>
         <li><a href="/terms/">Terms</a></li>
         <li><a href="/cookies/">Cookies</a></li>
-        <li><a href="/access/">Request sandbox access</a></li>
+        <li><a href="/access/">Request access</a></li>
       </ul>
     </nav>
     <div class="tile contact">
       <p class="small soft">Contact</p>
       <a class="mail" href={`mailto:${config.salesInbox}`}>{config.salesInbox.startsWith("PLACEHOLDER") ? "sales inbox (to be set)" : config.salesInbox}</a>
     </div>
-    <div class="tile mark" aria-hidden="true"><span>{config.brandName}</span></div>
+    <div class="tile mark" aria-hidden="true"><Logo height={96} /></div>
     <a class="tile invite" href={config.bookingUrl}>
       <span>Book a demo</span>
       <svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true"><path d="M10 38 L38 10 M16 10 H38 V32" fill="none" stroke="currentColor" stroke-width="4"/></svg>
@@ -39,18 +41,20 @@ const year = 2026;
 <style>
   .footer { padding: var(--section) 0 12px; }
   .tiles { display: grid; grid-template-columns: repeat(12, 1fr); gap: 8px; }
-  .tile { background: var(--ink-raised); border-radius: var(--radius); padding: 28px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; }
+  .tile { background: var(--surface); border-radius: var(--radius); padding: 28px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; }
   .statement { grid-column: span 4; font-size: 19px; line-height: 1.4; }
   .tile:nth-child(2), .tile:nth-child(3) { grid-column: span 2; }
   .contact { grid-column: span 4; }
   ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  .tile a { color: var(--paper); text-decoration: none; }
-  .tile a:hover { color: var(--blue-soft); }
+  .tile a { color: var(--text); text-decoration: none; }
+  .tile a:hover { color: var(--interactive-soft); }
   .mail { font: 500 22px/1.2 var(--font-head); word-break: break-word; }
-  .mark { grid-column: span 8; min-height: 320px; background: var(--paper); color: var(--ink-deep); align-items: center; justify-content: center; overflow: hidden; }
-  .mark span { font: 700 clamp(64px, 11vw, 168px)/0.9 var(--font-head); letter-spacing: -0.05em; }
-  .invite { text-decoration: none; grid-column: span 4; min-height: 320px; background: var(--orange) !important; color: var(--ink-deep) !important; font: 600 30px/1.1 var(--font-head); transition: background 160ms; }
-  .invite:hover { background: #FF7240 !important; }
+  .mark { grid-column: span 8; min-height: 320px; background: var(--text); color: var(--bg); flex-direction: row; align-items: center; justify-content: center; gap: clamp(16px, 3vw, 40px); overflow: hidden; }
+  .mark :global(svg) { width: min(86%, 900px); height: auto; }
+  .invite { text-decoration: none; grid-column: span 4; min-height: 320px; background: var(--signal) !important; color: var(--on-signal) !important; font: 600 30px/1.1 var(--font-head); transition: background 160ms; }
+  @media (hover: hover) and (pointer: fine) {
+    .invite:hover { background: var(--signal-hover) !important; }
+    }
   .invite svg { align-self: flex-end; transition: transform 200ms var(--ease-out); }
   .invite:hover svg { transform: translate(4px, -4px); }
   @media (max-width: 960px) {

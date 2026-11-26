@@ -11,7 +11,7 @@ Suggested headings once filled:
   the founder's notes)
 - Pricing and business model
 - Go-to-market and design partners
-- Regulatory notes (UK and EU; Detent is payment controls, never a payment provider)
+- Regulatory notes (UK and EU; DekernAI is payment controls, never a payment provider)
 - Decisions taken in that chat, and open questions
 
 Rules: no real client names, logos, testimonials or volume figures; nothing from a former employer;

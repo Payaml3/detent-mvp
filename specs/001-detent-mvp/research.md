@@ -1,4 +1,4 @@
-# Research and technical decisions: Detent MVP
+# Research and technical decisions: DekernAI MVP
 
 Phase 0 of [plan.md](plan.md). These are **technical** decisions within the stack the founder fixed in `AGENTS.md`.
 None of them sets a business rule. Business rules are in [decisions.md](decisions.md).
@@ -87,3 +87,29 @@ None of them sets a business rule. Business rules are in [decisions.md](decision
 - Foundry is installed from GitHub releases; in this cloud environment solc must come from GitHub releases because
   the Solidity binaries host is not reachable. CI downloads solc normally.
 - Docker runs Postgres 16 locally (`make db`); CI uses a service container.
+
+## R-14 External data sources: shortlist for when a solution is needed (research, nothing chosen)
+
+- **Status**: options to reach for when a story needs outside data, checked against the
+  [public-apis list](https://github.com/public-apis/public-apis) on 26 Nov 2026. Nothing here is adopted; each pick
+  needs its own story, and vendor contracts go through the `gate` skill. Limits are from search results, so confirm
+  them before signing.
+- **Phasing**: test networks first, main networks only after the founder approves and lifts invariant 14. Free chain
+  tiers are fine on test networks; screening, KYB and calendar data come from production sources from the start.
+
+| Need | First choice | Alternative | Notes |
+| --- | --- | --- | --- |
+| Wallet screening | OFAC SDN files ("Digital Currency Address - ETH/USDC" fields) | OpenSanctions (paid licence: compliance screening is commercial use) | Free government data; ingest the files, OFAC's search tool can't search addresses |
+| Name screening | UK Sanctions List (sole UK list since 28 Jan 2026), EU Financial Sanctions Files, UN list | OpenSanctions or an established screening vendor | Store the list version on each decision |
+| Chain RPC | Alchemy or Infura (free tiers on testnets) | A second node provider for read failover | Paid plans with a service level on mainnet; chain-ID guard stays |
+| Explorer and indexer | Blockscout PRO API (free: 5 req/s, 100K credits/day, key required) | Etherscan V2 (Base and its testnets are paid only) | `explorer_url()`, deposit matching, reconciliation |
+| Counterparty KYB | GLEIF API (free, no key, CC0) | UK Companies House (free key, 600 requests per 5 min) | `kyb_status`, read-only agent tools |
+| Business days | gov.uk bank holidays JSON, ECB TARGET calendar | Nager.Date (no service level; Docker image needs a sponsor key) | Snapshot into config, read through `Clock` |
+| FX for reports | ECB reference rates, self-hosted Frankfurter | None needed | Once per working day; never for execution |
+| Stablecoin peg | Chainlink USDC/USD feed (mainnet) | CoinGecko paid plan (Demo has no commercial licence) | A policy input only if the founder decides |
+| Transactional email | SendGrid or Mailjet | Any provider with EU hosting and a DPA | Open founder decision |
+
+- **Avoid**: free or demo tiers in production; third-party IBAN/BIC checkers (validate IBANs locally, BICs from
+  GLEIF); small unvetted sanctions APIs; FX feeds with no clear source; exchange APIs as price references.
+- **Rules for any source in a decision path**: store what it returned as evidence (replay never calls out), and fail
+  closed to `ESCALATE` with `SYSTEM_UNAVAILABLE` when it is down.

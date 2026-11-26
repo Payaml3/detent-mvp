@@ -1,7 +1,7 @@
 """The demo's own test token on Base Sepolia and Ethereum Sepolia (DEM-04, decision D-33).
 
 One demo run moves about $20,000 of test USDC, far more than Circle's faucet gives, so the live demo pays in
-``MockUSDC``: a 6-decimal test stand-in for USDC, named "Detent Demo USD (test stand-in, not USDC)",
+``MockUSDC``: a 6-decimal test stand-in for USDC, named "DekernAI Demo USD (test stand-in, not USDC)",
 symbol ``tUSDC``. The contract itself refuses every chain but 31337, 84532 and 11155111, and only its
 deployer can mint.
 

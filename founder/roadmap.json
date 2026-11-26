@@ -1,6 +1,6 @@
 {
- "project": "Detent",
- "current_stage": 13,
+ "project": "DekernAI",
+ "current_stage": 4,
  "stages": [
   {
    "stage": 1,
@@ -40,9 +40,9 @@
    "phase": "B Define",
    "name": "Brand strategy",
    "gate": "Name, trademark and domain checked",
-   "status": "To do",
+   "status": "Current",
    "where": "P 06",
-   "evidence": "Partial: working name only, domain a placeholder (D-17, `founder/brand.md`); no trademark check",
+   "evidence": "Name DekernAI approved (B-01); domain and UK/EU/WIPO trade mark screen clean (`docs/brand/name-review-2026-11.md`); domains dekernai.com and dekernai.co.uk registered 2026-11-26; still to do: attorney clearance (legal gate), design system on palette B-02",
    "start": "2026-11-18",
    "target": ""
   },
@@ -84,9 +84,9 @@
    "phase": "C Specify and design",
    "name": "Specify",
    "gate": "Every open item answered or deferred",
-   "status": "To do",
+   "status": "Passed",
    "where": "Code",
-   "evidence": "`specs/001-detent-mvp/spec.md`, `requirements.yaml`; decisions D-01 to D-36; still Proposed or Open: C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 (`founder/status.md`)",
+   "evidence": "`specs/001-detent-mvp/spec.md`, `requirements.yaml`; decisions D-01 to D-38; every C- and G- item Confirmed (D-38 closed the last ten); G-19 legal review due before P4",
    "start": "2026-11-18",
    "target": ""
   },
@@ -537,5 +537,20 @@
    "needed_by": "S9"
   }
  ],
- "decisions_waiting": []
+ "decisions_waiting": [
+  {
+   "id": "B-04",
+   "decision": "Clients join through DekernAI's **onboarding process**, not a free shadow report: seven phases (discovery, contract and due diligence, sandbox integration, policy setup, shadow on live traffic, go-live, scale), each with an owner and an exit check, in `docs/product/client-journey.md`. The free shadow report is withdrawn as an offer and plan (supersedes that part of D-15); Pilot, Growth and Scale with \"Talk to us\" stay. Site entry action becomes \"Book a demo\" / \"Talk to us\"",
+   "status": "Proposed",
+   "date": "2026-11-26",
+   "register": "founder/decisions.md"
+  },
+  {
+   "id": "B-05",
+   "decision": "Naming the people we serve: **client** is the company that contracts with DekernAI (contracts, rules, onboarding, console); **platform** is the same company in marketing copy (\"platforms that hold user balances\"); **users** are the client's own end customers. Never \"merchant\": it suggests card acquiring and a payment provider",
+   "status": "Proposed",
+   "date": "2026-11-26",
+   "register": "founder/decisions.md"
+  }
+ ]
 }

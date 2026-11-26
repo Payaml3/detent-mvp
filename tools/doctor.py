@@ -153,7 +153,7 @@ def hosting_checks(root: Path, hub: tickets.Hub | None, cache: dict[str, Any]) -
     via = bd.provider(dash)
     field = "vercel_project" if via == "vercel" else "cloudflare_pages_project"
     if not host and not proj:
-        out.append(item("hosting", "Dashboard hosting", "info", "built every hour but not served yet; the Claude page "
+        out.append(item("hosting", "Dashboard hosting", "info", "built every few hours but not served yet; the Claude page "
                         "is the backup", "Set host and cloudflare_pages_project (or provider \"vercel\" and "
                         "vercel_project) in founder/dashboard.json", "The startup dashboard"))
     elif via not in bd.PROVIDERS:
@@ -225,8 +225,16 @@ def github_checks(root: Path, hub: tickets.Hub, now: dt.datetime) -> list[dict[s
                         seen[role] = max(seen.get(role, ""), str(cm.get("created_at") or ""))
             cutoff = (now - dt.timedelta(hours=NO_RUN_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
             quiet = [r for r in on if seen.get(r, "") < cutoff]
+            auto = heartbeat.policy(root).get("autopilot")
+            waiting = ""
+            if quiet and isinstance(auto, dict) and auto.get("enabled") is True:
+                # The autopilot starts a role only when it has an open ticket, so a quiet role with nothing to do is fine.
+                busy = {lb for t in hub.tickets("open") for lb in tickets.labels_of(t)}
+                waiting = ", ".join(r for r in quiet if f"role:{r}" not in busy)
+                quiet = [r for r in quiet if f"role:{r}" in busy]
             out.append(item("runs", "Heartbeat runs", "todo" if quiet else "ok",
                             f"no run recorded in {NO_RUN_HOURS}h: " + ", ".join(quiet) if quiet
+                            else f"the autopilot starts {waiting} when they have a ticket" if waiting
                             else "every role that is on has run recently",
                             "Create each one's cloud scheduled task (python tools/heartbeat.py plan prints the prompt), "
                             "or turn it off", "The AI team"))
@@ -235,7 +243,9 @@ def github_checks(root: Path, hub: tickets.Hub, now: dt.datetime) -> list[dict[s
 
     try:
         got = hub.api("actions/workflows/dashboard.yml/runs?per_page=5&branch=main") or {}
-        runs = [r for r in got.get("workflow_runs") or [] if r.get("status") == "completed"]
+        # A skipped or cancelled run (a bot's comment, a newer run taking over) says nothing about the build.
+        runs = [r for r in got.get("workflow_runs") or [] if r.get("status") == "completed"
+                and r.get("conclusion") not in ("skipped", "cancelled")]
         last = runs[0] if runs else None
         if last is None:
             out.append(item("dashboard_run", "Dashboard build", "info", "no finished run yet"))

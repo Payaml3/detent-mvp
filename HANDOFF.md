@@ -3,7 +3,9 @@
 One repository, one session per slice. A new session reads `CLAUDE.md`, then this file, and then only
 the specs and code the slice needs. At the end of the slice, update this file and push it with the slice.
 
-Last updated: 2026-11-24. The founder confirmed Detent is in MVP development (TRL 4) and passed playbook stages 7 (MVP scope), 9 (screen specs: every criterion linked to a story in `traceability.md`) and 12 (tasks and story groups); stages 1 to 6, 8, 10 and 11 wait on the founder's Passed or Deferred call. The founder chose the full MVP scope on 2026-11-23 (D-37). The dashboard runs on Vercel behind its login, on solo-to-scale 2.7.0.
+Last updated: 2026-11-25. The founder passed playbook stage 8 (specify): every C- and G- item is Confirmed (D-38); the G-19 legal review is still due before P4.
+
+Earlier, 2026-11-24: the founder confirmed DekernAI is in MVP development (TRL 4) and passed playbook stages 7 (MVP scope), 9 (screen specs: every criterion linked to a story in `traceability.md`) and 12 (tasks and story groups); stages 1 to 6, 10 and 11 wait on the founder's Passed or Deferred call. The founder chose the full MVP scope on 2026-11-23 (D-37). The dashboard runs on Vercel behind its login, on solo-to-scale 2.7.0.
 
 Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-scale operating system (#7); the live deploy and testnet run wait on the founder. The Monday weekly review runs as a scheduled task (07:39 UK time).
 
@@ -47,9 +49,9 @@ downloads are blocked in cloud containers) and needs `binaries.soliditylang.org`
 
 ## Session names
 
-Name each session `Detent · <slice> <slice name>`, for example `Detent · S8 Proof and release gate`, and
+Name each session `DekernAI · <slice> <slice name>`, for example `DekernAI · S8 Proof and release gate`, and
 tag it `detent` and `slice:<id>`. When a slice is done, rename its session to end in `(done)`.
-The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
+The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 
 ## How we work (unchanged)
 
@@ -137,7 +139,7 @@ The S0 to S7 work happened in one session: `Detent · S0–S7 build (done)`.
   superseding D-34 (prototype first).
 - `ANTHROPIC_API_KEY` (also as a GitHub secret for the nightly eval): every agent answer is a labelled
   hand-written stand-in until real runs are recorded (AGT-01 10/10, EVL-04). The interpretation and
-  agreement figures measure Detent's checks, not a model, until then.
+  agreement figures measure DekernAI's checks, not a model, until then.
 - Publishing the measured results on the website: `uv run detent eval publish` writes
   `apps/site/src/data/results.json` from a passing full run (EVL-06 criterion 1 stays open until then).
 - Nightly eval against public testnets needs funded test wallets and RPC endpoints as secrets (EVL-07 criterion 0).

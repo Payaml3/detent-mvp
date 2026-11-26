@@ -1,6 +1,6 @@
 """Deposit intents (LED-03, spec/03 ``/deposit_intents``).
 
-A deposit intent tells the platform's user where to send money and lets Detent recognise it:
+A deposit intent tells the platform's user where to send money and lets DekernAI recognise it:
 
 - on a chain rail, a per-account test address (the same account on the same network always gets the
   same address); on the simulated bank rail, a unique payment reference;
@@ -9,7 +9,7 @@ A deposit intent tells the platform's user where to send money and lets Detent r
 - idempotent like payment intents: the same ``Idempotency-Key`` and body return the same intent; the
   same key with a different body is refused.
 
-Prototype: deposit addresses are derived, test-network only, and Detent holds no key for them.
+Prototype: deposit addresses are derived, test-network only, and DekernAI holds no key for them.
 """
 
 from __future__ import annotations
@@ -92,7 +92,7 @@ def view(conn: Connection, org_id: str, deposit_id: str) -> dict[str, Any] | Non
             "chain_id": d.chain_id,
             "token": cur.value,
             "address": d.deposit_address,
-            "note": "Test network only. A per-account prototype address; Detent holds no key for it.",
+            "note": "Test network only. A per-account prototype address; DekernAI holds no key for it.",
         }
     else:
         instructions = {

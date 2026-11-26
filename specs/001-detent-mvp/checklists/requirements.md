@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Detent MVP
+# Specification Quality Checklist: DekernAI MVP
 
 **Purpose**: Validate specification completeness and quality before planning
 **Created**: 2026-11-18

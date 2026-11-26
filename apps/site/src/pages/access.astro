@@ -4,10 +4,10 @@ import PageHead from "../components/PageHead.astro";
 import config from "../../site.config.mjs";
 const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
 ---
-<Base title="Request sandbox access" description={`Request access to the ${config.brandName} sandbox: test keys, simulated rails and test values for every path.`}>
-  <PageHead title="Request sandbox access." lead="Sandbox keys are issued after a short conversation, so we can set up an organisation with the test data that matches your platform.">
+<Base title="Request access" description={`Request access to ${config.brandName}: scoped API keys, simulated rails and values that trigger every path.`}>
+  <PageHead title="Request access." lead="Keys are issued after a short conversation, so we can set up an organisation with data that matches your platform.">
     <Fragment slot="fragments">
-      <div class="frag" data-ui data-reveal><p class="frag-title">Test key · example</p><p class="mono">sk_test_••••••••••••7Q2c</p><p class="soft">Scopes: read, intents:create. Shown once.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">API key · example</p><p class="mono">sk_••••••••••••7Q2c</p><p class="soft">Scopes: read, intents:create. Shown once.</p></div>
       <div class="frag" data-ui data-reveal><p class="frag-title">Amount ending .13</p><span class="chip st-UNKNOWN">UNKNOWN</span><p>Times out, then confirms. Nothing is resent.</p></div>
       <div class="frag" data-ui data-reveal><p class="frag-title">Amount ending .42</p><span class="chip st-FAILED">FAILED</span><p>Fails on the first rail, then fails over under the same payment ID.</p></div>
       <div class="frag" data-ui data-reveal><p class="frag-title">Address ending dEaD</p><span class="chip st-BLOCKED">BLOCKED</span><p>Screening hit. Final.</p></div>
@@ -28,11 +28,11 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
       <button class="button" type="submit">Request access</button>
     </form>
     <div class="aside" data-reveal>
-      <h2>What the sandbox gives you</h2>
+      <h2>What you get</h2>
       <ul>
-        <li>Test keys only, scoped, shown once.</li>
-        <li>Simulated rails by default, with real test networks on request.</li>
-        <li>Test values that trigger every path: an amount ending in .13 times out and then confirms; .42 fails over under the same payment ID; a flagged address is blocked.</li>
+        <li>Scoped API keys, shown once.</li>
+        <li>Simulated rails to try every path before you connect your own.</li>
+        <li>Values that trigger every path: an amount ending in .13 times out and then confirms; .42 fails over under the same payment ID; a flagged address is blocked.</li>
         <li>Signed webhooks and request logs.</li>
       </ul>
     </div>
@@ -40,14 +40,14 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
 </Base>
 <style>
   .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; }
-  .form { display: grid; gap: 18px; background: var(--ink-raised); border-radius: 14px; padding: 32px; }
+  .form { display: grid; gap: 18px; background: var(--surface); border-radius: 14px; padding: 32px; }
   label { display: grid; gap: 6px; font-weight: 500; }
-  input, select, textarea { font: inherit; color: var(--paper); background: #0B1226; border: 1px solid var(--ink-line); border-radius: 6px; padding: 12px 14px; min-height: 48px; }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--blue-soft); outline-offset: 1px; }
-  .notice { background: rgba(242, 184, 75, 0.12); color: var(--amber); border-radius: 6px; padding: 10px 14px; font-size: 15px; }
+  input, select, textarea { font: inherit; color: var(--text); background: var(--surface-sunk); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-height: 48px; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--interactive-soft); outline-offset: 1px; }
+  .notice { background: color-mix(in srgb, var(--wait) 12%, transparent); color: var(--wait); border-radius: 6px; padding: 10px 14px; font-size: 15px; }
   .aside { display: grid; gap: 20px; align-content: start; }
   .aside h2 { font-size: clamp(26px, 2.4vw, 36px); }
-  .aside ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--paper-soft); font-size: 18px; }
+  .aside ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--text-soft); font-size: 18px; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 </style>
 <script>

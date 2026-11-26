@@ -22,7 +22,7 @@ Statuses follow `founder/operating-protocol.md` §3: Approved, Proposed, Assumpt
 ## Top risks
 
 1. **No customer evidence yet.** Pricing, positioning and the first design partners are Open (`founder/business-context.md`).
-2. **Agent figures are stand-ins.** With no `ANTHROPIC_API_KEY`, every agent answer is a labelled hand-written stand-in, so the interpretation and agreement scores measure Detent's checks, not a model.
+2. **Agent figures are stand-ins.** With no `ANTHROPIC_API_KEY`, every agent answer is a labelled hand-written stand-in, so the interpretation and agreement scores measure DekernAI's checks, not a model.
 3. **Real testnet runs are missing.** RAL-02/03 (Sepolia) and RAL-07 (switching networks) need funded wallets. S9 depends on them.
 4. **Concurrency gap.** Parallel intents can deadlock on the audit head and counter rows. The loser fails closed and nothing is paid twice, but a burst can return some 500s.
 5. **Prototype is not production.** The gaps carried forward are POL-06 retry and re-route endpoints, EXC-07 incident notices, CON-03 route display, the untested CON-05 PDF path, the DSH-03 dashboard half, manual refund payouts, bank deposits pending until the statement import, and the flaky `test_banksim.py::test_contract`.

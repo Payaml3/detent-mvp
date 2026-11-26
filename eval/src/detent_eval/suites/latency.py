@@ -3,7 +3,7 @@
 - rules-only: ``POST /v1/decisions`` (decide, never send) through the API, end to end in-process: key
   check, typed facts, policy, audit write. A mix of EXECUTE, ESCALATE and BLOCK outcomes.
 - agent path: the same decision for an escalated payment, then the investigation agent on its case.
-  With the recorded stand-in this measures Detent's own work around the model (evidence gathering, tool
+  With the recorded stand-in this measures DekernAI's own work around the model (evidence gathering, tool
   calls, checks, storage), not model time; ``--live`` includes the model's own latency.
 
 Measured on the CI runner against a local Postgres; it says nothing about production hardware.

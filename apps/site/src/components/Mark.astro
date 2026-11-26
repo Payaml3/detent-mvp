@@ -1,0 +1,11 @@
+---
+// The brand mark (B-03, Route): one stroke that draws the D and turns back in, with the orange point resting
+// where the route settles. The stroke takes currentColor; the point is --settle (safety orange).
+// Rules and lockups: founder/brand.md and apps/site/public/brand/.
+interface Props { size?: number; }
+const { size = 22 } = Astro.props;
+---
+<svg class="mark" viewBox="0 0 48 48" width={size} height={size} aria-hidden="true">
+  <path fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" d="M9 41V7H23A17 17 0 0 1 23 41H17" />
+  <circle cx="22" cy="27" r="5.5" fill="var(--settle)" />
+</svg>

@@ -91,7 +91,10 @@ class BankAdapter:
                 f"{self._url}/payments",
                 json=body,
                 timeout=self._timeout,
-                headers={"Idempotency-Key": attempt.idempotency_key, "X-Detent-Attempt": attempt.attempt_id},
+                headers={
+                    "Idempotency-Key": attempt.idempotency_key,
+                    "X-DekernAI-Attempt": attempt.attempt_id,
+                },
             )
         except requests.exceptions.RequestException as exc:
             raise RailError(classify(exc), f"bank: {type(exc).__name__}") from exc
