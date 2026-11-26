@@ -58,17 +58,24 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   /* A graphite field (B-02): the page's tokens, swapped for this one band. Cards keep the light roles. */
   :global(body:has(.hero)) { --ink: var(--text); --paper: var(--bg); --ink-soft: var(--text-soft); --ink-surface: var(--surface); }
   :global(body:has(.hero) .nav) { --text: var(--paper); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --interactive-soft: var(--signal); }
-  .hero { position: relative; min-height: max(760px, 100svh); overflow: hidden; background: var(--ink); }
+  .hero { position: relative; min-height: max(760px, 100svh); overflow: hidden; background: var(--ink); isolation: isolate; }
+  /* cinematic light: one soft falloff behind the stack, and film grain over the whole field */
+  .hero::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(60% 70% at 72% 38%, color-mix(in srgb, var(--paper) 9%, transparent), transparent 70%),
+      radial-gradient(30% 30% at 70% 88%, color-mix(in srgb, var(--signal) 14%, transparent), transparent 70%); }
+  .hero::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0.09; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .art { z-index: 1; }
   .hero-grid { --text: var(--paper); --bg: var(--ink); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --line: color-mix(in srgb, var(--paper) 18%, var(--ink)); color: var(--text); }
   .cards .card { --text: var(--ink); --bg: var(--paper); --text-soft: var(--ink-soft); color: var(--text); }
   .hero .secondary { color: var(--paper); border-color: var(--paper); background: transparent; }
   .hero .secondary:hover { background: color-mix(in srgb, var(--paper) 12%, transparent); }
-  .art { position: absolute; left: 49%; top: 4%; width: 24%; height: 86%; pointer-events: none; }
+  .art { position: absolute; right: 0; top: 0; width: 58%; height: 74%; pointer-events: none; }
   .hero-grid { position: relative; z-index: 2; min-height: max(760px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
-    column-gap: 24px; padding-top: 136px; padding-bottom: 56px; pointer-events: none; }
+    grid-template-rows: 1fr auto; column-gap: 24px; row-gap: 56px; padding-top: 136px; padding-bottom: 48px; pointer-events: none; }
   .hero-grid > * { pointer-events: auto; }
   .intro { grid-column: 1 / span 7; display: grid; gap: 28px; align-content: start; }
-  .headline { font-size: clamp(40px, 4.1vw, 68px); line-height: 1; }
+  .headline { font-size: clamp(44px, 4.6vw, 80px); line-height: 0.98; }
   .line > span { white-space: nowrap; }
   .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
   .line > span { display: inline-block; animation: rise 900ms var(--ease-out) both; }
@@ -77,11 +84,13 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   .lead { max-width: 36ch; color: var(--text-soft); }
   .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .honesty { color: var(--text-soft); letter-spacing: 0.01em; }
-  .cards { grid-column: 9 / span 4; align-self: center; display: grid; gap: 8px; }
-  .card-top { display: grid; gap: 2px; padding: 0 4px 4px; }
+  .cards { grid-column: 1 / -1; align-self: end; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .card-top, .foot { grid-column: 1 / -1; display: flex; gap: 12px; align-items: baseline; }
+  .card-top { padding: 0 4px 4px; }
   .pid { color: var(--text-soft); word-break: break-all; }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; /* taste-skill-ignore: inside a data-ui interface fragment */
     transition: border-color 300ms, transform 300ms var(--ease-out), opacity 300ms; }
+  .card.idle { --text: var(--ink-soft); }
   .card.active { border-color: var(--interactive); transform: translateX(-6px); }
   .card-name { display: flex; gap: 8px; align-items: baseline; font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
   .word { color: var(--interactive); font: 600 15px/1 var(--font-head); }
@@ -91,9 +100,9 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   .card-rule { display: grid; gap: 6px; justify-items: start; color: var(--text-soft); }
   .foot { padding: 4px; }
   @media (max-width: 1100px) {
-    .art { left: 46%; width: 54%; height: 60%; top: 8%; opacity: 0.5; }
+    .art { width: 60%; height: 52%; top: 10%; opacity: 0.55; }
     .intro { grid-column: 1 / span 9; }
-    .cards { grid-column: 1 / span 8; margin-top: 64px; align-self: start; }
+    .cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   }
   @media (max-width: 680px) {
     .art { display: none; }
@@ -114,14 +123,14 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   const cards = Object.fromEntries([...root.querySelectorAll("[data-card]")].map((c) => [c.dataset.card, c]));
   let sift = null;
   const canvas = document.querySelector("[data-hero-sift]");
-  if (canvas && getComputedStyle(canvas).display !== "none") import("../scripts/sift.js").then(({ mountSift }) => { sift = mountSift(canvas); sift?.setState(phases.at(-1).status, true); });
+  if (canvas && getComputedStyle(canvas).display !== "none") import("../scripts/gate3d.js").then(({ mountGate }) => { sift = mountGate(canvas); sift?.setState(phases.at(-1).status, true); });
   else canvas?.remove();
   const show = (i) => {
     const p = phases[i];
     for (const [id, card] of Object.entries(cards)) {
       card.classList.toggle("active", id === p.layer);
       const latest = [...phases.slice(0, i + 1)].reverse().find((x) => x.layer === id);
-      card.style.opacity = latest ? "1" : "0.6";
+      card.classList.toggle("idle", !latest && id !== p.layer);
       if (!latest) continue;
       card.querySelector("[data-agent-line]").textContent = latest.agent;
       card.querySelector("[data-rule-line]").textContent = latest.rule;
