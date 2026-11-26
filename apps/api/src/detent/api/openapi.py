@@ -481,8 +481,8 @@ def build(app: FastAPI) -> dict[str, Any]:
             "description": (
                 "The public sandbox API. Test networks only: `sk_live_` keys are always refused. "
                 "The AI proposes and the client's rules decide. Generated from the code (API-05); "
-                "see the [error codes](/api/errors) for every `error.code` and the [changelog](/changelog) for "
-                "what changed in each version."
+                "see the [error codes](/api/errors) for every `error.code` and the [changelog](/changelog) "
+                "for what changed in each version."
             ),
             "license": {"name": "Proprietary", "identifier": "LicenseRef-Proprietary"},
         },
