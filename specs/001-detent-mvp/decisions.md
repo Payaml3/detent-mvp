@@ -1,4 +1,4 @@
-# Decisions register: Detent MVP
+# Decisions register: Dekernai MVP
 
 **Feature**: [spec.md](spec.md) · **Inventory**: [inventory.md](inventory.md) · **Created**: 2026-11-18
 

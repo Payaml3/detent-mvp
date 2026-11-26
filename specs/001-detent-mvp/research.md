@@ -1,4 +1,4 @@
-# Research and technical decisions: Detent MVP
+# Research and technical decisions: Dekernai MVP
 
 Phase 0 of [plan.md](plan.md). These are **technical** decisions within the stack the founder fixed in `AGENTS.md`.
 None of them sets a business rule. Business rules are in [decisions.md](decisions.md).

@@ -32,8 +32,8 @@ On stablecoins and instant bank payouts a wrong decision can't be reversed. Toda
 | **AI agent** (client's accounts-payable agent) | Proposes payment intents from invoices, inside a signed mandate. Never executes |
 | **Platform integrator** (client developer) | Calls the API, receives webhooks, uses the sandbox |
 | **Auditor** | Reads the audit log, replays payments, exports evidence |
-| **On-call engineer** (Detent) | Can engage the kill switch; handles Sev 1 incidents |
-| **Detent admin** (founder or sales) | Creates sandbox organisations after a demo; issues invites |
+| **On-call engineer** (Dekernai) | Can engage the kill switch; handles Sev 1 incidents |
+| **Dekernai admin** (founder or sales) | Creates sandbox organisations after a demo; issues invites |
 | **Prospect** | Reads the website, books a demo, requests sandbox access |
 
 ## MVP definition
@@ -72,13 +72,13 @@ Then a developer can get sandbox keys (sales-led), follow the quickstart and tri
 
 ## Honesty rules (product, docs and website)
 
-- Detent is "agentic payment controls" software, never a "payments company" or "payment provider". "Agentic" describes how the work is done, never who decides.
+- Dekernai is "agentic payment controls" software, never a "payments company" or "payment provider". "Agentic" describes how the work is done, never who decides.
 - No client logos, testimonials, customer counts or volume figures.
 - No certification badges and no "licensed" or "regulated" claims. Roadmap items are labelled as roadmap.
 - Every measured result is labelled "test-network evaluation on synthetic data, [date]".
 - Demo data uses invented names, marked as fictional.
 - No former-employer names, documents or API designs, anywhere.
-- The founder's prior-company figures may appear only as personal experience on an About section, never as Detent's traction.
+- The founder's prior-company figures may appear only as personal experience on an About section, never as Dekernai's traction.
 
 ## Out of scope for this MVP
 

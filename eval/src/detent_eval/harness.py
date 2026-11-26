@@ -111,7 +111,7 @@ def fresh_database(url: str) -> Engine:
 @dataclass
 class Chain:
     rpc_url: str  # anvil itself (the evaluator reads the chain here, never through the proxy)
-    proxy_url: str  # what Detent's adapters use
+    proxy_url: str  # what Dekernai's adapters use
     usdc: str
     funder: str
 

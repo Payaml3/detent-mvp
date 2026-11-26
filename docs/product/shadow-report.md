@@ -23,17 +23,17 @@ HTML and PDF (SHD-02). Plain language, no raw hashes. Sections, in order:
 
 1. **Summary (one screen).** Payments read, payments decided, period, rule set and version used, and a statement that nothing was sent.
 2. **Decision mix.** Count and amount of would-execute, would-escalate and would-block, with the top reason for each.
-3. **Agreement.** Where the platform supplied its own decision: how often Detent matched it, and the list of disagreements.
+3. **Agreement.** Where the platform supplied its own decision: how often Dekernai matched it, and the list of disagreements.
 4. **Unsafe approvals.** Payments the platform approved that the rules would have blocked or escalated, each with the rule that applied. This is the headline section; it is a list, not a score.
 5. **Unreconciled items.** Rows with no matching counterpart (e.g. a deposit with no payout, a duplicate ref).
-6. **Simulated routing saving.** Fees under the rail Detent's routing would have chosen, against the fee paid. Shown only if fee and rail columns exist; labelled a simulation.
+6. **Simulated routing saving.** Fees under the rail Dekernai's routing would have chosen, against the fee paid. Shown only if fee and rail columns exist; labelled a simulation.
 7. **Method and limits.** Rule version, what was and wasn't checked, and the honesty note: prototype, test data not used, no live rails touched.
 
 ## Honesty rules
 
 - No claim of savings or fraud caught beyond what the export shows; each figure links to the rows behind it.
 - The report is replayable: the same export and rule version give the same report (replay uses stored outputs, never a model call).
-- Detent is described as agentic payment controls, never a payment provider.
+- Dekernai is described as agentic payment controls, never a payment provider.
 
 ## Done when (for this ticket)
 

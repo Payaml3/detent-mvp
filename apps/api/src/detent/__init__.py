@@ -1,1 +1,1 @@
-"""Detent agentic payment controls (working name). Prototype: test networks only."""
+"""Dekernai agentic payment controls. Prototype: test networks only."""

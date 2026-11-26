@@ -26,5 +26,5 @@ Every screen named below is in the console nav. Every "Demo" step is one button 
 - The match line counts only items that moved money (C-10, Confirmed as D-35). If the presenter approves both escalations before Close the day, the line reads 26 of 27 (covered by a test).
 - The Evaluation screen in the console is not built yet (it says so); show the report file instead.
 - Agent answers are hand-written stand-ins, labelled as such on screen, until an `ANTHROPIC_API_KEY` is set and real runs are recorded.
-- On the live test networks the "USDC" is the demo's own test token, tUSDC ("Detent Demo USD, test stand-in, not USDC"; D-33); say so if asked. Local runs use the same contract on anvil.
+- On the live test networks the "USDC" is the demo's own test token, tUSDC ("Dekernai Demo USD, test stand-in, not USDC"; D-33); say so if asked. Local runs use the same contract on anvil.
 - Every name in the demo is invented and labelled fictional. The batch pays counterparties only: user payouts are deferred (D-26, D-32).
