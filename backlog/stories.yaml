@@ -1934,6 +1934,7 @@ stories:
   pri: Must
   est: 0.5
   deps: [CON-04, DSH-02]
+  done: [0]
   trace: [D.console]
   ms: P2
 - id: DSH-10

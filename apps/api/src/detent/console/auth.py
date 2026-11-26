@@ -1,8 +1,14 @@
-"""Demo login and the acting-user switcher (FND-04).
+"""Demo login and the acting-user switcher (FND-04), and the console per organisation (DSH-09).
 
-One shared demo password protects the console. After login the viewer picks an acting user from
+One shared demo password protects the demo console. After login the viewer picks an acting user from
 the demo organisation. Every write records that user's ID and role in the audit log. Permission
 checks run here, on the server, from ``detent.domain.roles.PERMISSIONS``.
+
+A member signed in to the developer dashboard uses the same screens as themselves, scoped to their own
+organisation (DSH-09): no act-as, no demo password, and no demo-only controls (`demo_only`). Their
+writes are refused while the organisation is read-only (DSH-03), and must come from this site (an Origin
+or Referer of the same host; the console's forms carry no CSRF token, so this stands in for one, on top
+of SameSite=Lax).
 """
 
 from __future__ import annotations
@@ -35,6 +41,7 @@ class ActingUser:
     org_id: str
     display_name: str
     role: Role
+    via_dashboard: bool = False  # a dashboard member in their own organisation (DSH-09)
 
     @property
     def actor(self) -> Actor:
@@ -76,7 +83,43 @@ def list_users(rt: Runtime) -> list[ActingUser]:
     return [ActingUser(r.id, r.org_id, r.display_name, Role(r.role)) for r in rows]
 
 
+_SAFE = frozenset({"GET", "HEAD", "OPTIONS"})
+
+
+def _same_site(request: Request) -> bool:
+    here = f"{request.url.scheme}://{request.url.netloc}"
+    origin = request.headers.get("origin")
+    if origin:
+        return origin == here
+    referer = request.headers.get("referer") or ""
+    return referer == here or referer.startswith(here + "/")
+
+
+def dashboard_member(request: Request, rt: Runtime) -> ActingUser | None:
+    """The dashboard member signed in on this browser, as a console user of their own organisation."""
+    from detent.dashboard.access import load_member
+    from detent.dashboard.web import SESSION_ORG, SESSION_USER, org_lock
+
+    uid, org_id = request.session.get(SESSION_USER), request.session.get(SESSION_ORG)
+    if not uid or not org_id:
+        return None
+    with rt.engine.connect() as conn:
+        member = load_member(conn, str(org_id), str(uid))
+    if member is None or member.is_staff:
+        return None
+    if request.method not in _SAFE:
+        if not _same_site(request):
+            raise HTTPException(status_code=403, detail="cross-site request refused")
+        lock = org_lock(rt, member.org_id)
+        if lock:
+            raise HTTPException(status_code=403, detail=lock)
+    return ActingUser(member.id, member.org_id, member.display_name, member.role, via_dashboard=True)
+
+
 def acting_user(request: Request, rt: Runtime = Depends(runtime)) -> ActingUser:  # noqa: B008
+    member = dashboard_member(request, rt)
+    if member is not None:
+        return member
     require_login(request)
     user_id = request.session.get("user_id")
     if not user_id:
@@ -89,6 +132,9 @@ def acting_user(request: Request, rt: Runtime = Depends(runtime)) -> ActingUser:
 
 
 def optional_acting_user(request: Request, rt: Runtime = Depends(runtime)) -> ActingUser | None:  # noqa: B008
+    member = dashboard_member(request, rt)
+    if member is not None:
+        return member
     if not is_logged_in(request) or not request.session.get("user_id"):
         return None
     return load_user(rt, str(request.session["user_id"]))
@@ -106,3 +152,10 @@ def require_permission(action: str) -> Callable[..., ActingUser]:
         return user
 
     return dep
+
+
+def demo_only(user: ActingUser) -> None:
+    """Demo-only screens and controls (the clock, the scenario runner, the invoice agent, act-as) do not exist
+    for a dashboard member (DSH-09)."""
+    if user.via_dashboard:
+        raise HTTPException(status_code=404)

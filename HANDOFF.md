@@ -150,8 +150,10 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 - **P2 group 4a: built (PR from `claude/project-thread-babje1`, 2026-11-26):** DSH-10 (`dashboard/leads.py`,
   `dashboard/public.py`, `POST /access-requests`) and DSH-12 (`dashboard/verification.py`), migration 0015. See
   spec/08 "As built (P2 group 4a)". WEB-06 points the site's form at `<dashboard>/access-requests` once deployed.
-- **P2 next:** group 4b, DSH-09 console per organisation. It must add the generation filter to the console's own
-  list queries. · Model: mid-tier for the screens
+- **P2 group 4b: built (PR from `claude/project-thread-babje1`, 2026-11-26):** DSH-09. A dashboard member opens
+  `/console/` as themselves (`console/auth.dashboard_member`), scoped to their organisation and current data
+  generation; demo-only controls answer 404 (`demo_only`). See spec/08 "As built (P2 group 4b)". P2 is complete.
+- **P3 next:** docs and SDKs (DOC, SDK, WHK-02), including the SBX-01 docs page. · Model: mid-tier
 - **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items

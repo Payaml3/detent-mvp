@@ -10,7 +10,7 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, Form, Request
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlalchemy import text
 
 from detent.audit.log import append
@@ -233,7 +233,7 @@ def onboarding_checklist(conn: Any, org_id: str) -> list[dict[str, Any]]:
         },
         {
             "label": "Set up policy",
-            "href": "/dashboard/policy",
+            "href": "/console/policy",
             "done": has("SELECT 1 FROM policy_versions WHERE org_id=:o AND proposed_by NOT LIKE 'system:%'"),
             "detail": "Version 1 of the default rules is installed; propose your own.",
         },
@@ -363,15 +363,14 @@ def _role(value: str) -> Role:
 
 
 # ------------------------------------------------------------------------------------------ later pages
-@router.get("/{section}", response_class=HTMLResponse)
-def not_built(
+@router.get("/{section}", response_model=None)
+def unknown_section(
     section: str,
     request: Request,
     rt: Runtime = Depends(runtime),  # noqa: B008
     member: Member = Depends(client_member),  # noqa: B008
-) -> HTMLResponse:
-    """Pages from later P2 story groups (policy, with the console in DSH-09)."""
-    known = {"policy"}
-    if section not in known:
-        return page(request, rt, "not_found.html", member, status_code=404)
-    return page(request, rt, "coming.html", member, section=section)
+) -> Response:
+    """Unknown sections. Policy, mandates and counterparties live in the console (DSH-09)."""
+    if section == "policy":
+        return RedirectResponse("/console/policy", status_code=303)
+    return page(request, rt, "not_found.html", member, status_code=404)

@@ -50,6 +50,7 @@ mark { background: var(--pill-wait-bg); color: var(--pill-wait-ink); padding: 0 
 .brand:hover { text-decoration: none; }
 .brand .logo { flex: none; display: block; width: auto; height: 20px; color: var(--text); }
 .scope { padding: 4px 8px 0; color: var(--muted); font-size: var(--fs-small); line-height: 16px; }
+.side .back { display: block; padding: 4px 8px 0; font-size: var(--fs-small); }
 .nav { display: grid; gap: 0; margin-top: 16px; }
 .nav-group { margin: 20px 8px 4px; color: var(--muted); font-size: var(--fs-small); line-height: 16px; }
 .nav a { display: flex; align-items: center; height: var(--control-nav-row); padding: 0 8px; border-radius: var(--radius-control);
