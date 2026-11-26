@@ -52,8 +52,8 @@ const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
 
 <style>
   .hero { position: relative; min-height: max(780px, 100svh); overflow: hidden; background:
-    radial-gradient(55% 65% at 52% 58%, rgba(47, 107, 255, 0.30), transparent 70%), /* taste-skill-ignore: gradients allowed by founder decision D-19 */
-    radial-gradient(35% 35% at 10% 95%, rgba(242, 98, 46, 0.10), transparent 70%), var(--ink-deep); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+    radial-gradient(55% 65% at 52% 58%, color-mix(in srgb, var(--interactive) 30%, transparent), transparent 70%), /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+    radial-gradient(35% 35% at 10% 95%, color-mix(in srgb, var(--signal) 10%, transparent), transparent 70%), var(--bg); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
   .agent { position: absolute; left: 24%; top: 22%; width: 44%; height: 84%; }
   .hero-grid { position: relative; z-index: 2; min-height: max(780px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
     column-gap: 24px; padding-top: 128px; padding-bottom: 48px; pointer-events: none; }
@@ -68,15 +68,15 @@ const finalFor = (id) => [...phases].reverse().find((p) => p.layer === id);
   .actions { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
   .cards { grid-column: 9 / span 4; align-self: center; display: grid; gap: 8px; }
   .card-top { display: grid; gap: 2px; padding: 0 4px 4px; }
-  .pid { color: var(--paper-soft); word-break: break-all; }
-  .card { background: rgba(20, 29, 54, 0.92); border: 1px solid var(--ink-line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; /* taste-skill-ignore: inside a data-ui interface fragment */
+  .pid { color: var(--text-soft); word-break: break-all; }
+  .card { background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; /* taste-skill-ignore: inside a data-ui interface fragment */
     transition: border-color 300ms, background 300ms, transform 300ms var(--ease-out); }
-  .card.active { border-color: var(--blue); background: rgba(23, 40, 92, 0.86); transform: translateX(-6px); }
-  .card-name { font-size: 12px; font-weight: 600; color: var(--blue-soft); letter-spacing: 0.01em; }
+  .card.active { border-color: var(--interactive); background: color-mix(in srgb, var(--interactive-strong) 32%, var(--surface)); transform: translateX(-6px); }
+  .card-name { font-size: 12px; font-weight: 600; color: var(--interactive-soft); letter-spacing: 0.01em; }
   .card-q { font: 600 18px/1.2 var(--font-head); letter-spacing: -0.01em; }
-  .card-agent { display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start; color: var(--paper); }
-  .agent-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--orange); }
-  .card-rule { display: grid; gap: 6px; justify-items: start; color: var(--paper-soft); }
+  .card-agent { display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start; color: var(--text); }
+  .agent-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--signal); }
+  .card-rule { display: grid; gap: 6px; justify-items: start; color: var(--text-soft); }
   .foot { padding: 4px; }
   @media (max-width: 1100px) {
     .agent { left: 30%; width: 70%; height: 70%; top: 10%; }

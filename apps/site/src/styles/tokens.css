@@ -1,20 +1,6 @@
-/* Brand tokens from spec/07 (D-18), set for the cinematic dark-blue style (D-19). */
+/* Design system (B-01): type, spacing and motion tokens. Colour roles come from palettes.mjs (B-01), set
+   on :root by layouts/Base.astro from site.config.mjs `palette`. Components use role names only. */
 :root {
-  --ink: #0F1629;
-  --ink-deep: #070C1A;
-  --ink-raised: #141D36;
-  --ink-line: #24304F;
-  --paper: #F6F5F0;
-  --paper-soft: #B9BFCE;
-  --orange: #F2622E;
-  --orange-press: #D9521F;
-  --blue: #2F6BFF;
-  --blue-soft: #8FB0FF;
-  --blueprint: #10307A;
-  --brass: #C9935F;
-  --ok: #7FD1A4;
-  --amber: #F2B84B;
-
   --font-head: "Space Grotesk Variable", "Space Grotesk", system-ui, sans-serif;
   --font-body: "Inter Variable", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; /* taste-skill-ignore: used only for <pre><code> samples */

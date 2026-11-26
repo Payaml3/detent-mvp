@@ -52,6 +52,16 @@ if __name__ == "__main__":
     ]:
         d, w, ch, bb = word("DekernAI", font, track, kern)
         out[key] = {"d": d, "w": w, "cap": ch, "bb": bb}
+        # The logo: the mark replaces the D, so set the rest of the name and the D's sidebearings.
+        d, w, ch, bb = word("ekernAI", font, -0.02, {})
+        t = TTFont(F + font)
+        gs = t.getGlyphSet()
+        g = t.getBestCmap()[ord("D")]
+        dbp = BoundsPen(gs)
+        gs[g].draw(dbp)
+        k = 100 / t["head"].unitsPerEm
+        rsb = (t["hmtx"][g][0] - dbp.bounds[2]) * k
+        out[key]["rest"] = {"d": d, "bb": bb, "d_lsb": dbp.bounds[0] * k, "d_rsb": rsb}
     with open("words.json", "w") as fh:
         json.dump(out, fh)
     print({k: (round(v["w"], 1), v["cap"]) for k, v in out.items()})
