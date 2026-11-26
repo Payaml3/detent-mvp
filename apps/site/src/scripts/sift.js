@@ -133,10 +133,15 @@ export function mountSift(canvas) {
     ctx.globalAlpha = 1;
   }
 
+  let last = 0;
   function frame(t) {
-    focus.x += (focus.tx - focus.x) * 0.08;
-    focus.y += (focus.ty - focus.y) * 0.08;
-    focus.pulse = Math.max(0, focus.pulse - 0.012);
+    // frame-rate independent ease-out: the same feel at 60 Hz and 120 Hz
+    const dt = last ? Math.min(64, t - last) / 16.7 : 1;
+    last = t;
+    const k = 1 - Math.pow(0.92, dt);
+    focus.x += (focus.tx - focus.x) * k;
+    focus.y += (focus.ty - focus.y) * k;
+    focus.pulse = Math.max(0, focus.pulse - 0.012 * dt);
     draw(t);
   }
 
@@ -150,7 +155,10 @@ export function mountSift(canvas) {
   for (let i = 0; i < 150; i++) { const p = spawn(); p.y = Math.random() * H; flow.push(p); }
   still();
   addEventListener("resize", () => { resize(); if (!running) still(); });
-  new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop())).observe(canvas);
+  let visible = false;
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }).observe(canvas);
+  // pause in a background tab; resume where it left off
+  document.addEventListener("visibilitychange", () => { if (document.hidden) stop(); else if (visible) { last = 0; start(); } });
 
   return {
     setState(status, transferred) {

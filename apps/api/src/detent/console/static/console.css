@@ -59,7 +59,7 @@ label.inline input { display: inline; width: auto; }
 .late { color: var(--danger); font-weight: 600; }
 .r-block td { background: color-mix(in srgb, var(--danger) 8%, var(--surface)); }
 .r-escalate td { background: color-mix(in srgb, var(--amber-fill) 14%, var(--surface)); }
-.note { background: var(--surface); border-left: 4px solid var(--amber-fill); padding: 8px 12px; }
+.note { background: color-mix(in srgb, var(--amber-fill) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--amber-fill) 55%, var(--line)); border-radius: 6px; padding: 8px 12px; }
 .card + .card { margin-top: 16px; }
 .timeline { padding-left: 20px; }
 section.card, details.card { margin-bottom: 16px; }
@@ -83,5 +83,5 @@ a.button { display: inline-block; border: 1px solid var(--line); border-radius: 
 .st-escalated, .st-held, .st-unknown, .st-failed { color: var(--amber); background: color-mix(in srgb, var(--amber-fill) 18%, transparent); }
 .st-ready, .st-submitted { color: var(--blue); background: color-mix(in srgb, var(--blue) 10%, transparent); }
 .st-blocked, .st-rejected, .st-failed_final { color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
-.st-blocked::before, .st-rejected::before, .st-failed_final::before { width: 8px; height: 8px; border-radius: 0;
-  clip-path: polygon(20% 0, 50% 30%, 80% 0, 100% 20%, 70% 50%, 100% 80%, 80% 100%, 50% 70%, 20% 100%, 0 80%, 30% 50%, 0 20%); }
+.st-blocked::before, .st-rejected::before, .st-failed_final::before { width: 9px; height: 9px; border-radius: 0;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 2l6 6M8 2L2 8' stroke='black' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 2l6 6M8 2L2 8' stroke='black' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat; }

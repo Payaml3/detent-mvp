@@ -71,7 +71,7 @@ const first = runs.find((r) => r.id === "timeout");
   .ctl:hover { background: var(--surface-hover); }
   .ctl:active { transform: scale(0.99); }
   .ctl[aria-pressed="true"] { background: var(--interactive-strong); color: var(--on-interactive); }
-  .ctl[aria-pressed="true"] .ctl-out { color: var(--text); }
+  .ctl[aria-pressed="true"] .ctl-out { color: color-mix(in srgb, var(--on-interactive) 84%, var(--interactive-strong)); }
   .ctl-name { font-weight: 600; }
   .ctl-out { font-size: 13px; }
   .nojs { margin-top: 24px; display: grid; gap: 8px; }

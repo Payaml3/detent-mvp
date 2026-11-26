@@ -52,7 +52,9 @@ const year = 2026;
   .mark :global(svg) { width: clamp(56px, 8vw, 120px); height: auto; flex: none; }
   .mark span { font: 700 clamp(64px, 11vw, 168px)/0.9 var(--font-head); letter-spacing: -0.05em; }
   .invite { text-decoration: none; grid-column: span 4; min-height: 320px; background: var(--signal) !important; color: var(--on-signal) !important; font: 600 30px/1.1 var(--font-head); transition: background 160ms; }
-  .invite:hover { background: var(--signal-hover) !important; }
+  @media (hover: hover) and (pointer: fine) {
+    .invite:hover { background: var(--signal-hover) !important; }
+    }
   .invite svg { align-self: flex-end; transition: transform 200ms var(--ease-out); }
   .invite:hover svg { transform: translate(4px, -4px); }
   @media (max-width: 960px) {
