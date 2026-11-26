@@ -41,8 +41,21 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 - Use "agentic payment controls" or "payment controls". Never "payments company" or "payment provider".
 - A timeout is "unknown", never "failed"; a block is final.
 
-## Visual identity (Open)
+## Visual identity
 
-- Palette: options in `/mnt/project-files/brand/palette-options-draft.md` (project files), founder to choose.
-- The detent-wheel motif (D-20) no longer fits the name; proposed replacement idea: "sift then settle"
-  (many inputs filtering to one clear outcome). Decided in the design-system work.
+- Palette (Approved, B-02): Parchment and seal.
+
+  | Token | Hex | Use |
+  |---|---|---|
+  | Ink | #14161F | Text, dark surfaces |
+  | Parchment | #F4EFE6 | Page background |
+  | Seal red | #B3261E | Brand accent, primary buttons |
+  | Brass | #C9935F | Secondary accent, illustration |
+  | Link blue | #2E5AAC | Links, "confirmed" status |
+  | Unknown amber | #E0A33A | "Unknown" status |
+
+  Blocked always shows an icon and label, never colour alone, so it can't be confused with seal red.
+- Fonts (D-18): Space Grotesk, Inter, JetBrains Mono.
+- Proposed: the detent-wheel motif (D-20) no longer fits the name; replacement idea "sift then settle"
+  (many inputs filtering to one clear outcome). Decided in the design-system work, with the dark theme
+  and WCAG AA contrast checks.

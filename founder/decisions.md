@@ -12,6 +12,7 @@ Layers: Business → Product → MVP → Architecture → Tasks → Tests → Re
 | ID | Decision | Status | Date | Source | Affected layers |
 |---|---|---|---|---|---|
 | B-01 | The brand name is **Dekernai** (from Latin *dēcernere*, to decide), replacing the working name Detent. Domains dekernai.com (primary) and dekernai.co.uk, registered by the founder on 2026-11-26. Story rule: the client's rules decide, never the AI | Approved | 2026-11-26 | Founder, on the decision card "Lock in Dekernai as the brand name now?": "Yes, lock in Dekernai". Evidence: `docs/brand/name-review-2026-11.md` | Business, Product, Release (site, docs, console copy, `BRAND_NAME`) |
+| B-02 | The brand palette is **B, Parchment and seal**: ink #14161F, parchment #F4EFE6, seal red #B3261E (brand accent), brass #C9935F, link blue #2E5AAC, unknown amber #E0A33A. Blocked always carries an icon and label so seal red never reads as "blocked" on its own. Fonts stay as D-18. Replaces the D-18 colour tokens; contrast (WCAG AA) and the dark theme are set in the design-system work | Approved | 2026-11-26 | Founder, on the decision card "Which palette should Dekernai use?": chose "B. Parchment and seal". Evidence: palette comparison page (project files `brand/dekernai-palettes.html`) | Product, Release (design system, site, docs, console) |
 
 ## Business decisions already in the specs register (indexed, not moved)
 
