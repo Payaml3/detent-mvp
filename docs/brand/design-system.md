@@ -21,7 +21,7 @@ palette misses WCAG AA on a pair the site renders.
 | `--settle` | The settled dot in the mark and the art |
 | `--accent` | Decoration only: the art's rule lines, hairlines, ornaments. Never text |
 
-Status colours keep their meaning in every palette: confirmed is green, waiting is amber, blocked is red.
+Status colours keep their meaning in every palette: confirmed is green (link blue in B, per B-02), waiting is amber, blocked is red.
 A block is never told by colour alone (B-02): the status label always shows, and BLOCKED, REJECTED and
 FAILED_FINAL carry a cross icon in place of the dot, on the site, in the console and in the art.
 
@@ -36,7 +36,7 @@ FAILED_FINAL carry a cross icon in place of the dot, on the site, in the console
 
 Palette B in full: ink `#14161F`, parchment `#F4EFE6`, surface `#FFFDF8`, seal red `#B3261E`, brass
 `#C9935F` (accent and strong lines), link blue `#2E5AAC`, unknown amber `#E0A33A` as a fill with `#8A5A00`
-for amber text (the lighter amber fails WCAG AA as text on parchment), confirmed green `#23714D`.
+for amber text (the lighter amber fails WCAG AA as text on parchment), and link blue `#2E5AAC` also marks CONFIRMED (B-02).
 The console (`apps/api/src/detent/console/static/console.css`) and the favicon use the same values.
 
 ## Mark: sift then settle

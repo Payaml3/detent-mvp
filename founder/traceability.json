@@ -26,9 +26,9 @@
   {
    "function": "00 Founder HQ",
    "measure": "Decisions resolved",
-   "done": 47,
-   "total": 92,
-   "pct_done": 51
+   "done": 48,
+   "total": 93,
+   "pct_done": 52
   },
   {
    "function": "03 Architecture",
@@ -1713,7 +1713,7 @@
   }
  ],
  "decision_counts": {
-  "Approved": 1,
+  "Approved": 2,
   "Proposed": 0,
   "Assumption": 0,
   "Open": 0,

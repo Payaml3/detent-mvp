@@ -50,7 +50,7 @@ export const palettes = {
     text: "#14161F", textSoft: "#4E5160",
     signal: "#B3261E", signalHover: "#C7342B", signalPress: "#931E18", onSignal: "#FFFFFF",
     interactive: "#2E5AAC", interactiveStrong: "#2E5AAC", interactiveSoft: "#2E5AAC", onInteractive: "#FFFFFF", interactiveDeep: "#DCE3F0",
-    ok: "#23714D", wait: "#8A5A00", // amber #E0A33A is the fill tone; as text it fails AA on parchment
+    ok: "#2E5AAC", wait: "#8A5A00", // B-02: confirmed uses link blue; amber #E0A33A fails AA as text
     danger: "#B3261E", dangerLine: "#D99A94",
     code: "#14161F", codeKey: "#2E5AAC", plot: "#5A4A30",
     settle: "#B3261E", accent: "#C9935F",

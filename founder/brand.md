@@ -41,16 +41,26 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 - Use "agentic payment controls" or "payment controls". Never "payments company" or "payment provider".
 - A timeout is "unknown", never "failed"; a block is final.
 
-## Visual identity (palette Approved, B-02; the rest Proposed, D-39)
+## Visual identity
 
-- Palette: **B, Parchment and seal** (B-02). Ink #14161F, parchment #F4EFE6, seal red #B3261E (the one
-  call-to-action colour), brass #C9935F (accent, never text), link blue #2E5AAC, unknown amber #E0A33A (as a
-  fill; amber text uses #8A5A00 to pass WCAG AA on parchment). Blocked always carries an icon and a label,
-  never colour alone. Roles: `apps/site/src/styles/palettes.mjs` (`b`), set by `palette` in
-  `apps/site/site.config.mjs`.
-- Mark: "sift then settle". Five dots, then three, above a rule; one dot settled below it in seal red.
-  Replaces the detent-wheel motif (D-20).
-- Site art: payments fall as halftone dots through three rules (decision, orchestration, operations); some
-  are held, some blocked, the rest settle at one point. The example payment stops at its state's rule.
-- Type: unchanged (D-18): Space Grotesk headings, Inter body, JetBrains Mono for IDs and code.
-- Full reference: `docs/brand/design-system.md`.
+- Palette (Approved, B-02): Parchment and seal.
+
+  | Token | Hex | Use |
+  |---|---|---|
+  | Ink | #14161F | Text, dark surfaces |
+  | Parchment | #F4EFE6 | Page background |
+  | Seal red | #B3261E | Brand accent, primary buttons |
+  | Brass | #C9935F | Secondary accent, illustration |
+  | Link blue | #2E5AAC | Links, "confirmed" status |
+  | Unknown amber | #E0A33A | "Unknown" status |
+
+  Blocked always shows an icon and label, never colour alone, so it can't be confused with seal red.
+- Fonts (D-18): Space Grotesk, Inter, JetBrains Mono.
+- Amber as text: #E0A33A fails WCAG AA as text on parchment, so amber words use #8A5A00 and #E0A33A stays the
+  fill and icon tone. Brass is decoration only, never text.
+- Mark (Proposed, D-39): "sift then settle". Five dots, then three, above a rule; one dot settled below it in
+  seal red. Replaces the detent-wheel motif (D-20).
+- Site art (Proposed, D-39): payments fall as halftone dots through three brass rules (decision,
+  orchestration, operations); some are held, some blocked (a cross), the rest settle at one point.
+- Built in: `apps/site/src/styles/palettes.mjs` (`b`), the console CSS and the favicon. Full reference:
+  `docs/brand/design-system.md`.

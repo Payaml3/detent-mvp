@@ -3,7 +3,7 @@
 :root {
   /* Palette B, Parchment and seal (B-02); the same values as the site's `b` palette. */
   --ink: #14161F; --paper: #F4EFE6; --surface: #FFFDF8; --signal: #B3261E; --blue: #2E5AAC;
-  --brass: #C9935F; --amber: #8A5A00; --amber-fill: #E0A33A; --ok: #23714D; --danger: #B3261E;
+  --brass: #C9935F; --amber: #8A5A00; --amber-fill: #E0A33A; --ok: #2E5AAC; --danger: #B3261E;
   --line: #D8CDB8; --muted: #4E5160;
   --font-head: "Space Grotesk", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
