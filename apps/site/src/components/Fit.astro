@@ -1,5 +1,6 @@
 ---
 import config from "../../site.config.mjs";
+import Board from "./Board.astro";
 // Landing UX §3.7: who it's for, in one compact row, then the questions buyers ask first.
 const cases = [
   { name: "Payout platforms", line: "Creator and contractor payouts, each decided before it moves.", status: "CONFIRMED", label: "EXECUTE", reason: "Routine payout within limits" },
@@ -30,6 +31,7 @@ const faq = [
         </li>
       ))}
     </ul>
+    <Board />
     <div class="faq" data-section="faq">
       <h2 class="faq-title" data-reveal>Questions</h2>
       <div class="qs">
