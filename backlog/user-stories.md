@@ -1157,7 +1157,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [x] spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask
+- [x] spec/11-demo-script.md updated to match the built screens; ends with the onboarding ask (B-04)
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S9 Demo-ready prototype in the EU · **Depends on:** CON-09 · **Traces to:** MVP.flow, B3.lead_shadow
 

@@ -81,7 +81,7 @@ def test_enough_everywhere_is_ok() -> None:
 
 
 def test_demo_script_matches_the_runner_and_ends_with_the_ask() -> None:
-    """DEM-05: spec/11 names the runner's scenarios by their button titles and ends with the shadow-report ask."""
+    """DEM-05: spec/11 names the runner's scenarios by their button titles and ends with the onboarding ask (B-04)."""
     from detent.demo.scenarios import SCENARIOS
     from detent.settings import REPO_ROOT
 
@@ -89,4 +89,5 @@ def test_demo_script_matches_the_runner_and_ends_with_the_ask() -> None:
     for sc in SCENARIOS.values():
         assert f"**{sc.title}**" in script, sc.title
     rows = [line for line in script.splitlines() if line.startswith("| 9 to 10")]
-    assert rows and "free shadow report?" in rows[0]
+    assert rows and "start onboarding?" in rows[0]
+    assert "shadow report" not in script.lower(), "no free shadow report (B-04)"

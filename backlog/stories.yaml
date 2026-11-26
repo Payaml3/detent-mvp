@@ -1523,7 +1523,7 @@ stories:
   want: a written 10-minute demo script matching the scenario runner
   so: every demo tells the same story
   ac:
-    - "spec/11-demo-script.md updated to match the built screens; ends with the shadow-report ask"
+    - "spec/11-demo-script.md updated to match the built screens; ends with the onboarding ask (B-04)"
   pri: Must
   est: 0.25
   deps: [CON-09]
