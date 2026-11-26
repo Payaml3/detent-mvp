@@ -99,6 +99,8 @@ class Settings(BaseSettings):
     # LED-06: how often the worker runs reconciliation for every organisation with a ledger.
     reconciliation_seconds: float = 3600.0
     worker_max_attempts: int = 8
+    # API-04: requests per key per minute (the per-address ceiling is 10 times this).
+    api_rate_limit_per_minute: int = 120
     # Extra handler modules, for tests only (rejected outside APP_ENV=test).
     worker_extra_handler_modules: Annotated[tuple[str, ...], NoDecode] = ()
 

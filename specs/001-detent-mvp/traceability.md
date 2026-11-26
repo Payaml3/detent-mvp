@@ -1152,16 +1152,16 @@ Sources: [spec/10 §runbooks-write-as-the-features-land](../../spec/10-security-
 
 The public API uses scoped, hashed test keys, a standard error envelope, dated versions pinned per organisation, and per-key rate limits with standard headers.
 
-Sources: [spec/03 §standards](../../spec/03-api.md#standards); [spec/03 §error-codes-starter-catalogue](../../spec/03-api.md#error-codes-starter-catalogue)
+Sources: [spec/03 §standards](../../spec/03-api.md#standards); [spec/03 §error-codes](../../spec/03-api.md#error-codes)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 0 | `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin | done | `integration/test_intents_api.py::test_requests_need_a_valid_key`<br>`integration/test_intents_api.py::test_wrong_scope_is_403` |
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 1 | Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable` | done | `integration/test_intents_api.py::test_wrong_scope_is_403`<br>`integration/test_api.py::test_live_keys_are_always_rejected` |
-| [API-01](../../backlog/user-stories.md#api-01) | P1 | 2 | Every data access filters by the key's organisation (cross-organisation tests in EVL-02) | planned | contract: `apps/api/tests/integration/test_api_01.py` |
-| [API-02](../../backlog/user-stories.md#api-02) | P1 | 0 | Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs | planned | contract: `apps/api/tests/integration/test_api_02.py` |
-| [API-03](../../backlog/user-stories.md#api-03) | P1 | 0 | `DekernAI-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400 | planned | contract: `apps/api/tests/integration/test_api_03.py` |
-| [API-04](../../backlog/user-stories.md#api-04) | P1 | 0 | `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After` | planned | contract: `apps/api/tests/integration/test_api_04.py` |
+| [API-01](../../backlog/user-stories.md#api-01) | P1 | 2 | Every data access filters by the key's organisation (cross-organisation tests in EVL-02) | partial | `unit/test_scope_guard.py::test_unscoped_queries_raise`<br>`integration/test_request_logs.py::test_an_organisation_sees_only_its_own_logs`<br>`ci:detent eval run --suite attacks: eval/scenarios/attacks/api-authorisation.yaml cross-organisation reads, lists and payees (EVL-02)` (criterion not fully met) |
+| [API-02](../../backlog/user-stories.md#api-02) | P1 | 0 | Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs | done | `unit/test_error_codes.py::test_every_envelope_has_the_spec_03_fields`<br>`unit/test_error_codes.py::test_the_docs_page_is_generated_from_the_catalogue`<br>`unit/test_error_codes.py::test_framework_errors_map_onto_catalogued_codes`<br>`integration/test_api.py::test_errors_use_the_envelope_for_404_and_405`<br>`ci:conftest.py pytest_sessionfinish fails the run if any returned code is missing from detent/api/error_codes.py` |
+| [API-03](../../backlog/user-stories.md#api-03) | P1 | 0 | `DekernAI-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400 | done | `integration/test_api_versions.py::test_without_a_header_the_organisations_pinned_version_applies`<br>`integration/test_api_versions.py::test_new_organisations_are_pinned_to_the_current_version`<br>`integration/test_api_versions.py::test_an_unknown_version_is_400_before_any_work`<br>`integration/test_api.py::test_unknown_version_is_400_and_known_is_echoed` |
+| [API-04](../../backlog/user-stories.md#api-04) | P1 | 0 | `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After` | done | `integration/test_api.py::test_v1_responses_carry_rate_limit_headers_and_429`<br>`unit/test_limits.py::test_limit_counts_down_then_blocks_and_resets`<br>`unit/test_limits.py::test_limits_are_per_key`<br>`integration/test_api.py::test_rotating_junk_tokens_still_hit_the_client_address_limit` |
 
 ## FR-101 · API (confirmed)
 
@@ -1173,7 +1173,7 @@ Sources: [spec/03 §standards](../../spec/03-api.md#standards)
 |---|---|---|---|---|---|
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 0 | `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin | done | `integration/test_intents_api.py::test_requests_need_a_valid_key`<br>`integration/test_intents_api.py::test_wrong_scope_is_403` |
 | [API-01](../../backlog/user-stories.md#api-01) | P1 | 1 | Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable` | done | `integration/test_intents_api.py::test_wrong_scope_is_403`<br>`integration/test_api.py::test_live_keys_are_always_rejected` |
-| [API-01](../../backlog/user-stories.md#api-01) | P1 | 2 | Every data access filters by the key's organisation (cross-organisation tests in EVL-02) | planned | contract: `apps/api/tests/integration/test_api_01.py` |
+| [API-01](../../backlog/user-stories.md#api-01) | P1 | 2 | Every data access filters by the key's organisation (cross-organisation tests in EVL-02) | partial | `unit/test_scope_guard.py::test_unscoped_queries_raise`<br>`integration/test_request_logs.py::test_an_organisation_sees_only_its_own_logs`<br>`ci:detent eval run --suite attacks: eval/scenarios/attacks/api-authorisation.yaml cross-organisation reads, lists and payees (EVL-02)` (criterion not fully met) |
 
 ## FR-102 · API (confirmed)
 
@@ -1185,7 +1185,7 @@ Sources: [spec/03 §03--public-api-sandbox](../../spec/03-api.md#03--public-api-
 |---|---|---|---|---|---|
 | [API-05](../../backlog/user-stories.md#api-05) | P1 | 0 | Generated from FastAPI, then completed with descriptions, examples and error responses | planned | contract: `apps/api/tests/integration/test_api_05.py` |
 | [API-05](../../backlog/user-stories.md#api-05) | P1 | 1 | Lint passes (Redocly or Spectral); a CI test fails if the code and the checked-in spec drift | planned | contract: `apps/api/tests/integration/test_api_05.py` |
-| [API-06](../../backlog/user-stories.md#api-06) | P1 | 0 | Stored per organisation for 30 days; bodies redacted; filterable in the dashboard | planned | contract: `apps/api/tests/integration/test_api_06.py` |
+| [API-06](../../backlog/user-stories.md#api-06) | P1 | 0 | Stored per organisation for 30 days; bodies redacted; filterable in the dashboard | done | `integration/test_request_logs.py::test_calls_are_logged_with_key_payment_and_no_body`<br>`integration/test_request_logs.py::test_the_retention_sweep_deletes_only_old_rows`<br>`integration/test_request_logs.py::test_logs_page_with_starting_after_and_filter_by_status`<br>`manual:the dashboard screen over GET /v1/request_logs is DSH 'Request logs page' (P2)` |
 | [API-07](../../backlog/user-stories.md#api-07) | P1 | 0 | Same event objects as webhooks; filter by type and payment ID | planned | contract: `apps/api/tests/integration/test_api_07.py` |
 
 ## FR-103 · Webhooks (confirmed)

@@ -34,6 +34,7 @@ class Worker:
         # sends and confirms payments straight away.
         self._last_watch: float | None = time.monotonic()
         self._last_recon: float | None = time.monotonic()
+        self._last_log_purge: float | None = None
         importlib.import_module("detent.execution.jobs")  # payment.send, payment.confirm
         importlib.import_module("detent.exceptions.investigation_job")  # case.investigate (EXC-03)
         for mod in rt.settings.worker_extra_handler_modules:
@@ -83,6 +84,7 @@ class Worker:
         try:
             self.watch_deposits(force=force)
             self.reconcile(force=force)
+            self.purge_request_logs(force=force)
         except Exception:
             log.exception("deposit watching or reconciliation failed")  # never stops the sweeper or job loop
         mono = time.monotonic()  # scheduling cadence only; the sweep itself reads the Clock
@@ -120,6 +122,17 @@ class Worker:
             return {}
         self._last_recon = mono
         return run_all(self.rt.engine, self.rt.clock, self.rt.settings)
+
+    def purge_request_logs(self, *, force: bool = False) -> int:
+        """API-06: drop request logs past the 30-day window, at most once an hour."""
+        from detent.db.retention import purge_request_logs
+
+        mono = time.monotonic()
+        last = self._last_log_purge
+        if not force and last is not None and mono - last < 3600:
+            return 0
+        self._last_log_purge = mono
+        return purge_request_logs(self.rt.engine, self.rt.clock)
 
     def run(self) -> None:
         log.info("worker started", extra={"worker_id": self.worker_id, "handlers": registry.kinds()})

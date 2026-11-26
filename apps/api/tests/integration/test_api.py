@@ -70,3 +70,46 @@ def test_request_logs_carry_request_id_and_never_keys(
     assert rec["request_id"].startswith("req_") and rec["status"] == 200 and rec["path"] == "/healthz"
     # Every line, including third-party loggers that print the raw URL, is scrubbed.
     assert all("SECRETVALUE123" not in line for line in lines)
+
+
+def test_unknown_version_is_400_and_known_is_echoed(client: TestClient) -> None:
+    bad = client.get("/v1/payment_intents", headers={"DekernAI-Version": "2020-01-01"})
+    assert bad.status_code == 400 and bad.json()["error"]["code"] == "unknown_version"
+    ok = client.get("/v1/payment_intents", headers={"DekernAI-Version": "2026-12-01"})
+    assert ok.headers["DekernAI-Version"] == "2026-12-01"
+
+
+def test_v1_responses_carry_rate_limit_headers_and_429(client: TestClient) -> None:
+    from detent.api.limits import RateLimiter
+
+    r = client.get("/v1/payment_intents")
+    assert {"ratelimit-limit", "ratelimit-remaining", "ratelimit-reset"} <= set(r.headers)
+    client.app.state.limiter = RateLimiter(limit=1)  # type: ignore[attr-defined]
+    client.get("/v1/payment_intents")
+    r = client.get("/v1/payment_intents")
+    assert r.status_code == 429 and r.json()["error"]["type"] == "rate_limit"
+    assert int(r.headers["Retry-After"]) > 0
+
+
+def test_errors_use_the_envelope_for_404_and_405(client: TestClient) -> None:
+    for r, code in (
+        (client.get("/v1/nowhere"), "not_found"),
+        (client.delete("/healthz"), "method_not_allowed"),
+    ):
+        err = r.json()["error"]
+        assert err["code"] == code and err["request_id"] == r.headers["Request-Id"]
+
+
+def test_rotating_junk_tokens_still_hit_the_client_address_limit(client: TestClient) -> None:
+    from detent.api.limits import IP_LIMIT_FACTOR, RateLimiter
+
+    client.app.state.limiter = RateLimiter(limit=1)  # type: ignore[attr-defined]
+    codes = [
+        client.get("/v1/payment_intents", headers={"Authorization": f"Bearer junk{i}"}).status_code
+        for i in range(IP_LIMIT_FACTOR + 2)
+    ]
+    assert codes[-1] == 429
+
+
+def test_the_rate_limit_comes_from_settings(client: TestClient) -> None:
+    assert client.app.state.limiter.limit == 120  # type: ignore[attr-defined]

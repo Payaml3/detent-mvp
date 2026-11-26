@@ -120,6 +120,24 @@ AUD-01:
 API-01:
   0: ["integration/test_intents_api.py::test_requests_need_a_valid_key", "integration/test_intents_api.py::test_wrong_scope_is_403"]
   1: ["integration/test_intents_api.py::test_wrong_scope_is_403", "integration/test_api.py::test_live_keys_are_always_rejected"]
+  2: ["unit/test_scope_guard.py::test_unscoped_queries_raise", "integration/test_request_logs.py::test_an_organisation_sees_only_its_own_logs",
+      "ci:detent eval run --suite attacks: eval/scenarios/attacks/api-authorisation.yaml cross-organisation reads, lists and payees (EVL-02)"]
+API-02:
+  0: ["unit/test_error_codes.py::test_every_envelope_has_the_spec_03_fields", "unit/test_error_codes.py::test_the_docs_page_is_generated_from_the_catalogue",
+      "unit/test_error_codes.py::test_framework_errors_map_onto_catalogued_codes", "integration/test_api.py::test_errors_use_the_envelope_for_404_and_405",
+      "ci:conftest.py pytest_sessionfinish fails the run if any returned code is missing from detent/api/error_codes.py"]
+API-03:
+  0: ["integration/test_api_versions.py::test_without_a_header_the_organisations_pinned_version_applies",
+      "integration/test_api_versions.py::test_new_organisations_are_pinned_to_the_current_version",
+      "integration/test_api_versions.py::test_an_unknown_version_is_400_before_any_work", "integration/test_api.py::test_unknown_version_is_400_and_known_is_echoed"]
+API-04:
+  0: ["integration/test_api.py::test_v1_responses_carry_rate_limit_headers_and_429", "unit/test_limits.py::test_limit_counts_down_then_blocks_and_resets",
+      "unit/test_limits.py::test_limits_are_per_key", "integration/test_api.py::test_rotating_junk_tokens_still_hit_the_client_address_limit"]
+API-06:
+  0: ["integration/test_request_logs.py::test_calls_are_logged_with_key_payment_and_no_body",
+      "integration/test_request_logs.py::test_the_retention_sweep_deletes_only_old_rows",
+      "integration/test_request_logs.py::test_logs_page_with_starting_after_and_filter_by_status",
+      "manual:the dashboard screen over GET /v1/request_logs is DSH 'Request logs page' (P2)"]
 EXE-01:
   0: ["integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited", "chain/test_send_once.py::test_parallel_send_triggers_produce_one_transaction"]
   1: ["integration/test_transition.py::test_illegal_transition_raises_changes_nothing_and_is_audited", "integration/test_transition.py::test_terminal_states_never_change"]

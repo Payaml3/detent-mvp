@@ -1281,7 +1281,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs
+- [x] Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** FND-08 · **Traces to:** D.standards
 
@@ -1291,7 +1291,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] `DekernAI-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400
+- [x] `DekernAI-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.standards
 
@@ -1301,7 +1301,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After`
+- [x] `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset` headers; 429 with `Retry-After`
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.standards, D.abuse
 
@@ -1322,7 +1322,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 **Acceptance criteria**
 
-- [ ] Stored per organisation for 30 days; bodies redacted; filterable in the dashboard
+- [x] Stored per organisation for 30 days; bodies redacted; filterable in the dashboard
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** API-01 · **Traces to:** D.logs
 

@@ -14,12 +14,15 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import Engine, text
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
 
 from detent import logging as dlog
 from detent.api import v1
 from detent.api.auth import AuthError
+from detent.api.error_codes import HTTP_STATUS_CODES
 from detent.api.errors import error_response
+from detent.api.limits import RateLimiter
 from detent.api.middleware import request_context
 from detent.clock import Clock
 from detent.console import routes as console_routes
@@ -57,6 +60,7 @@ def create_app(
         redoc_url=None,
     )
     app.state.runtime = rt
+    app.state.limiter = RateLimiter(limit=max(1, rt.settings.api_rate_limit_per_minute))
 
     app.add_middleware(
         SessionMiddleware,
@@ -92,6 +96,17 @@ def create_app(
         return _err(
             422, "invalid_request", "validation_error", msg or "invalid request", ".".join(loc) or None
         )
+
+    @app.exception_handler(StarletteHTTPException)
+    def _http(request: Request, exc: StarletteHTTPException) -> Response:
+        type_, code = HTTP_STATUS_CODES.get(
+            exc.status_code,
+            ("invalid_request", "bad_request") if exc.status_code < 500 else ("internal", "internal_error"),
+        )
+        resp = _err(exc.status_code, type_, code, str(exc.detail))
+        if exc.headers:
+            resp.headers.update(exc.headers)
+        return resp
 
     @app.exception_handler(RequestProblem)
     def _problem(request: Request, exc: RequestProblem) -> Response:

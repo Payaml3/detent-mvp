@@ -95,7 +95,7 @@ def authenticate(request: Request) -> Principal:
         row = conn.execute(
             text(
                 "SELECT k.id, k.org_id, k.scopes, k.user_id, u.role, k.revoked_at, k.expires_at, "
-                "k.mandate_id, o.expires_at AS org_expires_at "
+                "k.mandate_id, o.expires_at AS org_expires_at, o.api_version "
                 "FROM api_keys k JOIN users u ON u.org_id = k.org_id AND u.id = k.user_id "
                 "JOIN organisations o ON o.id = k.org_id "
                 "WHERE k.hash = :h"
@@ -106,7 +106,10 @@ def authenticate(request: Request) -> Principal:
         raise AuthError(401, "authentication", "invalid_api_key", "The API key is not valid.")
     if row.org_expires_at is not None and row.org_expires_at <= now:  # DSH-03 (API side), found by atk-au-02
         raise AuthError(403, "permission", "organisation_expired", "This sandbox organisation has expired.")
-    return Principal(row.org_id, row.id, row.user_id, row.role, frozenset(row.scopes), row.mandate_id)
+    principal = Principal(row.org_id, row.id, row.user_id, row.role, frozenset(row.scopes), row.mandate_id)
+    request.state.principal = principal  # read by the request log middleware (API-06)
+    request.state.api_version = row.api_version  # the organisation's pinned default (API-03)
+    return principal
 
 
 def require(principal: Principal, scope: str) -> None:

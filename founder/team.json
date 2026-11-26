@@ -1615,8 +1615,8 @@
    "initiative": "Public sandbox API",
    "slice": "P1",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1629,8 +1629,8 @@
    "initiative": "Public sandbox API",
    "slice": "P1",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1643,8 +1643,8 @@
    "initiative": "Public sandbox API",
    "slice": "P1",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1671,8 +1671,8 @@
    "initiative": "Public sandbox API",
    "slice": "P1",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },

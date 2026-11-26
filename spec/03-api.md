@@ -126,20 +126,23 @@ Event envelope:
 
 The signature header is `DekernAI-Signature: t=1764756000,v1=<hex HMAC-SHA256(secret, "{t}.{raw_body}")>`. Reject any delivery whose timestamp is more than 300 s from now. Delivery is at least once, so deduplicate on `id`. `sequence` increases per payment.
 
-## Error codes (starter catalogue)
+## Error codes
 
-- `idempotency_conflict`
-- `payment_blocked`
-- `already_resolved`
-- `invalid_transition`
-- `insufficient_scope`
-- `live_mode_unavailable`
-- `organisation_expired`
-- `quota_exceeded`
-- `unknown_version`
-- `mandate_invalid`
-- `self_approval_forbidden`
-- `insufficient_role` (the acting user's role may not perform the action, G-06)
-- `kill_switch_engaged`
-- `not_cancellable`
-- `validation_error`
+The catalogue of every code the API returns, with its status, type and what the client should do, lives in
+`apps/api/src/detent/api/error_codes.py`. `make error-docs` generates `docs/api/errors.md` from it, a unit test fails
+if the page drifts, and the test session fails if the API returns a code that is not in the catalogue (API-02).
+
+Codes planned by later stories join the catalogue with the code that returns them: `invalid_transition`,
+`not_cancellable` (INT-05), `quota_exceeded` (SBX), `kill_switch_engaged`.
+
+## As built (P1 group 1)
+
+- **Versions (API-03):** `DekernAI-Version`. Without the header, the organisation's pinned `api_version` applies and
+  is echoed on the response; an unknown version is 400 `unknown_version` before any work. Only `2026-12-01` exists.
+- **Rate limits (API-04):** a fixed 60-second window per key (120 requests) in process memory, plus a ceiling per
+  client address (10 times the key limit) so rotating junk tokens cannot dodge it. Fine for the single sandbox
+  instance; a shared store is needed before running more than one API instance.
+- **Request logs (API-06):** `GET /v1/request_logs` (scope `read`), newest first, filters `status`, `payment_id`,
+  `idempotency_key`, paged with `limit` and `starting_after`. Metadata only: no bodies, no query strings, no keys.
+  The worker deletes rows older than 30 days (`detent/db/retention.py`); reads never show them.
+- **Errors (API-02):** framework errors (404, 405 and others) use the same envelope as every other error.

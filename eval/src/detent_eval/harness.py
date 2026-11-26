@@ -479,6 +479,9 @@ def make_env(  # noqa: PLR0912, PLR0915 - one block per setup option, in reading
         agent_llm="recorded",
         rail_timeout_seconds=1.0,
         log_json=True,
+        # The suites drive hundreds of calls a minute through one key to measure DekernAI's checks; the
+        # rate limiter (API-04) has its own tests and would only turn those calls into 429s here.
+        api_rate_limit_per_minute=1_000_000,
         **extra,
     )
     env = Env(world, org_id, clock, rng, users, keys, settings, senders, payees)

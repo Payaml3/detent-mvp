@@ -186,6 +186,17 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         raise pytest.UsageError("REQUIRE_CHAIN=1 but anvil is not installed")
 
 
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    """API-02: every error code the API returned during the run must be in the public catalogue."""
+    from detent.api.errors import UNCATALOGUED
+
+    if UNCATALOGUED:
+        session.config.get_terminal_writer().line(
+            f"error codes missing from detent/api/error_codes.py: {sorted(UNCATALOGUED)}", red=True
+        )
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+
+
 @pytest.fixture(scope="module")
 def chain() -> Iterator[Any]:
     """A local anvil chain with MockUSDC, one per test module (S2 onwards)."""

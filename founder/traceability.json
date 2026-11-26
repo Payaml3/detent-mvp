@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 70,
-   "pct": 47
+   "done": 74,
+   "pct": 50
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 218,
-   "pct": 68
+   "done": 222,
+   "pct": 69
   },
   {
    "order": 3,
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 168,
+   "done": 172,
    "total": 244,
-   "pct_done": 69
+   "pct_done": 70
   },
   {
    "function": "05 QA",
@@ -75,8 +75,8 @@
    "role": "engineer",
    "stories": 7,
    "criteria": 10,
-   "criteria_done": 2,
-   "pct_done": 20
+   "criteria_done": 6,
+   "pct_done": 60
   },
   {
    "code": "AUD",
@@ -1317,9 +1317,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "API-03",
@@ -1327,9 +1327,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "API-04",
@@ -1337,9 +1337,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "API-05",
@@ -1357,9 +1357,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "API-07",
