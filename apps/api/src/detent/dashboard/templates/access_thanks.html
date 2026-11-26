@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Access request{% endblock %}
+{% block main %}
+{% if error %}
+<h1>Access request not sent</h1>
+<p class="error" role="alert">{{ error }}</p>
+<p>Go back to the form, fill in every field and send it again.</p>
+{% else %}
+<h1>Thank you</h1>
+<p role="status">We have your request for sandbox access to {{ brand }} agentic payment controls. Someone from the team will reply to your work email.</p>
+{% endif %}
+{% endblock %}

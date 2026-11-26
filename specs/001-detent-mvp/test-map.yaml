@@ -423,6 +423,11 @@ SBX-04:
   0: ["integration/test_sandbox_reset.py::test_a_reset_hides_earlier_data_from_the_api_and_deletes_nothing", "integration/test_sandbox_reset.py::test_an_insert_cannot_choose_its_generation", "integration/test_sandbox_reset.py::test_an_idempotency_key_replayed_after_a_reset_never_pays_twice", "integration/test_sandbox_reset.py::test_a_reset_is_refused_while_a_payout_can_still_be_sent", "integration/test_sandbox_reset.py::test_the_demo_organisation_cannot_be_reset_here"]
 DSH-07:
   0: ["integration/test_sandbox_reset.py::test_the_sandbox_page_resets_and_hides_earlier_logs", "integration/test_sandbox_reset.py::test_roles_without_sandbox_control_cannot_reset", "integration/test_sandbox_rails.py::test_the_sandbox_page_forces_scenarios_and_shows_the_rails", "integration/test_sandbox_rails.py::test_roles_without_sandbox_control_cannot_use_it"]
+DSH-10:
+  0: ["integration/test_leads_verification.py::test_the_access_form_stores_a_lead_and_emails_the_sales_inbox", "integration/test_leads_verification.py::test_without_a_sales_inbox_the_lead_is_stored_and_nothing_is_sent", "integration/test_leads_verification.py::test_admins_list_access_requests_and_change_their_status", "integration/test_leads_verification.py::test_client_members_cannot_see_the_inbox", "integration/test_leads_verification.py::test_the_website_form_fields_are_accepted"]
+DSH-12:
+  0: ["integration/test_leads_verification.py::test_the_checklist_is_filled_from_sandbox_evidence"]
+  1: ["integration/test_leads_verification.py::test_the_owner_requests_verification_and_an_admin_returns_then_verifies_it", "integration/test_leads_verification.py::test_only_the_owner_or_an_admin_can_request_verification"]
 DSH-11:
   0: ["integration/test_dashboard_access.py::test_owner_invites_a_developer_who_cannot_manage_the_team", "integration/test_dashboard_access.py::test_removing_a_member_stops_their_sign_in_and_keys"]
   1: ["unit/test_dashboard_rules.py::test_member_roles_are_the_spec_02_list", "unit/test_dashboard_rules.py::test_dashboard_permissions_follow_spec_08", "integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays"]

@@ -249,8 +249,8 @@ def onboarding_checklist(conn: Any, org_id: str) -> list[dict[str, Any]]:
         {
             "label": "Request verification",
             "href": "/dashboard/verification",
-            "done": False,
-            "detail": "When every test value has run, DekernAI checks the integration.",
+            "done": has("SELECT 1 FROM verification_requests WHERE org_id=:o AND status <> 'returned'"),
+            "detail": "When every sandbox check passes, DekernAI verifies the integration.",
         },
     ]
 
@@ -370,8 +370,8 @@ def not_built(
     rt: Runtime = Depends(runtime),  # noqa: B008
     member: Member = Depends(client_member),  # noqa: B008
 ) -> HTMLResponse:
-    """Pages from later P2 story groups (policy, verification)."""
-    known = {"policy", "verification"}
+    """Pages from later P2 story groups (policy, with the console in DSH-09)."""
+    known = {"policy"}
     if section not in known:
         return page(request, rt, "not_found.html", member, status_code=404)
     return page(request, rt, "coming.html", member, section=section)

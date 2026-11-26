@@ -713,14 +713,7 @@ def create_staff(conn: Connection, clock: Clock, *, email: str, display_name: st
     except ValueError as exc:
         raise AccessError("weak_password", str(exc)) from exc
     now = clock.now()
-    conn.execute(
-        text(
-            "INSERT INTO organisations (id, name, mode, fail_safe, kind, created_at) VALUES (:o, "
-            "'DekernAI operator (internal)', 'shadow', 'manual_queue', 'demo', :now) ON CONFLICT "
-            "(id) DO NOTHING"
-        ),
-        {"o": OPERATOR_ORG, "now": now},
-    )
+    ensure_operator_org(conn, clock)
     uid = new_id(Prefix.USR, now)
     try:
         with conn.begin_nested():
@@ -755,6 +748,18 @@ def create_staff(conn: Connection, clock: Clock, *, email: str, display_name: st
 
 
 # ------------------------------------------------------------------------------------------ checks
+def ensure_operator_org(conn: Connection, clock: Clock) -> None:
+    """DekernAI's own organisation: it holds the admins and the website's access requests (DSH-10)."""
+    conn.execute(
+        text(
+            "INSERT INTO organisations (id, name, mode, fail_safe, kind, created_at) VALUES (:o, "
+            "'DekernAI operator (internal)', 'shadow', 'manual_queue', 'demo', :now) ON CONFLICT "
+            "(id) DO NOTHING"
+        ),
+        {"o": OPERATOR_ORG, "now": clock.now()},
+    )
+
+
 def _require(member: Member, action: str) -> None:
     if not allowed(action, member.role):
         raise AccessError("forbidden", "Your role can't do that.", status=403)

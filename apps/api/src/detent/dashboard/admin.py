@@ -17,7 +17,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, Response
 
-from detent.dashboard import access
+from detent.dashboard import access, leads, verification
 from detent.dashboard.access import AccessError, Member
 from detent.dashboard.web import check_csrf, page, redirect, runtime, staff_member
 from detent.db.engine import transaction
@@ -243,3 +243,90 @@ def _date(value: str) -> date:
         return date.fromisoformat(value.strip())
     except ValueError as exc:
         raise AccessError("validation_error", "Enter the KYB approval date as YYYY-MM-DD.") from exc
+
+
+# --------------------------------------------------------------------------------- access requests (DSH-10)
+@router.get("/access-requests", response_class=HTMLResponse)
+def access_requests(
+    request: Request,
+    status: str = "",
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+    error: str | None = None,
+) -> HTMLResponse:
+    with rt.engine.connect() as conn:
+        rows = leads.list_leads(conn, status or None)
+    return page(
+        request,
+        rt,
+        "admin_leads.html",
+        staff,
+        rows=rows,
+        status=status,
+        statuses=leads.STATUSES,
+        inbox=rt.settings.sales_inbox,
+        error=error,
+        status_code=422 if error else 200,
+    )
+
+
+@router.post("/access-requests/{lead_id}/status", response_model=None)
+def access_request_status(
+    lead_id: str,
+    request: Request,
+    status: str = Form(""),
+    note: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+) -> Response:
+    try:
+        with transaction(rt.engine) as conn:
+            leads.set_status(conn, rt.clock, staff=staff, lead_id=lead_id, status=status, note=note)
+    except AccessError as exc:
+        resp = access_requests(request, "", rt, staff, error=str(exc))
+        resp.status_code = exc.status
+        return resp
+    return redirect("/admin/access-requests")
+
+
+# ------------------------------------------------------------------------------------ verification (DSH-12)
+@router.get("/verifications", response_class=HTMLResponse)
+def verifications(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+    error: str | None = None,
+) -> HTMLResponse:
+    with rt.engine.connect() as conn:
+        rows = verification.open_requests(conn)
+    return page(
+        request,
+        rt,
+        "admin_verifications.html",
+        staff,
+        rows=rows,
+        error=error,
+        status_code=422 if error else 200,
+    )
+
+
+@router.post("/verifications/{org_id}/{request_id}", response_model=None)
+def verification_decide(
+    org_id: str,
+    request_id: str,
+    request: Request,
+    outcome: str = Form(""),
+    note: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+) -> Response:
+    try:
+        with transaction(rt.engine) as conn:
+            verification.decide(
+                conn, rt.clock, staff=staff, org_id=org_id, request_id=request_id, outcome=outcome, note=note
+            )
+    except AccessError as exc:
+        resp = verifications(request, rt, staff, error=str(exc))
+        resp.status_code = exc.status
+        return resp
+    return redirect("/admin/verifications")

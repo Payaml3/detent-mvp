@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Verification{% endblock %}
+{% block main %}
+<h1>Integration verification</h1>
+<p class="muted">Each item is filled from what your sandbox recorded, not ticked by hand. When every item passes, the account owner asks {{ brand }} to verify the integration; a {{ brand }} admin verifies it or returns it with a note. Evidence from before a sandbox reset still counts.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if request.query_params.get('notice') == 'requested' %}<p class="note" role="status">Verification requested. A {{ brand }} admin will verify it or return it with a note.</p>{% endif %}
+<table>
+  <thead><tr><th>Check</th><th>Status</th><th>How to pass it</th></tr></thead>
+  <tbody>
+  {% for i in items %}
+  <tr><td>{{ i.label }}</td><td>{% if i.done %}<span class="st st-confirmed">passed</span>{% else %}<span class="st st-held">not yet</span>{% endif %}</td><td class="small">{{ i.how }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<section class="card">
+  <h2>Request</h2>
+  {% if last and last.status == 'verified' %}
+    <p><span class="st st-confirmed">verified</span> on {{ last.decided_at.strftime('%Y-%m-%d') }}.{% if last.note %} Note: {{ last.note }}{% endif %} Production mode is not available in the prototype.</p>
+  {% elif last and last.status == 'requested' %}
+    <p><span class="st">requested</span> on {{ last.requested_at.strftime('%Y-%m-%d %H:%M') }} UTC; waiting for a {{ brand }} admin.</p>
+  {% else %}
+    {% if last and last.status == 'returned' %}<p><span class="st st-held">returned</span> on {{ last.decided_at.strftime('%Y-%m-%d') }}: {{ last.note }}</p>{% endif %}
+    {% set ready = items | selectattr('done') | list | length == items | length %}
+    {% if can_request and not lock %}
+    <form method="post" action="/dashboard/verification/request">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button{% if not ready %} disabled{% endif %}>Request verification</button>
+      {% if not ready %}<span class="small muted">Every check must pass first.</span>{% endif %}
+    </form>
+    {% elif not can_request %}<p class="small muted">The account owner or an admin requests verification.</p>{% endif %}
+  {% endif %}
+</section>
+{% endblock %}

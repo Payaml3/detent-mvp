@@ -49,6 +49,7 @@ class Prefix(StrEnum):
     INV = "inv"  # invite
     LED = "lead"  # website access request
     MCH = "mch"  # mode change
+    VER = "ver"  # integration verification request
 
 
 _CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"

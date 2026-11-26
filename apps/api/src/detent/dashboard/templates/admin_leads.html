@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Access requests{% endblock %}
+{% block main %}
+<h1>Access requests</h1>
+<p class="muted">Requests from the website's access form, newest first. Everything here was typed into a public form: treat it as unverified.
+{% if inbox %}Each new request is emailed to the sales inbox (prototype: the outbox).{% else %}No sales inbox is configured (<span class="mono">SALES_INBOX</span>), so nothing is emailed; requests are only listed here.{% endif %}</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form method="get" action="/admin/access-requests">
+  <label>Status <select name="status"><option value="">All</option>{% for s in statuses %}<option value="{{ s }}"{% if s == status %} selected{% endif %}>{{ s }}</option>{% endfor %}</select></label>
+  <button>Filter</button>
+</form>
+<table>
+  <thead><tr><th>Received (UTC)</th><th>Person</th><th>Company</th><th>Use case</th><th>Emailed</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr><td class="small">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    <td>{{ r.name }}<div class="small mono">{{ r.email }}</div><div class="small muted">{{ r.role }}</div></td>
+    <td>{{ r.company }}</td><td class="small">{{ r.use_case }}</td>
+    <td class="small">{{ 'yes' if r.outbox_id else 'no' }}</td>
+    <td><span class="st">{{ r.status }}</span>{% if r.status_note %}<div class="small muted">{{ r.status_note }}</div>{% endif %}
+      <form method="post" action="/admin/access-requests/{{ r.id }}/status">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <select name="status" aria-label="New status">{% for s in statuses %}<option value="{{ s }}"{% if s == r.status %} selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+        <input name="note" placeholder="Note (optional)" aria-label="Note" maxlength="500">
+        <button>Save</button>
+      </form></td></tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">No access requests.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

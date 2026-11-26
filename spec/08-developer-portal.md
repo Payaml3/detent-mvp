@@ -215,6 +215,28 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 - **For DSH-09:** the console's own list queries (overview, queues) don't filter on the generation yet; the shared
   payment and case views do. The per-organisation console must add the filter before sandbox orgs reach it.
 
+## As built (P2 group 4a)
+
+- **Access requests (DSH-10):** the website's form posts to `POST /access-requests` (public: no session or CSRF
+  token, as the site is another origin). Name, work email and company are required; role and use case are kept,
+  and the site's own field names (`title`, `message`) and extra questions (country, platform, rails) are accepted.
+  A lead is stored in the operator organisation (`leads`, migration 0015) and emailed to `SALES_INBOX` through the
+  outbox, like every dashboard email until the founder chooses a provider; with no inbox set it is only listed.
+  The same work email within a day is stored once, and a form with the hidden `website` field filled in is
+  treated as a bot. The text is untrusted: shown escaped, never sent to a model. Admins list requests at
+  `/admin/access-requests`, filter by status (new, contacted, approved, declined) and move them along with a note.
+  Audited (`lead.received`, `lead.status_changed`). The site keeps its placeholder action until the dashboard is
+  deployed (WEB-06, P4).
+- **Integration verification (DSH-12):** `/dashboard/verification` fills eight checks from the organisation's own
+  records: `.13` timed out and was confirmed, `.42` reverted on its first rail, a screening block, an allowlist
+  escalation, a mandate-limit block, a 2xx-acknowledged delivery of a real (not test) event, an idempotent retry of
+  `POST /v1/payment_intents`, and an UNKNOWN payout confirmed with a single attempt. Evidence counts across data
+  generations. The account owner or an admin requests verification once all pass; the checklist is stored with the
+  request (`verification_requests`, one open at a time, a decided request is final by trigger). DekernAI admins
+  verify or return it with a note at `/admin/verifications`. Audited in the organisation's log
+  (`verification.requested`, `verification.verified`, `verification.returned`). Production mode stays unavailable
+  (DSH-13).
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

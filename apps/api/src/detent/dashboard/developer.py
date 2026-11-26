@@ -16,7 +16,7 @@ from sqlalchemy import text
 
 from detent.audit.log import append
 from detent.dashboard import keys as key_service
-from detent.dashboard import sandbox
+from detent.dashboard import sandbox, verification
 from detent.dashboard.access import AccessError, Member
 from detent.dashboard.web import check_csrf, client_member, page, redirect, runtime, writable_member
 from detent.db.engine import transaction
@@ -549,3 +549,46 @@ def sandbox_reset(
     except AccessError as exc:
         return _sandbox(request, rt, member, error=str(exc), status=exc.status)
     return redirect("/dashboard/sandbox?notice=reset")
+
+
+# ------------------------------------------------------------------------------------- verification (DSH-12)
+def _verification(
+    request: Request, rt: Runtime, member: Member, *, error: str | None = None, status: int = 200
+) -> HTMLResponse:
+    with rt.engine.connect() as conn:
+        items = verification.checklist(conn, member.org_id)
+        last = verification.latest(conn, member.org_id)
+    return page(
+        request,
+        rt,
+        "verification.html",
+        member,
+        items=items,
+        last=last,
+        can_request=allowed("verification.request", member.role),
+        error=error,
+        status_code=status,
+    )
+
+
+@router.get("/verification", response_class=HTMLResponse)
+def verification_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    member: Member = Depends(client_member),  # noqa: B008
+) -> HTMLResponse:
+    return _verification(request, rt, member)
+
+
+@router.post("/verification/request", response_model=None)
+def verification_request(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    member: Member = Depends(writable_member),  # noqa: B008
+) -> Response:
+    try:
+        with transaction(rt.engine) as conn:
+            verification.request_verification(conn, rt.clock, by=member)
+    except AccessError as exc:
+        return _verification(request, rt, member, error=str(exc), status=exc.status)
+    return redirect("/dashboard/verification?notice=requested")

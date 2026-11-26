@@ -19,7 +19,8 @@
       <div class="scope">{{ 'DekernAI admin' if member.is_staff else 'developer dashboard' }}</div>
       <nav class="nav" aria-label="Dashboard">
         {% if member.is_staff %}
-          {% set links = [("/admin/", "Organisations"), ("/admin/organisations/new", "New organisation")] %}
+          {% set links = [("/admin/", "Organisations"), ("/admin/organisations/new", "New organisation"),
+                          ("/admin/access-requests", "Access requests"), ("/admin/verifications", "Verifications")] %}
         {% else %}
           {% set links = [("/dashboard/", "Home"), ("/dashboard/team", "Team"), ("/dashboard/keys", "Keys"),
                           ("/dashboard/logs", "Request logs"), ("/dashboard/webhooks", "Webhooks"),

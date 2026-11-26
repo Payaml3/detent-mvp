@@ -1477,7 +1477,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Form fields: name, work email, company, role, use case; stored; admin list with status; email to the sales inbox
+- [x] Form fields: name, work email, company, role, use case; stored; admin list with status; email to the sales inbox
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.ops_pages
 
@@ -1499,8 +1499,8 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Checklist filled from sandbox evidence: every test value triggered (spec/06), a signed webhook received and acknowledged, idempotent retry used, an UNKNOWN resolved without a resend
-- [ ] The owner requests verification when every item passes; a DekernAI admin verifies or returns it with a note; both are audited
+- [x] Checklist filled from sandbox evidence: every test value triggered (spec/06), a signed webhook received and acknowledged, idempotent retry used, an UNKNOWN resolved without a resend
+- [x] The owner requests verification when every item passes; a DekernAI admin verifies or returns it with a note; both are audited
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-07, DSH-11 · **Traces to:** D.sandbox, B3.onboarding
 

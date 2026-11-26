@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Verifications{% endblock %}
+{% block main %}
+<h1>Integration verifications</h1>
+<p class="muted">Requests from account owners whose sandbox checklist passed, oldest first. Verify the integration, or return it with a note saying what is missing. Both are recorded in the organisation's audit log.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% for r in rows %}
+<section class="card">
+  <h2>{{ r.name }} <span class="small mono">{{ r.org_id }}</span></h2>
+  <p class="small muted">Requested {{ r.requested_at.strftime('%Y-%m-%d %H:%M') }} UTC by <span class="mono">{{ r.requested_by }}</span>.</p>
+  <ul>{% for i in r.checklist %}<li>{{ '✓' if i.done else '✗' }} {{ i.label }}</li>{% endfor %}</ul>
+  <form method="post" action="/admin/verifications/{{ r.org_id }}/{{ r.id }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Note <input name="note" maxlength="1000"></label>
+    <button name="outcome" value="verified">Verify</button>
+    <button name="outcome" value="returned">Return with note</button>
+  </form>
+</section>
+{% else %}
+<p class="muted">No verification requests are waiting.</p>
+{% endfor %}
+{% endblock %}
