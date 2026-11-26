@@ -940,14 +940,14 @@
    "epic": "API",
    "slice": "P1",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "API-03",
    "epic": "API",
    "slice": "P1",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "API-04",
@@ -968,7 +968,7 @@
    "epic": "API",
    "slice": "P1",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "API-07",

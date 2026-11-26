@@ -95,7 +95,7 @@ def authenticate(request: Request) -> Principal:
         row = conn.execute(
             text(
                 "SELECT k.id, k.org_id, k.scopes, k.user_id, u.role, k.revoked_at, k.expires_at, "
-                "k.mandate_id, o.expires_at AS org_expires_at "
+                "k.mandate_id, o.expires_at AS org_expires_at, o.api_version "
                 "FROM api_keys k JOIN users u ON u.org_id = k.org_id AND u.id = k.user_id "
                 "JOIN organisations o ON o.id = k.org_id "
                 "WHERE k.hash = :h"
@@ -108,6 +108,7 @@ def authenticate(request: Request) -> Principal:
         raise AuthError(403, "permission", "organisation_expired", "This sandbox organisation has expired.")
     principal = Principal(row.org_id, row.id, row.user_id, row.role, frozenset(row.scopes), row.mandate_id)
     request.state.principal = principal  # read by the request log middleware (API-06)
+    request.state.api_version = row.api_version  # the organisation's pinned default (API-03)
     return principal
 
 

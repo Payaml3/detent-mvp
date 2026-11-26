@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck eval backlog spec roadmap roadmap-page site site-dev site-test denylist governance secrets check
+.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck error-docs eval backlog spec roadmap roadmap-page site site-dev site-test denylist governance secrets check
 
 setup:            ## install dependencies and pre-commit hooks
 	$(UV) sync --all-packages
@@ -46,6 +46,9 @@ test-fast:        ## unit and property tests only, no database
 lint:
 	$(UV) run ruff check .
 	$(UV) run ruff format --check .
+
+error-docs:       ## API-02: regenerate docs/api/errors.md from the error-code catalogue
+	$(UV) run python -m detent.api.error_codes > docs/api/errors.md
 
 typecheck:
 	$(UV) run mypy

@@ -1664,6 +1664,7 @@ stories:
     - "`Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin"
     - "Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable`"
     - "Every data access filters by the key's organisation (cross-organisation tests in EVL-02)"
+  done: [0, 1, 2]
   pri: Must
   est: 0.75
   deps: [FND-03]
@@ -1678,6 +1679,7 @@ stories:
   so: I can handle errors in code
   ac:
     - "Every 4xx and 5xx uses the schema in spec/03-api.md; the code catalogue is generated into the docs"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [FND-08]
@@ -1691,6 +1693,7 @@ stories:
   so: my integration doesn't break when the API changes
   ac:
     - "`DekernAI-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [API-01]
@@ -1732,6 +1735,7 @@ stories:
   so: I can debug my own integration
   ac:
     - "Stored per organisation for 30 days; bodies redacted; filterable in the dashboard"
+  done: [0]
   pri: Must
   est: 0.5
   deps: [API-01]

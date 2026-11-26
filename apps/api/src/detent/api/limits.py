@@ -11,7 +11,7 @@ import threading
 from dataclasses import dataclass
 from datetime import datetime
 
-VERSION_HEADER = "Detent-Version"
+VERSION_HEADER = "DekernAI-Version"
 CURRENT_VERSION = "2026-12-01"
 SUPPORTED_VERSIONS = frozenset({CURRENT_VERSION})
 DEFAULT_LIMIT = 120

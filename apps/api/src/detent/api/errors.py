@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Literal
 
 from fastapi.responses import JSONResponse
@@ -17,6 +18,10 @@ ErrorType = Literal[
     "internal",
 ]
 
+log = logging.getLogger("detent.api.errors")
+# Codes returned that are missing from the catalogue (API-02). The test session fails if any appear.
+UNCATALOGUED: set[str] = set()
+
 
 def error_response(
     status: int,
@@ -28,6 +33,11 @@ def error_response(
     payment_id: str | None = None,
     param: str | None = None,
 ) -> JSONResponse:
+    from detent.api.error_codes import BY_CODE  # deferred: error_codes imports ErrorType from here
+
+    if code not in BY_CODE:
+        UNCATALOGUED.add(code)
+        log.error("uncatalogued error code %s", code)
     body = {
         "error": {
             "type": type_,

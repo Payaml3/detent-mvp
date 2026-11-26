@@ -20,6 +20,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from detent import logging as dlog
 from detent.api import v1
 from detent.api.auth import AuthError
+from detent.api.error_codes import HTTP_STATUS_CODES
 from detent.api.errors import error_response
 from detent.api.limits import RateLimiter
 from detent.api.middleware import request_context
@@ -98,9 +99,9 @@ def create_app(
 
     @app.exception_handler(StarletteHTTPException)
     def _http(request: Request, exc: StarletteHTTPException) -> Response:
-        kinds = {404: ("not_found", "not_found"), 405: ("invalid_request", "method_not_allowed")}
-        type_, code = kinds.get(
-            exc.status_code, ("invalid_request" if exc.status_code < 500 else "internal", "http_error")
+        type_, code = HTTP_STATUS_CODES.get(
+            exc.status_code,
+            ("invalid_request", "bad_request") if exc.status_code < 500 else ("internal", "internal_error"),
         )
         resp = _err(exc.status_code, type_, code, str(exc.detail))
         if exc.headers:

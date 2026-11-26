@@ -13,6 +13,7 @@ from sqlalchemy import text
 from detent.api.auth import Principal, authenticate, require
 from detent.api.errors import ErrorType, error_response
 from detent.audit.log import Actor
+from detent.db.retention import REQUEST_LOG_DAYS
 from detent.exceptions.cases import CaseError, approve, reject
 from detent.intents.service import IntentRequest, payment_view, submit_intent
 from detent.ledger.deposits import DepositRequest
@@ -275,7 +276,6 @@ def release_kill_switch(
 
 
 # --------------------------------------------------------------------------------- mandates (MND-01, MND-03)
-REQUEST_LOG_DAYS = 30
 
 
 @router.get("/request_logs")
@@ -286,17 +286,13 @@ def list_request_logs(
     payment_id: str | None = None,
     idempotency_key: str | None = None,
     limit: int = Query(default=50, ge=1, le=100),
-    before: int | None = Query(default=None, ge=1),
+    starting_after: int | None = Query(default=None, ge=1),
 ) -> JSONResponse:
     """API-06: this organisation's own calls of the last 30 days, newest first."""
     require(principal, "read")
     rt = request.app.state.runtime
-    since = rt.clock.now() - timedelta(days=REQUEST_LOG_DAYS)
-    with rt.engine.begin() as conn:
-        conn.execute(
-            text("DELETE FROM request_logs WHERE org_id = :o AND at < :since"),
-            {"o": principal.org_id, "since": since},
-        )
+    since = rt.clock.now() - timedelta(days=REQUEST_LOG_DAYS)  # older rows are swept by the worker
+    with rt.engine.connect() as conn:
         rows = conn.execute(
             text(
                 "SELECT id, key_id, method, path, status, latency_ms, idempotency_key, payment_id, "
@@ -304,7 +300,7 @@ def list_request_logs(
                 "AND (CAST(:status AS INTEGER) IS NULL OR status = :status) "
                 "AND (CAST(:pay AS TEXT) IS NULL OR payment_id = :pay) "
                 "AND (CAST(:idem AS TEXT) IS NULL OR idempotency_key = :idem) "
-                "AND (CAST(:before AS BIGINT) IS NULL OR id < :before) "
+                "AND (CAST(:after AS BIGINT) IS NULL OR id < :after) "
                 "ORDER BY id DESC LIMIT :n"
             ),
             {
@@ -313,7 +309,7 @@ def list_request_logs(
                 "status": status,
                 "pay": payment_id,
                 "idem": idempotency_key,
-                "before": before,
+                "after": starting_after,
                 "n": limit + 1,
             },
         ).all()

@@ -141,7 +141,8 @@ async def request_context(request: Request, call_next: Callable[[Request], Await
                         request_id=rid,
                     )
             if is_api:
-                response.headers[VERSION_HEADER] = version or CURRENT_VERSION
+                pinned = getattr(request.state, "api_version", None)
+                response.headers[VERSION_HEADER] = version or pinned or CURRENT_VERSION
                 if limit is not None:
                     response.headers["RateLimit-Limit"] = str(limit.limit)
                     response.headers["RateLimit-Remaining"] = str(limit.remaining)

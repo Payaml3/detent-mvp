@@ -73,10 +73,10 @@ def test_request_logs_carry_request_id_and_never_keys(
 
 
 def test_unknown_version_is_400_and_known_is_echoed(client: TestClient) -> None:
-    bad = client.get("/v1/payment_intents", headers={"Detent-Version": "2020-01-01"})
+    bad = client.get("/v1/payment_intents", headers={"DekernAI-Version": "2020-01-01"})
     assert bad.status_code == 400 and bad.json()["error"]["code"] == "unknown_version"
-    ok = client.get("/v1/payment_intents", headers={"Detent-Version": "2026-12-01"})
-    assert ok.headers["Detent-Version"] == "2026-12-01"
+    ok = client.get("/v1/payment_intents", headers={"DekernAI-Version": "2026-12-01"})
+    assert ok.headers["DekernAI-Version"] == "2026-12-01"
 
 
 def test_v1_responses_carry_rate_limit_headers_and_429(client: TestClient) -> None:
