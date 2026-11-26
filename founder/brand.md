@@ -8,7 +8,7 @@ below the name is **Proposed** until the founder approves it.
 - **Dekernai**, said "deh-KER-nye". Write it as one word with one capital: Dekernai (not DekernAI, not DEKERNAI).
 - Root: Latin *dēcernere*, "to decide, settle, rule on", from *dē-* ("off") and *cernere* ("to sift, see
   clearly"). The same root gives *decree*, *discern* and *certain*.
-- Domains: dekernai.com (primary), dekernai.ai, dekernai.io. Registration needs the `spend` gate.
+- Domains: dekernai.com (primary) and dekernai.co.uk, registered by the founder on 2026-11-26 (GoDaddy, 1 year). dekernai.ai and .io are not registered. Set up 2FA and the transfer lock; company email is still to choose.
 - Evidence and alternatives considered: `docs/brand/name-review-2026-11.md`.
 
 ## Positioning line (Proposed)
