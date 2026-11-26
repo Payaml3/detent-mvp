@@ -16,7 +16,7 @@ brand ([decisions.md](../001-detent-mvp/decisions.md#decision-log)).
 
 ### Session 2026-11-18
 
-- Q: Show prices? → A: No. Name the free shadow report, Pilot, Growth and Scale; every plan says "Talk to us" (D-15).
+- Q: Show prices? → A: No. Name Pilot, Growth and Scale; every plan says "Talk to us" (D-15). There is no free shadow report (B-04).
 - Q: Where do "Book a demo" and "Request sandbox access" go before the booking page and access inbox exist? → A: Clearly marked placeholders in one config value each; nothing is sent (D-16).
 - Q: Name? → A: The name "DekernAI" (B-01, replacing the working name Detent) from one setting; domain stays a placeholder (D-17).
 - Q: Look? → A: The spec/07 brand tokens (D-18), in a cinematic dark-blue style with an original WebGL watch-escapement scene, built in-house after reviewing GetLayers references; glows and gradients allowed (D-19).
@@ -29,7 +29,7 @@ A buyer from a platform that holds user balances lands on the home page and, wit
 DekernAI is ("agentic payment controls") and what to do (book a demo). Scrolling, they see how it works, the three
 layers, why it suits irreversible rails, security, use cases and how pricing works.
 
-**Why this priority**: the site's job is demos (spec/11: the signal is a "yes" to the shadow report).
+**Why this priority**: the site's job is demos (spec/11: the signal is a booked demo that leads into onboarding, B-04).
 
 **Independent Test**: build the site, open the home page, and run the honesty and structure checks.
 
@@ -44,7 +44,7 @@ layers, why it suits irreversible rails, security, use cases and how pricing wor
 **Acceptance Scenarios**:
 
 1. **Given** the Security page, **When** read, **Then** it covers non-custodial design, audit and replay, the kill switch and EU hosting, and every roadmap item is labelled roadmap (for example "SOC 2: planned").
-2. **Given** the Design partners page, **When** read, **Then** it explains the free shadow report and how the data is handled.
+2. **Given** the Onboarding page (`/design-partners/`), **When** read, **Then** it explains the seven onboarding phases, who signs each exit check, and how the data is handled (B-04).
 3. **Given** the Product page, **When** read, **Then** it explains the decision, orchestration and operations layers.
 
 ### User Story 3 - Results, code and legal pages are honest before they exist (Priority: P2)
@@ -65,16 +65,16 @@ layers, why it suits irreversible rails, security, use cases and how pricing wor
 
 ### Functional Requirements
 
-- **FR-201**: The home page MUST present spec/08's eleven sections in order with primary CTA "Book a demo" and secondary "Request sandbox access" (WEB-01).
+- **FR-201**: The home page MUST present spec/08's eleven sections in order with primary CTA "Book a demo" and secondary "Talk to us" (WEB-01, B-04).
 - **FR-202**: All pages MUST use "agentic payment controls" (or "payment controls") and MUST NOT contain the banned claims and phrases listed in User Story 1, scenario 2 (WEB-01, spec/00, spec/product-definition).
-- **FR-203**: The Product, Security and Design partners pages MUST exist with the content in User Story 2 (WEB-02).
+- **FR-203**: The Product, Security and Onboarding (`/design-partners/`) pages MUST exist with the content in User Story 2 (WEB-02).
 - **FR-204**: The results section MUST read a results file at build time and show either labelled figures or the not-yet-published state (WEB-03).
 - **FR-205**: The developer section MUST show one payment-intent request in eight languages, labelled pre-launch (WEB-04, partial until DOC-04).
 - **FR-206**: Privacy, terms and cookie pages MUST exist, marked "draft for legal review"; analytics MUST be off unless configured and cookie-less (WEB-05).
 - **FR-207**: Booking and access targets MUST come from one config file, and the build MUST report any placeholder still in use (WEB-06 partial, D-16).
 - **FR-208**: Every title MUST pair the name with "payment controls"; the build MUST emit sitemap.xml, Open Graph images and schema.org Organization and SoftwareApplication markup (WEB-08).
 - **FR-209**: The brand name MUST come from one setting (D-17).
-- **FR-210**: Pricing MUST list the free shadow report, Pilot, Growth and Scale with "Talk to us" and no prices (D-15).
+- **FR-210**: The onboarding section MUST show the seven phases of the client journey and list Pilot, Growth and Scale with "Talk to us" and no prices; no page may offer a free shadow report (D-15, B-04).
 
 Out of scope now: the status page (WEB-07, needs the deployed services), deployment and the domain.
 

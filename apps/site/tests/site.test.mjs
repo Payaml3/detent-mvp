@@ -43,18 +43,18 @@ test("honesty: certifications appear only as roadmap items", () => {
   }
 });
 
-test("home: category wording, the shadow report as the main action, demo and access", () => {
+test("home: category wording, Book a demo as the main action, Talk to us beside it (B-04)", () => {
   const html = read(PAGES.home);
   assert.match(text(html), /agentic payment controls/i);
   const hero = html.split('data-section="hero"')[1].split("data-section=")[0];
   const buttons = [...hero.matchAll(/<a[^>]*class="([^"]*\bbutton\b[^"]*)"[^>]*>\s*([^<]+)/g)].map((m) => [m[1], m[2].trim()]);
-  assert.deepEqual(buttons[0], ["button", "Get a free shadow report"], "the first hero button is the primary shadow report action");
-  assert.ok(buttons.some(([cls, label]) => /secondary/.test(cls) && label === "Book a demo"), "Book a demo is the secondary button");
+  assert.deepEqual(buttons[0], ["button", "Book a demo"], "the first hero button is Book a demo");
+  assert.ok(buttons.some(([cls, label]) => /secondary/.test(cls) && label === "Talk to us"), "Talk to us is the secondary button");
   assert.match(text(html), /Request access/);
 });
 
 test("home: the sections of docs/design/landing-page-ux.md, in order", () => {
-  const order = ["hero", "problem", "spine", "use-cases", "rules", "irreversible", "roles", "offer", "faq", "close", "footer"];
+  const order = ["hero", "problem", "spine", "use-cases", "rules", "irreversible", "roles", "onboarding", "faq", "close", "footer"];
   const found = [...read(PAGES.home).matchAll(/data-section="([a-z-]+)"/g)].map((m) => m[1]);
   assert.deepEqual(found.filter((s) => order.includes(s)), order);
 });
@@ -86,13 +86,20 @@ test("developers: one request in eight languages, with the sandbox, in the engin
   assert.match(section, /<pre[\s\S]*payment_intents/);
 });
 
-test("offer: the free shadow report, paid plans 'Talk to us', no prices", () => {
+test("onboarding: the seven phases of the client journey, plans 'Talk to us', no prices (B-04)", () => {
   const html = read(PAGES.home);
-  const section = text(html.split('data-section="offer"')[1].split("data-section=")[0]);
-  for (const plan of ["shadow report", "Pilot", "Growth", "Scale"]) assert.match(section, new RegExp(plan, "i"));
+  const section = text(html.split('data-section="onboarding"')[1].split("data-section=")[0]);
+  for (const phase of ["Discovery", "Contract and due diligence", "Sandbox integration", "Policy setup", "Shadow on live traffic", "Go-live", "Scale"]) assert.match(section, new RegExp(phase));
+  for (const plan of ["Pilot", "Growth", "Scale"]) assert.match(section, new RegExp(plan));
   assert.match(section, /Talk to us/);
-  assert.match(section, /Sample data/i, "the sample report is labelled as sample data");
   assert.ok(!/(free|Pilot|Growth|Scale)[^.]{0,40}[$£€]\s?\d/i.test(section), "no prices next to a plan");
+});
+
+test("no free shadow report: shadow is a phase after the contract, never a free offer (B-04)", () => {
+  for (const p of Object.values(PAGES)) {
+    const t = text(read(p));
+    assert.ok(!/free shadow|shadow report/i.test(t), `${p} offers a shadow report`);
+  }
 });
 
 test("sub-pages carry their required content", () => {
@@ -100,8 +107,8 @@ test("sub-pages carry their required content", () => {
   for (const w of [/non-custodial/i, /audit/i, /replay/i, /kill switch/i, /EU/]) assert.match(sec, w);
   assert.match(sec, /SOC 2[^.]{0,40}planned/i);
   const dp = text(read(PAGES.partners));
-  assert.match(dp, /shadow report/i);
-  assert.match(dp, /anonymis/i);
+  assert.match(dp, /seven phases/i);
+  assert.match(dp, /data processing agreement/i);
   const prod = text(read(PAGES.product));
   for (const w of [/decision/i, /orchestration/i, /operations/i]) assert.match(prod, w);
 });

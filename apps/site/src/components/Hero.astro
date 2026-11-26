@@ -1,8 +1,8 @@
 ---
 import config from "../../site.config.mjs";
 import { PAYMENT_ID } from "../scripts/scenarios.mjs";
-// Landing UX (docs/design/landing-page-ux.md §3.1): headline A, the category line, the shadow report as the
-// primary action, the example payment played layer by layer, and the "sift then settle" art (Q2: replaces
+// Landing UX (docs/design/landing-page-ux.md §3.1): headline A, the category line, Book a demo as the
+// primary action and Talk to us beside it (B-04), the example payment played layer by layer, and the "sift then settle" art (Q2: replaces
 // the D-21 AI-agent figure, so the first screen shows the rules deciding). Final state shows without script.
 const phases = [
   { layer: "decision", agent: "Agent prepared $18,500.00 USDC to Bluefin Components Ltd, from invoice INV-2026-0142.", status: "ESCALATED", rule: "Your rules: escalate. First payment, above the $10,000 auto limit." },
@@ -37,8 +37,8 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
       </h1>
       <p class="lead" data-reveal>{category}: one layer that decides, orchestrates and operates every deposit and payout, under your rules.</p>
       <div class="actions" data-reveal>
-        <a class="button" href="#shadow-report">Get a free shadow report</a> {/* taste-skill-ignore: "shadow report" is a product name */}
-        <a class="button secondary" href={config.bookingUrl}>Book a demo</a>
+        <a class="button" href={config.bookingUrl}>Book a demo</a>
+        <a class="button secondary" href={`mailto:${config.salesInbox}`}>Talk to us</a>
       </div>
       <p class="honesty small" data-reveal>Sits beside your rails · never holds your funds or keys</p>
     </div>
