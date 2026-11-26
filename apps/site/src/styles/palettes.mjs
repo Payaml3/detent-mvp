@@ -17,6 +17,8 @@
 //   accent                                           decoration only (rules, hairlines, ornaments), never text
 //   scheme                                           "dark" or "light"; the canvas art blends to suit it
 
+import tokens from "../../../../design/tokens.json" with { type: "json" };
+
 export const palettes = {
   current: {
     label: "Current (Detent, D-18)",
@@ -45,15 +47,9 @@ export const palettes = {
   b: {
     label: "B · Parchment and seal",
     scheme: "light",
-    bg: "#F4EFE6", bgAlt: "#EDE6D8", surface: "#FFFDF8", surfaceSunk: "#EAE2D2", surfaceHover: "#E3D9C6",
-    line: "#D8CDB8", lineStrong: "#C9935F",
-    text: "#14161F", textSoft: "#4E5160",
-    signal: "#B3261E", signalHover: "#C7342B", signalPress: "#931E18", onSignal: "#FFFFFF",
-    interactive: "#2E5AAC", interactiveStrong: "#2E5AAC", interactiveSoft: "#2E5AAC", onInteractive: "#FFFFFF", interactiveDeep: "#DCE3F0",
-    ok: "#2E5AAC", wait: "#8A5A00", // B-02: confirmed uses link blue; amber #E0A33A fails AA as text
-    danger: "#B3261E", dangerLine: "#D99A94",
-    code: "#14161F", codeKey: "#2E5AAC", plot: "#5A4A30",
-    settle: "#B3261E", accent: "#C9935F",
+    // B-02, live. Values live in design/tokens.json (`site`), the one source shared with the console.
+    // Confirmed uses link blue (B-02); amber #E0A33A is the fill tone and fails AA as text, so `wait` is #8A5A00.
+    ...tokens.site,
   },
   c: {
     label: "C · Night console",
