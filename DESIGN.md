@@ -45,7 +45,7 @@ Token names are roles, not colours (`stop`, not "red"), so a new palette swaps v
 | BLOCKED, REJECTED | `pill-blocked` plus a cross icon | Final; never retried |
 | Everything else | `pill-neutral` | In progress |
 
-A blocked state always carries an icon and its label, never colour alone (B-02).
+A blocked state always carries an icon and its label, never colour alone.
 
 ## Type, space, motion
 

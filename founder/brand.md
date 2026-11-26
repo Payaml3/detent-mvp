@@ -41,26 +41,15 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 - Use "agentic payment controls" or "payment controls". Never "payments company" or "payment provider".
 - A timeout is "unknown", never "failed"; a block is final.
 
-## Visual identity
+## Visual identity (Open)
 
-- Palette (Approved, B-02): Parchment and seal.
-
-  | Token | Hex | Use |
-  |---|---|---|
-  | Ink | #14161F | Text, dark surfaces |
-  | Parchment | #F4EFE6 | Page background |
-  | Seal red | #B3261E | Brand accent, primary buttons |
-  | Brass | #C9935F | Secondary accent, illustration |
-  | Link blue | #2E5AAC | Links, "confirmed" status |
-  | Unknown amber | #E0A33A | "Unknown" status |
-
-  Blocked always shows an icon and label, never colour alone, so it can't be confused with seal red.
+- Palette: Open. The founder rejected palette B (Parchment and seal) on 2026-11-26; new options are being chosen.
+  Until then the site and console run on palette B as a placeholder. All colour values live in
+  `design/tokens.json`, so the chosen palette is a one-file change.
 - Fonts (D-18): Space Grotesk, Inter, JetBrains Mono.
-- Amber as text: #E0A33A fails WCAG AA as text on parchment, so amber words use #8A5A00 and #E0A33A stays the
-  fill and icon tone. Brass is decoration only, never text.
-- Mark (Proposed, D-39): "sift then settle". Five dots, then three, above a rule; one dot settled below it in
-  seal red. Replaces the detent-wheel motif (D-20).
-- Site art (Proposed, D-39): payments fall as halftone dots through three brass rules (decision,
-  orchestration, operations); some are held, some blocked (a cross), the rest settle at one point.
-- Built in: `apps/site/src/styles/palettes.mjs` (`b`), the console CSS and the favicon. Full reference:
-  `docs/brand/design-system.md`.
+- Blocked always shows an icon and a label, never colour alone.
+- Mark (Proposed, D-39): "sift then settle". Five dots, then three, above a rule; one dot settled below it.
+  Replaces the detent-wheel motif (D-20).
+- Site art (Proposed, D-39): payments fall as halftone dots through three rules (decision, orchestration,
+  operations); some are held, some blocked (a cross), the rest settle at one point.
+- Reference: `DESIGN.md` and `docs/brand/design-system.md`.

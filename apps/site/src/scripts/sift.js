@@ -122,7 +122,7 @@ export function mountSift(canvas) {
       ctx.globalAlpha = 0.5 + 0.3 * breathe; ctx.strokeStyle = fc; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.arc(focus.x, focus.y, 11 + 2 * breathe, 0, Math.PI * 2); ctx.stroke();
       if (stopped) {
-        // a block is a cross, not only a colour (B-02); the demo's status label says BLOCKED beside it
+        // a block is a cross, not only a colour; the demo's status label says BLOCKED beside it
         ctx.globalAlpha = 1; ctx.strokeStyle = fc; ctx.lineWidth = 2.5; ctx.lineCap = "round";
         ctx.beginPath();
         ctx.moveTo(focus.x - 5, focus.y - 5); ctx.lineTo(focus.x + 5, focus.y + 5);

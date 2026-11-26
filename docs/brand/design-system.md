@@ -1,6 +1,6 @@
 # Dekernai design system
 
-Status: palette **Approved: B, Parchment and seal (B-02)**. Roles, mark and art **Proposed (D-39)**.
+Status: palette **Open** (B, Parchment and seal, is a placeholder; the founder is choosing a new one). Roles, mark and art **Proposed (D-39)**.
 
 ## Colour roles
 
@@ -21,8 +21,8 @@ palette misses WCAG AA on a pair the site renders.
 | `--settle` | The settled dot in the mark and the art |
 | `--accent` | Decoration only: the art's rule lines, hairlines, ornaments. Never text |
 
-Status colours keep their meaning in every palette: confirmed is green (link blue in B, per B-02), waiting is amber, blocked is red.
-A block is never told by colour alone (B-02): the status label always shows, and BLOCKED, REJECTED and
+Status colours keep their meaning in every palette: confirmed is green (link blue in B), waiting is amber, blocked is red.
+A block is never told by colour alone: the status label always shows, and BLOCKED, REJECTED and
 FAILED_FINAL carry a cross icon in place of the dot, on the site, in the console and in the art.
 
 ## Palettes
@@ -31,12 +31,12 @@ FAILED_FINAL carry a cross icon in place of the dot, on the site, in the console
 |---|---|---|---|---|
 | `current` | Detent colours (D-18), kept as a reference | dark | orange `#F2622E` | blue `#2F6BFF` |
 | `a` | Settled ink | dark | sift teal `#14B8A6` | verdict blue `#2F5BEA` |
-| **`b`** | **Parchment and seal: chosen (B-02), live** | light | seal red `#B3261E` | link blue `#2E5AAC` |
+| **`b`** | **Parchment and seal: placeholder, live** | light | seal red `#B3261E` | link blue `#2E5AAC` |
 | `c` | Night console | dark | decision violet `#6D5BFF` | clear cyan `#22D3EE` |
 
 Palette B in full: ink `#14161F`, parchment `#F4EFE6`, surface `#FFFDF8`, seal red `#B3261E`, brass
 `#C9935F` (accent and strong lines), link blue `#2E5AAC`, unknown amber `#E0A33A` as a fill with `#8A5A00`
-for amber text (the lighter amber fails WCAG AA as text on parchment), and link blue `#2E5AAC` also marks CONFIRMED (B-02).
+for amber text (the lighter amber fails WCAG AA as text on parchment), and link blue `#2E5AAC` also marks CONFIRMED.
 The console (`apps/api/src/detent/console/static/console.css`) and the favicon use the same values.
 
 ## Mark: sift then settle

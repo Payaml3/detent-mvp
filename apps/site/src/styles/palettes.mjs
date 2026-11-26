@@ -1,6 +1,6 @@
 // Colour roles for the design system (B-01). Components use only these role tokens (`--bg`,
 // `--signal`, ...), never raw hex, so a palette is one object here and one value in site.config.mjs.
-// The founder chose B, Parchment and seal (B-02); site.config.mjs selects it. "current" (the D-18 colours),
+// B, Parchment and seal, is live as a placeholder until the founder picks a new palette; site.config.mjs selects it. "current" (the D-18 colours),
 // A and C stay as references and keep passing the same checks. tests/palette.test.mjs checks every palette against WCAG AA.
 //
 // Roles
@@ -47,8 +47,8 @@ export const palettes = {
   b: {
     label: "B · Parchment and seal",
     scheme: "light",
-    // B-02, live. Values live in design/tokens.json (`site`), the one source shared with the console.
-    // Confirmed uses link blue (B-02); amber #E0A33A is the fill tone and fails AA as text, so `wait` is #8A5A00.
+    // Placeholder, live. Values live in design/tokens.json (`site`), the one source shared with the console.
+    // Confirmed uses link blue; amber #E0A33A is the fill tone and fails AA as text, so `wait` is #8A5A00.
     ...tokens.site,
   },
   c: {
