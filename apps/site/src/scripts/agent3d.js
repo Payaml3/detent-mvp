@@ -1,9 +1,11 @@
-// The hero's live scene: "Agents prepare. Your rules decide." An AI agent, a small robot of particles whose
+// The hero's live scene: "Agents prepare. Your rules decide." An AI agent, a small solid robot whose
 // head follows the pointer and whose visor scans while it works, prepares payments and streams them toward the D of the Route mark (B-03), the rules.
 // Each payment lands in the D and settles; the orange point is the one outcome the rules settle on and
 // pulses with each sent example payment. The robot looks toward the pointer; the D turns to face it and parts around it. Orange never marks a block (B-02).
 // three.js is bundled with the site; colours come from the palette roles. Original work.
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { POINT, inD, inPoint } from "./markShape.js";
 
 
@@ -30,7 +32,7 @@ function cloud(count, size, map) {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
-  const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size, map, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true }));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size, map, vertexColors: true, transparent: true, depthWrite: false, sizeAttenuation: true, toneMapped: false }));
   pts.frustumCulled = false; // particles move far from where they start
   return { pos, col, geo, pts };
 }
@@ -69,53 +71,63 @@ export function mountAgent(canvas) {
   rules.add(d.pts);
   const PX = (POINT.cx - 24) * S, PY = (24 - POINT.cy) * S;
 
-  // ---- the agent: a small robot built from particles, upper left. Its head turns to follow the pointer,
-  // its eyes blink, a scan line crosses its visor while it works, and it hands payments over from its hand.
-  const A_AT = new THREE.Vector3(-5, 17, 0), AS = 1.12;
+  // ---- the agent: a small solid robot, upper left, in ceramic, dark metal and glass. Its head turns to
+  // follow the pointer, its eyes blink, a scan line crosses its visor while it works, and it hands payments
+  // over from its hand. Lit by a soft studio environment so the surfaces read as real materials.
+  const A_AT = new THREE.Vector3(-3, 17, 0), AS = 1.04;
   const agent = new THREE.Group(); agent.position.copy(A_AT); agent.scale.setScalar(AS); scene.add(agent);
   const head = new THREE.Group(); head.position.set(0, 2, 0); agent.add(head);
   const rnd = (a, b) => a + Math.random() * (b - a);
-  const shade = (lo = 0.45, hi = 1) => paper.clone().multiplyScalar(rnd(lo, hi));
-  // a point on a rounded box (superellipsoid) surface
-  const box = (hx, hy, hz, n = 5) => {
-    const v = new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize();
-    const k = Math.pow(Math.pow(Math.abs(v.x / hx), n) + Math.pow(Math.abs(v.y / hy), n) + Math.pow(Math.abs(v.z / hz), n), -1 / n);
-    return v.multiplyScalar(k);
-  };
-  const disc = (r) => { const a = rnd(0, Math.PI * 2), q = Math.sqrt(Math.random()) * r; return [Math.cos(a) * q, Math.sin(a) * q]; };
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.55;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x1a1b1d, 0.7));
+  const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(-50, 70, 90); scene.add(key);
+  const rim = new THREE.DirectionalLight(paper.getHex(), 1.6); rim.position.set(70, 25, -70); scene.add(rim);
+  const shell = new THREE.MeshPhysicalMaterial({ color: paper.clone().multiplyScalar(0.84), roughness: 0.42, metalness: 0, clearcoat: 0.6, clearcoatRoughness: 0.25 });
+  const metal = new THREE.MeshStandardMaterial({ color: 0x2b2c2f, roughness: 0.32, metalness: 0.85 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0x07080a, roughness: 0.06, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.03 });
+  const lamp = () => new THREE.MeshStandardMaterial({ color: 0x000000, emissive: signal, emissiveIntensity: 1.4, roughness: 0.4 });
+  const mesh = (geo, mat, parent, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
   const HX = 7.5, HY = 6, HZ = 6;
-  const headPts = [], headCol = [], visor = [];
-  for (let i = 0; i < 2300; i++) {
-    const p = box(HX, HY, HZ);
-    const onVisor = p.z > HZ * 0.55 && Math.abs(p.y) < 2.8 && Math.abs(p.x) < HX * 0.8;
-    if (onVisor) { p.z -= 0.5; visor.push(headPts.length); headCol.push(paper.clone().multiplyScalar(0.18)); }
-    else headCol.push(shade(0.5, 1));
-    headPts.push(p);
+  // head: a rounded ceramic shell, a glass visor, ear pods, an antenna with a lamp
+  mesh(new RoundedBoxGeometry(HX * 2, HY * 2, HZ * 2, 8, 3.4), shell, head);
+  mesh(new RoundedBoxGeometry(HX * 1.68, 6.4, 1.6, 6, 0.75), glass, head, 0, 0.2, HZ - 0.55);
+  for (const side of [-1, 1]) {
+    const pod = mesh(new THREE.CylinderGeometry(2.2, 2.2, 1.4, 40), metal, head, side * (HX + 0.35), 0, 0); pod.rotation.z = Math.PI / 2;
+    const cap = mesh(new THREE.CylinderGeometry(1.3, 1.3, 0.3, 32), shell, head, side * (HX + 1.15), 0, 0); cap.rotation.z = Math.PI / 2;
   }
-  for (const side of [-1, 1]) for (let i = 0; i < 110; i++) { const [a, b] = disc(2.1); headPts.push(new THREE.Vector3(side * (HX + rnd(0.2, 1)), a, b)); headCol.push(shade(0.6, 1)); } // ears
-  for (let i = 0; i < 70; i++) { headPts.push(new THREE.Vector3(rnd(-0.15, 0.15), HY + rnd(0, 3.6), rnd(-0.15, 0.15))); headCol.push(shade(0.5, 0.8)); } // antenna
-  const tipAt = headPts.length;
-  for (let i = 0; i < 60; i++) { const v = new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize().multiplyScalar(rnd(0.3, 1)); headPts.push(v.add(new THREE.Vector3(0, HY + 4.3, 0))); headCol.push(signal.clone()); }
-  const h = cloud(headPts.length, 1.05, map);
-  headPts.forEach((p, i) => { h.pos.set([p.x, p.y, p.z], i * 3); h.col.set([headCol[i].r, headCol[i].g, headCol[i].b], i * 3); });
-  head.add(h.pts);
-  // the eyes: two bright discs on the visor, in their own group so they can blink and glance
-  const eyes = new THREE.Group(); eyes.position.set(0, 0.3, HZ - 0.1); head.add(eyes);
-  const e = cloud(360, 1.15, map);
-  for (let i = 0; i < 360; i++) { const [a, b] = disc(1.35); e.pos.set([(i % 2 ? 2.9 : -2.9) + a, b, rnd(0, 0.4)], i * 3); e.col.set([paper.r, paper.g, paper.b], i * 3); }
-  eyes.add(e.pts);
-  // neck, body with a chest light, and the right arm reaching toward the rules
-  const bodyPts = [], bodyCol = [];
-  for (let i = 0; i < 160; i++) { const a = rnd(0, Math.PI * 2); bodyPts.push(new THREE.Vector3(Math.cos(a) * 2.2, rnd(-6.8, -4.2), Math.sin(a) * 2.2)); bodyCol.push(shade(0.35, 0.6)); }
-  for (let i = 0; i < 1700; i++) { const p = box(8.5, 5.5, 5, 4).add(new THREE.Vector3(0, -12.5, 0)); if (p.y < -16.5) continue; bodyPts.push(p); bodyCol.push(shade(0.45, 0.95)); }
-  const chestAt = bodyPts.length;
-  for (let i = 0; i < 140; i++) { const a = rnd(0, Math.PI * 2), q = rnd(1.1, 1.6); bodyPts.push(new THREE.Vector3(Math.cos(a) * q, -11.5 + Math.sin(a) * q, 5.2)); bodyCol.push(signal.clone()); }
-  const SHOULDER = new THREE.Vector3(8.8, -9.5, 0), HAND = new THREE.Vector3(14.5, -11, 5);
-  for (let i = 0; i < 260; i++) { const u = Math.random(); const p = SHOULDER.clone().lerp(HAND, u); const [a, b] = disc(1.1); bodyPts.push(p.add(new THREE.Vector3(0, a, b))); bodyCol.push(shade(0.45, 0.9)); }
-  for (let i = 0; i < 120; i++) { bodyPts.push(new THREE.Vector3(rnd(-1, 1), rnd(-1, 1), rnd(-1, 1)).normalize().multiplyScalar(rnd(0.8, 1.6)).add(HAND)); bodyCol.push(shade(0.7, 1)); }
-  const b = cloud(bodyPts.length, 1.05, map);
-  bodyPts.forEach((p, i) => { b.pos.set([p.x, p.y, p.z], i * 3); b.col.set([bodyCol[i].r, bodyCol[i].g, bodyCol[i].b], i * 3); });
-  agent.add(b.pts);
+  mesh(new THREE.CylinderGeometry(0.95, 1.15, 0.6, 32), metal, head, 0, HY + 0.1, 0);
+  mesh(new THREE.CylinderGeometry(0.16, 0.16, 3.6, 12), metal, head, 0, HY + 2, 0);
+  const tipMat = lamp();
+  mesh(new THREE.SphereGeometry(0.85, 24, 16), tipMat, head, 0, HY + 4.3, 0);
+  const tipLight = new THREE.PointLight(signal, 0, 26, 2); tipLight.position.set(0, HY + 4.3, 0.6); head.add(tipLight);
+  // the eyes: two soft lit capsules behind the visor glass, in their own group so they can blink and glance
+  const eyes = new THREE.Group(); eyes.position.set(0, 0.3, HZ + 0.27); head.add(eyes);
+  const eyeMat = new THREE.MeshBasicMaterial({ color: paper, toneMapped: false });
+  for (const side of [-1, 1]) { const ey = mesh(new THREE.CapsuleGeometry(0.85, 0.9, 6, 20), eyeMat, eyes, side * 2.9, 0, 0); ey.scale.z = 0.25; }
+  const scanLine = mesh(new THREE.PlaneGeometry(0.45, 5.4), new THREE.MeshBasicMaterial({ color: signal, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }), head, 0, 0.2, HZ + 0.29);
+  // neck, body with a chest lamp, a resting left arm and the right arm reaching toward the rules
+  mesh(new THREE.CylinderGeometry(1.9, 2.2, 2.8, 32), metal, agent, 0, -5.5, 0);
+  for (const y of [-4.8, -6]) { const r = mesh(new THREE.TorusGeometry(2.15, 0.18, 10, 40), metal, agent, 0, y, 0); r.rotation.x = Math.PI / 2; }
+  mesh(new RoundedBoxGeometry(17, 9.6, 10, 8, 3.2), shell, agent, 0, -11.8, 0);
+  mesh(new RoundedBoxGeometry(9, 0.35, 0.4, 2, 0.15), metal, agent, 0, -14.6, 5.0);
+  mesh(new THREE.CylinderGeometry(2.1, 2.1, 0.5, 40), glass, agent, 0, -11.2, 4.9).rotation.x = Math.PI / 2;
+  const chestMat = lamp();
+  mesh(new THREE.TorusGeometry(1.35, 0.26, 14, 48), chestMat, agent, 0, -11.2, 5.2);
+  const SHOULDER = new THREE.Vector3(8.8, -9.5, 0), ELBOW = new THREE.Vector3(12.4, -13.4, 2.2), HAND = new THREE.Vector3(14.5, -11, 5);
+  const limb = (a, b, r, mat) => {
+    const len = a.distanceTo(b), m = new THREE.Mesh(new THREE.CapsuleGeometry(r, Math.max(0.01, len - r * 2), 6, 20), mat);
+    m.position.copy(a).lerp(b, 0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tmpV.copy(b).sub(a).normalize()); agent.add(m);
+  };
+  const tmpV = new THREE.Vector3();
+  const L_SH = new THREE.Vector3(-8.8, -9.5, 0), L_EL = new THREE.Vector3(-10.6, -13.8, 0.8), L_HA = new THREE.Vector3(-10.2, -17.6, 2);
+  for (const [s, el, ha] of [[SHOULDER, ELBOW, HAND], [L_SH, L_EL, L_HA]]) {
+    mesh(new THREE.SphereGeometry(1.7, 28, 18), metal, agent, s.x, s.y, s.z);
+    limb(s, el, 1.05, shell); limb(el, ha, 0.95, shell);
+    mesh(new THREE.SphereGeometry(1.15, 24, 16), metal, agent, el.x, el.y, el.z);
+    mesh(new THREE.SphereGeometry(1.35, 28, 18), metal, agent, ha.x, ha.y, ha.z);
+  }
   const AR = 9; // the agent's reach, for the label
 
   // ---- the stream: payments the agent prepares, flying to the rules ----
@@ -269,17 +281,12 @@ export function mountAgent(canvas) {
     eyes.scale.y += (blink - eyes.scale.y) * Math.min(1, dt * 30);
     eyes.position.x = look.x * 0.6; eyes.position.y = 0.3 - look.y * 0.4;
     // a scan line crosses the visor while it works
-    const scan = ((t * 0.6) % 1) * HX * 1.8 - HX * 0.9;
-    for (const i of visor) {
-      const k = Math.max(0, 1 - Math.abs(h.pos[i * 3] - scan) / 0.9);
-      const c = 0.18 + k * 0.6;
-      h.col[i * 3] = paper.r * c + signal.r * k * 0.2; h.col[i * 3 + 1] = paper.g * c; h.col[i * 3 + 2] = paper.b * c;
-    }
-    // the antenna tip and chest light breathe; both flare when a payment is sent
+    const sw = (t * 0.6) % 1;
+    scanLine.position.x = sw * HX * 1.5 - HX * 0.75; scanLine.material.opacity = 0.5 * Math.sin(Math.PI * sw);
+    // the antenna lamp and chest light breathe; both flare when a payment is sent
     const glow = 0.55 + 0.45 * Math.sin(t * 3) + pulse * 0.8;
-    for (let i = tipAt; i < headPts.length; i++) h.col.set([signal.r * glow, signal.g * glow, signal.b * glow], i * 3);
-    for (let i = chestAt; i < chestAt + 140; i++) b.col.set([signal.r * glow, signal.g * glow, signal.b * glow], i * 3);
-    h.geo.attributes.color.needsUpdate = true; b.geo.attributes.color.needsUpdate = true;
+    tipMat.emissiveIntensity = chestMat.emissiveIntensity = 0.6 + glow * 1.4;
+    tipLight.intensity = 30 * glow;
 
     // the rules turn to face the pointer and part around it
     rules.rotation.y = -0.25 + look.x * 0.45;
