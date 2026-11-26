@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Usage{% endblock %}
+{% block main %}
+<h1>Usage</h1>
+<p class="muted">Counts for today (UTC) against the organisation's daily sandbox quotas, and for {{ month }} so far. Quotas reset at midnight UTC, in {{ (resets_in // 3600) }} h {{ (resets_in % 3600) // 60 }} min. Over a quota, the API answers 429 <span class="mono">quota_exceeded</span>; an investigation over quota leaves the case for a person, with its raw facts.</p>
+{% set label = {"api_calls": "API calls", "payments_decided": "Payments decided", "agent_investigations": "Agent investigations"} %}
+<table>
+  <thead><tr><th>What</th><th>Today</th><th>Daily quota</th><th>This month</th></tr></thead>
+  <tbody>
+  {% for l in lines %}
+  <tr><td>{{ label[l.metric] }}</td><td class="mono">{{ l.today }}</td>
+    <td>{% if l.quota %}<span class="mono">{{ l.quota }}</span>{% if l.today >= l.quota %} <span class="st st-held">used up</span>{% elif l.today * 5 >= l.quota * 4 %} <span class="small muted">over 80% used</span>{% endif %}{% elif l.metric == 'api_calls' %}<span class="small muted">no daily quota; {{ per_minute }} requests a minute per key</span>{% else %}<span class="small muted">none</span>{% endif %}</td>
+    <td class="mono">{{ l.month }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

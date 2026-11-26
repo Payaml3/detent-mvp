@@ -87,6 +87,11 @@ class Settings(BaseSettings):
     invite_days: int = 7  # DSH-01, DSH-11: invites are single-use and expire after 7 days
     evaluation_days: int = 60  # DSH-03: the default expiry of an evaluation organisation
     login_attempts_per_minute: int = 10  # per email and (times 3) per client address
+    # SBX-02 (spec/08 Quotas, Estimate): daily caps for each new client or evaluation organisation.
+    sandbox_daily_payments: int = 500
+    sandbox_daily_investigations: int = 50
+    # DSH-04: how long a rolled key keeps working, unless the person rolling it picks another overlap.
+    key_roll_overlap_hours: int = 24
     sales_inbox: str | None = None
 
     # FND-07: where this instance and its database run, as stated in the console footer and /healthz.
@@ -154,6 +159,10 @@ class Settings(BaseSettings):
             )
         if not 1 <= self.invite_days <= 30 or not 1 <= self.evaluation_days <= 365:
             raise ValueError("INVITE_DAYS must be 1 to 30 and EVALUATION_DAYS 1 to 365")
+        if self.sandbox_daily_payments < 1 or self.sandbox_daily_investigations < 1:
+            raise ValueError("SANDBOX_DAILY_PAYMENTS and SANDBOX_DAILY_INVESTIGATIONS must be at least 1")
+        if not 0 <= self.key_roll_overlap_hours <= 168:
+            raise ValueError("KEY_ROLL_OVERLAP_HOURS must be 0 to 168")
         if self.app_env in ("demo", "sandbox"):
             for name in ("demo_password", "session_secret"):
                 val: SecretStr = getattr(self, name)

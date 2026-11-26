@@ -7,11 +7,12 @@ from urllib.parse import quote
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse, Response
 
-from detent.dashboard import admin, routes
+from detent.dashboard import admin, developer, routes
 from detent.dashboard.web import Forbidden, SignInRequired, page, runtime
 
 
 def install(app: FastAPI) -> None:
+    app.include_router(developer.router)  # before routes: its /{section} placeholder catches the rest
     app.include_router(routes.router)
     app.include_router(admin.router)
 

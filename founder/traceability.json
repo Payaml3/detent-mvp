@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 82,
-   "pct": 55
+   "done": 87,
+   "pct": 58
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 240,
-   "pct": 75
+   "done": 246,
+   "pct": 77
   },
   {
    "order": 3,
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 190,
+   "done": 196,
    "total": 244,
-   "pct_done": 78
+   "pct_done": 80
   },
   {
    "function": "05 QA",
@@ -120,8 +120,8 @@
    "role": "engineer",
    "stories": 13,
    "criteria": 24,
-   "criteria_done": 10,
-   "pct_done": 42
+   "criteria_done": 15,
+   "pct_done": 62
   },
   {
    "code": "EVL",
@@ -174,8 +174,8 @@
    "role": "engineer",
    "stories": 8,
    "criteria": 20,
-   "criteria_done": 18,
-   "pct_done": 90
+   "criteria_done": 19,
+   "pct_done": 95
   },
   {
    "code": "OPS",
@@ -947,9 +947,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "AUD-01",
@@ -1437,9 +1437,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DSH-05",
@@ -1447,9 +1447,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DSH-06",
@@ -1457,9 +1457,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DSH-07",
@@ -1477,9 +1477,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DSH-09",

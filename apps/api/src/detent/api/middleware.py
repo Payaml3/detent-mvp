@@ -24,6 +24,7 @@ from detent.api.limits import (
     LimitResult,
 )
 from detent.logging import request_id_var
+from detent.sandbox import usage
 
 log = logging.getLogger("detent.http")
 
@@ -49,6 +50,7 @@ def record_request(request: Request, response: Response, rid: str, latency_ms: i
     rt = request.app.state.runtime
     match = _PAYMENT_ID.search(request.url.path)
     idem = request.headers.get("idempotency-key")
+    now = rt.clock.now()
     try:
         with rt.engine.begin() as conn:
             conn.execute(
@@ -67,8 +69,17 @@ def record_request(request: Request, response: Response, rid: str, latency_ms: i
                     "idem": idem[:_IDEM_MAX] if idem else None,
                     "pay": match.group(1) if match else None,
                     "rid": rid,
-                    "at": rt.clock.now(),
+                    "at": now,
                 },
+            )
+            usage.count(conn, rt.clock, principal.org_id, "api_calls")  # LED-08 (no quota: SBX-02)
+            # DSH-04: the key's last use, written at most once a minute per key.
+            conn.execute(
+                text(
+                    "UPDATE api_keys SET last_used_at=:now WHERE org_id=:o AND id=:k "
+                    "AND (last_used_at IS NULL OR last_used_at < :now - interval '60 seconds')"
+                ),
+                {"now": now, "o": principal.org_id, "k": principal.key_id},
             )
     except Exception:
         log.exception("request log write failed")

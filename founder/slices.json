@@ -681,7 +681,7 @@
    "epic": "LED",
    "slice": "P2",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "AUD-01",
@@ -1024,21 +1024,21 @@
    "epic": "DSH",
    "slice": "P2",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "DSH-05",
    "epic": "DSH",
    "slice": "P2",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DSH-06",
    "epic": "DSH",
    "slice": "P2",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DSH-07",
@@ -1052,7 +1052,7 @@
    "epic": "DSH",
    "slice": "P2",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "DSH-09",

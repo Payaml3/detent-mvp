@@ -487,6 +487,7 @@ def investigate(
     llm: LLMClient,
     model: str,
     daily_token_budget: int,
+    quota_reached: bool = False,
 ) -> Investigation:
     with engine.connect() as conn:
         evidence = gather_evidence(conn, clock, org_id, case_id)
@@ -502,6 +503,8 @@ def investigate(
         _store(engine, clock, org_id, inv, model=model, input_hash=input_hash, result=result)
         return inv
 
+    if quota_reached:  # SBX-02: the organisation's daily investigation quota; the case still works
+        return human("QUOTA_EXCEEDED", "Today's agent investigation quota is used up; review the raw facts.")
     if used >= daily_token_budget:
         return human("BUDGET_EXCEEDED", "The daily AI budget is used up; review the raw facts.")
 

@@ -40,6 +40,7 @@ from detent.policy.facts import (
 )
 from detent.policy.screening import Screening
 from detent.policy.store import ActivePolicy, active_policy
+from detent.sandbox import usage
 from detent.views.payments import _iso, payment_view
 from detent.worker.queue import enqueue
 
@@ -851,6 +852,7 @@ def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tu
     if replay:
         return replay
     cpt = _validate_refs(conn, c)
+    usage.consume(conn, clock, c.org_id, "payments_decided")  # SBX-02, LED-08; rolls back with the decision
     org = load_org(conn, c.org_id)
     policy = active_policy(conn, c.org_id)
     rules = policy.rules
@@ -907,6 +909,7 @@ def _decide_failed(conn: Connection, clock: Clock, c: _Ctx, error: str) -> tuple
     if replay:
         return replay
     cpt = _validate_refs(conn, c)
+    usage.count(conn, clock, c.org_id, "payments_decided")  # already passed the quota in _decide
     org = load_org(conn, c.org_id)
     policy = active_policy(conn, c.org_id)
     pid = _insert_intent(conn, clock, c, cpt, None)
@@ -950,7 +953,7 @@ def submit_intent(
     try:
         with transaction(engine) as conn:
             return _decide(conn, clock, c, screening)
-    except (RequestProblem, IdempotencyConflict):
+    except (RequestProblem, IdempotencyConflict, usage.QuotaExceeded):
         raise
     except Exception as exc:
         log.exception("decision failed; recording it fail-closed", extra={"error": type(exc).__name__})

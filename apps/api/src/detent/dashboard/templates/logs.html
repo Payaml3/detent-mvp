@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Request logs{% endblock %}
+{% block main %}
+<h1>Request logs</h1>
+<p class="muted">Every authenticated API call from the last {{ days }} days: metadata only. Request and response bodies, query strings and keys are never stored.</p>
+<form method="get" action="/dashboard/logs" class="filters">
+  <label>Status <input name="status" value="{{ filters.status }}" placeholder="422 or 4xx" size="6"></label>
+  <label>Path contains <input name="path" value="{{ filters.path }}" placeholder="/v1/payment_intents"></label>
+  <label>Idempotency key <input name="idempotency_key" value="{{ filters.idempotency_key }}"></label>
+  <label>Payment ID <input name="payment_id" value="{{ filters.payment_id }}" placeholder="pay_…"></label>
+  <button>Filter</button> <a href="/dashboard/logs">Clear</a>
+</form>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<table>
+  <thead><tr><th>Time (UTC)</th><th>Method</th><th>Path</th><th>Status</th><th>Latency</th><th>Payment</th><th>Request ID</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr><td class="small"><a href="/dashboard/logs/{{ r.id }}">{{ r.at.strftime('%Y-%m-%d %H:%M:%S') }}</a></td><td class="mono">{{ r.method }}</td><td class="mono">{{ r.path }}</td>
+    <td class="mono">{{ r.status }}</td><td class="small">{{ r.latency_ms }} ms</td><td class="mono">{{ r.payment_id or "" }}</td><td class="mono small">{{ r.request_id }}</td></tr>
+  {% else %}
+  <tr><td colspan="7" class="muted">No requests match.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if next_before %}{% set q = filters | dictsort | selectattr(1) | list %}
+<p><a href="/dashboard/logs?{% for k, v in q %}{{ k }}={{ v | urlencode }}&amp;{% endfor %}before={{ next_before }}">Older requests</a></p>{% endif %}
+{% endblock %}

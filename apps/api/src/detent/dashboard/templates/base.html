@@ -23,7 +23,8 @@
         {% else %}
           {% set links = [("/dashboard/", "Home"), ("/dashboard/team", "Team"), ("/dashboard/keys", "Keys"),
                           ("/dashboard/logs", "Request logs"), ("/dashboard/webhooks", "Webhooks"),
-                          ("/dashboard/sandbox", "Sandbox"), ("/dashboard/verification", "Verification")] %}
+                          ("/dashboard/usage", "Usage"), ("/dashboard/sandbox", "Sandbox"),
+                          ("/dashboard/verification", "Verification")] %}
         {% endif %}
         {% for href, label in links %}
         {% set current = (here == href) if href.endswith("/") else here.startswith(href) %}

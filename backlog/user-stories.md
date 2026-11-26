@@ -865,7 +865,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 
 **Acceptance criteria**
 
-- [ ] Monthly counts of payments decided, agent investigations and API calls per organisation
+- [x] Monthly counts of payments decided, agent investigations and API calls per organisation
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** LED-01 · **Traces to:** A4.fee, B3.billing, D.usage
 
@@ -1416,8 +1416,8 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate
-- [ ] Only `sk_test_` keys exist in the prototype; the page labels production keys as not available in the prototype (invariant 14)
+- [x] Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate
+- [x] Only `sk_test_` keys exist in the prototype; the page labels production keys as not available in the prototype (invariant 14)
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-02 · **Traces to:** D.keys
 
@@ -1427,7 +1427,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Filters by status, path, idempotency key and payment ID; detail view with redacted bodies
+- [x] Filters by status, path, idempotency key and payment ID; detail view with redacted bodies
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-06, DSH-02 · **Traces to:** D.logs
 
@@ -1437,7 +1437,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] All WHK features available in the UI
+- [x] All WHK features available in the UI
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** WHK-03, DSH-02 · **Traces to:** D.webhooks
 
@@ -1457,7 +1457,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Calls, payments decided and agent investigations against daily quotas
+- [x] Calls, payments decided and agent investigations against daily quotas
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** LED-08, SBX-02 · **Traces to:** D.usage
 

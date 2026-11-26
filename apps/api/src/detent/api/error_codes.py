@@ -139,6 +139,10 @@ CATALOGUE: tuple[ErrorCode, ...] = (
     ErrorCode("rate_limited", (429,), "rate_limit",
               "Too many requests for this key or client address in the current window.",
               "Wait for the seconds in `Retry-After`, then retry."),
+    # quota
+    ErrorCode("quota_exceeded", (429,), "quota",
+              "The organisation used its daily sandbox quota for this kind of request (SBX-02).",
+              "Wait for the seconds in `Retry-After` (the next UTC day); the usage page shows the quotas."),
     # internal
     ErrorCode("webhooks_unavailable", (503,), "internal",
               "Webhooks are not configured on this instance, so no endpoint can be created or signed.",

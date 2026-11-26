@@ -399,6 +399,17 @@ DSH-02:
 DSH-03:
   0: ["integration/test_dashboard_access.py::test_an_expired_evaluation_is_locked_until_extended"]
   1: ["integration/test_dashboard_access.py::test_a_client_org_never_expires_and_suspension_is_audited"]
+DSH-04:
+  0: ["integration/test_dashboard_developer.py::test_a_key_is_shown_once_works_and_records_its_last_use", "integration/test_dashboard_developer.py::test_roll_keeps_the_old_key_for_the_overlap_and_revoke_is_immediate", "integration/test_dashboard_developer.py::test_key_forms_check_the_name_scopes_and_overlap"]
+  1: ["integration/test_dashboard_developer.py::test_a_key_is_shown_once_works_and_records_its_last_use"]
+DSH-05:
+  0: ["integration/test_dashboard_developer.py::test_request_logs_filter_and_show_a_redacted_detail"]
+DSH-06:
+  0: ["integration/test_dashboard_developer.py::test_webhooks_page_covers_create_secret_once_test_resend_and_disable"]
+DSH-08:
+  0: ["integration/test_dashboard_developer.py::test_new_organisations_get_the_quotas_and_the_usage_page_shows_them"]
+LED-08:
+  0: ["integration/test_dashboard_developer.py::test_api_calls_are_metered_and_months_add_up", "integration/test_dashboard_developer.py::test_over_the_daily_payment_quota_is_429_quota_exceeded_and_nothing_is_created"]
 DSH-11:
   0: ["integration/test_dashboard_access.py::test_owner_invites_a_developer_who_cannot_manage_the_team", "integration/test_dashboard_access.py::test_removing_a_member_stops_their_sign_in_and_keys"]
   1: ["unit/test_dashboard_rules.py::test_member_roles_are_the_spec_02_list", "unit/test_dashboard_rules.py::test_dashboard_permissions_follow_spec_08", "integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays"]
