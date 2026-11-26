@@ -42,7 +42,7 @@ Open: which role holds the budget. Interview question 9 tests it.
 - **Format:** 25 minutes, video, notes in this file within 24 hours. Problem interview first; the demo only
   in a second meeting.
 - **Rules (The Mom Test):** ask about the past, not the future; no pitching; ask for specifics and numbers;
-  end with a concrete next step (shadow report export, second meeting with compliance).
+  end with a concrete next step (a second meeting with compliance, then KYB and contract).
 
 ### Script (Proposed)
 
@@ -66,11 +66,11 @@ Open: which role holds the budget. Interview question 9 tests it.
 
 ## Willingness to pay (how we test it)
 
-Pricing is Open beyond D-15 (free shadow report, Pilot, Growth, Scale; "Talk to us"). In discovery we test
+Pricing is Open beyond D-15 and B-04 (Pilot, Growth, Scale; "Talk to us"; no free shadow report). In discovery we test
 willingness, not price:
 
 - **Strong:** agrees to a paid pilot, or a letter of intent naming a budget range.
-- **Medium:** shares an export for the free shadow report and books a second meeting with compliance.
+- **Medium:** books a second meeting with compliance and starts KYB.
 - **Weak:** likes the demo, no next step.
 
 The gate passes on at least 3 strong or medium signals out of 8.

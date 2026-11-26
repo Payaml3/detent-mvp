@@ -35,7 +35,7 @@
 - {code: A3.gates,        source: "Product model A3", item: "Signed gate between modes (agreement %, zero unsafe approvals)", status: partly}
 
 - {code: A4.fee,          source: "Product model A4", item: "Software fee per payment, not a share of money moved (usage metering)", status: partly}
-- {code: A4.plans,        source: "Product model A4", item: "Plans: free shadow report, Pilot, Growth, Scale, routing add-on", status: partly}
+- {code: A4.plans,        source: "Product model A4", item: "Plans: Pilot, Growth, Scale, routing add-on (no free shadow report, B-04)", status: partly}
 
 - {code: A5.proposes,     source: "Product model A5", item: "The LLM proposes; the policy layer decides; uncertain fields flagged, never guessed", status: mvp}
 - {code: A5.tools,        source: "Product model A5", item: "Agent tools are read-only; nothing that moves money", status: mvp}
@@ -66,8 +66,8 @@
 
 - {code: B2.org,          source: "Operating model B2", item: "Organisation by stage and hiring priority", status: non-software}
 
-- {code: B3.lead_shadow,  source: "Operating model B3", item: "Lead to shadow report process (report in 5 working days)", status: partly}
-- {code: B3.onboarding,   source: "Operating model B3", item: "Client onboarding: rail connection, policy workshop, rules signed off, shadow", status: partly}
+- {code: B3.lead_shadow,  source: "Operating model B3", item: "Lead to contract: discovery, demo, NDA, KYB and contract (B-04)", status: partly}
+- {code: B3.onboarding,   source: "Operating model B3", item: "Client onboarding (B-04): KYB, owner sign-up, team and roles, sandbox integration and verification, policy sign-off, shadow, go-live", status: partly}
 - {code: B3.mode_gates,   source: "Operating model B3", item: "Weekly agreement report; client signs each mode move", status: partly}
 - {code: B3.rule_changes, source: "Operating model B3", item: "Rule changes versioned, two approvers, loosening needs compliance lead", status: mvp}
 - {code: B3.agent_eval,   source: "Operating model B3", item: "Attack and regression suite per release; weekly quality sample", status: mvp}
@@ -103,7 +103,7 @@
 - {code: B7.automation,   source: "Operating model B7", item: "KPI: share decided without a human >= 70%", status: mvp}
 - {code: B7.recon,        source: "Operating model B7", item: "KPI: automatic match rate >= 99%", status: mvp}
 - {code: B7.reliability,  source: "Operating model B7", item: "KPI: uptime and p95 latency", status: partly}
-- {code: B7.commercial,   source: "Operating model B7", item: "KPI: shadow-to-pilot 40%, pilot-to-paid 60%", status: non-software}
+- {code: B7.commercial,   source: "Operating model B7", item: "KPI: demo-to-contract (Open), pilot-to-paid 60%", status: non-software}
 - {code: B7.speed,        source: "Operating model B7", item: "KPI: <10 days pilot signed to shadow live", status: non-software}
 - {code: B7.economics,    source: "Operating model B7", item: "KPI: gross margin, NRR", status: non-software}
 - {code: B8.milestones,   source: "Operating model B8", item: "Quarterly milestones and gates", status: non-software}
@@ -125,7 +125,7 @@
 - {code: D.docs,        source: "Developer portal 3", item: "Docs portal structure, concepts, guides, reference, changelog", status: mvp}
 - {code: D.samples,     source: "Developer portal 3", item: "Code samples in 8 languages, tested in CI", status: mvp}
 - {code: D.sdks,        source: "Developer portal 3", item: "Python and TypeScript SDKs, Postman, OpenAPI download", status: mvp}
-- {code: D.sales_led,   source: "Developer portal 4", item: "Sales-led access: org created by admin, invite, email verify, expiry", status: mvp}
+- {code: D.sales_led,   source: "Developer portal 4", item: "KYB-gated access: org created by admin after KYB, owner invite, email verify, team and roles, evaluation expiry", status: mvp}
 - {code: D.keys,        source: "Developer portal 4", item: "Test keys: create, roll, revoke, shown once, hashed, scoped; live disabled", status: mvp}
 - {code: D.logs,        source: "Developer portal 4", item: "Request logs with idempotency key and payment ID", status: mvp}
 - {code: D.webhooks,    source: "Developer portal 4/6", item: "Webhooks: endpoints, secret, test event, delivery log, HMAC signature, retries", status: mvp}

@@ -50,7 +50,7 @@
   },
   "SHD": {
    "name": "Shadow mode",
-   "goal": "Run decisions on a prospect's exported data and produce the free shadow report"
+   "goal": "Decide a client's payments without sending any (the shadow phase of onboarding, or an exported month to calibrate rule set v1) and report agreement"
   },
   "OPS": {
    "name": "Operational controls",
@@ -66,7 +66,7 @@
   },
   "DSH": {
    "name": "Developer dashboard",
-   "goal": "Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console per organisation"
+   "goal": "KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox controls, integration verification, usage and the console per organisation"
   },
   "SBX": {
    "name": "Sandbox",
@@ -167,8 +167,8 @@
    "id": "P2",
    "name": "Dashboard and sandbox",
    "status": "",
-   "goal": "Sales-led onboarding through to triggering every test value.",
-   "exit": "Admin invites a developer, who verifies, gets keys, triggers every test value and sees results in their own console; an expired organisation is locked."
+   "goal": "KYB-gated onboarding: owner sign-up, team and roles, through to triggering every test value and integration verification.",
+   "exit": "Admin invites an account owner after KYB, who signs up, invites a developer with a role; the developer gets keys, triggers every test value and sees results in their own console; DekernAI verifies the integration; an expired evaluation organisation is locked."
   },
   {
    "id": "P3",
@@ -188,8 +188,8 @@
    "id": "L",
    "name": "After launch (Should and Could)",
    "status": "",
-   "goal": "Shadow mode and operations hardening; first shadow report from a CSV export.",
-   "exit": "The first free shadow report is produced from a CSV export."
+   "goal": "Shadow mode and operations hardening; the shadow-phase report and production-mode request.",
+   "exit": "A shadow-phase report is produced from a CSV export and the mode-gate sign-off is recorded."
   }
  ],
  "stories": [
@@ -1002,28 +1002,28 @@
    "id": "DSH-01",
    "epic": "DSH",
    "slice": "P2",
-   "criteria": 2,
+   "criteria": 3,
    "done": 0
   },
   {
    "id": "DSH-02",
    "epic": "DSH",
    "slice": "P2",
-   "criteria": 2,
+   "criteria": 3,
    "done": 0
   },
   {
    "id": "DSH-03",
    "epic": "DSH",
    "slice": "P2",
-   "criteria": 1,
+   "criteria": 2,
    "done": 0
   },
   {
    "id": "DSH-04",
    "epic": "DSH",
    "slice": "P2",
-   "criteria": 1,
+   "criteria": 2,
    "done": 0
   },
   {
@@ -1066,6 +1066,27 @@
    "epic": "DSH",
    "slice": "P2",
    "criteria": 1,
+   "done": 0
+  },
+  {
+   "id": "DSH-11",
+   "epic": "DSH",
+   "slice": "P2",
+   "criteria": 3,
+   "done": 0
+  },
+  {
+   "id": "DSH-12",
+   "epic": "DSH",
+   "slice": "P2",
+   "criteria": 2,
+   "done": 0
+  },
+  {
+   "id": "DSH-13",
+   "epic": "DSH",
+   "slice": "L",
+   "criteria": 3,
    "done": 0
   },
   {
@@ -1171,7 +1192,7 @@
    "epic": "WEB",
    "slice": "P4",
    "criteria": 2,
-   "done": 2
+   "done": 1
   },
   {
    "id": "WEB-03",

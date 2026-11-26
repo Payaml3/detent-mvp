@@ -1122,7 +1122,7 @@ Sources: [DEM-06 criteria](../../backlog/user-stories.md#dem-06)
 
 ## FR-098 · Shadow (confirmed)
 
-(Should) A CSV export can be decided in shadow mode, anonymised on import, and summarised in a shadow report; (Could) a mode-gate report and sign-off.
+(Should) A CSV export can be decided in shadow mode, anonymised on import, and summarised in a shadow-phase report (onboarding, B-04); (Could) a mode-gate report and sign-off, and a production-mode request that starts in Shadow and issues no live keys in the prototype.
 
 Sources: [spec/00 §product-principles](../../spec/00-product-context.md#product-principles); [SHD-01 criteria](../../backlog/user-stories.md#shd-01)
 
@@ -1132,6 +1132,9 @@ Sources: [spec/00 §product-principles](../../spec/00-product-context.md#product
 | [SHD-02](../../backlog/user-stories.md#shd-02) | L | 0 | Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF | planned | integration: `apps/api/tests/integration/test_shd_02.py` |
 | [SHD-03](../../backlog/user-stories.md#shd-03) | L | 0 | Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change | planned | integration: `apps/api/tests/integration/test_shd_03.py` |
 | [SHD-04](../../backlog/user-stories.md#shd-04) | L | 0 | Raw names and account identifiers never stored; hashes are consistent within one import | planned | integration: `apps/api/tests/integration/test_shd_04.py` |
+| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 0 | Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1 | planned | manual: `manual check, recorded in the PR description` |
+| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 1 | Production starts in Shadow mode (founder, 2026-11-26); moves to Assist and Auto follow SHD-03 | planned | manual: `manual check, recorded in the PR description` |
+| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 2 | In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14) | planned | console: `apps/api/tests/integration/test_dsh_13.py` |
 
 ## FR-099 · Operations (confirmed)
 
@@ -1222,24 +1225,33 @@ Sources: [spec/03 §webhooks](../../spec/03-api.md#webhooks); [spec/02 §entitie
 
 ## FR-105 · Dashboard (confirmed)
 
-Sales-led access: the admin creates organisations (60-day expiry) and single-use invites (7 days); developers verify email and set a password; keys, logs, webhooks, sandbox controls, usage and the per-organisation console; an access-requests inbox.
+KYB-gated access: after KYB the admin creates the client organisation and invites the account owner (single use, 7 days; evaluation organisations expire after 60 days); the owner verifies email, sets a password, invites the team and assigns roles; integration verification by DekernAI; keys, logs, webhooks, sandbox controls, usage and the per-organisation console with policy screens; an access-requests inbox.
 
 Sources: [spec/08 §dashboard-dsh](../../spec/08-developer-portal.md#dashboard-dsh)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 0 | Admin screen: organisation name, expiry (default 60 days), invite emails; invite links are single-use and expire in 7 days | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
-| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 1 | No public sign-up route exists | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
-| [DSH-02](../../backlog/user-stories.md#dsh-02) | P2 | 0 | Email verification link; password hashed with argon2; first login shows the keys page | planned | console: `apps/api/tests/integration/test_dsh_02.py` |
-| [DSH-02](../../backlog/user-stories.md#dsh-02) | P2 | 1 | Emails go through a transactional email provider in production and the outbox in development | planned | console: `apps/api/tests/integration/test_dsh_02.py` |
+| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 0 | Admin screen: organisation name, KYB approval reference and date (required for a client organisation), account owner email; the invite link is single-use and expires in 7 days | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
+| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 1 | An evaluation organisation (no KYB, sandbox only) can be created with an expiry (default 60 days, DSH-03) | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
+| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 2 | No public sign-up route exists | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
+| [DSH-02](../../backlog/user-stories.md#dsh-02) | P2 | 0 | Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role | planned | console: `apps/api/tests/integration/test_dsh_02.py` |
+| [DSH-02](../../backlog/user-stories.md#dsh-02) | P2 | 1 | First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification | planned | console: `apps/api/tests/integration/test_dsh_02.py` |
+| [DSH-02](../../backlog/user-stories.md#dsh-02) | P2 | 2 | Emails go through a transactional email provider in production and the outbox in development | planned | console: `apps/api/tests/integration/test_dsh_02.py` |
 | [DSH-03](../../backlog/user-stories.md#dsh-03) | P2 | 0 | After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend | planned | console: `apps/api/tests/integration/test_dsh_03.py` |
+| [DSH-03](../../backlog/user-stories.md#dsh-03) | P2 | 1 | Client organisations have no expiry; admin can suspend one (same 403 and read-only), with the reason audited | planned | console: `apps/api/tests/integration/test_dsh_03.py` |
 | [DSH-04](../../backlog/user-stories.md#dsh-04) | P2 | 0 | Keys shown once at creation; last-used time; roll keeps the old key valid for a configurable overlap; revoke is immediate | planned | console: `apps/api/tests/integration/test_dsh_04.py` |
+| [DSH-04](../../backlog/user-stories.md#dsh-04) | P2 | 1 | Only `sk_test_` keys exist in the prototype; the page labels production keys as not available in the prototype (invariant 14) | planned | console: `apps/api/tests/integration/test_dsh_04.py` |
 | [DSH-05](../../backlog/user-stories.md#dsh-05) | P2 | 0 | Filters by status, path, idempotency key and payment ID; detail view with redacted bodies | planned | console: `apps/api/tests/integration/test_dsh_05.py` |
 | [DSH-06](../../backlog/user-stories.md#dsh-06) | P2 | 0 | All WHK features available in the UI | planned | console: `apps/api/tests/integration/test_dsh_06.py` |
 | [DSH-07](../../backlog/user-stories.md#dsh-07) | P2 | 0 | Reset; force timeout to UNKNOWN, rail failure and flagged address; explorer links for real-testnet payments | planned | fault: `apps/api/tests/integration/test_dsh_07.py` |
 | [DSH-08](../../backlog/user-stories.md#dsh-08) | P2 | 0 | Calls, payments decided and agent investigations against daily quotas | planned | console: `apps/api/tests/integration/test_dsh_08.py` |
-| [DSH-09](../../backlog/user-stories.md#dsh-09) | P2 | 0 | Console screens reused with the organisation scope; demo-only controls (clock, scenario runner) hidden | planned | console: `apps/api/tests/integration/test_dsh_09.py` |
+| [DSH-09](../../backlog/user-stories.md#dsh-09) | P2 | 0 | Console screens reused with the organisation scope, including the policy screens (rule sets, counterparties, mandates); demo-only controls (clock, scenario runner) hidden | planned | console: `apps/api/tests/integration/test_dsh_09.py` |
 | [DSH-10](../../backlog/user-stories.md#dsh-10) | P2 | 0 | Form fields: name, work email, company, role, use case; stored; admin list with status; email to the sales inbox | planned | console: `apps/api/tests/integration/test_dsh_10.py` |
+| [DSH-11](../../backlog/user-stories.md#dsh-11) | P2 | 0 | Owner and admin roles can invite, change roles and remove members; invites are single-use and expire in 7 days | planned | console: `apps/api/tests/integration/test_dsh_11.py` |
+| [DSH-11](../../backlog/user-stories.md#dsh-11) | P2 | 1 | Roles: account owner, admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor (spec/02); permissions follow spec/08; two-person rules still apply | planned | console: `apps/api/tests/integration/test_dsh_11.py` |
+| [DSH-11](../../backlog/user-stories.md#dsh-11) | P2 | 2 | An organisation always keeps at least one account owner; every change writes an audit event | planned | console: `apps/api/tests/integration/test_dsh_11.py` |
+| [DSH-12](../../backlog/user-stories.md#dsh-12) | P2 | 0 | Checklist filled from sandbox evidence: every test value triggered (spec/06), a signed webhook received and acknowledged, idempotent retry used, an UNKNOWN resolved without a resend | planned | console: `apps/api/tests/integration/test_dsh_12.py` |
+| [DSH-12](../../backlog/user-stories.md#dsh-12) | P2 | 1 | The owner requests verification when every item passes; a DekernAI admin verifies or returns it with a note; both are audited | planned | console: `apps/api/tests/integration/test_dsh_12.py` |
 
 ## FR-106 · Sandbox (confirmed)
 
@@ -1272,8 +1284,9 @@ Sources: [spec/08 §sandbox-sbx](../../spec/08-developer-portal.md#sandbox-sbx)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 0 | Admin screen: organisation name, expiry (default 60 days), invite emails; invite links are single-use and expire in 7 days | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
-| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 1 | No public sign-up route exists | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
+| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 0 | Admin screen: organisation name, KYB approval reference and date (required for a client organisation), account owner email; the invite link is single-use and expires in 7 days | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
+| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 1 | An evaluation organisation (no KYB, sandbox only) can be created with an expiry (default 60 days, DSH-03) | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
+| [DSH-01](../../backlog/user-stories.md#dsh-01) | P2 | 2 | No public sign-up route exists | planned | console: `apps/api/tests/integration/test_dsh_01.py` |
 | [SBX-04](../../backlog/user-stories.md#sbx-04) | P2 | 0 | Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08) | planned | integration: `apps/api/tests/integration/test_sbx_04.py` |
 
 ## FR-109 · Docs (confirmed)
@@ -1318,7 +1331,7 @@ Sources: [spec/08 §website-web](../../spec/08-developer-portal.md#website-web);
 | [WEB-01](../../backlog/user-stories.md#web-01) | P4 | 1 | Category wording 'agentic payment controls', with the three layers shown as one section; never 'payments company' or 'payment provider' | done | `ci:apps/site/tests/site.test.mjs home: category wording and both calls to action`<br>`ci:apps/site/tests/site.test.mjs honesty: no banned claims or phrases on any page` |
 | [WEB-01](../../backlog/user-stories.md#web-01) | P4 | 2 | Passes the honesty checklist: no logos, testimonials, customer counts, certification badges or licence claims | done | `ci:apps/site/tests/site.test.mjs honesty: no banned claims or phrases on any page`<br>`ci:apps/site/tests/site.test.mjs honesty: certifications appear only as roadmap items` |
 | [WEB-02](../../backlog/user-stories.md#web-02) | P4 | 0 | Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned') | done | `ci:apps/site/tests/site.test.mjs sub-pages carry their required content`<br>`ci:apps/site/tests/site.test.mjs honesty: certifications appear only as roadmap items` |
-| [WEB-02](../../backlog/user-stories.md#web-02) | P4 | 1 | Design partners page explains the free shadow report and data handling | done | `ci:apps/site/tests/site.test.mjs sub-pages carry their required content` |
+| [WEB-02](../../backlog/user-stories.md#web-02) | P4 | 1 | Onboarding page explains the seven onboarding phases and data handling (B-04) | partial | `ci:apps/site/tests/site.test.mjs sub-pages carry their required content` (criterion not fully met) |
 | [WEB-03](../../backlog/user-stories.md#web-03) | P4 | 0 | Reads results.json at build time; every figure labelled 'test-network evaluation, [date]' | done | `ci:apps/site/tests/logic.test.mjs results: every figure carries the dated test-network label`<br>`ci:apps/site/tests/logic.test.mjs results: absent file means not published and no figures`<br>`ci:apps/site/tests/site.test.mjs results: not published, and no figures, while there is no results file` |
 | [WEB-04](../../backlog/user-stories.md#web-04) | P4 | 0 | Uses the same tested snippets as DOC-04 | partial | `ci:apps/site/tests/site.test.mjs developers: one request in eight languages, labelled pre-launch (snippets not yet the DOC-04 tested set)` (criterion not fully met) |
 | [WEB-05](../../backlog/user-stories.md#web-05) | P4 | 0 | Templates marked 'draft for legal review'; analytics without cookie banners where possible | done | `ci:apps/site/tests/site.test.mjs legal pages are marked draft for legal review`<br>`ci:apps/site/tests/site.test.mjs no third-party requests: scripts, styles and fonts are served locally`<br>`manual:apps/site sets no cookies and has no analytics configured` |

@@ -20,7 +20,7 @@ Every screen named below is in the console nav. Every "Demo" step is one button 
 | 7 to 9 | Payments, then Demo, then Reconciliation | Payments: the batch on three rails; one block (Example Sanctioned Trading Co, screening hit, never re-routed, no attempt); p08 (75.42 USDC) reverts on Base Sepolia and fails over to Ethereum Sepolia under the same payment ID. Demo: **Close the day** (bank statements, then reconciliation): 24 of 25 money-moving items matched (17 payouts and 8 deposits; the block and the two held escalations never moved money) and one designed break, dep-07, a deposit sent to another user's address, with a proposed fix. Act as Priya and approve the fix. Open any payment and click **Replay** | "One ledger across rails. Every payment can be replayed. The 99% match rate is measured on the 500-item evaluation set." |
 | 9 to 10 | Demo, then the release-gate report | Demo: **Attack sample**: a screened payee is blocked, forcing the block to send is refused, the agent's $60,000 proposal above its mandate is blocked, and an injected invoice only produces flags. Then the results report from the latest release-gate run (`report.html`, the CI artifact of `detent eval`): 0 unauthorised executions in 120 attacks; 0 duplicates in 52 faults; dated, test-network, synthetic | "Would you share one month of anonymised exports for a free shadow report?" |
 
-**The signal:** a "yes" to the shadow report. Praise for the demo isn't the signal.
+**The signal:** a "yes" to starting onboarding (KYB, then the sandbox; B-04). Praise for the demo isn't the signal.
 
 **Notes:**
 - The match line counts only items that moved money (C-10, Confirmed as D-35). If the presenter approves both escalations before Close the day, the line reads 26 of 27 (covered by a test).

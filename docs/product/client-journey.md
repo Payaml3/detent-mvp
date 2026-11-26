@@ -17,11 +17,29 @@ the contract.
 |---|---|---|---|---|---|
 | 1 | **Discovery** | Discovery call and the 10-minute demo (spec/11); fit check on rails, volumes and how their rules work today | Founder (later the solutions lead) | Head of payments | Both sides want to go ahead; NDA signed |
 | 2 | **Contract and due diligence** | DekernAI's own due diligence (KYB) on the client; MSA, DPA, DORA Article 30 annex, the clause that the client owns the rules; agreed pilot scope (rail, volumes, dates) | Founder; counsel (`legal` gate) | Legal, compliance | Contract and DPA signed; pilot scope agreed |
-| 3 | **Sandbox integration** | Sales-led org, invites and sandbox keys (spec/08); the client integrates the API and webhooks and triggers every test value (spec/06) | Engineering support | Client engineers | Integration checklist passes in the sandbox |
+| 3 | **Account and sandbox integration** | KYB approved: DekernAI creates the organisation and the account owner gets a registration email; they sign up, invite their team and assign roles; their engineers integrate against the sandbox and trigger every test value (spec/06). See "Account and dashboard flow" | Engineering support | Account owner, client engineers | Client marks the integration ready; DekernAI verifies it |
 | 4 | **Policy setup** | Policy workshop: the client's rules become rule set v1 (spec/04); counterparties and allowlists; agent mandates (spec/05); approvers, roles and backup owners; exception tiers and deadlines | Solutions lead | Compliance lead, head of payments | Client compliance lead signs off rule set v1 |
 | 5 | **Shadow on live traffic** | Mode 1 Shadow (product model A3): every live payment is decided and recorded, nothing is sent; weekly agreement report against the client's own outcomes | Solutions lead | Payments operations | Client signs the move to Assist: agreement % and zero unsafe approvals |
 | 6 | **Go-live** | Mode 2 Assist (staff click every decision), then Mode 3 Auto, on one rail; go-live checklist: kill-switch owner, backup owners, exception tiers, incident runbook (spec/10) | Founder (go-live decision) | Head of payments | Client signs each mode move (Assist, then Auto) |
 | 7 | **Scale** | More rails; Mode 4 Orchestrate (routing and failover); reconciliation across rails; support levels and quarterly business reviews | Solutions lead | Head of payments | Reviewed each quarter |
+
+## Account and dashboard flow
+
+Founder's flow (2026-11-26), with policy sign-off and shadow kept before any live send:
+
+1. **KYB approved** (phase 2). DekernAI's admin creates the client's organisation. There is no public sign-up.
+2. **Registration email** to the client's account owner: a single-use invite link.
+3. **Sign up.** The account owner verifies their email, sets a password and lands in the client dashboard.
+4. **One dashboard** holds everything for that client: the developer portal (keys, request logs, webhooks,
+   docs), sandbox controls, the policy engine (rule sets, counterparties, mandates) and the console.
+5. **Team.** The account owner invites team members and assigns roles and permissions (spec/02 and spec/08: account owner,
+   admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor). Two-person rules still apply (spec/04, spec/07).
+6. **Sandbox integration.** Engineers use sandbox keys (`sk_test_`) and trigger every test value. The client
+   marks the integration ready; DekernAI verifies it against the integration checklist.
+7. **Production mode.** Once DekernAI has verified the integration **and** the client's compliance lead has
+   signed off rule set v1 (phase 4), the account owner can enable production. Production starts in Shadow
+   (phase 5): live payments are decided, nothing is sent. Assist and Auto follow, each signed by the client
+   (phase 6).
 
 ## What this changes
 
@@ -34,9 +52,22 @@ the contract.
 - **Targets (B7):** "under 10 days from pilot signed to shadow live" now reads as phase 2 exit to phase 5
   start.
 
+## Where it is specified
+
+- spec/08 (dashboard access, team and roles, integration verification, production mode), spec/02 (roles),
+  spec/00 (personas), `specs/001-detent-mvp/spec.md` (W-11, FR-105).
+- Stories: DSH-01 to DSH-03 rewritten; DSH-11 team and roles, DSH-12 integration verification (P2);
+  DSH-13 production mode (slice L, Could). P1 (API keys) is unchanged: live keys already return
+  `live_mode_unavailable`.
+- Production mode and live keys are after the MVP: the prototype runs on test networks only (invariant 14).
+
+## Production starts in Shadow (founder, 2026-11-26)
+
+During integration the client is on the sandbox. When the integration is complete they ask DekernAI for a
+review; once DekernAI approves it, the account owner can enable production mode. Production starts in Shadow:
+live payments are decided and nothing is sent until the client signs the move to Assist, then Auto (founder's
+choice "Start in Shadow, then Assist").
+
 ## Follow-ups (not in this change)
 
-- Site copy, nav, CTA and the design-partners page, with spec/08 §7, `specs/002-marketing-site` FR-210,
-  `founder/landing-page.md` and `docs/design/landing-page-ux.md`: done in the landing redesign work.
-- Backlog: reword the SHD epic and stories from "free shadow report" to "shadow phase" in
-  `backlog/stories.yaml`, then regenerate.
+- Site copy, nav, CTA and the Onboarding page: PR #74 (landing redesign).
