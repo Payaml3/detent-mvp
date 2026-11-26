@@ -110,5 +110,5 @@ def to_uuid(value: str) -> uuid.UUID:
 def prefix_of(value: str) -> str:
     m = _VALID.match(value)
     if not m:
-        raise ValueError(f"not a Dekernai ID: {value!r}")
+        raise ValueError(f"not a DekernAI ID: {value!r}")
     return m.group("prefix")

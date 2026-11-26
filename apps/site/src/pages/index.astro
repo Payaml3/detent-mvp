@@ -2,27 +2,30 @@
 import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
 import Problem from "../components/Problem.astro";
-import HowItWorks from "../components/HowItWorks.astro";
-import Layers from "../components/Layers.astro";
+import Spine from "../components/Spine.astro";
+import Rules from "../components/Rules.astro";
+import Console from "../components/Console.astro";
 import Irreversible from "../components/Irreversible.astro";
 import Results from "../components/Results.astro";
-import Developers from "../components/Developers.astro";
-import Security from "../components/Security.astro";
-import UseCases from "../components/UseCases.astro";
-import Pricing from "../components/Pricing.astro";
+import Roles from "../components/Roles.astro";
+import Offer from "../components/Offer.astro";
+import Fit from "../components/Fit.astro";
 import Close from "../components/Close.astro";
 import config from "../../site.config.mjs";
+// Home page structure: docs/design/landing-page-ux.md (approved in #59). Measured results appear only once a
+// dated results file exists (Q4); until then the section is left out rather than shown empty.
+const resultsFile = Object.keys(import.meta.glob("../data/results.json")).length > 0;
 ---
-<Base description={`${config.brandName}: agentic payment controls. Decide, orchestrate and operate every deposit and payout, under your rules, on rails that can’t be reversed.`} schema>
+<Base description={`${config.brandName}: agentic payment controls. Every deposit and payout decided by your rules, sent once and proven, on rails that can’t be reversed.`} schema>
   <Hero />
   <Problem />
-  <HowItWorks />
-  <Layers />
+  <Spine />
+  <Rules />
+  <Console />
   <Irreversible />
-  <Results />
-  <Developers />
-  <Security />
-  <UseCases />
-  <Pricing />
+  {resultsFile && <Results />}
+  <Roles />
+  <Offer />
+  <Fit />
   <Close />
 </Base>

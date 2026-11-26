@@ -22,13 +22,13 @@ const gate = [
     </div>
     {results.published ? (
       <dl class="ledger">
-        {results.figures.map((f) => <div data-figure data-reveal><dt>{f.value}</dt><dd>{f.caption}</dd></div>)}
+        {results.figures.map((f) => <div data-figure data-card><dt>{f.value}</dt><dd>{f.caption}</dd></div>)}
       </dl>
     ) : (
       <div class="gate">
         <p class="gate-title" data-reveal>What every release must pass before it ships:</p>
         <dl class="ledger">
-          {gate.map((g) => <div data-reveal><dt>{g.value}</dt><dd>{g.caption}</dd></div>)}
+          {gate.map((g) => <div data-card><dt>{g.value}</dt><dd>{g.caption}</dd></div>)}
         </dl>
         <p class="small soft" data-reveal>These are release-gate thresholds, not results.</p>
       </div>

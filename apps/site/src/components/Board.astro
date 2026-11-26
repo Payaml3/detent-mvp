@@ -1,0 +1,99 @@
+---
+// A live payments board, like a split-flap departures board: fictional payouts move through their real
+// states (spec/02) and each status flips letter by letter when it changes. Hover or focus a row for the
+// reason. A simulation with fictional payees; without script the board shows one still moment.
+const rows = [
+  { time: "09:41", who: "Quill Studio Ltd", amount: "£820.00", rail: "Faster Payments", status: "ESCALATED", why: "Bank details changed 3 days ago. Waiting for a reviewer." },
+  { time: "09:42", who: "Harbor Logistics GmbH", amount: "€2,400.00", rail: "SEPA Instant", status: "CONFIRMED", why: "Every check passed. Sent once, settled." },
+  { time: "09:42", who: "Bluefin Components Ltd", amount: "$18,500.00", rail: "Base Sepolia", status: "SUBMITTED", why: "Approved by Sam; rules re-ran first. One attempt in flight." },
+  { time: "09:43", who: "Example Sanctioned Trading Co", amount: "500.00 USDC", rail: "Base Sepolia", status: "BLOCKED", why: "Screening hit on the address. A block is final." },
+  { time: "09:44", who: "Northwind Creators", amount: "$1,120.00", rail: "Ethereum Sepolia", status: "UNKNOWN", why: "The rail's answer was lost. Nothing is resent until the chain shows what happened." },
+  { time: "09:45", who: "Marlow Prop Traders", amount: "$64,000.00", rail: "Base Sepolia", status: "ESCALATED", why: "Far above this trader's usual payout. A second look first." },
+];
+const NEXT = { ESCALATED: "READY", READY: "SUBMITTED", SUBMITTED: "CONFIRMED", UNKNOWN: "CONFIRMED" };
+---
+<figure class="board" data-board aria-label="Live payments board, simulation with fictional payees">
+  <figcaption class="top"><span>Payments today</span><span class="soft">Simulation · fictional payees · test networks</span></figcaption>
+  <div class="head" aria-hidden="true"><span>Time</span><span>Payee</span><span class="r">Amount</span><span>Rail</span><span>Status</span></div>
+  <ul>
+    {rows.map((r) => (
+      <li tabindex="0" data-status={r.status}>
+        <span class="t">{r.time}</span>
+        <span class="who">{r.who}</span>
+        <span class="r amt">{r.amount}</span>
+        <span class="rail">{r.rail}</span>
+        <span class="st"><span class="dot" aria-hidden="true"></span><span class="flap" data-flap>{r.status}</span></span>
+        <span class="why">{r.why}</span>
+      </li>
+    ))}
+  </ul>
+  <script type="application/json" data-board-next set:html={JSON.stringify(NEXT)} />
+</figure>
+<style>
+  .board { margin: 56px 0 0; padding: 28px; border-radius: 14px; background: var(--text); color: var(--bg); display: grid; gap: 14px;
+    --muted: color-mix(in srgb, var(--bg) 62%, var(--text)); --tile: color-mix(in srgb, var(--bg) 9%, var(--text)); }
+  .top { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-weight: 600; }
+  .soft { color: var(--muted); font-weight: 500; font-size: var(--t-small); }
+  .head, li { display: grid; grid-template-columns: 64px 1.6fr 1fr 1.1fr 190px; gap: 0 16px; align-items: center; }
+  .head { color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 0 14px; }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  li { padding: 12px 14px; border-radius: 8px; background: var(--tile); font-variant-numeric: tabular-nums; outline: none; cursor: default; transition: background 200ms; }
+  li:hover, li:focus-visible { background: color-mix(in srgb, var(--bg) 15%, var(--text)); }
+  li:focus-visible { box-shadow: 0 0 0 2px var(--signal); }
+  .t, .rail { color: var(--muted); }
+  .who { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .r { text-align: right; }
+  .st { display: flex; align-items: center; gap: 10px; }
+  .flap { display: inline-flex; gap: 2px; font: 600 14px/1 var(--font-head); letter-spacing: 0.02em; }
+  .flap :global(i) { font-style: normal; display: inline-grid; place-items: center; width: 0.95em; height: 1.55em; border-radius: 3px;
+    background: color-mix(in srgb, var(--bg) 14%, var(--text)); box-shadow: inset 0 -0.78em 0 color-mix(in srgb, var(--text) 18%, transparent); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  li[data-status="ESCALATED"] .dot { background: var(--signal); }
+  li[data-status="CONFIRMED"] .dot { background: var(--bg); }
+  li[data-status="BLOCKED"] .dot { border-radius: 0; background: none; width: 10px; height: 10px; position: relative; }
+  li[data-status="BLOCKED"] .dot::before, li[data-status="BLOCKED"] .dot::after { content: ""; position: absolute; left: 4px; top: -1px; width: 2px; height: 12px; background: var(--bg); transform: rotate(45deg); }
+  li[data-status="BLOCKED"] .dot::after { transform: rotate(-45deg); }
+  .why { grid-column: 2 / -1; color: var(--muted); max-height: 0; overflow: hidden; transition: max-height 260ms var(--ease-out), padding 260ms var(--ease-out); }
+  li:hover .why, li:focus-visible .why { max-height: 4em; padding-top: 10px; }
+  @media (max-width: 900px) {
+    .head { display: none; }
+    li { grid-template-columns: 1fr auto; }
+    .st { margin-top: 8px; }
+    .t, .rail { display: none; }
+    .amt { text-align: right; }
+    .st { grid-column: 1 / -1; }
+    .why { grid-column: 1 / -1; }
+  }
+</style>
+<script>
+  const board = document.querySelector("[data-board]");
+  const NEXT = JSON.parse(board.querySelector("[data-board-next]").textContent);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const tiles = (el, word) => { el.replaceChildren(...[...word].map((ch) => Object.assign(document.createElement("i"), { textContent: ch }))); };
+  const rows = [...board.querySelectorAll("li")];
+  rows.forEach((li) => tiles(li.querySelector("[data-flap]"), li.dataset.status));
+  const flip = (li, word) => {
+    const el = li.querySelector("[data-flap]");
+    li.dataset.status = word;
+    if (reduce) { tiles(el, word); return; }
+    let frame = 0;
+    const len = Math.max(word.length, el.children.length);
+    const id = setInterval(() => {
+      frame++;
+      const out = [...Array(len)].map((_, k) => (frame > k * 2 + 6 ? word[k] ?? "" : A[(Math.random() * 26) | 0])).join("");
+      tiles(el, out);
+      if (frame > len * 2 + 6) { clearInterval(id); tiles(el, word); }
+    }, 45);
+  };
+  const START = rows.map((li) => li.dataset.status);
+  let visible = false;
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(board);
+  if (!reduce) setInterval(() => {
+    if (!visible) return;
+    const moving = rows.filter((li) => NEXT[li.dataset.status]);
+    const li = moving.length ? moving[(Math.random() * moving.length) | 0] : null;
+    if (li) flip(li, NEXT[li.dataset.status]);
+    else rows.forEach((r, i) => flip(r, START[i])); // the day starts again
+  }, 2400);
+</script>

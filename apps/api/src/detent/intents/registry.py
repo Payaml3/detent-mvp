@@ -175,7 +175,7 @@ def refresh_stats(conn: Connection, org_id: str, counterparty_id: str) -> None:
         {"o": org_id, "c": counterparty_id},
     ).all()
     if not rows:
-        return  # keep imported history until Dekernai has confirmed payments of its own
+        return  # keep imported history until DekernAI has confirmed payments of its own
     # The median is per currency (G-13); store the currency with the most confirmed payments.
     cur = Counter(r.currency for r in rows).most_common(1)[0][0]
     median = _median([r.amount_minor for r in rows if r.currency == cur])

@@ -1,0 +1,202 @@
+---
+// The merchant's console, drawn as a working screen inside a glass window that tilts flat as it scrolls in and
+// leans toward the pointer. Sample data for a fictional merchant on test networks, labelled as such. The
+// numbers add up: executed + escalated + blocked = decided, hour by hour. Pick an escalation to read the
+// agent's case; the approve button is a picture of the real one, which re-runs the rules first (spec/07).
+const hours = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17"];
+const executed = [22, 31, 44, 48, 41, 36, 39, 45, 42, 33];
+const escalated = [1, 2, 3, 4, 2, 3, 2, 3, 2, 2];
+const blocked = [0, 1, 1, 0, 1, 1, 0, 2, 1, 0];
+const sum = (a) => a.reduce((x, y) => x + y, 0);
+const totals = { executed: sum(executed), escalated: sum(escalated), blocked: sum(blocked) };
+const decided = totals.executed + totals.escalated + totals.blocked;
+const peak = Math.max(...hours.map((_, i) => executed[i] + escalated[i] + blocked[i]));
+const cases = [
+  { id: "c1", who: "Marlow Prop Traders", amount: "$64,000.00", rail: "Base Sepolia", code: "ABOVE_NORM", wait: "12 min",
+    agent: "Usual payout for this trader is $4,000 to $6,500. This one is about 11 times that. Wallet unchanged since March; no screening hits.",
+    checks: [["Screening list", "clear"], ["Auto limit $10,000", "over"], ["Usual size for this payee", "over"], ["Wallet details unchanged", "clear"]] },
+  { id: "c2", who: "Quill Studio Ltd", amount: "£820.00", rail: "Faster Payments", code: "CHANGED_DETAILS", wait: "31 min",
+    agent: "Bank details changed 3 days ago, by an email from a new address. Previous 14 payouts went to the old account.",
+    checks: [["Screening list", "clear"], ["Auto limit £5,000", "clear"], ["Bank details unchanged", "over"], ["Paid before", "clear"]] },
+  { id: "c3", who: "Fenwick Tutors", amount: "€1,480.00", rail: "SEPA Instant", code: "FIRST_PAYMENT", wait: "4 min",
+    agent: "First payout to this payee. Name matches the account holder check. Invoice reference matches the request.",
+    checks: [["Screening list", "clear"], ["Auto limit €5,000", "clear"], ["Bank details unchanged", "clear"], ["Paid before", "over"]] },
+];
+const rails = [["Faster Payments", "ok", "Healthy"], ["SEPA Instant", "ok", "Healthy"], ["Base Sepolia", "wait", "1 UNKNOWN, checking the chain"]];
+const n = (x) => x.toLocaleString("en-GB");
+---
+<section class="section console" id="console" data-section="console" aria-labelledby="console-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <h2 id="console-title">Your Tuesday, on one screen.</h2>
+      <p class="lead">Routine payouts go straight through. The few that need judgement wait in one queue, with the agent’s notes already written and the rule that held them named.</p>
+    </div>
+    <figure class="window" data-card data-console aria-label="Console illustration with sample data for a fictional merchant">
+      <div class="bar">
+        <span class="brand"><span class="mk" aria-hidden="true"></span>Console</span>
+        <span class="merchant">Kestrel Market <span class="mut">(fictional)</span></span>
+        <span class="mut tag">Tue 24 Nov · sample data · test networks</span>
+      </div>
+      <div class="body">
+        <nav class="side" aria-hidden="true">
+          <span class="on">Today</span><span>Escalations <b>{cases.length}</b></span><span>Payments</span><span>Rules <i>v14</i></span><span>Rails</span><span>Audit</span>
+          <span class="kill"><span class="sw" aria-hidden="true"></span>Kill switch off</span>
+        </nav>
+        <div class="main">
+          <dl class="kpis">
+            <div><dt>Decided</dt><dd>{n(decided)}</dd></div>
+            <div><dt>Executed</dt><dd>{n(totals.executed)}</dd></div>
+            <div class="esc"><dt>Escalated</dt><dd>{totals.escalated}</dd></div>
+            <div class="blk"><dt>Blocked</dt><dd>{totals.blocked}</dd></div>
+          </dl>
+          <div class="chart" data-chart>
+            <p class="cap"><span>Decisions by hour</span><span class="mut" data-chart-read>Point at an hour</span></p>
+            <div class="bars">
+              {hours.map((h, i) => {
+                const t = executed[i] + escalated[i] + blocked[i];
+                return (
+                  <button type="button" class="col" style={`--h:${(t / peak) * 100}%`} data-read={`${h}:00 · ${t} decided: ${executed[i]} executed, ${escalated[i]} escalated, ${blocked[i]} blocked`} aria-label={`${h}:00, ${t} decided`}>
+                    <span class="stack">
+                      {blocked[i] > 0 && <span class="b" style={`flex:${blocked[i]}`}></span>}
+                      <span class="e" style={`flex:${escalated[i]}`}></span>
+                      <span class="x" style={`flex:${executed[i]}`}></span>
+                    </span>
+                    <span class="h">{h}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <p class="legend mut"><span><i class="x"></i>Executed</span><span><i class="e"></i>Escalated</span><span><i class="b"></i>Blocked</span></p>
+          </div>
+          <div class="queue">
+            <p class="cap"><span>Waiting for a person</span><span class="mut">oldest first</span></p>
+            <ul role="list">
+              {cases.map((c, i) => (
+                <li><button type="button" data-case={c.id} aria-pressed={i === 0 ? "true" : "false"}>
+                  <span class="who">{c.who}</span><span class="amt">{c.amount}</span>
+                  <span class="code">{c.code}</span><span class="mut">{c.wait}</span>
+                </button></li>
+              ))}
+            </ul>
+          </div>
+          <div class="case">
+            {cases.map((c, i) => (
+              <article data-case-detail={c.id} hidden={i !== 0}>
+                <p class="cap"><span>{c.who} · {c.amount} · {c.rail}</span></p>
+                <p class="note"><span class="by">Agent’s notes</span>{c.agent}</p>
+                <ul class="checks" role="list">
+                  {c.checks.map(([label, r]) => <li class={r}><span>{label}</span><span>{r === "over" ? "held" : "clear"}</span></li>)}
+                </ul>
+                <p class="acts"><span class="btn-a">Approve · rules run again</span><span class="btn-b">Reject</span></p>
+              </article>
+            ))}
+          </div>
+          <ul class="rails" role="list">
+            {rails.map(([name, s, line]) => <li class={s}><span class="dot" aria-hidden="true"></span><span>{name}</span><span class="mut">{line}</span></li>)}
+          </ul>
+        </div>
+      </div>
+    </figure>
+    <p class="small soft foot">Illustration with sample data for a fictional merchant. The agent writes the notes; your rules make the decision, and approving re-runs them first.</p>
+  </div>
+</section>
+<style>
+  .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; }
+  .head h2 { grid-column: 1 / span 6; }
+  .head .lead { grid-column: 8 / -1; margin: 0; }
+  .window { margin: 56px 0 0; border-radius: 16px; background: var(--text); color: var(--bg); overflow: hidden;
+    --mut: color-mix(in srgb, var(--bg) 58%, var(--text)); --tile: color-mix(in srgb, var(--bg) 7%, var(--text));
+    --line: color-mix(in srgb, var(--bg) 14%, var(--text));
+    box-shadow: 0 60px 120px -60px color-mix(in srgb, var(--text) 70%, transparent); font-size: 14px; }
+  :global(.cards-live) .window[data-card] {
+    transform: perspective(1800px) translateY(calc(var(--in) * 80px)) rotateX(calc(var(--in) * 34deg + var(--ty) * -3deg)) rotateY(calc(var(--tx) * 4deg)) scale(calc(1 - var(--in) * 0.14 - var(--out) * 0.04));
+    transform-origin: 50% 0%;
+  }
+  .mut { color: var(--mut); }
+  .bar { display: flex; align-items: center; gap: 20px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 8px; font: 600 15px/1 var(--font-head); }
+  .mk { width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
+  .merchant { font-weight: 600; }
+  .tag { margin-left: auto; font-size: 12px; }
+  .body { display: grid; grid-template-columns: 180px 1fr; }
+  .side { display: grid; align-content: start; gap: 2px; padding: 16px 12px; border-right: 1px solid var(--line); color: var(--mut); }
+  .side span { padding: 8px 10px; border-radius: 6px; display: flex; justify-content: space-between; }
+  .side .on { background: var(--tile); color: var(--bg); }
+  .side b { background: var(--signal); color: var(--on-signal); border-radius: 10px; padding: 0 7px; font-size: 12px; }
+  .side i { font-style: normal; font-size: 12px; }
+  .side .kill { margin-top: 24px; justify-content: flex-start; gap: 8px; font-size: 12px; }
+  .sw { width: 26px; height: 14px; border-radius: 8px; background: var(--line); position: relative; }
+  .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--mut); }
+  .main { display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; padding: 16px; }
+  .kpis { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0; }
+  .kpis div { background: var(--tile); border-radius: 10px; padding: 14px 16px; }
+  .kpis dt { color: var(--mut); font-size: 12px; }
+  .kpis dd { margin: 6px 0 0; font: 600 30px/1 var(--font-head); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .kpis .esc dd { color: var(--signal); }
+  .cap { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 12px; font-weight: 600; font-size: 13px; }
+  .cap .mut { font-weight: 500; }
+  .chart, .queue, .case { background: var(--tile); border-radius: 10px; padding: 14px 16px; }
+  .chart { grid-row: span 2; display: grid; grid-template-rows: auto 1fr auto; }
+  .bars { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; align-items: end; min-height: 200px; }
+  .col { all: unset; height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 6px; cursor: pointer; }
+  .stack { align-self: end; height: var(--h); display: flex; flex-direction: column; border-radius: 3px; overflow: hidden; transition: filter 160ms; }
+  :global(.cards-live) .stack { height: calc(var(--h) * (1 - var(--in, 0))); }
+  .col:hover .stack, .col:focus-visible .stack { filter: brightness(1.25); }
+  .col:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; border-radius: 3px; }
+  .x { background: color-mix(in srgb, var(--bg) 42%, var(--text)); }
+  .e { background: var(--signal); }
+  .b { background: repeating-linear-gradient(135deg, var(--mut) 0 2px, transparent 2px 5px); }
+  .h { text-align: center; color: var(--mut); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 16px; margin: 12px 0 0; font-size: 12px; }
+  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .queue ul, .checks, .rails { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .queue button { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 160ms; }
+  .queue button:hover { background: var(--line); }
+  .queue button[aria-pressed="true"] { background: var(--line); box-shadow: inset 3px 0 0 var(--signal); }
+  .queue button:focus-visible { outline: 2px solid var(--signal); }
+  .who { font-weight: 600; } .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .code { font-size: 11px; letter-spacing: 0.04em; color: var(--mut); font-weight: 600; }
+  .queue .mut { text-align: right; font-size: 12px; }
+  .note { margin: 0 0 12px; line-height: 1.5; }
+  .by { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mut); margin-bottom: 4px; }
+  .checks li { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); color: var(--mut); }
+  .checks li.over { color: var(--bg); } .checks li.over span:last-child { color: var(--signal); font-weight: 600; }
+  .acts { display: flex; gap: 8px; margin: 14px 0 0; }
+  .btn-a, .btn-b { padding: 9px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; }
+  .btn-a { background: var(--signal); color: var(--on-signal); } .btn-b { background: var(--line); }
+  .rails { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .rails li { display: flex; align-items: center; gap: 8px; background: var(--tile); border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .rails .mut { margin-left: auto; font-size: 12px; text-align: right; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
+  .rails .wait .dot { background: var(--signal); animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: 0.3; } }
+  .foot { margin-top: 16px; }
+  @media (max-width: 1000px) {
+    .head h2, .head .lead { grid-column: 1 / -1; }
+    .body { grid-template-columns: 1fr; } .side { display: none; }
+    .main { grid-template-columns: 1fr; } .chart { grid-row: auto; }
+    .rails { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .tag { display: none; } .bar { flex-wrap: wrap; }
+    .bars { min-height: 140px; gap: 4px; }
+  }
+</style>
+<script>
+  const root = document.querySelector("[data-console]");
+  if (root) {
+    const read = root.querySelector("[data-chart-read]");
+    const idle = read.textContent;
+    root.querySelectorAll("[data-read]").forEach((b) => {
+      const show = () => { read.textContent = b.dataset.read; };
+      b.addEventListener("pointerenter", show); b.addEventListener("focus", show); b.addEventListener("click", show);
+      b.addEventListener("pointerleave", () => { read.textContent = idle; });
+    });
+    const buttons = [...root.querySelectorAll("[data-case]")];
+    buttons.forEach((b) => b.addEventListener("click", () => {
+      buttons.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      root.querySelectorAll("[data-case-detail]").forEach((d) => { d.hidden = d.dataset.caseDetail !== b.dataset.case; });
+    }));
+  }
+</script>

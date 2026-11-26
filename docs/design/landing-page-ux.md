@@ -1,4 +1,4 @@
-# Landing page: UX structure (Dekernai)
+# Landing page: UX structure (DekernAI)
 
 Status: **Proposed.** Becomes Approved when the founder merges the PR. Scope: the structure, flow and copy
 outline of the home page (`apps/site/src/pages/index.astro`). Visuals (palette, type, motif) come from the
@@ -45,7 +45,7 @@ Problems:
 The brand story gives the page its spine: **sift** (decision), **settle** (orchestration), **prove** (operations).
 
 ```
-NAV       Dekernai · Product · Security · Developers · Shadow report        [Get a free shadow report]
+NAV       DekernAI · Product · Security · Developers · Shadow report        [Get a free shadow report]
 1 HERO    Headline + category line · CTA pair · live example payment (kept) · honesty strip
 2 PROBLEM On rails you can't reverse, every mistake is permanent (4 pains)
 3 SPINE   Sift. Settle. Prove.  the three layers, one payment ID, "agents prepare, your rules decide"
@@ -61,7 +61,7 @@ NAV       Dekernai · Product · Security · Developers · Shadow report        
 - **Headline** (pick one, Q3):
   - A. "Every deposit and payout, decided by your rules." (plain, covers both directions)
   - B. "Sift every payment. Settle it once. Prove it after." (brand story, three layers)
-  - C. "Your rules decide. Dekernai makes it happen." (tagline option from brand.md)
+  - C. "Your rules decide. DekernAI makes it happen." (tagline option from brand.md)
 - **Category line:** "Agentic payment controls: one layer that decides, orchestrates and operates every deposit
   and payout, under your rules."
 - **CTAs:** primary "Get a free shadow report" (to the offer section, then `/design-partners/`); secondary
@@ -123,7 +123,7 @@ This replaces the Pricing section.
 
 - **Who it's for**, one compact row: payout platforms, crypto service providers, brokers and prop firms,
   marketplaces, each with one line.
-- **FAQ** (5 to 7, collapsible `<details>`): Is Dekernai a payment provider? (No: agentic payment controls,
+- **FAQ** (5 to 7, collapsible `<details>`): Is DekernAI a payment provider? (No: agentic payment controls,
   beside your rails.) Does the AI approve payments? (No: agents propose; your rules decide.) Do you hold funds
   or keys? Which rails? What data does the shadow report need? What does it cost?
 

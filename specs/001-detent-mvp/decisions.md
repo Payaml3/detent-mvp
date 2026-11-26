@@ -1,4 +1,4 @@
-# Decisions register: Dekernai MVP
+# Decisions register: DekernAI MVP
 
 **Feature**: [spec.md](spec.md) · **Inventory**: [inventory.md](inventory.md) · **Created**: 2026-11-18
 

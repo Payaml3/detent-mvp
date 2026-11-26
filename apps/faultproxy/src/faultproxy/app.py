@@ -1,6 +1,6 @@
 """Fault-injection proxy (RAL-05, spec/06). Test and sandbox only.
 
-It sits between Dekernai's rail adapters and an upstream (a JSON-RPC node or the bank simulator) and
+It sits between DekernAI's rail adapters and an upstream (a JSON-RPC node or the bank simulator) and
 passes everything through, unless a scenario says to inject a fault into the next matching calls.
 
 Scenarios (``POST /__faults``)::
@@ -11,7 +11,7 @@ Scenarios (``POST /__faults``)::
     {"match": "POST /payments", "fault": "duplicate_request", "count": 1}
 
 ``match`` is a JSON-RPC method, or ``"<HTTP method> <path prefix>"``. ``count`` -1 means until cleared.
-An optional ``attempt`` limits the scenario to requests carrying that ``X-Dekernai-Attempt`` header, and an
+An optional ``attempt`` limits the scenario to requests carrying that ``X-DekernAI-Attempt`` header, and an
 optional ``body_contains`` to requests whose body contains that text, ignoring case (the demo batch uses it
 to revert only the transfer of 75.42 USDC: ``"body_contains": "047ed160"``, S9).
 Every injected fault is logged with the attempt ID (``GET /__faults/log``).
@@ -109,7 +109,7 @@ def create_app(upstream: str | None = None, *, hold_seconds: float = 5.0, demo_m
         upstream=(upstream or os.environ.get("FAULTPROXY_UPSTREAM", "")).rstrip("/"),
         hold_seconds=hold_seconds,
     )
-    app = FastAPI(title="Dekernai fault-injection proxy (test only)")
+    app = FastAPI(title="DekernAI fault-injection proxy (test only)")
     app.state.faults = state
 
     @app.get("/healthz")

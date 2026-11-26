@@ -1,6 +1,6 @@
-# Dekernai MVP: development package for Claude Code
+# DekernAI MVP: development package for Claude Code
 
-**Confidential. Prepared 17 Nov 2026.** Dekernai is the brand name (B-01, 26 Nov 2026; it replaced the working name Detent). Category: agentic payment controls, in three layers: decision, orchestration and operations.
+**Confidential. Prepared 17 Nov 2026.** DekernAI is the brand name (B-01, 26 Nov 2026; it replaced the working name Detent). Category: agentic payment controls, in three layers: decision, orchestration and operations.
 
 This package turns the product model, operating model, MVP scope and developer portal spec into a build-ready repository start: standing instructions for Claude Code, specs, a fully decomposed backlog with acceptance criteria, fixtures and kickoff prompts.
 

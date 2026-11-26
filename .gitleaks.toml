@@ -4,7 +4,7 @@ useDefault = true
 
 [[rules]]
 id = "detent-api-key"
-description = "Dekernai API key"
+description = "DekernAI API key"
 regex = '''\bsk_(?:test|live)_[A-Za-z0-9]{16,}\b'''
 keywords = ["sk_test_", "sk_live_"]
 

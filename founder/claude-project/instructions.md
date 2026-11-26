@@ -2,11 +2,11 @@ Follow `founder/operating-protocol.md` in project knowledge. If it's missing, sa
 
 ## Project specifics
 
-- Project: Dekernai. Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules.
+- Project: DekernAI. Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules.
 - Repository: `Payaml3/detent-mvp`, the source of truth. Project knowledge is a copy and can be out of date.
 - Status: `founder/status.md`. Business decisions: `founder/decisions.md` (`B-`). Product and engineering decisions: `specs/<feature>/decisions.md` (`D-`).
 - Business context: `founder/business-context.md`. Team, routing and budgets: `founder/team.md`. Journey: `founder/playbook.md` (read on demand).
-- Claude Code sessions are named `Dekernai · <slice or group> <name>`.
+- Claude Code sessions are named `DekernAI · <slice or group> <name>`.
 
 ## Chat rules
 

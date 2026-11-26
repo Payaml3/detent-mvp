@@ -34,7 +34,7 @@ support. Every hire goes through the `hire` gate.
 | Rule changes | Versioned; two approvers; loosening needs the compliance lead | Built (S6) |
 | Agent evaluation | Attack and regression suite per release; weekly quality sample | Built (S8) |
 | Exceptions | Owner, deadline by tier, held past deadline, counterparty update, backup owner | Built (S3, S6) |
-| Kill switch | Client payments lead or Dekernai on-call engages; restart needs client approval | Built (S4) |
+| Kill switch | Client payments lead or DekernAI on-call engages; restart needs client approval | Built (S4) |
 | Incidents | Severity levels; Sev 1 for unauthorised execution, wrong credit or duplicate; replay to investigate | Partly |
 | Adapter maintenance | Daily contract tests against each rail | Partly |
 | Support | Support levels and quarterly business reviews | Open |
@@ -42,7 +42,7 @@ support. Every hire goes through the `hire` gate.
 
 ## B4. Partners
 
-- **Rails:** partners; the client holds the accounts. Dekernai connects, never holds.
+- **Rails:** partners; the client holds the accounts. DekernAI connects, never holds.
 - **Licensed execution partner:** later, for bank rails (v2).
 - **Risk data:** screening vendors on the client's contract; integrate, don't resell.
 - **Distribution:** back-office platforms used by brokers and prop firms (later).

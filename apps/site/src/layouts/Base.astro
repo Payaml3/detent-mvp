@@ -27,7 +27,7 @@ const palette = palettes[config.palette];
     <meta name="description" content={description} />
     {!config.indexable && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content={palette.bg} />
+    <meta name="theme-color" content={palette.text} />
     <style is:inline set:html={paletteCss(config.palette)} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -47,6 +47,7 @@ const palette = palettes[config.palette];
     <Footer />
     <script>
       import "../scripts/reveal.js";
+      import "../scripts/cards.js";
     </script>
   </body>
 </html>

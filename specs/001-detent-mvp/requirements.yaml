@@ -1,4 +1,4 @@
-# Functional requirements for the Dekernai MVP: the source of spec.md's FR list, inventory.md and
+# Functional requirements for the DekernAI MVP: the source of spec.md's FR list, inventory.md and
 # traceability.md. Edit here, then run: python tools/build_spec.py
 #
 # id:      FR-nnn, stable

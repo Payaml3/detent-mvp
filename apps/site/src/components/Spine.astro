@@ -1,0 +1,97 @@
+---
+import { PAYMENT_ID } from "../scripts/scenarios.mjs";
+import Mark from "./Mark.astro";
+// Landing UX §3.3: one payment's life through the three layers, the brand story's "sift, settle, prove".
+// Replaces "How it works" and "Three layers" on the home page; "Agents prepare. Your rules decide." is said here once.
+const layers = [
+  { word: "Sift", name: "Decision", question: "Should this payment happen?",
+    rules: "Your rules execute, escalate or block it. A block is final.",
+    agent: "Prepares the payment intent from the invoice or request.", status: "ESCALATED" },
+  { word: "Settle", name: "Orchestration", question: "How and where does it go?",
+    rules: "Best rail by your policy, sent exactly once. A timeout is UNKNOWN, never resent.",
+    agent: "Investigates an UNKNOWN result against the rail’s own record.", status: "SUBMITTED" },
+  { word: "Prove", name: "Operations", question: "Can you show what happened?",
+    rules: "Every outcome reconciled across rails and written to an append-only audit log.",
+    agent: "Drafts the reconciliation fix for a person to accept.", status: "CONFIRMED" },
+];
+---
+<section class="section spine" id="how-it-works" data-section="spine" aria-labelledby="spine-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <h2 id="spine-title">Sift. Settle. Prove.</h2>
+      <p class="statement"><Mark size={28} /> <span>Agents prepare. <strong>Your rules decide.</strong></span></p>
+    </div>
+    <p class="pid-row" data-reveal>One payment ID for life: <span class="pid">{PAYMENT_ID}</span></p>
+    <div class="stage-wrap">
+    <div class="stage" aria-hidden="true"><canvas data-spine-stage></canvas>{layers.map((l, i) => <span class="stage-label small" data-stage-label={i} hidden><b>{l.word}</b> {l.name.toLowerCase()}</span>)}<p class="small stage-cap">Scroll: one payment through the three layers</p></div>
+    <ol class="cols">
+      {layers.map((l, i) => (
+        <li class="col" data-card data-layer-status={l.status} style={`--d:${i * 90}ms`}>
+          <h3><span class="word">{l.word}.</span> {l.question}</h3>
+          <p class="layer">The {l.name.toLowerCase()} layer</p>
+          <dl>
+            <div><dt>Your rules</dt><dd>{l.rules}</dd></div>
+            <div><dt>Agents do the groundwork</dt><dd>{l.agent}</dd></div>
+          </dl>
+          <p class="state" data-ui><span class={`chip st-${l.status}`}>{l.status}</span></p>
+        </li>
+      ))}
+    </ol>
+    </div>
+  </div>
+</section>
+<style>
+  .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 20px; }
+  .head h2 { grid-column: 1 / span 6; }
+  .statement { grid-column: 7 / span 6; display: flex; gap: 14px; align-items: center; font: 500 clamp(22px, 2.1vw, 32px)/1.25 var(--font-head); letter-spacing: -0.01em; }
+  .statement strong { color: var(--interactive); font-weight: 600; }
+  .statement :global(.mark) { color: var(--text); flex: none; }
+  .pid-row { margin-bottom: 40px; }
+  .pid-row { color: var(--text-soft); }
+  .pid { color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; word-break: break-all; }
+  .stage-wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: start; }
+  .stage { grid-column: 1 / span 6; position: sticky; top: 96px; height: min(78vh, 680px); border-radius: 14px; overflow: hidden; background: var(--text); }
+  .stage canvas { width: 100%; height: 100%; display: block; }
+  .stage-label { position: absolute; left: 0; top: 0; padding: 4px 10px; border-radius: 999px; white-space: nowrap; pointer-events: none;
+    color: color-mix(in srgb, var(--bg) 60%, var(--text)); background: color-mix(in srgb, var(--bg) 6%, var(--text)); transition: color 300ms, background 300ms; }
+  .stage-label b { font-weight: 600; }
+  .stage-label.on { color: var(--on-signal); background: var(--signal); }
+  .stage-cap { position: absolute; left: 20px; bottom: 16px; color: color-mix(in srgb, var(--bg) 70%, var(--text)); }
+  .cols { grid-column: 7 / span 6; list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .col { min-height: 42vh; transition: box-shadow 300ms var(--ease-out); }
+  .col.on { box-shadow: inset 4px 0 0 var(--signal); }
+  .col { position: relative; padding: 32px; display: grid; gap: 18px; align-content: start; background: var(--surface); border-radius: var(--radius); }
+  .col:nth-child(2) { background: var(--bg-alt); }
+  .col:nth-child(3) { background: var(--surface-sunk); }
+  .layer { color: var(--text-soft); font-size: var(--t-small); margin-top: -8px; }
+  h3 { font-size: clamp(24px, 2.2vw, 32px); letter-spacing: -0.02em; }
+  dl { margin: 0; display: grid; gap: 14px; }
+  dt { font-size: var(--t-small); font-weight: 600; color: var(--text-soft); margin-bottom: 2px; }
+  dd { margin: 0; }
+  @media (max-width: 900px) {
+    .head h2, .statement { grid-column: 1 / -1; }
+    .stage { display: none; }
+    .cols { grid-column: 1 / -1; }
+    .col { min-height: 0; }
+    .col { padding: 24px; }
+  }
+</style>
+<script>
+  const canvas = document.querySelector("[data-spine-stage]");
+  const cols = [...document.querySelectorAll("[data-layer-status]")];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (canvas && getComputedStyle(canvas.parentElement).display !== "none") {
+    import("../scripts/layers3d.js").then(({ mountLayers }) => {
+      const stage = mountLayers(canvas);
+      const pick = (col) => {
+        cols.forEach((c) => c.classList.toggle("on", c === col));
+        stage?.setState(col.dataset.layerStatus, col.dataset.layerStatus === "CONFIRMED");
+      };
+      pick(cols[0]);
+      // the layer card nearest the middle of the screen lights its plate in the stage
+      const io = new IntersectionObserver((entries) => { for (const e of entries) if (e.isIntersecting) pick(e.target); }, { rootMargin: "-45% 0px -45% 0px" });
+      cols.forEach((c) => io.observe(c));
+      if (reduce) pick(cols[2]);
+    });
+  } else canvas?.parentElement?.remove();
+</script>

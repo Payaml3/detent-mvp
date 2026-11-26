@@ -1,7 +1,7 @@
 [project]
 name = "detent-eval"
 version = "0.0.1"
-description = "Dekernai evaluation runner: attack, fault, interpretation and agreement suites (EVL-01..08)"
+description = "DekernAI evaluation runner: attack, fault, interpretation and agreement suites (EVL-01..08)"
 requires-python = ">=3.12,<3.13"
 dependencies = ["detent", "banksim", "faultproxy", "httpx>=0.27", "pyyaml>=6.0", "jinja2>=3.1", "uvicorn>=0.32"]
 
