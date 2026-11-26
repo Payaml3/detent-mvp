@@ -27,13 +27,9 @@ const palette = palettes[config.palette];
     <meta name="description" content={description} />
     {!config.indexable && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
-<<<<<<< HEAD
-    <meta name="theme-color" content="#18191B" />
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
-=======
     <meta name="theme-color" content={palette.bg} />
     <style is:inline set:html={paletteCss(config.palette)} />
->>>>>>> origin/main
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
