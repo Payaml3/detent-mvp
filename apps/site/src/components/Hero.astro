@@ -27,6 +27,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     <span class="art-label small" data-art-label="rules" aria-hidden="true" hidden>Your rules decide</span>
     <span class="art-label art-bubble small" data-art-label="bubble" aria-hidden="true" hidden><span data-bubble-text></span><i aria-hidden="true"></i></span>
     <span class="art-label art-verdict small" data-art-label="verdict" data-verdict aria-hidden="true" hidden></span>
+    {["read", "check", "propose"].map((tool) => <span class="art-tool" data-art-tool data-tool={tool} aria-hidden="true" hidden>{tool}</span>)}
   </>}
   <div class="wrap hero-grid">
     <div class="intro">
@@ -87,6 +88,10 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   .art-verdict[data-kind="ESCALATE"] { background: var(--signal); color: var(--on-signal); }
   .art-verdict[data-kind="BLOCK"] { background: var(--paper); color: var(--ink); }
   .art-verdict[data-kind="BLOCK"] :global(b)::before { content: "✕ "; }
+  .art-tool { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; font: 500 11px/1 var(--font-mono); letter-spacing: 0.06em;
+    color: color-mix(in srgb, var(--paper) 70%, var(--ink)); padding: 3px 7px; border-radius: 4px; transition: background 200ms, color 200ms; }
+  .art-tool.on { color: var(--ink); background: var(--paper); }
+  .art-tool.on[data-tool="propose"] { background: var(--signal); color: var(--on-signal); }
   .art-label[data-art-label="rules"] { color: var(--signal); background: color-mix(in srgb, var(--signal) 12%, transparent); }
   .hero-grid { --text: var(--paper); --bg: var(--ink); --text-soft: color-mix(in srgb, var(--paper) 74%, var(--ink)); --line: color-mix(in srgb, var(--paper) 18%, var(--ink)); color: var(--text); }
   .cards .card { --text: var(--ink); --bg: var(--paper); --text-soft: var(--ink-soft); color: var(--text); }
@@ -127,7 +132,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   }
   @media (max-width: 680px) {
-    .art, .art-label { display: none; }
+    .art, .art-label, .art-tool { display: none; }
     .hero-grid { padding-top: 112px; }
     .intro, .cards { grid-column: 1 / -1; }
     .headline { font-size: clamp(28px, 7.8vw, 52px); }
