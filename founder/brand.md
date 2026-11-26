@@ -61,3 +61,5 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 - Fonts (D-18): Space Grotesk, Inter, JetBrains Mono.
 - Proposed: the detent-wheel motif (D-20) no longer fits the name; replacement idea "sift then settle"
   (many inputs filtering to one clear outcome). Decided in the design-system work.
+- Logo (B-03): **Route**, a D drawn as one unbroken stroke that curls in to one safety-orange point. In the
+  logo the mark is the D of DekernAI (rest of the name in JetBrains Mono Bold). Files and rules: `docs/brand/logo.md`; assets in `apps/site/public/brand/`.
