@@ -296,7 +296,7 @@ requirements:
 
 # ------------------------------------------------------------------ developer portal
 - {id: FR-100, area: API, layer: portal, status: confirmed, stories: [API-01, API-02, API-03, API-04],
-   src: ["spec/03#standards", "spec/03#error-codes-starter-catalogue"],
+   src: ["spec/03#standards", "spec/03#error-codes"],
    text: "The public API uses scoped, hashed test keys, a standard error envelope, dated versions pinned per organisation, and per-key rate limits with standard headers."}
 - {id: FR-101, area: API, layer: portal, status: confirmed, decision: [G-08, D-23], stories: [API-01],
    src: ["spec/03#standards"],

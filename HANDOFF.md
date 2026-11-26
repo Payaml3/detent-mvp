@@ -120,10 +120,13 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 - **S9 live run** (needs the founder items below): deploy `render.yaml`, set the secrets, `detent demo check`,
   then run spec/11 on Base Sepolia and Ethereum Sepolia and fix any mismatch in spec/11; then mark S9 done
   (FND-07 criterion 0 and the slice exit). · Model: mid-tier
-- **P1 group 1, now:** API-01 to API-04 and API-06 (keys and scopes, error model, dated versions, rate limits,
-  request logs); then group 2: WHK-01 to WHK-03, EXC-08, API-07 and API-05 (the OpenAPI file last, as it depends
-  on EXC-08). No P1 story depends on S9. See `specs/001-detent-mvp/slices.yaml` (P1). · Model: strongest (API and
-  webhooks touch money paths)
+- **P1 group 1: built (PR from `claude/project-thread-babje1`, 2026-11-26):** API-01 to API-04 and API-06. The
+  error-code catalogue is `detent/api/error_codes.py` (`make error-docs` writes `docs/api/errors.md`; the test session
+  fails on an uncatalogued code); `DekernAI-Version` with the organisation's pinned default; per-key and per-address
+  rate limits; `GET /v1/request_logs` with a 30-day worker sweep. See spec/03 "As built (P1 group 1)".
+- **P1 group 2, next:** WHK-01 to WHK-03, EXC-08, API-07 and API-05 (the OpenAPI file last, as it depends on EXC-08).
+  No P1 story depends on S9. See `specs/001-detent-mvp/slices.yaml` (P1). · Model: strongest (API and webhooks touch
+  money paths)
 - **Then:** P2, P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items

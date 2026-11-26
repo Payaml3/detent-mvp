@@ -442,7 +442,7 @@
    "exit": "An external client with a test key creates an intent, receives signed webhooks and sees its request logs; the OpenAPI file lints and matches the code.",
    "stories": 11,
    "criteria": 16,
-   "criteria_done": 2
+   "criteria_done": 6
   },
   {
    "id": "P2",

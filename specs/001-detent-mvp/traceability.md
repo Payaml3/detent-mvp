@@ -1152,7 +1152,7 @@ Sources: [spec/10 §runbooks-write-as-the-features-land](../../spec/10-security-
 
 The public API uses scoped, hashed test keys, a standard error envelope, dated versions pinned per organisation, and per-key rate limits with standard headers.
 
-Sources: [spec/03 §standards](../../spec/03-api.md#standards); [spec/03 §error-codes-starter-catalogue](../../spec/03-api.md#error-codes-starter-catalogue)
+Sources: [spec/03 §standards](../../spec/03-api.md#standards); [spec/03 §error-codes](../../spec/03-api.md#error-codes)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
