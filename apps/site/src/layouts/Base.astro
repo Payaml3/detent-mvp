@@ -1,6 +1,7 @@
 ---
 import "../styles/site.css";
 import config from "../../site.config.mjs";
+import { palettes, paletteCss } from "../styles/palettes.mjs";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
 
@@ -15,9 +16,10 @@ const jsonLd = schema ? [
   { "@context": "https://schema.org", "@type": "SoftwareApplication", name: `${config.brandName} payment controls`,
     applicationCategory: "BusinessApplication", operatingSystem: "Web", description },
 ] : [];
+const palette = palettes[config.palette];
 ---
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-GB" data-palette={config.palette} data-scheme={palette.scheme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,7 +27,8 @@ const jsonLd = schema ? [
     <meta name="description" content={description} />
     {!config.indexable && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#070C1A" />
+    <meta name="theme-color" content={palette.bg} />
+    <style is:inline set:html={paletteCss(config.palette)} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
