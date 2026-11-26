@@ -49,7 +49,7 @@ const roles = [
 </section>
 <style>
   .head { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; margin-bottom: 40px; }
-  h2 { max-width: 16ch; }
+  h2 { max-width: 22ch; }
   .tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface-sunk); border-radius: 8px; }
   .tabs[hidden] { display: none; }
   .tabs button { border: 0; border-radius: 6px; padding: 11px 18px; background: transparent; color: var(--text-soft); font: 600 15px var(--font-head); cursor: pointer; transition: background 160ms, color 160ms; }
@@ -57,6 +57,7 @@ const roles = [
   .tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 0 var(--line-strong); }
   .panel { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding: 40px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
   .panel + .panel { margin-top: 12px; }
+  .panel[hidden] { display: none; }
   .text { grid-column: 1 / span 5; display: grid; gap: 24px; align-content: start; }
   .panel:not(.panel-engineering) .text { grid-column: 1 / -1; }
   .panel:not(.panel-engineering) dl { grid-template-columns: repeat(3, 1fr); gap: 32px; }
