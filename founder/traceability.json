@@ -3,21 +3,21 @@
   {
    "order": 1,
    "level": "User stories",
-   "total": 146,
-   "done": 71,
-   "pct": 49
+   "total": 149,
+   "done": 70,
+   "pct": 47
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
-   "total": 308,
-   "done": 219,
-   "pct": 71
+   "total": 320,
+   "done": 218,
+   "pct": 68
   },
   {
    "order": 3,
    "level": "Criteria with test evidence",
-   "total": 308,
+   "total": 320,
    "done": 0,
    "pct": 0
   }
@@ -41,8 +41,8 @@
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
    "done": 168,
-   "total": 232,
-   "pct_done": 72
+   "total": 244,
+   "pct_done": 69
   },
   {
    "function": "05 QA",
@@ -54,9 +54,9 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 8,
+   "done": 7,
    "total": 23,
-   "pct_done": 35
+   "pct_done": 30
   }
  ],
  "initiatives": [
@@ -118,8 +118,8 @@
    "code": "DSH",
    "initiative": "Developer dashboard",
    "role": "engineer",
-   "stories": 10,
-   "criteria": 12,
+   "stories": 13,
+   "criteria": 24,
    "criteria_done": 0,
    "pct_done": 0
   },
@@ -237,8 +237,8 @@
    "role": "growth",
    "stories": 8,
    "criteria": 11,
-   "criteria_done": 8,
-   "pct_done": 73
+   "criteria_done": 7,
+   "pct_done": 64
   },
   {
    "code": "WHK",
@@ -1406,7 +1406,7 @@
    "epic": "DSH",
    "function": "04 Engineering",
    "slice": "P2",
-   "criteria": 2,
+   "criteria": 3,
    "criteria_done": 0,
    "criteria_tested": 0,
    "status": "To do"
@@ -1416,7 +1416,7 @@
    "epic": "DSH",
    "function": "04 Engineering",
    "slice": "P2",
-   "criteria": 2,
+   "criteria": 3,
    "criteria_done": 0,
    "criteria_tested": 0,
    "status": "To do"
@@ -1426,7 +1426,7 @@
    "epic": "DSH",
    "function": "04 Engineering",
    "slice": "P2",
-   "criteria": 1,
+   "criteria": 2,
    "criteria_done": 0,
    "criteria_tested": 0,
    "status": "To do"
@@ -1436,7 +1436,7 @@
    "epic": "DSH",
    "function": "04 Engineering",
    "slice": "P2",
-   "criteria": 1,
+   "criteria": 2,
    "criteria_done": 0,
    "criteria_tested": 0,
    "status": "To do"
@@ -1497,6 +1497,36 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-11",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 3,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-12",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "P2",
+   "criteria": 2,
+   "criteria_done": 0,
+   "criteria_tested": 0,
+   "status": "To do"
+  },
+  {
+   "story": "DSH-13",
+   "epic": "DSH",
+   "function": "04 Engineering",
+   "slice": "L",
+   "criteria": 3,
    "criteria_done": 0,
    "criteria_tested": 0,
    "status": "To do"
@@ -1647,9 +1677,9 @@
    "function": "06 GTM",
    "slice": "P4",
    "criteria": 2,
-   "criteria_done": 2,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "Done"
+   "status": "In progress"
   },
   {
    "story": "WEB-03",

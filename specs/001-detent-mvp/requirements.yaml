@@ -287,9 +287,9 @@ requirements:
 - {id: FR-097, area: Demo, layer: cross-cutting, status: confirmed, stories: [DEM-06],
    src: ["story:DEM-06"],
    text: "(Should) Scenario packs per platform type."}
-- {id: FR-098, area: Shadow, layer: decision, status: confirmed, stories: [SHD-01, SHD-02, SHD-03, SHD-04],
+- {id: FR-098, area: Shadow, layer: decision, status: confirmed, stories: [SHD-01, SHD-02, SHD-03, SHD-04, DSH-13],
    src: ["spec/00#product-principles", "story:SHD-01"],
-   text: "(Should) A CSV export can be decided in shadow mode, anonymised on import, and summarised in a shadow report; (Could) a mode-gate report and sign-off."}
+   text: "(Should) A CSV export can be decided in shadow mode, anonymised on import, and summarised in a shadow-phase report (onboarding, B-04); (Could) a mode-gate report and sign-off, and a production-mode request that starts in Shadow and issues no live keys in the prototype."}
 - {id: FR-099, area: Operations, layer: operations, status: confirmed, stories: [OPS-01, OPS-03, OPS-04],
    src: ["spec/10#runbooks-write-as-the-features-land"],
    text: "(Should/Could) Incident records, a restore drill under one hour, and a security pack draft."}
@@ -314,9 +314,9 @@ requirements:
    src: ["spec/03#webhooks", "spec/02#entities"],
    text: "Webhook signing secrets are shown once and stored encrypted (not hashed), because every delivery is signed with the plaintext secret."}
 - {id: FR-105, area: Dashboard, layer: portal, status: confirmed,
-   stories: [DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-08, DSH-09, DSH-10],
+   stories: [DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-08, DSH-09, DSH-10, DSH-11, DSH-12],
    src: ["spec/08#dashboard-dsh"],
-   text: "Sales-led access: the admin creates organisations (60-day expiry) and single-use invites (7 days); developers verify email and set a password; keys, logs, webhooks, sandbox controls, usage and the per-organisation console; an access-requests inbox."}
+   text: "KYB-gated access: after KYB the admin creates the client organisation and invites the account owner (single use, 7 days; evaluation organisations expire after 60 days); the owner verifies email, sets a password, invites the team and assigns roles; integration verification by DekernAI; keys, logs, webhooks, sandbox controls, usage and the per-organisation console with policy screens; an access-requests inbox."}
 - {id: FR-106, area: Sandbox, layer: portal, status: confirmed, stories: [SBX-01, SBX-02, SBX-03],
    src: ["spec/08#sandbox-sbx", "spec/06#sandbox-test-values-sbx-01"],
    text: "Sandbox test values trigger every path; quotas and abuse limits apply; expired organisations get 403 organisation_expired; (Should) opt-in real testnet mode from a capped faucet wallet."}

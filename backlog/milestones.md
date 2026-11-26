@@ -22,10 +22,10 @@ estimates for one developer working with Claude Code (Estimate); see `epics.md` 
 | S8 | **Proof and release gate** | EVL-01, EVL-02, EVL-03, EVL-04, EVL-06, EVL-07, EVL-08 | 4.25 | make eval passes: 100+ attacks with 0 unauthorised, 30+ faults with 0 duplicates, canonical invoice 10/10; the dated report is generated; CI blocks a deliberately injected regression. |
 | S9 | **Demo-ready prototype in the EU** | FND-07, CON-09, DEM-01, DEM-03, DEM-04, DEM-05 | 2.25 | The deployed EU instance runs spec/11 end to end on Base Sepolia and Ethereum Sepolia; mismatches are fixed in spec/11. |
 | P1 | **Public sandbox API and webhooks** | API-01, API-02, API-03, API-04, API-05, API-06, WHK-01, WHK-02, WHK-03, EXC-08 | 5 | An external client with a test key creates an intent, receives signed webhooks and sees its request logs; the OpenAPI file lints and matches the code. |
-| P2 | **Dashboard and sandbox** | DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-09, DSH-10, SBX-01, SBX-02, SBX-04, RAL-11 | 4.75 | Admin invites a developer, who verifies, gets keys, triggers every test value and sees results in their own console; an expired organisation is locked. |
+| P2 | **Dashboard and sandbox** | DSH-01, DSH-02, DSH-03, DSH-04, DSH-05, DSH-06, DSH-07, DSH-09, DSH-10, DSH-11, DSH-12, SBX-01, SBX-02, SBX-04, RAL-11 | 5.75 | Admin invites an account owner after KYB, who signs up and invites a developer with a role; the developer gets keys, triggers every test value and sees results in their own console; DekernAI verifies the integration; an expired evaluation organisation is locked. |
 | P3 | **Docs and SDKs** | DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, SDK-01, SDK-02 | 6 | The docs site is live; the quickstart works in 5 minutes; all 8-language snippets pass in CI; both SDKs pass against the sandbox. |
 | P4 | **Website launch** | WEB-01, WEB-02, WEB-03, WEB-04, WEB-05, WEB-06 | 3.25 | The site is live with dated results, booking and the access form; the honesty checklist is signed off by the founder. |
-| L | **After launch (Should and Could)** | - | 0 | The first free shadow report is produced from a CSV export. |
+| L | **After launch (Should and Could)** | - | 0 | A shadow-phase report is produced from a CSV export and the mode-gate sign-off is recorded. |
 
 ## Parallel work
 
@@ -46,7 +46,7 @@ The founder chose the full scope on 2026-11-23 ("we want to complete the build e
 5. **P4** Website launch. WEB-07 depends on FND-07, so P4 closes after the S9 deploy.
 6. **L** After launch (Should and Could).
 
-Remaining after S8, from `epics.md`: about 2.25 days (S9), 5.25 (P1), 5.75 (P2), 6.5 (P3), 3.75 (P4) and 7 (L) of
+Remaining after S8, from `epics.md`: about 2.25 days (S9), 5.25 (P1), 6.75 (P2), 6.5 (P3), 3.75 (P4) and 7.25 (L) of
 Must and Should work, about 30 days for one developer with Claude Code. The P1 and P2 rules (C-12, C-14, C-16,
 G-10, G-17 to G-20, G-23, G-25) were approved as proposed on 2026-11-24 (D-38).
 

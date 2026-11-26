@@ -18,7 +18,7 @@ approves stage 3, the goal tree (`founder/goals.json`) is due under the plugin's
 | Channels | Founder-led sales; demo, then the onboarding process (`client-journey.md`, B-04); website and sandbox for evaluation; later back-office platform partners | Proposed |
 | Revenue | Software fee per payment decided, never a share of money moved; plans Pilot, Growth, Scale; routing add-on | Proposed (A4; D-15 for plan names) |
 | Cost structure | AI model usage, EU hosting, security assurance (pen test, then SOC 2), legal (perimeter opinion, contracts), founder time | Assumption |
-| Key metrics | Payments decided per week under DekernAI (North Star); shadow-to-pilot 40%; pilot-to-paid 60%; under 10 days from pilot signed to shadow live | Proposed (B7) |
+| Key metrics | Payments decided per week under DekernAI (North Star); demo-to-contract (target Open); pilot-to-paid 60%; under 10 days from KYB approved to sandbox keys; under 10 days from integration verified to shadow live | Proposed (B7) |
 | Unfair advantage | Founder's domain experience in payment operations (personal experience only, never as DekernAI traction); safety invariants proven by a release gate | Assumption |
 
 ## Positioning
@@ -66,7 +66,7 @@ meeting, then run `/founder:pricing-strategy` with that evidence.
 1. Problem interviews (8), no pitching.
 2. Demo (spec/11) and fit check; NDA.
 3. Due diligence and contract; Pilot signed (B-04; `client-journey.md` phase 2).
-4. Onboarding: sandbox, policy setup, shadow on live traffic in under 10 days (B7); weekly agreement report; client signs each mode move.
+4. Onboarding: KYB approved, owner signs up and invites the team, sandbox integration verified, policy signed off, production in Shadow (B7 timing); weekly agreement report; client signs each mode move.
 5. Go-live, then the paid plan and scale.
 
 ## Regulatory model

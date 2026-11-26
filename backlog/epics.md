@@ -16,11 +16,11 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | CON Back-office console | All three (console) | prototype | The screens where the 10-minute demo happens | 10 | 9 | 1 | 0 | 4.75 |
 | EVL Evaluation harness | All three (proof) | prototype | Measured proof: attacks, faults, interpretation and agreement, gated in CI and published as a results report | 8 | 7 | 1 | 0 | 4.75 |
 | DEM Demo data and scenarios | All three (demo) | prototype | Fictional, repeatable demo data and a one-click scenario runner | 6 | 5 | 1 | 0 | 1.75 |
-| SHD Shadow mode | Decision (shadow mode) | prototype | Run decisions on a prospect's exported data and produce the free shadow report | 4 | 0 | 3 | 1 | 2.25 |
+| SHD Shadow mode | Decision (shadow mode) | prototype | Decide a client's payments without sending any (the shadow phase of onboarding, or an exported month to calibrate rule set v1) and report agreement | 4 | 0 | 3 | 1 | 2.25 |
 | OPS Operational controls | Operations | prototype | The operating-model processes that need software: incidents, independence check, recovery | 4 | 1 | 1 | 2 | 1.25 |
 | API Public sandbox API | All three (public API) | portal | A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI | 7 | 6 | 1 | 0 | 3.75 |
 | WHK Webhooks | All three (public API) | portal | Signed, retried, logged event delivery | 3 | 3 | 0 | 0 | 1.25 |
-| DSH Developer dashboard | All three (developer access) | portal | Sales-led access, keys, logs, webhooks, sandbox controls, usage and the console per organisation | 10 | 9 | 1 | 0 | 3.5 |
+| DSH Developer dashboard | All three (developer access) | portal | KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox controls, integration verification, usage and the console per organisation | 13 | 11 | 1 | 1 | 4.75 |
 | SBX Sandbox | All three (developer access) | portal | Developers trigger every path with test values, inside quotas | 4 | 3 | 1 | 0 | 1.5 |
 | DOC Docs portal | All three (developer access) | portal | Concepts, guides and reference with tested samples in 8 languages | 6 | 5 | 1 | 0 | 4.25 |
 | SDK SDKs | All three (developer access) | portal | Typed Python and TypeScript clients with automatic idempotency and webhook helpers | 3 | 2 | 1 | 0 | 2.25 |
@@ -30,10 +30,10 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 
 | | Stories | Days |
 |---|---|---|
-| All stories | 146 | 71.75 |
-| Must only | 119 | 61.5 |
+| All stories | 149 | 73 |
+| Must only | 121 | 62.5 |
 | Must, prototype track | 85 | 43.25 |
-| Must, portal track | 34 | 18.25 |
+| Must, portal track | 36 | 19.25 |
 
 ## By milestone
 
@@ -50,7 +50,7 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | S8 Proof and release gate (done) | 8 | 4.25 | 4.75 |
 | S9 Demo-ready prototype in the EU | 6 | 2.25 | 2.25 |
 | P1 Public sandbox API and webhooks | 11 | 5 | 5.25 |
-| P2 Dashboard and sandbox | 16 | 4.75 | 5.75 |
+| P2 Dashboard and sandbox | 18 | 5.75 | 6.75 |
 | P3 Docs and SDKs | 9 | 6 | 6.5 |
 | P4 Website launch | 8 | 3.25 | 3.75 |
-| L After launch (Should and Could) | 16 | 0 | 7 |
+| L After launch (Should and Could) | 17 | 0 | 7.25 |

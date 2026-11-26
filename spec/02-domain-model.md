@@ -108,7 +108,7 @@ As built (S8, migration 0008): the `attempt_ready_guard` trigger refuses an atte
 | Table | Key fields | Notes |
 |---|---|---|
 | `organisations` | id, name, mode (shadow, assist, auto), fail_safe (hold, manual_queue), expires_at, api_version | Demo org plus sandbox orgs |
-| `users` | id, org_id, email, role (payments_lead, compliance_lead, reviewer, backup_owner, oncall, admin), password_hash | Console demo users are seeded |
+| `users` | id, org_id, email, role (account_owner, admin, developer, payments_lead, compliance_lead, reviewer, backup_owner, auditor (C-14), oncall (DekernAI only)), password_hash | Console demo users are seeded |
 | `api_keys` | id, org_id, prefix, hash, scopes[], last_used_at, revoked_at, expires_at | Shown once |
 | `counterparties` | id, org_id, name, kyb_status (verified, pending, failed), allowlisted, jurisdiction, payment_count, median_amount_minor, contact_email | Stats are refreshed on confirmation. `contact_email` is fictional and only ever used in the outbox (G-02) |
 | `destinations` | id, counterparty_id, kind (evm_wallet, bank_account), network, address or iban_masked, first_seen_at, last_changed_at | Editing sets last_changed_at |
