@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 92,
-   "pct": 62
+   "done": 94,
+   "pct": 63
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 253,
-   "pct": 79
+   "done": 256,
+   "pct": 80
   },
   {
    "order": 3,
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 203,
+   "done": 206,
    "total": 244,
-   "pct_done": 83
+   "pct_done": 84
   },
   {
    "function": "05 QA",
@@ -120,8 +120,8 @@
    "role": "engineer",
    "stories": 13,
    "criteria": 24,
-   "criteria_done": 16,
-   "pct_done": 67
+   "criteria_done": 19,
+   "pct_done": 79
   },
   {
    "code": "EVL",
@@ -1497,9 +1497,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DSH-11",
@@ -1517,9 +1517,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DSH-13",

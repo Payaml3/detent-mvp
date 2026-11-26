@@ -147,8 +147,11 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 - **P2 group 3b: built (PR from `claude/project-thread-babje1`, 2026-11-26):** SBX-04 and DSH-07. The reset is a new
   data generation (migration 0014, `detent/sandbox/generations.py`, `dashboard/sandbox.reset_sandbox`); API and
   dashboard reads filter on it. See spec/08 "As built (P2 group 3b)".
-- **P2 next:** group 4 (DSH-09 console per organisation, DSH-10 access requests, DSH-12 verification). DSH-09 must
-  add the generation filter to the console's own list queries. · Model: mid-tier for the screens
+- **P2 group 4a: built (PR from `claude/project-thread-babje1`, 2026-11-26):** DSH-10 (`dashboard/leads.py`,
+  `dashboard/public.py`, `POST /access-requests`) and DSH-12 (`dashboard/verification.py`), migration 0015. See
+  spec/08 "As built (P2 group 4a)". WEB-06 points the site's form at `<dashboard>/access-requests` once deployed.
+- **P2 next:** group 4b, DSH-09 console per organisation. It must add the generation filter to the console's own
+  list queries. · Model: mid-tier for the screens
 - **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items

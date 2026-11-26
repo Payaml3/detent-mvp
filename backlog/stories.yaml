@@ -1944,6 +1944,7 @@ stories:
   so: I can follow up and approve companies
   ac:
     - "Form fields: name, work email, company, role, use case; stored; admin list with status; email to the sales inbox"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [DSH-01]
@@ -1975,6 +1976,7 @@ stories:
   ac:
     - "Checklist filled from sandbox evidence: every test value triggered (spec/06), a signed webhook received and acknowledged, idempotent retry used, an UNKNOWN resolved without a resend"
     - "The owner requests verification when every item passes; a DekernAI admin verifies or returns it with a note; both are audited"
+  done: [0, 1]
   pri: Must
   est: 0.5
   deps: [DSH-07, DSH-11]
