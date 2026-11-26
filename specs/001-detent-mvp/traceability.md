@@ -777,8 +777,8 @@ Sources: [spec/06 §rails-in-the-mvp](../../spec/06-rails-and-faults.md#rails-in
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-11](../../backlog/user-stories.md#ral-11) | P2 | 0 | Implements the adapter contract with instant settlement and the same test values | planned | contract: `apps/api/tests/integration/test_ral_11.py` |
-| [RAL-11](../../backlog/user-stories.md#ral-11) | P2 | 1 | Sandbox organisations use it by default; real testnet is opt-in (SBX-03) | planned | contract: `apps/api/tests/integration/test_ral_11.py` |
+| [RAL-11](../../backlog/user-stories.md#ral-11) | P2 | 0 | Implements the adapter contract with instant settlement and the same test values | done | `integration/test_sandbox_rails.py::test_a_new_sandbox_organisation_pays_on_the_simulated_chain`<br>`integration/test_sandbox_rails.py::test_the_simulated_chain_is_append_only_and_deduplicates_a_rebroadcast`<br>`integration/test_sandbox_rails.py::test_point_13_times_out_to_unknown_then_confirms_without_a_resend`<br>`integration/test_sandbox_rails.py::test_point_42_reverts_on_the_first_rail_and_fails_over_under_the_same_id` |
+| [RAL-11](../../backlog/user-stories.md#ral-11) | P2 | 1 | Sandbox organisations use it by default; real testnet is opt-in (SBX-03) | done | `integration/test_sandbox_rails.py::test_a_new_sandbox_organisation_pays_on_the_simulated_chain`<br>`integration/test_sandbox_rails.py::test_moving_to_real_test_networks_needs_configuration_and_no_payout_in_flight` |
 
 ## FR-070 · Exceptions (confirmed)
 
@@ -1261,10 +1261,10 @@ Sources: [spec/08 §sandbox-sbx](../../spec/08-developer-portal.md#sandbox-sbx);
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [SBX-01](../../backlog/user-stories.md#sbx-01) | P2 | 0 | Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK | planned | fault: `apps/api/tests/integration/test_sbx_01.py` |
+| [SBX-01](../../backlog/user-stories.md#sbx-01) | P2 | 0 | Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK | done | `integration/test_sandbox_rails.py::test_point_13_times_out_to_unknown_then_confirms_without_a_resend`<br>`integration/test_sandbox_rails.py::test_point_42_reverts_on_the_first_rail_and_fails_over_under_the_same_id`<br>`integration/test_sandbox_rails.py::test_point_42_without_a_network_switch_ends_failed`<br>`integration/test_sandbox_rails.py::test_flagged_address_blocks_and_a_payee_off_the_allowlist_escalates`<br>`integration/test_sandbox_rails.py::test_test_values_are_exact_cents`<br>`integration/test_mandates.py::test_out_of_scope_blocks_with_the_specific_reason` |
 | [SBX-01](../../backlog/user-stories.md#sbx-01) | P2 | 1 | Documented in the docs and covered by tests | planned | integration: `apps/api/tests/integration/test_sbx_01.py` |
-| [SBX-02](../../backlog/user-stories.md#sbx-02) | P2 | 0 | Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap | planned | integration: `apps/api/tests/integration/test_sbx_02.py` |
-| [SBX-03](../../backlog/user-stories.md#sbx-03) | P2 | 0 | Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned | planned | integration: `apps/api/tests/integration/test_sbx_03.py` |
+| [SBX-02](../../backlog/user-stories.md#sbx-02) | P2 | 0 | Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap | done | `integration/test_dashboard_developer.py::test_over_the_daily_payment_quota_is_429_quota_exceeded_and_nothing_is_created`<br>`integration/test_dashboard_developer.py::test_the_quota_holds_under_concurrent_requests`<br>`integration/test_sandbox_rails.py::test_the_shared_faucet_wallet_has_daily_caps_for_everyone_and_each_org` |
+| [SBX-03](../../backlog/user-stories.md#sbx-03) | P2 | 0 | Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned | done | `integration/test_sandbox_rails.py::test_moving_to_real_test_networks_needs_configuration_and_no_payout_in_flight`<br>`integration/test_sandbox_rails.py::test_the_shared_faucet_wallet_has_daily_caps_for_everyone_and_each_org`<br>`integration/test_sandbox_rails.py::test_the_sandbox_page_forces_scenarios_and_shows_the_rails` |
 
 ## FR-107 · Sandbox (confirmed)
 

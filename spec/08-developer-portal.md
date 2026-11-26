@@ -166,8 +166,35 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   nothing is created. Over the investigation quota the case still opens and the agent records `QUOTA_EXCEEDED`, so a
   person works from the raw facts. API calls have no daily quota; the per-key rate limit applies.
 - **Usage (DSH-08):** `/dashboard/usage`, for every member: today against the quotas, and the month so far.
-- **Not yet:** the shared testnet wallet's daily outflow cap arrives with real testnet mode (SBX-03, P2 group 3),
-  so SBX-02 stays open until then.
+- **Not yet:** the shared testnet wallet's daily outflow cap arrives with real testnet mode (SBX-03, P2 group 3).
+
+## As built (P2 group 3a)
+
+- **Simulated chain (RAL-11):** a client or evaluation organisation starts with `sandbox_rails = simulated`. Its
+  `base-sepolia` and `eth-sepolia` rails keep their IDs (so routing, failover and the API are unchanged) but run on
+  an in-database simulated chain (`detent/rails/simchain.py`, table `simchain_transfers`, append-only). It follows
+  the EVM contract: a nonce and a stored "signed" transaction (a deterministic hash) before broadcast, the same
+  bytes broadcast twice are one transaction, and an UNKNOWN attempt is resolved only from what the chain recorded.
+  Payouts settle at once and use no faucet wallet. Simulated attempts show `simulated: true` and no explorer link.
+  The deposit watcher records simulated payouts as rail records, so reconciliation matches them. The simulated
+  chain has no deposits; inbound transfers need a real test network. Demo and test organisations keep `testnet`.
+- **Test values (SBX-01):** on the simulated chain, an amount of exactly `.13` (10.13, not 10.1301) times out after
+  forwarding: UNKNOWN, then CONFIRMED a few seconds later, never resent; exactly `.42` reverts on a payment's first
+  attempt (TECHNICAL_FINAL), then fails over to the other network under the same payment ID if the intent allows a
+  network switch, else the payment fails. Flagged address, allowlist and mandate values come from the policy, as on
+  every rail. The docs page arrives with P3 (SBX-01 criterion 1 stays open).
+- **Real test networks (SBX-03):** the sandbox page moves an organisation to `testnet` when this instance has an RPC
+  URL, a faucet wallet and a token for at least one network, and never while a payout on those networks is in
+  flight. Payouts then come from the shared faucet wallet and carry explorer links. Daily caps on that wallet
+  (SBX-02): `FAUCET_DAILY_CAP` (500 USDC) for all organisations together per network and `FAUCET_ORG_DAILY_CAP`
+  (50 USDC) for each, checked inside the send lock under one advisory lock; a payout over a cap is held
+  (`SHARED_WALLET_DAILY_CAP`). Known limit: after a move to `testnet`, earlier simulated payouts have no real-chain
+  record, so a later reconciliation run can list them as missing on the rail.
+- **Sandbox controls (DSH-07):** `/dashboard/sandbox`, for account owners, admins and developers: run a scenario
+  (timeout to UNKNOWN, rail failure with failover, flagged address), each one sandbox payout to a fictional payee
+  through the same decision path as the API; switch rails; recent payouts with their attempts and explorer links.
+  Audited (`sandbox.scenario_run`, `sandbox.rails_mode_changed`). Reset (SBX-04) is P2 group 3b, so DSH-07 stays
+  open.
 
 ## Needed from the founder before M8 to M11
 

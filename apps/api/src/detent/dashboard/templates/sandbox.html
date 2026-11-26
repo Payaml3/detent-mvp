@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Sandbox{% endblock %}
+{% block main %}
+<h1>Sandbox controls</h1>
+<p class="muted">Run a test scenario on demand, or move between the simulated chain and real test networks. Every action is recorded in the audit log. The test values work from the API too: see the docs.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% set n = {"scenario": "Scenario started. Its payout is at the top of the list below; refresh to follow it.", "rails": "Rails changed."}.get(request.query_params.get('notice')) %}
+{% if n %}<p class="note" role="status">{{ n }}</p>{% endif %}
+{% if mode == 'shadow' %}<p class="note" role="status">The organisation is in shadow mode, so payouts are decided but never sent. Switch to assist or auto mode in the console to see scenarios reach the rail.</p>{% endif %}
+
+<section class="card">
+  <h2>Force a scenario</h2>
+  <p class="muted small">Each button creates one sandbox payout to a fictional payee, through the same rules as the API.</p>
+  {% for key, s in scenarios.items() %}
+  <form method="post" action="/dashboard/sandbox/scenarios">
+    <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="scenario" value="{{ key }}">
+    <p><strong>{{ s.label }}</strong> <span class="mono small">{{ s.request.amount.amount }} USDC</span><br><span class="small muted">{{ s.expect }}</span></p>
+    <button{% if lock %} disabled{% endif %}>Run: {{ s.label }}</button>
+  </form>
+  {% endfor %}
+</section>
+
+<section class="card">
+  <h2>Rails</h2>
+  {% if rails == 'simulated' %}
+  <p>USDC payouts run on the <strong>simulated chain</strong>: they settle in about a second, and no faucet wallet is used. Simulated transactions have no explorer page.</p>
+  {% else %}
+  <p>USDC payouts go to <strong>real test networks</strong> (Base Sepolia, Ethereum Sepolia) from a shared faucet wallet. Each payout gets an explorer link. The faucet allows {{ faucet[1] }} USDC a day for your organisation and {{ faucet[0] }} USDC a day for everyone; a payout over either cap is held.</p>
+  {% endif %}
+  {% if not lock %}
+  <form method="post" action="/dashboard/sandbox/rails">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    {% if rails == 'simulated' %}
+      <input type="hidden" name="mode" value="testnet">
+      <button{% if not testnets %} disabled{% endif %}>Use real test networks</button>
+      {% if not testnets %}<span class="small muted">Not configured on this instance.</span>{% endif %}
+    {% else %}
+      <input type="hidden" name="mode" value="simulated"><button>Use the simulated chain</button>
+    {% endif %}
+  </form>
+  {% endif %}
+  <p class="muted small">Reset of test data arrives in a later part of the sandbox build.</p>
+</section>
+
+<h2>Recent payouts</h2>
+<table>
+  <thead><tr><th>Payment</th><th>Amount</th><th>Status</th><th>Attempts</th><th>Created (UTC)</th></tr></thead>
+  <tbody>
+  {% for row in payouts %}{% set p = row.p %}
+  <tr{% if request.query_params.get('payment') == p.id %} aria-current="true"{% endif %}><td class="mono">{{ p.id }}<div class="small muted">{{ p.reference or "" }}</div></td>
+    <td class="mono">{{ p.amount_minor }} <span class="small">{{ p.currency }} minor units</span></td>
+    <td><span class="st st-{{ p.status | lower }}">{{ p.status }}</span></td>
+    <td class="small">{% for a in row.attempts %}<div>#{{ a.attempt_no }} {{ a.rail_id }}: {{ a.status }}
+      {% if a.explorer_url %}· <a href="{{ a.explorer_url }}" rel="noopener noreferrer" target="_blank">explorer</a>{% elif a.simulated %}· simulated{% endif %}</div>{% else %}None{% endfor %}</td>
+    <td class="small">{{ p.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td></tr>
+  {% else %}
+  <tr><td colspan="5" class="muted">No payouts yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

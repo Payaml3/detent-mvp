@@ -619,7 +619,7 @@ def rails_screen(
 
     day = rt.clock.now().date().isoformat()
     try:
-        adapters = build_adapters(rt.settings, rt.engine, user.org_id)
+        adapters = build_adapters(rt.settings, rt.engine, user.org_id, clock=rt.clock)
     except Exception:  # an unreachable RPC must not take the screen down
         adapters = {}
     with rt.engine.connect() as conn:

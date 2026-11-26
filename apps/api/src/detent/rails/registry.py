@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from typing import Any
 
 import yaml
 from sqlalchemy import Connection, Engine, text
 
+from detent.clock import Clock
 from detent.domain.money import Money
 from detent.rails.base import RailAdapter
 from detent.settings import REPO_ROOT, Settings
@@ -16,6 +18,15 @@ EXPLORERS = {
     "base-sepolia": "https://sepolia.basescan.org/tx/{tx}",
     "eth-sepolia": "https://sepolia.etherscan.io/tx/{tx}",
 }
+
+
+@dataclass(frozen=True, slots=True)
+class SharedWalletCap:
+    """SBX-02: daily outflow caps on a shared faucet wallet, in minor units: for all organisations
+    together, and for each one."""
+
+    daily_minor: int
+    org_daily_minor: int
 
 
 def install_rail(
@@ -85,14 +96,20 @@ def local_chain_config() -> dict[str, Any] | None:
     return dict(json.loads(path.read_text())) if path.exists() else None
 
 
-def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str, RailAdapter]:
-    """Adapters for the organisation's enabled EVM rails that have a signer in settings.
+def build_adapters(
+    settings: Settings, engine: Engine, org_id: str, *, clock: Clock
+) -> dict[str, RailAdapter]:
+    """Adapters for the organisation's enabled rails.
 
-    A rail without a configured signer or RPC URL simply has no adapter: payments routed to it are
-    held, never sent another way.
+    RAL-11, SBX-03: an organisation in `simulated` sandbox mode (the default for client and evaluation
+    organisations) gets the simulated chain for base-sepolia and eth-sepolia. In `testnet` mode an EVM rail
+    needs a signer and an RPC URL in settings; a client or evaluation organisation then sends from the shared
+    faucet wallet, under its daily caps (SBX-02). A rail without an adapter simply has none: payments routed
+    to it are held, never sent another way.
     """
     from detent.rails.evm import EvmAdapter
     from detent.rails.signer import LocalKeySigner
+    from detent.rails.simchain import SIMULATED_NETWORKS, SimChainAdapter
 
     keys = {
         "base-sepolia": (settings.base_sepolia_rpc_url, settings.test_wallet_private_key_base),
@@ -100,6 +117,12 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
         "local-evm": (settings.local_evm_rpc_url, settings.test_wallet_private_key_local),
     }
     out: dict[str, RailAdapter] = {}
+    with engine.connect() as conn:
+        org = conn.execute(
+            text("SELECT kind, sandbox_rails FROM organisations WHERE org_id=:o"), {"o": org_id}
+        ).one_or_none()
+    simulated = org is not None and org.sandbox_rails == "simulated"
+    shared_wallet = org is not None and org.kind in ("client", "evaluation")
     with engine.connect() as conn:
         rows = conn.execute(
             text(
@@ -133,6 +156,9 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
             timeout_seconds=settings.rail_timeout_seconds,
         )
     for r in rows:
+        if simulated and r.id in SIMULATED_NETWORKS:
+            out[r.id] = SimChainAdapter(rail_id=r.id, org_id=org_id, engine=engine, clock=clock)
+            continue
         url, key = keys.get(r.id, (None, None))
         if not url or key is None or not r.token_address:
             continue
@@ -146,6 +172,11 @@ def build_adapters(settings: Settings, engine: Engine, org_id: str) -> dict[str,
             explorer_tx_url=r.explorer_tx_url,
             timeout_seconds=settings.rail_timeout_seconds,
         )
+        if shared_wallet:  # SBX-02, SBX-03: the faucet wallet is shared, so its outflow is capped
+            out[r.id].shared_wallet = SharedWalletCap(  # type: ignore[attr-defined]
+                Money.parse(settings.faucet_daily_cap, "USDC").amount_minor,
+                Money.parse(settings.faucet_org_daily_cap, "USDC").amount_minor,
+            )
     return out
 
 

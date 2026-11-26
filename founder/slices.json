@@ -562,7 +562,7 @@
    "epic": "RAL",
    "slice": "P2",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "EXC-01",
@@ -1094,21 +1094,21 @@
    "epic": "SBX",
    "slice": "P2",
    "criteria": 2,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SBX-02",
    "epic": "SBX",
    "slice": "P2",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SBX-03",
    "epic": "SBX",
    "slice": "P2",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SBX-04",

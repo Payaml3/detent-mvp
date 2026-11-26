@@ -16,6 +16,7 @@ from sqlalchemy import text
 
 from detent.audit.log import append
 from detent.dashboard import keys as key_service
+from detent.dashboard import sandbox
 from detent.dashboard.access import AccessError, Member
 from detent.dashboard.web import check_csrf, client_member, page, redirect, runtime, writable_member
 from detent.db.engine import transaction
@@ -455,3 +456,77 @@ def usage_page(
         month=now.strftime("%B %Y"),
         per_minute=rt.settings.api_rate_limit_per_minute,
     )
+
+
+# ------------------------------------------------------------------------------------------ sandbox (DSH-07)
+def _sandbox(
+    request: Request, rt: Runtime, member: Member, *, error: str | None = None, status: int = 200
+) -> HTMLResponse:
+    if not allowed("sandbox.control", member.role):
+        return page(
+            request,
+            rt,
+            "forbidden.html",
+            member,
+            message="Your role can't use the sandbox controls.",
+            status_code=403,
+        )
+    with rt.engine.connect() as conn:
+        org = conn.execute(
+            text("SELECT mode, sandbox_rails FROM organisations WHERE org_id=:o"), {"o": member.org_id}
+        ).one()
+        payouts = sandbox.recent_payouts(conn, member.org_id)
+    return page(
+        request,
+        rt,
+        "sandbox.html",
+        member,
+        scenarios=sandbox.SCENARIOS,
+        mode=org.mode,
+        rails=org.sandbox_rails,
+        testnets=sandbox.testnet_available(rt.settings),
+        payouts=payouts,
+        faucet=(rt.settings.faucet_daily_cap, rt.settings.faucet_org_daily_cap),
+        error=error,
+        status_code=status,
+    )
+
+
+@router.get("/sandbox", response_class=HTMLResponse)
+def sandbox_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    member: Member = Depends(client_member),  # noqa: B008
+) -> HTMLResponse:
+    return _sandbox(request, rt, member)
+
+
+@router.post("/sandbox/scenarios", response_model=None)
+def sandbox_scenario(
+    request: Request,
+    scenario: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    member: Member = Depends(writable_member),  # noqa: B008
+) -> Response:
+    try:
+        out = sandbox.run_scenario(
+            rt.engine, rt.clock, rt.settings, request.app.state.screening, by=member, scenario=scenario
+        )
+    except AccessError as exc:
+        return _sandbox(request, rt, member, error=str(exc), status=exc.status)
+    return redirect(f"/dashboard/sandbox?notice=scenario&payment={out['id']}")
+
+
+@router.post("/sandbox/rails", response_model=None)
+def sandbox_rails(
+    request: Request,
+    mode: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    member: Member = Depends(writable_member),  # noqa: B008
+) -> Response:
+    try:
+        with transaction(rt.engine) as conn:
+            sandbox.set_rails_mode(conn, rt.clock, rt.settings, by=member, mode=mode)
+    except AccessError as exc:
+        return _sandbox(request, rt, member, error=str(exc), status=exc.status)
+    return redirect("/dashboard/sandbox?notice=rails")

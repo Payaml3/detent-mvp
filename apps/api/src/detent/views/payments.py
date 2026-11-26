@@ -91,7 +91,7 @@ def payment_view(
         attempts = conn.execute(
             text(
                 "SELECT id, attempt_no, rail_id, status, failure_class, nonce, tx_hash, submitted_at, "
-                "resolved_at "
+                "resolved_at, explorer_url, left(raw_tx, 4) = 'sim:' AS simulated "
                 "FROM attempts WHERE org_id=:o AND payment_id=:p ORDER BY attempt_no"
             ),
             {"o": org_id, "p": payment_id},
@@ -117,6 +117,8 @@ def payment_view(
                     "failure_class": a.failure_class,
                     "nonce": a.nonce,
                     "tx_hash": a.tx_hash,
+                    "explorer_url": a.explorer_url,  # SBX-03: real test networks only
+                    "simulated": bool(a.simulated),  # RAL-11: on the sandbox's simulated chain
                     "submitted_at": _iso(a.submitted_at) if a.submitted_at else None,
                     "resolved_at": _iso(a.resolved_at) if a.resolved_at else None,
                 }

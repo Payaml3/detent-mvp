@@ -662,8 +662,8 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Implements the adapter contract with instant settlement and the same test values
-- [ ] Sandbox organisations use it by default; real testnet is opt-in (SBX-03)
+- [x] Implements the adapter contract with instant settlement and the same test values
+- [x] Sandbox organisations use it by default; real testnet is opt-in (SBX-03)
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** RAL-01 · **Traces to:** D.sandbox
 
@@ -1526,7 +1526,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 
 **Acceptance criteria**
 
-- [ ] Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK
+- [x] Amount ending .13 -> timeout, UNKNOWN, then CONFIRMED; .42 -> technical failure then failover under the same ID; payee 0x...dEaD -> BLOCK; payee not allowlisted -> ESCALATE; amount above mandate -> BLOCK
 - [ ] Documented in the docs and covered by tests
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** RAL-11, RAL-05 · **Traces to:** D.sandbox
@@ -1537,7 +1537,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 
 **Acceptance criteria**
 
-- [ ] Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap
+- [x] Over quota -> 429 `quota_exceeded`; shared testnet wallet has a daily outflow cap
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-04 · **Traces to:** D.abuse
 
@@ -1547,7 +1547,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 
 **Acceptance criteria**
 
-- [ ] Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned
+- [x] Per-organisation setting; payouts come from a shared, rate-limited faucet wallet; explorer links returned
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** RAL-03, SBX-02 · **Traces to:** D.sandbox
 

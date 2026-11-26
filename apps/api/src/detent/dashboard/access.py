@@ -158,8 +158,9 @@ def create_organisation(
     conn.execute(
         text(
             "INSERT INTO organisations (id, name, mode, fail_safe, kind, kyb_reference, kyb_approved_on, "
-            "expires_at, created_by, created_at, daily_payment_quota, daily_investigation_quota) "
-            "VALUES (:id, :n, 'shadow', 'manual_queue', :k, :ref, :on, :exp, :by, :now, :qp, :qi)"
+            "expires_at, created_by, created_at, daily_payment_quota, daily_investigation_quota, "
+            "sandbox_rails) VALUES (:id, :n, 'shadow', 'manual_queue', :k, :ref, :on, :exp, :by, :now, :qp, "
+            ":qi, 'simulated')"
         ),
         {
             "id": org_id,

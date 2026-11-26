@@ -140,7 +140,11 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   LED-08. Pages in `detent/dashboard/developer.py` (key service in `keys.py`), metering and quotas in
   `detent/sandbox/usage.py`, migration 0012. 429 `quota_exceeded` over the payment quota. See spec/08 "As built
   (P2 group 2)". Open: SBX-02 waits for the shared testnet wallet's daily cap (group 3).
-- **P2 next:** group 3 (RAL-11, SBX-01, SBX-02 wallet cap, SBX-03, SBX-04, DSH-07), group 4 (DSH-09 console per organisation, DSH-10 access requests,
+- **P2 group 3a: built (PR from `claude/project-thread-babje1`, 2026-11-26):** RAL-11, SBX-01 (criterion 0),
+  SBX-02, SBX-03. The simulated chain in `detent/rails/simchain.py` (migration 0013), chosen per organisation in
+  `rails/registry.build_adapters` (now takes `clock=`); the faucet caps in `execution/send._check_shared_wallet`;
+  the sandbox page in `dashboard/developer.py` and `dashboard/sandbox.py`. See spec/08 "As built (P2 group 3a)".
+- **P2 next:** group 3b (SBX-04 reset as a new data generation, then DSH-07's reset button), group 4 (DSH-09 console per organisation, DSH-10 access requests,
   DSH-12 verification). · Model: strongest for quotas and the rail; mid-tier for the screens
 - **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 

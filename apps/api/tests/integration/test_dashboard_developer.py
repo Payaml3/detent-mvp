@@ -390,7 +390,7 @@ def test_over_the_investigation_quota_the_case_goes_to_a_person(
     _set_quota(engine, dorg.id, None, 1)
     _, first = escalated_case(api, dorg, engine)
     _, second = escalated_case(api, dorg, engine)
-    w = Worker(Runtime(make_settings(dorg.id), engine, clock), worker_id="test-quota")
+    w = Worker(Runtime(make_settings(dorg.id), engine, clock), worker_id="test-quota", org_id=dorg.id)
     while w.run_one():
         pass
     with engine.connect() as conn:

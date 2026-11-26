@@ -176,7 +176,7 @@ def watch_all(engine: Engine, clock: Clock, settings: Any) -> dict[str, int]:
     out: dict[str, int] = {}
     for org in orgs:
         new = 0
-        for rail_id, adapter in build_adapters(settings, engine, org).items():
+        for rail_id, adapter in build_adapters(settings, engine, org, clock=clock).items():
             try:
                 if hasattr(adapter, "transfers"):
                     new += watch_evm(engine, clock, org, rail_id, adapter)
