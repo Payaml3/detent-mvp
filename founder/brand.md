@@ -43,13 +43,6 @@ Maps to the three layers: **sift** (decision), **settle** (orchestration), **pro
 
 ## Visual identity (Open)
 
-- Palette: Open. The founder rejected palette B (Parchment and seal) on 2026-11-26; new options are being chosen.
-  Until then the site and console run on palette B as a placeholder. All colour values live in
-  `design/tokens.json`, so the chosen palette is a one-file change.
-- Fonts (D-18): Space Grotesk, Inter, JetBrains Mono.
-- Blocked always shows an icon and a label, never colour alone.
-- Mark (Proposed, D-39): "sift then settle". Five dots, then three, above a rule; one dot settled below it.
-  Replaces the detent-wheel motif (D-20).
-- Site art (Proposed, D-39): payments fall as halftone dots through three rules (decision, orchestration,
-  operations); some are held, some blocked (a cross), the rest settle at one point.
-- Reference: `DESIGN.md` and `docs/brand/design-system.md`.
+- Palette: options in `/mnt/project-files/brand/palette-options-draft.md` (project files), founder to choose.
+- The detent-wheel motif (D-20) no longer fits the name; proposed replacement idea: "sift then settle"
+  (many inputs filtering to one clear outcome). Decided in the design-system work.

@@ -19,7 +19,7 @@ To change the palette, edit `design/tokens.json`, run `python tools/build_tokens
 
 Token names are roles, not colours (`stop`, not "red"), so a new palette swaps values only.
 
-**Palette status:** the founder is choosing a new palette (2026-11-26). The values now in `tokens.json` are palette B and are a placeholder until then.
+**Palette:** Graphite and safety orange (B-02). Safety orange `#FF4A1F` is a fill only, with near-black text on it; orange text and links use `#C2360F`. Blocked is graphite with a cross icon, never orange.
 
 ## Two surfaces
 
@@ -32,7 +32,7 @@ Token names are roles, not colours (`stop`, not "red"), so a new palette swaps v
 
 - Shell: a 240px sidebar with the nav grouped by layer (Decision, Orchestration, Operations, then Prototype). The current page carries `aria-current="page"`. The user row and log out sit at the foot. Under 860px the sidebar folds into a top bar.
 - Title bar: demo clock, kill-switch state and the kill-switch button, on every page.
-- One primary button per screen, in the `primary` (ink) colour. The `stop` colour is only for block, reject and the kill switch.
+- One primary button per screen, in the `primary` colour (safety orange). The `stop` colour (graphite) is only for block, reject and the kill switch.
 - Figures: one container split by dividers, label above value, tabular numbers.
 - Tables: no zebra stripes, 12px muted headers, numbers right-aligned, a quiet hover row.
 
@@ -70,6 +70,6 @@ A blocked state always carries an icon and its label, never colour alone.
 ## Don't
 
 - Write a raw colour anywhere but `design/tokens.json`.
-- Use the stop colour for decoration or for a primary action.
+- Use safety orange as text, or for a block or error; use the stop colour for decoration or a primary action.
 - Put a gradient, glow or icon-in-a-tinted-square in the console.
 - Call DekernAI a payments company or payment provider.

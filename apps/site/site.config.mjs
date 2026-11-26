@@ -2,8 +2,8 @@
 // Values starting with PLACEHOLDER are reported at build time in dist/placeholders.json.
 export default {
   brandName: "Dekernai",
-  // Colour palette: one of the keys in src/styles/palettes.mjs. B is a placeholder until the founder picks a new palette.
-  palette: "b",
+  // Colour palette: one of the keys in src/styles/palettes.mjs. The founder chose Graphite and safety orange (B-02).
+  palette: "graphite",
   category: "agentic payment controls",
   siteUrl: "https://example.invalid",
   // Pre-launch: pages carry noindex and robots.txt blocks crawlers. Set true at launch (founder decision).

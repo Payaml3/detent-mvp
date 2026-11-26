@@ -33,13 +33,13 @@ details > summary:hover { color: var(--text); }
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .error { color: var(--stop); font-weight: 500; }
 .attention, .late { color: var(--stop); font-weight: 600; }
-.ok { color: var(--accent); }
+.ok { color: var(--confirm); }
 .diff-old { color: var(--stop); text-decoration: line-through; text-decoration-thickness: 1px; }
-.diff-new { color: var(--accent); }
+.diff-new { color: var(--confirm); }
 mark { background: var(--pill-wait-bg); color: var(--pill-wait-ink); padding: 0 2px; border-radius: 2px; }
 
 /* ---------- the honesty banner and the kill switch: always visible, never decorative ---------- */
-.banner { background: var(--text); color: var(--on-primary); text-align: center; font-size: var(--fs-small); line-height: 28px; }
+.banner { background: var(--text); color: var(--ground); text-align: center; font-size: var(--fs-small); line-height: 28px; }
 .kill-bar { background: var(--stop); color: var(--on-stop); text-align: center; font-weight: 600; padding: 10px 16px; }
 
 /* ---------- shell: open plane, a labelled sidebar on the page ground ---------- */
@@ -89,7 +89,7 @@ button, .button { display: inline-flex; align-items: center; justify-content: ce
 button:active, .button:active { transform: scale(0.97); }
 @media (hover: hover) and (pointer: fine) { button:hover, .button:hover { background: var(--raised); text-decoration: none; } }
 button.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
-@media (hover: hover) and (pointer: fine) { button.primary:hover { background: var(--text); opacity: 0.88; } }
+@media (hover: hover) and (pointer: fine) { button.primary:hover { opacity: 0.88; } }
 button.danger { color: var(--stop); border-color: var(--stop); }
 @media (hover: hover) and (pointer: fine) { button.danger:hover { background: var(--stop); color: var(--on-stop); } }
 button.link { height: auto; padding: 0; border: 0; background: none; color: var(--muted); font-weight: 400; }
@@ -150,9 +150,9 @@ tbody tr { transition: background var(--motion-fast) var(--motion-ease-out); }
 @media (hover: hover) and (pointer: fine) { tbody tr:hover td { background: var(--raised); } }
 td.mono a { color: var(--accent); }
 td.muted[colspan] { padding: 20px 16px; text-align: left; }
-.r-block td { background: var(--pill-blocked-bg); }
+.r-block td { background: var(--raised); }
 .r-escalate td { background: var(--pill-wait-bg); }
-td.ok { color: var(--accent); }
+td.ok { color: var(--confirm); }
 
 /* ---------- status labels: the word always shows; a final state carries a cross, never colour alone ---------- */
 .st { display: inline-flex; flex: none; align-items: center; gap: 6px; height: 20px; padding: 0 8px; border-radius: var(--radius-chip);
