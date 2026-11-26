@@ -2,8 +2,10 @@
 
 # Landing page copy: DekernAI
 
+> **Updated for B-04 (client journey, `docs/product/client-journey.md`):** there is no free shadow report. Clients come in through a seven-phase onboarding; shadow is a phase after the contract, on live traffic. The buttons are "Book a demo" and "Talk to us".
+
 - Assumption: there are no `founder/` files yet, so the product, audience and rules come from `spec/00-product-context.md` and the site decisions already approved: plans priced "Talk to us", placeholders clearly marked, and "DekernAI" as the working name.
-- Assumption: the company is pre-launch, with a design-partner offer (the free shadow report). No customer, waitlist or volume numbers exist yet.
+- Assumption: the company is pre-launch, with onboarding in seven phases (B-04). No customer, waitlist or volume numbers exist yet.
 - Assumption: the main reader is the head of payments at a UK or EU platform that holds user balances. Their compliance lead and developers read second.
 - Constraint from the spec's honesty rules: no testimonials, logos, customer counts or volume figures, and no certification claims. The proof and testimonial sections below follow these rules.
 
@@ -15,10 +17,10 @@ Alternative (closer to the current site): Every payout decided, sent once, recon
 
 **Subheadline:** For UK and EU platforms that hold user balances. DekernAI checks, routes and reconciles every stablecoin and instant bank payment, beside the rails you already use.
 
-**Button:** Get your free shadow report
-**Second link:** Book a 10-minute demo
+**Button:** Book a demo
+**Second link:** Talk to us
 
-**Proof line:** Starts in shadow mode: DekernAI decides beside your team and sends nothing.
+**Proof line:** Sits beside your rails and never holds your funds or keys.
 
 There is no real number to show yet. If you later publish one, use a dated evaluation figure in this exact form: `[Figure], test-network evaluation on synthetic data, [date]`. Don't show a design-partner count until each partner has agreed in writing.
 
@@ -50,12 +52,15 @@ Exceptions land in one queue that shows the raw facts first. Deposits are matche
 
 ## 4. How it works
 
-1. **Book a call.** In 10 minutes, tell us which rails you pay out on and how you decide payments today.
-2. **Send one month of exports.** Anonymised payout and deposit files, under a data processing agreement signed first.
-3. **Read your shadow report.** Within five working days, see what your rules would have decided, payment by payment.
-4. **Choose your pace.** Shadow mode, then Assist (your team clicks Send), then Auto within the rules you approve.
+Onboarding runs in seven phases, each with an owner on both sides and an exit check:
 
-Your part of steps 1 and 2 takes under an hour. Step 3 is our work, not yours.
+1. **Discovery.** A call and a live demo; we check the fit together. Exit: NDA signed.
+2. **Contract and due diligence.** Our KYB on your business, the contract and DPA, and the pilot scope.
+3. **Sandbox integration.** Your engineers integrate and trigger every path in the sandbox.
+4. **Policy setup.** Your rules become rule set v1. Your compliance lead signs it off.
+5. **Shadow on live traffic.** Every live payment is decided, nothing is sent; a weekly agreement report. You sign the move to Assist.
+6. **Go-live.** Assist, then Auto, on one rail. You sign each move.
+7. **Scale.** More rails, routing and failover, quarterly reviews.
 
 ## 5. Social proof
 
@@ -66,16 +71,15 @@ Your part of steps 1 and 2 takes under an hour. Step 3 is our work, not yours.
 
 **Testimonial slots (placeholders only):**
 - `[Quote from an advisor who has run payout operations: which irreversible payment mistake this would have caught, and how they handle that today]`
-- `[Quote from a design-partner head of payments, with written consent: what the shadow report found in their own month of data that their current checks missed]`
+- `[Quote from a client head of payments, with written consent: what the shadow phase found in their own live traffic that their current checks missed]`
 
 The second slot conflicts with the spec's current rule of "no testimonials". Keep it hidden until you change that rule and have written consent.
 
 ## 6. Pricing preview
 
-**Free shadow report:** one month of your past payments, decided under your rules. Nothing is sent.
-**Pilot, Growth, Scale:** Talk to us.
+**Pilot, Growth, Scale:** Talk to us. The Pilot covers phases 3 to 6 on one rail. A software fee per payment decided, never a share of the money you move.
 
-**Is it worth it?** You'll see, on your own data, what your rules would have held, before you pay anything.
+**Is it worth it?** In the shadow phase you see, on your own live traffic, what your rules decide before anything is sent.
 
 ## 7. FAQ
 
@@ -89,24 +93,24 @@ No. DekernAI works with the rails you already use and starts with stablecoins an
 No. AI agents propose payments and draft fixes, but your rules make every decision and a person approves every exception. The approver can never be the person who started the payment.
 
 **Where does our data go?**
-Shadow report exports are anonymised and processed in the UK or EU, under a data processing agreement signed before anything is sent. They are used only for your report and deleted on the schedule the agreement sets out.
+The contract and a data processing agreement are signed before any of your data reaches us. Data is processed in the UK or EU and used only as the agreement sets out.
 
 **What happens if something breaks?**
 DekernAI fails closed. Any error in a decision holds the payment or sends it to your review queue; it never sends. If a rail times out, nothing is resent until the rail gives a definite answer, so no payment can go out twice.
 
 ## 8. Final call to action
 
-**Headline:** See which of last month's payouts your rules would have stopped
+**Headline:** Held until it's right. Sent exactly once.
 
-**Button:** Get your free shadow report
+**Button:** Book a demo
 
-**Risk reversal:** The report is free and sends nothing. You only need one month of anonymised exports.
+**Risk reversal:** You sign every step that moves money closer to being sent, and in the shadow phase nothing is sent at all.
 
 ## 9. SEO metadata
 
 **Title tag (52 characters):** DekernAI: agentic payment controls for instant payouts
 
-**Meta description (157 characters):** Check every stablecoin and instant bank payout against your own rules before it is sent. Sent once, reconciled and provable. Start with a free shadow report.
+**Meta description (157 characters):** Check every stablecoin and instant bank payout against your own rules before it is sent. Sent once, reconciled and provable. Book a demo.
 
 **Target keywords:**
 1. payout controls

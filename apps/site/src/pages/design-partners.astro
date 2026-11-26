@@ -3,45 +3,43 @@ import Base from "../layouts/Base.astro";
 import PageHead from "../components/PageHead.astro";
 import Prose from "../components/Prose.astro";
 import config from "../../site.config.mjs";
+import { phases, plans } from "../data/onboarding.mjs";
+// The onboarding page (docs/product/client-journey.md, B-04): how a platform becomes a client, phase by phase.
+// Shadow is a phase inside onboarding, on live traffic, after the contract. There is no free pre-sale report.
 ---
-<Base title="Design partners" description={`A free shadow report: ${config.brandName} decides one month of your past payouts and deposits under your rules, without executing anything.`}> {/* taste-skill-ignore: "shadow report" is a product name, not a CSS shadow */}
-  <PageHead title="A free shadow report." lead="Send one month of anonymised exports. We show you what your rules would have decided, payment by payment, without executing anything."> {/* taste-skill-ignore: "shadow report" is a product name, not a CSS shadow */}
-    <div class="ctas" data-reveal><a class="button" href={config.bookingUrl}>Book a demo</a><a class="textlink" href="/access/">Request access</a></div>
+<Base title="Onboarding" description={`How a platform becomes a ${config.brandName} client: seven phases from discovery to scale, each with an owner and an exit check you sign.`}>
+  <PageHead title="Onboarding in seven phases." lead="From the first call to every rail. Each phase has an owner on both sides and an exit check, and you sign every step that moves money closer to being sent.">
+    <div class="ctas" data-reveal><a class="button" href={config.bookingUrl}>Book a demo</a><a class="textlink" href={`mailto:${config.salesInbox}`}>Talk to us</a></div>
     <Fragment slot="fragments">
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row</p>
-        <p>Payout to Harbor Logistics GmbH, €2,400.00</p><span class="chip st-CONFIRMED">EXECUTE</span><p class="soft">Every check passed. Your team: paid.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row</p>
-        <p>Payout to Quill Studio Ltd, £820.00</p><span class="chip st-ESCALATED">ESCALATE</span><p class="soft">Bank details changed 3 days ago. Your team: paid without review.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample report row</p>
-        <p>Payout to Example Sanctioned Trading Co, 500.00 USDC</p><span class="chip st-BLOCKED">BLOCK</span><p class="soft">Screening hit on the address.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Sample deposit fix</p>
-        <p>200.00 USDC arrived on Ethereum, expected on Base.</p><p class="soft">Proposed fix: match to the open deposit intent.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Phase 4 · Policy setup</p>
+        <p>Rule set v1, versioned</p><span class="chip st-READY">SIGNED OFF</span><p class="soft">By your compliance lead.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Phase 5 · Weekly agreement report</p>
+        <p>Live payments decided · sent: 0</p><span class="chip st-CONFIRMED">ZERO UNSAFE APPROVALS</span><p class="soft">Where your rules and your team decided differently, case by case.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Phase 6 · Go-live</p>
+        <p>Assist → Auto on one rail</p><span class="chip st-ESCALATED">YOUR SIGN-OFF</span><p class="soft">Kill-switch owner and backup owners named first.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Sample data</p>
+        <p>Every figure on this page is an example.</p></div>
     </Fragment>
   </PageHead>
   <section class="section"><div class="wrap">
     <Prose>
-      <h2 data-reveal>What you send</h2>
+      {phases.map((p) => (
+        <>
+          <h2 data-reveal>{p.n}. {p.name}</h2>
+          <div class="block" data-reveal>
+            <p>{p.what}</p>
+            <p><strong>We own:</strong> {p.us}. <strong>You own:</strong> {p.you}.</p>
+            <p><strong>{p.sign ? "You sign:" : "Exit check:"}</strong> {p.exit}.</p>
+          </div>
+        </>
+      ))}
+      <h2 data-reveal>Your data</h2>
       <div class="block" data-reveal>
-        <p>One month of payout and deposit exports from your platform, as CSV, anonymised before they leave you: account references instead of names, and no personal data you don’t need to share.</p>
-        <p>Your current rules, in whatever form they exist today. We turn them into a versioned rule set and you sign it off.</p>
+        <p>The contract and a data processing agreement are signed before any of your data reaches us. Data is processed in the UK or EU and used only as the agreement sets out. In shadow, payments are only decided: nothing is sent to any rail.</p>
       </div>
-      <h2 data-reveal>What you get</h2>
+      <h2 data-reveal>Plans</h2>
       <div class="block" data-reveal>
-        <ul>
-          <li>Every payment decided under your rules: execute, escalate or block, with the reason for each check.</li>
-          <li>How many payments would have needed a person, and why.</li>
-          <li>Deposits that would have needed attention, with a proposed fix for each.</li>
-          <li>The cases where the rules and your team decided differently.</li>
-        </ul>
-        <p>Delivered within five working days of receiving the data.</p>
-      </div>
-      <h2 data-reveal>How the data is handled</h2>
-      <div class="block" data-reveal>
-        <p>A data processing agreement is signed before anything is sent. Exports are anonymised, processed in the UK or EU, used only for your report and deleted as the agreement sets out. Shadow mode only decides: nothing is sent to any rail.</p>
-      </div>
-      <h2 data-reveal>What happens next</h2>
-      <div class="block" data-reveal>
-        <p>If the report is useful, the next step is a pilot: shadow mode on live data, then Assist, where your team clicks Send on every payment, then Auto within the rules you approve. Each move is signed off by you.</p> {/* taste-skill-ignore: "shadow report" is a product name, not a CSS shadow */}
+        <p>The Pilot covers phases 3 to 6 on one rail. {plans.join(", ")} are a software fee per payment decided, never a share of the money you move. <a class="textlink" href={`mailto:${config.salesInbox}`}>Talk to us</a>.</p>
       </div>
     </Prose>
   </div></section>

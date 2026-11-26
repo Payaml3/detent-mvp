@@ -6,7 +6,7 @@ const links = [
   { href: "/#solutions", label: "Solutions" },
   { href: "/security/", label: "Security" },
   { href: "/#developers", label: "Developers" },
-  { href: "/design-partners/", label: "Shadow report" }, // taste-skill-ignore: "shadow report" is a product name
+  { href: "/design-partners/", label: "Onboarding" },
 ];
 const here = Astro.url.pathname;
 ---
@@ -20,8 +20,8 @@ const here = Astro.url.pathname;
         {links.map((l) => <li><a href={l.href} aria-current={here === l.href ? "page" : undefined}>{l.label}</a></li>)}
       </ul>
     </nav>
-    <a class="textlink nav-demo" href={config.bookingUrl}>Book a demo</a>
-    <a class="button nav-cta" href="/design-partners/">Get a free shadow report</a> {/* taste-skill-ignore: "shadow report" is a product name */}
+    <a class="textlink nav-demo" href={`mailto:${config.salesInbox}`}>Talk to us</a>
+    <a class="button nav-cta" href={config.bookingUrl}>Book a demo</a>
   </div>
 </header>
 <style>

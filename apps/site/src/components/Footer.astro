@@ -13,7 +13,7 @@ const year = 2026;
       <ul>
         <li><a href="/product/">Product</a></li>
         <li><a href="/security/">Security</a></li>
-        <li><a href="/design-partners/">Shadow report</a></li> {/* taste-skill-ignore: "shadow report" is a product name */}
+        <li><a href="/design-partners/">Onboarding</a></li>
         <li><a href={config.bookingUrl}>Book a demo</a></li>
         <li><span class="soon">Docs <span class="soft small">(at launch)</span></span></li>
         <li><span class="soon">Status <span class="soft small">(at launch)</span></span></li>
@@ -32,8 +32,8 @@ const year = 2026;
       <a class="mail" href={`mailto:${config.salesInbox}`}>{config.salesInbox.startsWith("PLACEHOLDER") ? "sales inbox (to be set)" : config.salesInbox}</a>
     </div>
     <div class="tile mark" aria-hidden="true"><Logo height={96} /></div>
-    <a class="tile invite" href="/design-partners/">
-      <span>Get a free shadow report</span> {/* taste-skill-ignore: "shadow report" is a product name */}
+    <a class="tile invite" href={config.bookingUrl}>
+      <span>Book a demo</span>
       <svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true"><path d="M10 38 L38 10 M16 10 H38 V32" fill="none" stroke="currentColor" stroke-width="4"/></svg>
     </a>
   </div>

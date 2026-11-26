@@ -1,0 +1,83 @@
+---
+import config from "../../site.config.mjs";
+import { phases, plans } from "../data/onboarding.mjs";
+// Landing UX §3.6: onboarding in seven phases (docs/product/client-journey.md, B-04), where the offer was.
+// The client signs every step that moves money closer to being sent. Plans stay "Talk to us" (D-15).
+const talk = `mailto:${config.salesInbox}`;
+---
+<section class="section onboarding" id="onboarding" data-section="onboarding" aria-labelledby="onb-title">
+  <div class="wrap">
+    <div class="head">
+      <h2 id="onb-title" data-reveal>From first call to every rail, in seven phases.</h2>
+      <div class="side" data-reveal>
+        <p class="lead">Each phase has an owner on both sides and an exit check. Nothing moves closer to being sent until you sign it.</p>
+        <div class="actions">
+          <a class="button" href={config.bookingUrl}>Book a demo</a>
+          <a class="textlink" href={talk}>Talk to us</a>
+        </div>
+      </div>
+    </div>
+    <ol class="track">
+      {phases.map((p) => (
+        <li class:list={["phase", { pilot: p.pilot, sign: p.sign, first: p.n === 3 }]} data-card>
+          <span class="n" aria-hidden="true">{String(p.n).padStart(2, "0")}</span>
+          <div class="body">
+            <h3>{p.name}{p.mode && <span class="mode">{p.mode}</span>}</h3>
+            <p>{p.what}</p>
+          </div>
+          <dl class="who">
+            <div><dt>We own</dt><dd>{p.us}</dd></div>
+            <div><dt>You own</dt><dd>{p.you}</dd></div>
+          </dl>
+          <p class="exit"><span class="k">{p.sign ? "You sign" : "Exit check"}</span>{p.exit}</p>
+        </li>
+      ))}
+    </ol>
+    <p class="plans small soft" data-reveal>
+      The Pilot covers phases 3 to 6 on one rail. {plans.join(", ")}: a software fee per payment decided, never a share of the money you move. <a class="textlink" href={talk}>Talk to us</a>.
+    </p>
+  </div>
+</section>
+<style>
+  .onboarding { background: var(--bg-alt); margin-top: calc(var(--section) * 0.6); padding: clamp(96px, 10vw, 160px) 0; }
+  .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 56px; }
+  .head h2 { grid-column: 1 / span 6; margin: 0; max-width: 16ch; }
+  .side { grid-column: 8 / span 5; display: grid; gap: 24px; }
+  .side .lead { margin: 0; color: var(--text-soft); }
+  .actions { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+
+  .track { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; counter-reset: phase; }
+  .phase { display: grid; grid-template-columns: 72px minmax(0, 5fr) minmax(0, 2.4fr) minmax(0, 2.6fr); gap: 24px; align-items: start;
+    padding: 24px 28px; border-radius: var(--radius); background: var(--surface); position: relative; }
+  .phase.pilot { background: var(--surface); box-shadow: inset 3px 0 0 var(--signal); }
+  .phase.first { margin-top: 34px; }
+  .phase.first::before { content: "Pilot · phases 3 to 6, on one rail"; position: absolute; left: 0; top: -30px;
+    font: 600 12px/1.6 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); }
+  .phase.pilot + .phase:not(.pilot) { margin-top: 18px; }
+  .n { font: 600 clamp(28px, 2.6vw, 40px)/1 var(--font-head); letter-spacing: -0.03em; color: var(--text-soft); font-variant-numeric: tabular-nums; }
+  .phase.sign .n { color: var(--text); }
+  .body h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 8px; font-size: clamp(20px, 1.7vw, 24px); }
+  .mode { font: 600 11px/1.6 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px;
+    background: var(--text); color: var(--bg); }
+  .body p { color: var(--text-soft); max-width: 58ch; margin: 0; }
+  .who { margin: 0; display: grid; gap: 10px; font-size: 14px; }
+  .who dt { font: 600 11px/1.6 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); }
+  .who dd { margin: 0; font-weight: 600; }
+  .exit { margin: 0; display: grid; gap: 6px; font-size: 14px; line-height: 1.45; }
+  .exit .k { justify-self: start; font: 600 11px/1.6 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px;
+    background: color-mix(in srgb, var(--text) 10%, transparent); color: var(--text); }
+  .phase.sign .exit .k { background: var(--signal); color: var(--on-signal); }
+  .plans { margin-top: 32px; max-width: 70ch; }
+  .plans .textlink, .actions .textlink { color: var(--interactive-soft); }
+
+  @media (max-width: 1000px) {
+    .head h2, .side { grid-column: 1 / -1; }
+    .phase { grid-template-columns: 56px 1fr; }
+    .who, .exit { grid-column: 2; }
+    .who { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .phase { grid-template-columns: 1fr; padding: 20px; gap: 14px; }
+    .who, .exit { grid-column: 1; }
+  }
+</style>

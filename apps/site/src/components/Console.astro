@@ -1,6 +1,6 @@
 ---
-// The merchant's console, drawn as a working screen inside a glass window that tilts flat as it scrolls in and
-// leans toward the pointer. Sample data for an example merchant, labelled as such. The
+// The client's console, drawn as a working screen inside a glass window that tilts flat as it scrolls in and
+// leans toward the pointer. Sample data for an example client, labelled as such. The
 // numbers add up: executed + escalated + blocked = decided, hour by hour. Pick an escalation to read the
 // agent's case; the approve button is a picture of the real one, which re-runs the rules first (spec/07).
 const hours = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17"];
@@ -34,7 +34,7 @@ const n = (x) => x.toLocaleString("en-GB");
     <figure class="window" data-card data-console aria-label="Console illustration with sample data">
       <div class="bar">
         <span class="brand"><span class="mk" aria-hidden="true"></span>Console</span>
-        <span class="merchant">Kestrel Market</span>
+        <span class="client">Kestrel Market</span>
         <span class="mut tag">Tue 24 Nov · sample data</span>
       </div>
       <div class="body">
@@ -116,7 +116,7 @@ const n = (x) => x.toLocaleString("en-GB");
   .bar { display: flex; align-items: center; gap: 20px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
   .brand { display: flex; align-items: center; gap: 8px; font: 600 15px/1 var(--font-head); }
   .mk { width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
-  .merchant { font-weight: 600; }
+  .client { font-weight: 600; }
   .tag { margin-left: auto; font-size: 12px; }
   .body { display: grid; grid-template-columns: 180px 1fr; }
   .side { display: grid; align-content: start; gap: 2px; padding: 16px 12px; border-right: 1px solid var(--line); color: var(--mut); }

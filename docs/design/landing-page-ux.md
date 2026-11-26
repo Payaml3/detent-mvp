@@ -4,6 +4,11 @@ Status: **Proposed.** Becomes Approved when the founder merges the PR. Scope: th
 outline of the home page (`apps/site/src/pages/index.astro`). Visuals (palette, type, motif) come from the
 design-system work and are applied in a follow-up PR; nothing here changes code yet.
 
+**Amended by B-04 (client journey, `docs/product/client-journey.md`):** there is no free shadow report. The
+primary CTA is "Book a demo" and the secondary is "Talk to us"; the offer section (§3.6) becomes the seven
+onboarding phases; the nav item "Shadow report" becomes "Onboarding"; `/design-partners/` is the onboarding
+page. Shadow is a phase after the contract, on live traffic. Where this document still says otherwise, B-04 wins.
+
 Sources: `spec/08-developer-portal.md` (WEB), `founder/brand.md` (on the brand-name PR #58 branch), `docs/product/shadow-report.md`
 (I5), `docs/product/customer-discovery.md` (buying roles), decisions D-15, D-19 to D-21.
 
@@ -11,8 +16,8 @@ Sources: `spec/08-developer-portal.md` (WEB), `founder/brand.md` (on the brand-n
 
 | Reader | Arrives asking | Needs to leave with | Next step we offer |
 |---|---|---|---|
-| Head of payments (champion, buyer) | "Will this stop manual reviews and double payouts?" | One payment followed end to end; a free way to try it | Free shadow report |
-| Compliance lead (can veto) | "Who decides, and can I prove it to an auditor?" | Their rules decide; a block is final; audit and replay | Security page, then shadow report |
+| Head of payments (champion, buyer) | "Will this stop manual reviews and double payouts?" | One payment followed end to end; how onboarding works | Book a demo |
+| Compliance lead (can veto) | "Who decides, and can I prove it to an auditor?" | Their rules decide; a block is final; audit and replay | Security page, then the onboarding phases |
 | CTO or engineering lead | "How hard is it to plug in, and does it touch our funds?" | One API, sits beside the rails, no custody, sandbox | Docs and sandbox access |
 
 The page has to work for the head of payments first, give compliance a clear answer on "who decides" without
@@ -45,13 +50,13 @@ Problems:
 The brand story gives the page its spine: **sift** (decision), **settle** (orchestration), **prove** (operations).
 
 ```
-NAV       DekernAI · Product · Security · Developers · Shadow report        [Get a free shadow report]
+NAV       DekernAI · Product · Solutions · Security · Developers · Onboarding   Talk to us [Book a demo]
 1 HERO    Headline + category line · CTA pair · live example payment (kept) · honesty strip
 2 PROBLEM On rails you can't reverse, every mistake is permanent (4 pains)
 3 SPINE   Sift. Settle. Prove.  the three layers, one payment ID, "agents prepare, your rules decide"
 4 PROOF   Built for payments you can't take back  (irreversible demo, kept)
 5 ROLES   Tabs: Payments · Compliance · Engineering  (absorbs Developers + Security)
-6 OFFER   The free shadow report: what you send, what you get, in 5 working days
+6 ONBOARD Seven onboarding phases, owners and exit checks; plans "Talk to us" (B-04)
 7 FIT     Who it's for (4 use cases, compact) + FAQ
 8 CLOSE   Final CTA + footer
 ```
@@ -64,8 +69,7 @@ NAV       DekernAI · Product · Security · Developers · Shadow report        
   - C. "Your rules decide. DekernAI makes it happen." (tagline option from brand.md)
 - **Category line:** "Agentic payment controls: one layer that decides, orchestrates and operates every deposit
   and payout, under your rules."
-- **CTAs:** primary "Get a free shadow report" (to the offer section, then `/design-partners/`); secondary
-  "Book a demo". Engineers get "Read the docs" in the nav, not a third hero button.
+- **CTAs:** primary "Book a demo"; secondary "Talk to us" (B-04). Engineers get "Read the docs" in the nav, not a third hero button.
 - **Visual:** keep the example-payment card player. Replace the AI-agent figure with the "sift then settle"
   motif (many payment dots passing a rule line, one settled outcome), subject to Q2.
 - **Honesty strip** under the CTAs, small: "Prototype · test networks only · never holds your funds or keys".
@@ -110,7 +114,11 @@ Each tab: three facts and one link. Tabs are buttons with `aria-selected`; witho
 This absorbs the current Developers and Security sections; the roadmap list (SOC 2 and the rest, all
 "planned") moves to `/security/` only.
 
-### 6. Offer: "See your last month, decided by your rules."
+### 6. Onboarding: "From first call to every rail, in seven phases." (B-04)
+
+The seven phases of `docs/product/client-journey.md`, each with both owners and its exit check; phases 4 to 6
+marked "You sign"; the Pilot band over phases 3 to 6. Plans: Pilot, Growth, Scale, "Talk to us", no prices.
+The text below described the superseded shadow-report offer and is kept for history only.
 
 The shadow report (I5) as the page's main offer, in three steps: **send** one month's CSV export (DPA signed
 first; names hashed on import) · **we decide** every row under your written rules, nothing is sent ·
@@ -125,7 +133,7 @@ This replaces the Pricing section.
   marketplaces, each with one line.
 - **FAQ** (5 to 7, collapsible `<details>`): Is DekernAI a payment provider? (No: agentic payment controls,
   beside your rails.) Does the AI approve payments? (No: agents propose; your rules decide.) Do you hold funds
-  or keys? Which rails? What data does the shadow report need? What does it cost?
+  or keys? Which rails? How does onboarding work? What does it cost?
 
 ### 8. Close and footer
 
@@ -133,7 +141,7 @@ Close: one line ("Held until it's right." stays a candidate) and the primary CTA
 
 ## 4. Behaviour and accessibility
 
-- One primary action colour, used only for "Get a free shadow report". Every other link is secondary.
+- One primary action colour, used only for "Book a demo". Every other link is secondary.
 - Motion: entrance reveals and the card player respect `prefers-reduced-motion` (show the final state).
 - Every animated demo has a static, readable final state without script (as today).
 - Status chips never rely on colour alone: the state word is always printed.
@@ -142,13 +150,13 @@ Close: one line ("Held until it's right." stays a candidate) and the primary CTA
 
 ## 5. What to measure (once analytics is chosen)
 
-Primary: share of visitors who start the shadow report request. Secondary: demo bookings, docs and sandbox
+Primary: demo bookings. Secondary: demo bookings, docs and sandbox
 clicks from the Engineering tab, scroll depth to the offer section. No tracking ships without the cookie
 decision on `/cookies/`.
 
 ## 6. Other pages, in order after this one
 
-1. `/design-partners/` becomes the shadow-report page (form, what we need, DPA, timeline).
+1. `/design-partners/` is the onboarding page (the seven phases in full, data handling, plans) (B-04).
 2. `/product/` and `/security/` follow the same spine (sift, settle, prove) and take the roadmap list.
 3. Dashboard, docs and console: a separate pass once the design-system tokens land, since they share components.
 
