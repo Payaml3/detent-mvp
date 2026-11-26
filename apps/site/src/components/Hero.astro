@@ -25,9 +25,8 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   <div class="wrap hero-grid">
     <div class="intro">
       <h1 id="hero-title" class="headline">
-        <span class="line"><span>Every deposit</span></span>
-        <span class="line"><span>and payout, decided</span></span>
-        <span class="line"><span>by <em>your rules</em>.</span></span>
+        <span class="line"><span>Every deposit and payout,</span></span>
+        <span class="line"><span>decided by your rules.</span></span>
       </h1>
       <p class="lead" data-reveal>{category}: one layer that decides, orchestrates and operates every deposit and payout, under your rules.</p>
       <div class="actions" data-reveal>
@@ -56,19 +55,17 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
 </section>
 
 <style>
-  .hero { position: relative; min-height: max(760px, 100svh); overflow: hidden; background:
-    radial-gradient(50% 60% at 62% 55%, var(--interactive-deep), transparent 72%), var(--bg); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+  .hero { position: relative; min-height: max(760px, 100svh); overflow: hidden; background: var(--bg); }
   .art { position: absolute; left: 49%; top: 4%; width: 24%; height: 86%; pointer-events: none; }
   .hero-grid { position: relative; z-index: 2; min-height: max(760px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
     column-gap: 24px; padding-top: 136px; padding-bottom: 56px; pointer-events: none; }
   .hero-grid > * { pointer-events: auto; }
   .intro { grid-column: 1 / span 7; display: grid; gap: 28px; align-content: start; }
-  .headline { font-size: clamp(42px, 4.9vw, 80px); line-height: 0.98; }
-  .headline em { font-style: normal; color: var(--signal); }
+  .headline { font-size: clamp(40px, 4.1vw, 68px); line-height: 1; }
+  .line > span { white-space: nowrap; }
   .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
   .line > span { display: inline-block; animation: rise 900ms var(--ease-out) both; }
   .line:nth-child(2) > span { animation-delay: 110ms; }
-  .line:nth-child(3) > span { animation-delay: 220ms; }
   @keyframes rise { from { transform: translateY(105%); } }
   .lead { max-width: 36ch; color: var(--text-soft); }
   .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -80,7 +77,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     transition: border-color 300ms, transform 300ms var(--ease-out), opacity 300ms; }
   .card.active { border-color: var(--interactive); transform: translateX(-6px); }
   .card-name { display: flex; gap: 8px; align-items: baseline; font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
-  .word { color: var(--signal); font: 600 13px/1 var(--font-head); text-transform: uppercase; letter-spacing: 0.08em; }
+  .word { color: var(--signal); font: 600 15px/1 var(--font-head); }
   .card-q { font: 600 18px/1.2 var(--font-head); letter-spacing: -0.01em; }
   .card-agent { display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start; color: var(--text); }
   .agent-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--text-soft); }
@@ -95,8 +92,8 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .art { display: none; }
     .hero-grid { padding-top: 112px; }
     .intro, .cards { grid-column: 1 / -1; }
-    .headline { font-size: clamp(34px, 9.6vw, 52px); }
-    .line, .line > span { display: inline; animation: none; }
+    .headline { font-size: clamp(28px, 7.8vw, 52px); }
+    .line, .line > span { display: inline; animation: none; white-space: normal; }
     .line + .line::before { content: " "; }
     .actions .button { width: 100%; justify-content: center; }
     .cards { margin-top: 48px; }

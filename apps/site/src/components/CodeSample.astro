@@ -49,9 +49,9 @@ const response = `{
 <style>
   .code { display: grid; gap: 8px; min-width: 0; }
   .langs { display: flex; flex-wrap: wrap; gap: 6px; }
-  .langs button { border: 1px solid var(--line); border-radius: 6px; padding: 8px 13px; background: var(--surface); color: var(--text-soft); font: 500 14px var(--font-body); cursor: pointer; transition: background 160ms, color 160ms; }
+  .langs button { border: 0; border-radius: 6px; padding: 8px 13px; background: var(--surface); color: var(--text-soft); font: 500 14px var(--font-body); cursor: pointer; transition: background 160ms, color 160ms; }
   .langs button:hover { color: var(--text); }
-  .langs button[aria-selected="true"] { background: var(--text); border-color: var(--text); color: var(--bg); }
+  .langs button[aria-selected="true"] { background: var(--text); color: var(--bg); }
   pre { margin: 0; background: var(--surface-sunk); border-radius: var(--radius); padding: 22px; overflow-x: auto; font: 13px/1.6 var(--font-mono); color: var(--code); }
   .response { background: var(--surface-sunk); border-radius: var(--radius); padding: 16px 20px; display: grid; gap: 8px; }
   .response pre { background: transparent; padding: 0; color: var(--code-key); }

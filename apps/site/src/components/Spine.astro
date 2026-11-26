@@ -21,12 +21,12 @@ const layers = [
       <h2 id="spine-title">Sift. Settle. Prove.</h2>
       <p class="statement"><Mark size={28} /> <span>Agents prepare. <strong>Your rules decide.</strong></span></p>
     </div>
-    <p class="pid-row small soft" data-reveal>One payment ID for life: <span class="mono">{PAYMENT_ID}</span></p>
+    <p class="pid-row" data-reveal>One payment ID for life: <span class="pid">{PAYMENT_ID}</span></p>
     <ol class="cols">
       {layers.map((l, i) => (
         <li class="col" data-reveal style={`--d:${i * 90}ms`}>
-          <p class="step"><span class="word">{l.word}</span><span class="soft small">{l.name}</span></p>
-          <h3>{l.question}</h3>
+          <h3><span class="word">{l.word}.</span> {l.question}</h3>
+          <p class="layer">The {l.name.toLowerCase()} layer</p>
           <dl>
             <div><dt>Your rules</dt><dd>{l.rules}</dd></div>
             <div><dt>Agents do the groundwork</dt><dd>{l.agent}</dd></div>
@@ -44,12 +44,13 @@ const layers = [
   .statement strong { color: var(--signal); font-weight: 600; }
   .statement :global(.mark) { color: var(--text); flex: none; }
   .pid-row { margin-bottom: 40px; }
-  .pid-row .mono { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
-  .cols { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 2px solid var(--text); }
-  .col { position: relative; padding: 28px 28px 32px 0; display: grid; gap: 18px; align-content: start; }
-  .col + .col { padding-left: 28px; border-left: 1px solid var(--line); }
-  .step { display: flex; gap: 10px; align-items: baseline; }
-  .word { font: 600 14px/1 var(--font-head); text-transform: uppercase; letter-spacing: 0.1em; color: var(--signal); }
+  .pid-row { color: var(--text-soft); }
+  .pid { color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; word-break: break-all; }
+  .cols { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .col { position: relative; padding: 32px; display: grid; gap: 18px; align-content: start; background: var(--surface); border-radius: var(--radius); }
+  .col:nth-child(2) { background: var(--bg-alt); }
+  .col:nth-child(3) { background: var(--surface-sunk); }
+  .layer { color: var(--text-soft); font-size: var(--t-small); margin-top: -8px; }
   h3 { font-size: clamp(24px, 2.2vw, 32px); letter-spacing: -0.02em; }
   dl { margin: 0; display: grid; gap: 14px; }
   dt { font-size: var(--t-small); font-weight: 600; color: var(--text-soft); margin-bottom: 2px; }
@@ -57,6 +58,6 @@ const layers = [
   @media (max-width: 900px) {
     .head h2, .statement { grid-column: 1 / -1; }
     .cols { grid-template-columns: 1fr; }
-    .col, .col + .col { padding: 24px 0; border-left: 0; border-top: 1px solid var(--line); }
+    .col { padding: 24px; }
   }
 </style>

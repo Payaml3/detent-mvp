@@ -17,8 +17,8 @@ const plans = ["Pilot", "Growth", "Scale"];
 <section class="section offer" id="shadow-report" data-section="offer" aria-labelledby="offer-title">
   <div class="wrap grid">
     <div class="head" data-reveal>
-      <p class="eyebrow">Free shadow report</p> {/* taste-skill-ignore: "shadow report" is a product name */}
       <h2 id="offer-title">See your last month, decided by your rules.</h2>
+      <p class="lead">The shadow report is free, and nothing is sent anywhere.</p> {/* taste-skill-ignore: "shadow report" is a product name */}
       <ol class="steps">
         {steps.map((s) => (
           <li><span class="n" aria-hidden="true">{s.n}</span><div><h3>{s.title}</h3><p>{s.body}</p></div></li>
@@ -45,19 +45,18 @@ const plans = ["Pilot", "Growth", "Scale"];
   </div>
 </section>
 <style>
-  .offer { background: var(--bg-alt); margin-top: var(--section); padding-bottom: var(--section); border-block: 1px solid var(--line); }
+  .offer { background: var(--bg-alt); margin-top: calc(var(--section) * 0.6); padding: clamp(96px, 10vw, 160px) 0; }
   .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: start; }
   .head { grid-column: 1 / span 6; display: grid; gap: 32px; }
-  .eyebrow { font: 600 14px/1 var(--font-head); text-transform: uppercase; letter-spacing: 0.1em; color: var(--signal); }
   .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
   .steps li { display: grid; grid-template-columns: 40px 1fr; gap: 16px; align-items: start; }
-  .n { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--text); display: grid; place-items: center; font: 600 14px/1 var(--font-head); }
+  .n { width: 32px; height: 32px; border-radius: 50%; background: var(--text); color: var(--bg); display: grid; place-items: center; font: 600 14px/1 var(--font-head); }
   .steps h3 { margin-bottom: 4px; }
   .steps p { color: var(--text-soft); max-width: 48ch; }
   .actions { display: grid; gap: 14px; justify-items: start; }
   .actions .textlink { color: var(--interactive-soft); }
-  .sample { grid-column: 8 / span 5; margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; gap: 20px; transform: rotate(0.6deg); }
-  .sample-top { display: flex; justify-content: space-between; font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .sample { grid-column: 8 / span 5; margin: 0; background: var(--surface); border-radius: 14px; padding: 24px; display: grid; gap: 20px; transform: rotate(0.6deg); }
+  .sample-top { display: flex; justify-content: space-between; font-weight: 600; }
   .sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .sum div { display: grid; gap: 4px; }
   .sum strong { font: 600 28px/1 var(--font-head); letter-spacing: -0.02em; }

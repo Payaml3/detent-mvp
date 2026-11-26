@@ -54,8 +54,8 @@ const roles = [
   .tabs[hidden] { display: none; }
   .tabs button { border: 0; border-radius: 6px; padding: 11px 18px; background: transparent; color: var(--text-soft); font: 600 15px var(--font-head); cursor: pointer; transition: background 160ms, color 160ms; }
   .tabs button:hover { color: var(--text); }
-  .tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 0 var(--line-strong); }
-  .panel { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding: 40px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .tabs button[aria-selected="true"] { background: var(--text); color: var(--bg); }
+  .panel { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding: 40px; background: var(--surface); border-radius: 14px; }
   .panel + .panel { margin-top: 12px; }
   .panel[hidden] { display: none; }
   .text { grid-column: 1 / span 5; display: grid; gap: 24px; align-content: start; }
