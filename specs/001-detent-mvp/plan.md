@@ -1,4 +1,4 @@
-# Implementation Plan: Detent MVP
+# Implementation Plan: Dekernai MVP
 
 **Branch**: `spec/001-detent-mvp` | **Date**: 2026-11-18 | **Spec**: [spec.md](spec.md)
 
@@ -6,7 +6,7 @@
 
 ## Summary
 
-Detent is agentic payment controls in three layers. The plan keeps the architecture the founder specified in
+Dekernai is agentic payment controls in three layers. The plan keeps the architecture the founder specified in
 `spec/01` and that M0 has started (one Python service, a worker, two simulator apps and Postgres). It adds two
 things: contracts for every interface, and a re-sliced build order. The new order is nine small end-to-end
 prototype slices (S1 to S9) and four portal slices (P1 to P4); each ends in a demonstrable exit check. The re-slicing

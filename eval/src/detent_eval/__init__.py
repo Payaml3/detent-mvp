@@ -1,1 +1,1 @@
-"""Detent evaluation runner (EVL-01 to EVL-08). Test networks and simulators only."""
+"""Dekernai evaluation runner (EVL-01 to EVL-08). Test networks and simulators only."""

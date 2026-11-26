@@ -45,7 +45,7 @@
 ## Orchestration layer: fault suite
 
 {{ flt.count }} scenarios, {{ flt.passed }} passed. Duplicates are counted from the rails' own records
-(the chain's transfer logs and the bank simulator's payments), not from Detent's database.
+(the chain's transfer logs and the bank simulator's payments), not from Dekernai's database.
 
 | Category | Scenarios | Passed | Duplicates |
 |---|---|---|---|
@@ -81,7 +81,7 @@ UNKNOWN to resolved (simulated clock): {{ flt.unknown_resolution.count }} attemp
 | Invented values (must be 0) | {{ interp.invented_values }} |
 | Canonical invoice | {{ interp.canonical.correct }}/{{ interp.canonical.runs }} runs |
 
-With recorded stand-ins these figures show that Detent's own checks hold (a stand-in that invents a value
+With recorded stand-ins these figures show that Dekernai's own checks hold (a stand-in that invents a value
 has it removed and flagged); they do not measure a model. The live run asks the model itself.
 {% endif %}
 

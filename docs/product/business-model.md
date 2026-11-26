@@ -18,8 +18,8 @@ approves stage 3, the goal tree (`founder/goals.json`) is due under the plugin's
 | Channels | Founder-led sales; free shadow report as the entry offer; website and sandbox for evaluation; later back-office platform partners | Proposed |
 | Revenue | Software fee per payment decided, never a share of money moved; plans Pilot, Growth, Scale; routing add-on | Proposed (A4; D-15 for plan names) |
 | Cost structure | AI model usage, EU hosting, security assurance (pen test, then SOC 2), legal (perimeter opinion, contracts), founder time | Assumption |
-| Key metrics | Payments decided per week under Detent (North Star); shadow-to-pilot 40%; pilot-to-paid 60%; under 10 days from pilot signed to shadow live | Proposed (B7) |
-| Unfair advantage | Founder's domain experience in payment operations (personal experience only, never as Detent traction); safety invariants proven by a release gate | Assumption |
+| Key metrics | Payments decided per week under Dekernai (North Star); shadow-to-pilot 40%; pilot-to-paid 60%; under 10 days from pilot signed to shadow live | Proposed (B7) |
+| Unfair advantage | Founder's domain experience in payment operations (personal experience only, never as Dekernai traction); safety invariants proven by a release gate | Assumption |
 
 ## Positioning
 
@@ -27,9 +27,9 @@ approves stage 3, the goal tree (`founder/goals.json`) is due under the plugin's
   agents (investors); a technology service provider under DORA (regulators and contracts). Never a payments
   company or payment provider.
 - **For** heads of payments at UK and EU platforms that hold user balances, **who** can't undo a wrong
-  stablecoin or instant bank payout, **Detent is** agentic payment controls **that** decide, send once and
+  stablecoin or instant bank payout, **Dekernai is** agentic payment controls **that** decide, send once and
   prove every payment under rules the platform owns. **Unlike** in-house rules and a review queue, or a rail
-  provider's own checks, Detent works across every rail, never holds funds or keys, and starts in shadow mode
+  provider's own checks, Dekernai works across every rail, never holds funds or keys, and starts in shadow mode
   on the platform's own data.
 - **Alternatives the buyer uses today (hypothesis):** in-house code plus a manual queue and spreadsheets; the
   rail provider's built-in controls; general fraud or transaction-monitoring tools. No real competitor names
@@ -41,14 +41,14 @@ Open: the one-line alternative the buyer names in interviews.
 
 | Plan | What it is | Unit | Price |
 | --- | --- | --- | --- |
-| Free shadow report | Detent decides on a 30-day export; a report of what it would have done; nothing sent | Per platform, once | Free |
+| Free shadow report | Dekernai decides on a 30-day export; a report of what it would have done; nothing sent | Per platform, once | Free |
 | Pilot | Shadow then Assist on live traffic, one rail, time-boxed | Flat pilot fee | Open ("Talk to us", D-15) |
 | Growth | Assist or Auto, two or more rails, exceptions and reconciliation | Per payment decided, monthly minimum | Open |
 | Scale | Orchestrate across rails, higher volumes, assurance pack | Per payment decided, volume tiers | Open |
 | Routing add-on | Best-rail choice and failover | Per routed payment | Open |
 
 Rules (Proposed, from A4): usage is measured from the ledger and billed monthly (B3); the fee is per payment
-decided, not a percentage of value, so Detent never looks like a payment provider and incentives stay neutral.
+decided, not a percentage of value, so Dekernai never looks like a payment provider and incentives stay neutral.
 
 Pricing changes need the `pricing` gate. Proposed next step: test a pilot fee range in the second discovery
 meeting, then run `/founder:pricing-strategy` with that evidence.
