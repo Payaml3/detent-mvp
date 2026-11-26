@@ -5,8 +5,11 @@ import config from "../../site.config.mjs";
   <div class="wrap inner">
     <h2 id="close-title" data-reveal>Held until it’s right.<br />Sent exactly once.</h2>
     <div class="foot" data-reveal>
-      <p>See your own payouts decided under your rules: book a demo, or start with a free shadow report.</p> {/* taste-skill-ignore: "shadow report" is a product name, not a CSS shadow */}
-      <a class="button dark" href={config.bookingUrl}>Book a demo</a>
+      <p>See your own payments decided under your rules, before anything is sent.</p>
+      <div class="acts">
+        <a class="button" href="/design-partners/">Get a free shadow report</a> {/* taste-skill-ignore: "shadow report" is a product name */}
+        <a class="button secondary dark" href={config.bookingUrl}>Book a demo</a>
+      </div>
     </div>
   </div>
 </section>
@@ -17,5 +20,8 @@ import config from "../../site.config.mjs";
   @media (max-width: 680px) { h2 { font-size: 7.4vw; } }
   .foot { display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; }
   .foot p { font-size: 20px; max-width: 46ch; }
-  @media (max-width: 680px) { .foot .button { width: 100%; justify-content: center; } }
+  .acts { display: flex; gap: 12px; flex-wrap: wrap; }
+  .secondary.dark { color: var(--bg); border-color: var(--bg); }
+  .secondary.dark:hover { background: color-mix(in srgb, var(--bg) 12%, transparent); }
+  @media (max-width: 680px) { .acts, .foot .button { width: 100%; justify-content: center; } }
 </style>

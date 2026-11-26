@@ -5,7 +5,7 @@ below the name is **Proposed** until the founder approves it.
 
 ## Name
 
-- **DekernAI**, said "deh-KER-nye". Write it as one word with a capital D and a capital AI: DekernAI (not Dekernai, not DEKERNAI). Founder decision, 2026-11-26.
+- **DekernAI**, said "deh-KER-nye". Write it as one word: **DekernAI**, with a capital D and a capital "AI" (founder, 26 Nov 2026). Not Dekernai, not DEKERNAI, not Dekern AI. Domains and identifiers stay lower case (dekernai.com).
 - Root: Latin *dēcernere*, "to decide, settle, rule on", from *dē-* ("off") and *cernere* ("to sift, see
   clearly"). The same root gives *decree*, *discern* and *certain*.
 - Domains: dekernai.com (primary) and dekernai.co.uk, registered by the founder on 2026-11-26 (GoDaddy, 1 year). dekernai.ai and .io are not registered. Set up 2FA and the transfer lock; company email is still to choose.

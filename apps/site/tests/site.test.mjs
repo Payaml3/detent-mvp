@@ -43,17 +43,26 @@ test("honesty: certifications appear only as roadmap items", () => {
   }
 });
 
-test("home: category wording and both calls to action", () => {
+test("home: category wording, the shadow report as the main action, demo and sandbox access", () => {
   const html = read(PAGES.home);
   assert.match(text(html), /agentic payment controls/i);
-  assert.match(html, /<a[^>]*class="[^"]*\bbutton\b[^"]*"[^>]*>\s*Book a demo/);
+  const hero = html.split('data-section="hero"')[1].split("data-section=")[0];
+  const buttons = [...hero.matchAll(/<a[^>]*class="([^"]*\bbutton\b[^"]*)"[^>]*>\s*([^<]+)/g)].map((m) => [m[1], m[2].trim()]);
+  assert.deepEqual(buttons[0], ["button", "Get a free shadow report"], "the first hero button is the primary shadow report action");
+  assert.ok(buttons.some(([cls, label]) => /secondary/.test(cls) && label === "Book a demo"), "Book a demo is the secondary button");
   assert.match(text(html), /Request sandbox access/);
 });
 
-test("home: the eleven spec/08 sections, in order", () => {
-  const order = ["hero", "problem", "how-it-works", "layers", "irreversible", "results", "developers", "security", "use-cases", "pricing", "footer"];
+test("home: the sections of docs/design/landing-page-ux.md, in order", () => {
+  const order = ["hero", "problem", "spine", "rules", "irreversible", "roles", "offer", "use-cases", "faq", "close", "footer"];
   const found = [...read(PAGES.home).matchAll(/data-section="([a-z-]+)"/g)].map((m) => m[1]);
   assert.deepEqual(found.filter((s) => order.includes(s)), order);
+});
+
+test("home: the rules decide, said once, and never the AI", () => {
+  const t = text(read(PAGES.home));
+  assert.match(t, /Agents prepare\. Your rules decide\./);
+  assert.ok(!/\b(AI|agent)s? (decides?|approves?)\b/i.test(t.replace(/Does the AI approve payments\?/, "")), "no copy says the AI decides or approves");
 });
 
 test("home: the demonstration's scenarios are readable without JavaScript", () => {
@@ -63,27 +72,27 @@ test("home: the demonstration's scenarios are readable without JavaScript", () =
   assert.match(t, /A failure can retry\. A rejection can.t\. No retry ever becomes a second payment\./);
 });
 
-test("results: not published, and no figures, while there is no results file", () => {
+test("results: left off the home page, with no figures, while there is no results file", () => {
   const html = read(PAGES.home);
-  const section = html.split('data-section="results"')[1].split("data-section=")[0];
-  assert.match(text(section), /not yet published/i);
-  assert.ok(!/data-figure=/.test(section));
+  assert.ok(!html.includes('data-section="results"'), "no empty results section");
+  assert.ok(!/data-figure=/.test(html));
 });
 
-test("developers: one request in eight languages, labelled pre-launch", () => {
+test("developers: one request in eight languages, labelled pre-launch, in the engineering panel", () => {
   const html = read(PAGES.home);
-  const section = html.split('data-section="developers"')[1].split("data-section=")[0];
+  const section = html.split('id="panel-engineering"')[1].split("data-section=")[0];
   for (const lang of ["cURL", "Python", "TypeScript", "Go", "Java", "C#", "PHP", "Ruby"]) assert.ok(section.includes(`>${lang}<`), lang);
   assert.match(text(section), /pre-launch/i);
   assert.match(section, /<pre[\s\S]*payment_intents/);
 });
 
-test("pricing: four offers, every one 'Talk to us', no prices", () => {
+test("offer: the free shadow report, paid plans 'Talk to us', no prices", () => {
   const html = read(PAGES.home);
-  const section = text(html.split('data-section="pricing"')[1].split("data-section=")[0]);
+  const section = text(html.split('data-section="offer"')[1].split("data-section=")[0]);
   for (const plan of ["shadow report", "Pilot", "Growth", "Scale"]) assert.match(section, new RegExp(plan, "i"));
-  assert.equal((section.match(/Talk to us/g) || []).length >= 4, true);
-  assert.ok(!/[$£€]\s?\d/.test(section), "no prices");
+  assert.match(section, /Talk to us/);
+  assert.match(section, /Fictional data/i, "the sample report is labelled fictional");
+  assert.ok(!/(free|Pilot|Growth|Scale)[^.]{0,40}[$£€]\s?\d/i.test(section), "no prices next to a plan");
 });
 
 test("sub-pages carry their required content", () => {

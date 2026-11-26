@@ -3,18 +3,18 @@ const problems = [
   { name: "Review queues that never empty", body: "Static rules flag too much, so people check payments one by one, and the risky ones wait in the same line as the routine ones." },
   { name: "Deposits credited to the wrong account", body: "Wrong network, wrong reference, a duplicate notification: each one is a credit someone has to unwind by hand." },
   { name: "Retries that become second payments", body: "A timeout looks like a failure, the job retries, and the supplier is paid twice on a rail that won’t give it back." },
-  { name: "Rails that can’t be reversed", body: "Stablecoins and instant bank payouts settle in seconds. A wrong decision is final the moment it’s sent." },
+  { name: "Decisions nobody can replay", body: "Months later, an auditor asks why a payout went out. The answer is in someone’s inbox, if it’s anywhere." },
 ];
 ---
 <section class="section problem" data-section="problem" aria-labelledby="problem-title">
   <div class="wrap grid">
     <div class="head" data-reveal>
-      <h2 id="problem-title">Rails move money. Decisions stay yours.</h2>
-      <p class="lead soft-lead">Platforms that hold user balances get rails from their providers and keep every decision themselves: credit this deposit, send this payout, which rail, how to reconcile.</p>
+      <h2 id="problem-title">On instant rails, mistakes are final.</h2>
+      <p class="lead soft-lead">Stablecoins and instant bank payouts settle in seconds. Your rails move the money. The decisions stay with you, and today they’re made by hand.</p>
     </div>
     <ol class="list">
       {problems.map((p) => (
-        <li data-reveal>
+        <li data-card>
           <h3>{p.name}</h3>
           <p>{p.body}</p>
         </li>
