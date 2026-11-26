@@ -2315,6 +2315,17 @@
    "deps": [],
    "blocks": [],
    "dependents": []
+  },
+  {
+   "id": "B-04",
+   "title": "Clients join through DekernAI's **onboarding process**, not a free shadow report: seven phases (discovery, contract a...",
+   "kind": "decision",
+   "role": "product",
+   "slice": "",
+   "status": "todo",
+   "progress": "Proposed",
+   "deps": [],
+   "dependents": []
   }
  ]
 }

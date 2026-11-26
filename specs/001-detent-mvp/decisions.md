@@ -116,7 +116,7 @@ original documents would let me check every Proposed item below against them.
 | D-12 | C-19: webhook signing secrets are stored encrypted with the credentials key, not hashed; still shown once (spec/02, spec/10) | 2026-11-18 | Same |
 | D-13 | EVL-08 (latency benchmark) is promoted from Should to Must | 2026-11-18 | Same |
 | D-14 | Build the marketing website (slice P4) before S1; stories whose dependencies aren't built yet (WEB-03 results, WEB-04 tested snippets, WEB-06 access inbox, WEB-07 status page) ship with honest placeholders and stay open | 2026-11-18 | Founder: "can we build first the website landing and its internal pages?" |
-| D-15 | Pricing section names the free shadow report, Pilot, Growth and Scale; no prices; every plan says "Talk to us" (resolves the open "prices or Talk to us" question for now) | 2026-11-18 | Founder answer |
+| D-15 | (Free shadow report superseded by B-04, 2026-11-26.) Pricing section names the free shadow report, Pilot, Growth and Scale; no prices; every plan says "Talk to us" (resolves the open "prices or Talk to us" question for now) | 2026-11-18 | Founder answer |
 | D-16 | Booking link and access form point to clearly marked placeholders in one config file until the founder supplies the booking URL and sales inbox; nothing is sent anywhere | 2026-11-18 | Founder answer |
 | D-17 | The site takes the name from one setting (working name "Detent"); the domain stays a placeholder; nothing is deployed | 2026-11-18 | Founder answer |
 | D-18 | The site uses the spec/07 brand tokens (ink, paper, orange, blue; Space Grotesk and Inter; JetBrains Mono only for code) | 2026-11-18 | Founder answer |

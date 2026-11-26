@@ -27,7 +27,7 @@
    "function": "00 Founder HQ",
    "measure": "Decisions resolved",
    "done": 49,
-   "total": 94,
+   "total": 95,
    "pct_done": 52
   },
   {
@@ -1714,7 +1714,7 @@
  ],
  "decision_counts": {
   "Approved": 3,
-  "Proposed": 0,
+  "Proposed": 1,
   "Assumption": 0,
   "Open": 0,
   "Confirmed": 46
