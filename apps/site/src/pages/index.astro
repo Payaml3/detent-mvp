@@ -4,6 +4,7 @@ import Hero from "../components/Hero.astro";
 import Problem from "../components/Problem.astro";
 import Spine from "../components/Spine.astro";
 import Rules from "../components/Rules.astro";
+import Console from "../components/Console.astro";
 import Irreversible from "../components/Irreversible.astro";
 import Results from "../components/Results.astro";
 import Roles from "../components/Roles.astro";
@@ -20,6 +21,7 @@ const resultsFile = Object.keys(import.meta.glob("../data/results.json")).length
   <Problem />
   <Spine />
   <Rules />
+  <Console />
   <Irreversible />
   {resultsFile && <Results />}
   <Roles />
