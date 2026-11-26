@@ -1133,7 +1133,7 @@ Sources: [spec/00 §product-principles](../../spec/00-product-context.md#product
 | [SHD-03](../../backlog/user-stories.md#shd-03) | L | 0 | Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change | planned | integration: `apps/api/tests/integration/test_shd_03.py` |
 | [SHD-04](../../backlog/user-stories.md#shd-04) | L | 0 | Raw names and account identifiers never stored; hashes are consistent within one import | planned | integration: `apps/api/tests/integration/test_shd_04.py` |
 | [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 0 | Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1 | planned | manual: `manual check, recorded in the PR description` |
-| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 1 | Production starts in Shadow mode (B-04; open question to the founder in client-journey.md); moves to Assist and Auto follow SHD-03 | planned | manual: `manual check, recorded in the PR description` |
+| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 1 | Production starts in Shadow mode (founder, 2026-11-26); moves to Assist and Auto follow SHD-03 | planned | manual: `manual check, recorded in the PR description` |
 | [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 2 | In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14) | planned | console: `apps/api/tests/integration/test_dsh_13.py` |
 
 ## FR-099 · Operations (confirmed)

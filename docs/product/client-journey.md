@@ -61,12 +61,12 @@ Founder's flow (2026-11-26), with policy sign-off and shadow kept before any liv
   `live_mode_unavailable`.
 - Production mode and live keys are after the MVP: the prototype runs on test networks only (invariant 14).
 
-## Open question for the founder
+## Production starts in Shadow (founder, 2026-11-26)
 
-- **Does production start in Shadow?** This journey (B-04) says yes: production begins in phase 5 with nothing
-  sent, then Assist, then Auto. The founder's flow says the client "enables production mode and starts". If
-  production should send from day one (straight to Assist), phase 5 moves before production, on sandbox or
-  exported data.
+During integration the client is on the sandbox. When the integration is complete they ask DekernAI for a
+review; once DekernAI approves it, the account owner can enable production mode. Production starts in Shadow:
+live payments are decided and nothing is sent until the client signs the move to Assist, then Auto (founder's
+choice "Start in Shadow, then Assist").
 
 ## Follow-ups (not in this change)
 

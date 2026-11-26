@@ -1511,7 +1511,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 **Acceptance criteria**
 
 - [ ] Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1
-- [ ] Production starts in Shadow mode (B-04; open question to the founder in client-journey.md); moves to Assist and Auto follow SHD-03
+- [ ] Production starts in Shadow mode (founder, 2026-11-26); moves to Assist and Auto follow SHD-03
 - [ ] In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14)
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** DSH-12 · **Traces to:** B3.onboarding, A3.gates
