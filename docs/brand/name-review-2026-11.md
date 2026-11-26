@@ -258,7 +258,7 @@ TMview worked again today, so the UK, EU and WIPO trade mark search ran on these
 
 | Name | .com | .ai | .io | Trade marks (GB, EU, WIPO) | UK companies | Web use | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Dekernai** | free | free | free | none | none | none | Latin *decernere*, "to decide": the decision layer in one word. Could be misread "DEK-er-nay" or as "kernel" |
+| **DekernAI** | free | free | free | none | none | none | Latin *decernere*, "to decide": the decision layer in one word. Could be misread "DEK-er-nay" or as "kernel" |
 | **Helmela** | free | free | free | none | none | none | Softest sound; no "AI" in the word |
 | Kriterai | free | free | free | none | none | none | Will be spelt "Criterai" |
 | Dokizai | free | free | free | none | none | none | Harder sound |
@@ -270,7 +270,7 @@ TMview worked again today, so the UK, EU and WIPO trade mark search ran on these
 | Kanonai, Regoai, Davarai, Selorai, Sorvai, Tenorai, Kiverai | taken | | | | | | .com needs an offer |
 | RailHelm, RailSift, RailPoise, RailCoda | free | not checked | | | | | Descriptive; narrows the brand to rails |
 
-**Recommendation: Dekernai.** It is the only candidate that says the core job (decide), carries AI, can be
+**Recommendation: DekernAI.** It is the only candidate that says the core job (decide), carries AI, can be
 registered at normal price on .com, .ai and .io, and came back clean on trade marks, UK companies and the web.
 Say it to five people cold before buying, to see whether they land on "deh-KER-nye". If the sound doesn't
 survive that test, use Helmela.
@@ -283,4 +283,4 @@ survive that test, use Helmela.
 - **habenai.com is a live AI app, "HabenAi"** ("Your digital twin, your real personality"), with a sign-in page; domain registered 4 Feb 2026 (GoDaddy).
 - Free: habenai.ai, .io, .co, .eu, .co.uk, .app, .net; gethabenai.com, usehabenai.com, habenaihq.com.
 - Trade marks (GB, EU, WIPO): none. UK companies: none.
-- Verdict: usable on .ai, but you would share the name with a live consumer AI product that owns the .com and the search results, and could file a mark first. Dekernai remains the only fully clear option.
+- Verdict: usable on .ai, but you would share the name with a live consumer AI product that owns the .com and the search results, and could file a mark first. DekernAI remains the only fully clear option.

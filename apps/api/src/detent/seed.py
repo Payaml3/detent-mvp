@@ -67,7 +67,7 @@ def seed_demo(rt: Runtime, fixture: Path = FIXTURE, *, org_id: str | None = None
         orgs_added = int(
             ensure_org(conn, rt, org_id, plat["name"], mode=plat["mode"], fail_safe=plat["fail_safe"])
         )
-        orgs_added += int(ensure_org(conn, rt, OPERATOR_ORG, "Dekernai operator (internal)", kind="demo"))
+        orgs_added += int(ensure_org(conn, rt, OPERATOR_ORG, "DekernAI operator (internal)", kind="demo"))
         for fixture_user in data["users"]:
             u = {**fixture_user, "id": demo_user_id(fixture_user["id"], org_id)}
             added = conn.execute(

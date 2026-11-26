@@ -1,8 +1,8 @@
 <!-- /founder:landing-page · 2026-11-18 · input: none (built from spec/00-product-context.md, spec/08-developer-portal.md and the live site in apps/site) -->
 
-# Landing page copy: Dekernai
+# Landing page copy: DekernAI
 
-- Assumption: there are no `founder/` files yet, so the product, audience and rules come from `spec/00-product-context.md` and the site decisions already approved: plans priced "Talk to us", placeholders clearly marked, and "Dekernai" as the working name.
+- Assumption: there are no `founder/` files yet, so the product, audience and rules come from `spec/00-product-context.md` and the site decisions already approved: plans priced "Talk to us", placeholders clearly marked, and "DekernAI" as the working name.
 - Assumption: the company is pre-launch, with a design-partner offer (the free shadow report). No customer, waitlist or volume numbers exist yet.
 - Assumption: the main reader is the head of payments at a UK or EU platform that holds user balances. Their compliance lead and developers read second.
 - Constraint from the spec's honesty rules: no testimonials, logos, customer counts or volume figures, and no certification claims. The proof and testimonial sections below follow these rules.
@@ -13,12 +13,12 @@
 
 Alternative (closer to the current site): Every payout decided, sent once, reconciled
 
-**Subheadline:** For UK and EU platforms that hold user balances. Dekernai checks, routes and reconciles every stablecoin and instant bank payment, beside the rails you already use.
+**Subheadline:** For UK and EU platforms that hold user balances. DekernAI checks, routes and reconciles every stablecoin and instant bank payment, beside the rails you already use.
 
 **Button:** Get your free shadow report
 **Second link:** Book a 10-minute demo
 
-**Proof line:** Starts in shadow mode: Dekernai decides beside your team and sends nothing.
+**Proof line:** Starts in shadow mode: DekernAI decides beside your team and sends nothing.
 
 There is no real number to show yet. If you later publish one, use a dated evaluation figure in this exact form: `[Figure], test-network evaluation on synthetic data, [date]`. Don't show a design-partner count until each partner has agreed in writing.
 
@@ -41,7 +41,7 @@ Every deposit and payout is executed, escalated or blocked under a rule set your
 *Detail:* loosening a rule needs two named approvers. One of them is your compliance lead.
 
 **Sent once, even when rails fail**
-Dekernai picks the rail your policy prefers and sends each payment exactly once. If a rail times out, the payment is marked unknown and nothing is resent until the rail gives a definite answer.
+DekernAI picks the rail your policy prefers and sends each payment exactly once. If a rail times out, the payment is marked unknown and nothing is resent until the rail gives a definite answer.
 *Detail:* each payment keeps one ID through every retry and switch of rail. One kill switch stops all sending.
 
 **Reconciled and provable afterwards**
@@ -80,10 +80,10 @@ The second slot conflicts with the spec's current rule of "no testimonials". Kee
 ## 7. FAQ
 
 **Do you hold our funds or keys?**
-No. Dekernai never holds client funds or keys. It sits beside your rails and tells them what to do, so your money stays where it is today.
+No. DekernAI never holds client funds or keys. It sits beside your rails and tells them what to do, so your money stays where it is today.
 
 **Do we have to change payment providers?**
-No. Dekernai works with the rails you already use and starts with stablecoins and instant bank payouts. You keep your contracts and add a control layer on top of them.
+No. DekernAI works with the rails you already use and starts with stablecoins and instant bank payouts. You keep your contracts and add a control layer on top of them.
 
 **Can the AI approve or send a payment?**
 No. AI agents propose payments and draft fixes, but your rules make every decision and a person approves every exception. The approver can never be the person who started the payment.
@@ -92,7 +92,7 @@ No. AI agents propose payments and draft fixes, but your rules make every decisi
 Shadow report exports are anonymised and processed in the UK or EU, under a data processing agreement signed before anything is sent. They are used only for your report and deleted on the schedule the agreement sets out.
 
 **What happens if something breaks?**
-Dekernai fails closed. Any error in a decision holds the payment or sends it to your review queue; it never sends. If a rail times out, nothing is resent until the rail gives a definite answer, so no payment can go out twice.
+DekernAI fails closed. Any error in a decision holds the payment or sends it to your review queue; it never sends. If a rail times out, nothing is resent until the rail gives a definite answer, so no payment can go out twice.
 
 ## 8. Final call to action
 
@@ -104,7 +104,7 @@ Dekernai fails closed. Any error in a decision holds the payment or sends it to 
 
 ## 9. SEO metadata
 
-**Title tag (52 characters):** Dekernai: agentic payment controls for instant payouts
+**Title tag (52 characters):** DekernAI: agentic payment controls for instant payouts
 
 **Meta description (157 characters):** Check every stablecoin and instant bank payout against your own rules before it is sent. Sent once, reconciled and provable. Start with a free shadow report.
 

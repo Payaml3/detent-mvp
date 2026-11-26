@@ -20,7 +20,7 @@ def test_faults_are_refused_in_demo_mode_unless_the_scenario_runner_asks() -> No
     c = TestClient(proxy_app("http://127.0.0.1:9", demo_mode=True))
     body = {"match": "eth_sendRawTransaction", "fault": "timeout_after_forward"}
     assert c.post("/__faults", json=body).status_code == 403
-    assert c.post("/__faults", json=body, headers={"X-Dekernai-Scenario-Runner": "1"}).status_code == 201
+    assert c.post("/__faults", json=body, headers={"X-DekernAI-Scenario-Runner": "1"}).status_code == 201
     assert (
         TestClient(proxy_app("http://127.0.0.1:9"))
         .post("/__faults", json={**body, "fault": "nope"})

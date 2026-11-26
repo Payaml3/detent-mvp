@@ -378,8 +378,8 @@ stories:
   epic: POL
   title: Decision-only API
   as: platform integrator
-  want: POST /v1/decisions to get a decision without Dekernai executing anything
-  so: I can use Dekernai before my own payout process, and shadow mode can reuse the same engine
+  want: POST /v1/decisions to get a decision without DekernAI executing anything
+  so: I can use DekernAI before my own payout process, and shadow mode can reuse the same engine
   ac:
     - "Returns the same decision object as intent creation, with `executed: false`"
     - "Decisions are stored and audited but never create attempts"
@@ -670,7 +670,7 @@ stories:
   epic: EXE
   title: Kill switch
   as: payments lead
-  want: a kill switch that I or Dekernai's on-call engineer can pull, and that only I can release
+  want: a kill switch that I or DekernAI's on-call engineer can pull, and that only I can release
   so: we can stop all sending at once during an incident
   ac:
     - "Engaging (console button or POST /v1/kill_switch) stops new submissions; the flag is checked inside the lock before every send"
@@ -1550,7 +1550,7 @@ stories:
   title: Shadow CSV import
   as: payments lead
   want: to upload a month of payout and deposit exports with our actual decisions
-  so: Dekernai can show what it would have decided on our real data
+  so: DekernAI can show what it would have decided on our real data
   ac:
     - "Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed"
   pri: Should
@@ -1565,7 +1565,7 @@ stories:
   want: a report of what would have been auto-approved, escalated and blocked, agreement with our decisions, unsafe approvals and routing savings
   so: we can judge the value before any pilot
   ac:
-    - "Sections: decision mix, agreement, unsafe approvals (approved by Dekernai but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF"
+    - "Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF"
   pri: Should
   est: 0.75
   deps: [SHD-01, RAL-06]
@@ -1690,7 +1690,7 @@ stories:
   want: a dated version header
   so: my integration doesn't break when the API changes
   ac:
-    - "`Dekernai-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400"
+    - "`DekernAI-Version: 2026-12-01`; organisations are pinned to a default; unknown versions return 400"
   pri: Must
   est: 0.25
   deps: [API-01]
@@ -1770,9 +1770,9 @@ stories:
   title: Signed webhooks
   as: platform integrator
   want: an HMAC-SHA256 signature over timestamp and body with a 5-minute window
-  so: I can trust that events come from Dekernai
+  so: I can trust that events come from DekernAI
   ac:
-    - "`Dekernai-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)"
+    - "`DekernAI-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)"
   pri: Must
   est: 0.25
   deps: [WHK-01]
@@ -1796,7 +1796,7 @@ stories:
 - id: DSH-01
   epic: DSH
   title: Admin creates organisations and invites
-  as: Dekernai admin
+  as: DekernAI admin
   want: to create an organisation after a demo and invite its developers
   so: sandbox access stays sales-led
   ac:
@@ -1824,7 +1824,7 @@ stories:
 - id: DSH-03
   epic: DSH
   title: Organisation expiry and extension
-  as: Dekernai admin
+  as: DekernAI admin
   want: sandbox access to expire unless I extend it
   so: access is reviewed and can't linger
   ac:
@@ -1915,7 +1915,7 @@ stories:
 - id: DSH-10
   epic: DSH
   title: Access requests inbox
-  as: Dekernai admin
+  as: DekernAI admin
   want: website access requests stored as leads and emailed to the sales inbox
   so: I can follow up and approve companies
   ac:
@@ -2209,7 +2209,7 @@ stories:
   title: SEO basics
   as: founder
   want: titles, meta, sitemap, Open Graph and structured data paired with the category
-  so: '"Dekernai payment controls" and our topic searches find us'
+  so: '"DekernAI payment controls" and our topic searches find us'
   ac:
     - "Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication"
   pri: Should
