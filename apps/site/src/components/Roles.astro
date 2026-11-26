@@ -1,0 +1,96 @@
+---
+import config from "../../site.config.mjs";
+import CodeSample from "./CodeSample.astro";
+// Landing UX §3.5: one tab per buying role (docs/product/customer-discovery.md). Absorbs the former Developers
+// and Security sections. Without script every panel shows, stacked; the script turns them into tabs.
+const roles = [
+  { id: "payments", tab: "Payments", title: "For the head of payments",
+    facts: [
+      ["Only escalations reach a person", "Routine payments within your limits go straight through. Your team sees the ones that need judgement."],
+      ["Never paid twice", "One payment ID for life and at most one confirmed attempt, enforced in the database, not in a script."],
+      ["A kill switch you own", "Stops every send at once. Only your payments lead can release it."],
+    ],
+    link: { href: config.bookingUrl, label: "Book a demo" } },
+  { id: "compliance", tab: "Compliance", title: "For the compliance lead",
+    facts: [
+      ["Your rules, versioned", "Every decision names the rule version it used. Approving a held payment runs the rules again first."],
+      ["A block is final", "Blocked and rejected payments can’t be approved, retried or re-routed by anyone, agent or person."],
+      ["Audit and replay", "An append-only, hash-chained log. Every payment replays to the decision it got, without calling a model."],
+    ],
+    link: { href: "/security/", label: "Read about security" } },
+  { id: "engineering", tab: "Engineering", title: "For the engineering lead",
+    facts: [
+      ["One request, every check", "Create a payment intent and the decision comes back at once, with a reason for every check. The same Idempotency-Key returns the same payment."],
+      ["Beside your rails, never custodial", "Signing stays with your custody provider. Hosting in a UK or EU cloud region."],
+      ["Sandbox, pre-launch", "Test networks only. The samples follow the published API contract; tested samples ship with the docs."],
+    ],
+    link: { href: "/access/", label: "Request sandbox access" } },
+];
+---
+<section class="section roles" id="developers" data-section="roles" aria-labelledby="roles-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <h2 id="roles-title">One answer for everyone who signs off.</h2>
+      <div class="tabs" role="tablist" aria-label="Role" data-role-tabs hidden>
+        {roles.map((r, i) => <button type="button" role="tab" id={`tab-${r.id}`} aria-controls={`panel-${r.id}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>{r.tab}</button>)}
+      </div>
+    </div>
+    {roles.map((r) => (
+      <div class={`panel panel-${r.id}`} id={`panel-${r.id}`} role="tabpanel" aria-labelledby={`tab-${r.id}`} data-role-panel data-reveal>
+        <div class="text">
+          <h3 class="ptitle">{r.title}</h3>
+          <dl>{r.facts.map(([t, d]) => <div><dt>{t}</dt><dd>{d}</dd></div>)}</dl>
+          <a class="textlink" href={r.link.href}>{r.link.label}</a>
+        </div>
+        {r.id === "engineering" && <CodeSample />}
+      </div>
+    ))}
+  </div>
+</section>
+<style>
+  .head { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; margin-bottom: 40px; }
+  h2 { max-width: 16ch; }
+  .tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface-sunk); border-radius: 8px; }
+  .tabs[hidden] { display: none; }
+  .tabs button { border: 0; border-radius: 6px; padding: 11px 18px; background: transparent; color: var(--text-soft); font: 600 15px var(--font-head); cursor: pointer; transition: background 160ms, color 160ms; }
+  .tabs button:hover { color: var(--text); }
+  .tabs button[aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 0 var(--line-strong); }
+  .panel { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; padding: 40px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .panel + .panel { margin-top: 12px; }
+  .text { grid-column: 1 / span 5; display: grid; gap: 24px; align-content: start; }
+  .panel:not(.panel-engineering) .text { grid-column: 1 / -1; }
+  .panel:not(.panel-engineering) dl { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .panel-engineering :global(.code) { grid-column: 7 / span 6; }
+  .ptitle { font-size: var(--t-small); font-family: var(--font-body); font-weight: 600; color: var(--text-soft); letter-spacing: 0.01em; }
+  dl { margin: 0; display: grid; gap: 22px; }
+  dt { font: 600 clamp(20px, 1.7vw, 24px)/1.2 var(--font-head); letter-spacing: -0.01em; margin-bottom: 6px; }
+  dd { margin: 0; color: var(--text-soft); max-width: 44ch; }
+  .textlink { justify-self: start; color: var(--interactive-soft); }
+  @media (max-width: 960px) {
+    .panel { padding: 24px; }
+    .text, .panel-engineering :global(.code) { grid-column: 1 / -1; }
+    .panel:not(.panel-engineering) dl { grid-template-columns: 1fr; gap: 22px; }
+  }
+</style>
+<script>
+  const tablist = document.querySelector("[data-role-tabs]");
+  const tabs = [...tablist.querySelectorAll('[role="tab"]')];
+  const panels = [...document.querySelectorAll("[data-role-panel]")];
+  tablist.hidden = false;
+  const select = (i, focus = false) => {
+    tabs.forEach((t, k) => { t.setAttribute("aria-selected", String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    panels.forEach((p, k) => (p.hidden = k !== i));
+    if (focus) tabs[i].focus();
+  };
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => select(i));
+    t.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") { e.preventDefault(); select((i + 1) % tabs.length, true); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); select((i + tabs.length - 1) % tabs.length, true); }
+    });
+  });
+  // the nav's "Developers" link lands on the engineering tab
+  const fromHash = () => { if (location.hash === "#developers") select(2); };
+  addEventListener("hashchange", fromHash);
+  select(location.hash === "#developers" ? 2 : 0);
+</script>

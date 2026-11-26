@@ -34,6 +34,7 @@ const first = runs.find((r) => r.id === "timeout");
           </button>
         ))}
         <p class="small soft">Every path is a real state from the payment state machine. Example payment, test network.</p>
+        <p class="small kill"><strong>Kill switch.</strong> One switch stops every send, checked before each one. Only your payments lead can release it.</p>
       </div>
     </div>
     <div class="nojs" data-nojs>
@@ -48,6 +49,7 @@ const first = runs.find((r) => r.id === "timeout");
   <script type="application/json" data-runs set:html={JSON.stringify(runs)} />
 </section>
 <style>
+  .kill { border-top: 1px solid var(--line); padding-top: 12px; }
   .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-bottom: 48px; }
   .head h2 { grid-column: 1 / span 6; }
   .statement { grid-column: 7 / span 6; align-self: end; font: 500 clamp(22px, 2.1vw, 32px)/1.25 var(--font-head); letter-spacing: -0.01em; color: var(--text); }

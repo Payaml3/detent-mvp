@@ -1,4 +1,5 @@
 ---
+// The create-payment-intent request in eight languages, with the decision that comes back (DOC/WEB).
 const body = `{
   "kind": "payout",
   "source": "platform",
@@ -35,38 +36,25 @@ const response = `{
   }
 }`;
 ---
-<section class="section developers" id="developers" data-section="developers" aria-labelledby="dev-title">
-  <div class="wrap grid">
-    <div class="head" data-reveal>
-      <h2 id="dev-title">One request, every check.</h2>
-      <p class="lead">Create a payout intent and the decision comes back at once, with a reason for every check. Retries are safe: the same Idempotency-Key returns the same payment.</p>
-      <p class="small soft">Sandbox, pre-launch. These samples follow the published API contract; tested samples ship with the docs.</p>
-    </div>
-    <div class="code" data-tabs-code data-reveal>
-      <div class="langs" role="tablist" aria-label="Language">
-        {samples.map((s, i) => <button role="tab" aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1} data-lang={i}>{s.lang}</button>)}
-      </div>
-      {samples.map((s, i) => <pre data-code={i} hidden={i !== 0}><code>{s.code}</code></pre>)}
-      <div class="response" data-ui>
-        <p class="small soft">Response · 201</p>
-        <pre><code>{response}</code></pre>
-      </div>
-    </div>
+<div class="code" data-tabs-code>
+  <div class="langs" role="tablist" aria-label="Language">
+    {samples.map((s, i) => <button type="button" role="tab" aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1} data-lang={i}>{s.lang}</button>)}
   </div>
-</section>
+  {samples.map((s, i) => <pre data-code={i} hidden={i !== 0}><code>{s.code}</code></pre>)}
+  <div class="response" data-ui>
+    <p class="small soft">Response · 201</p>
+    <pre><code>{response}</code></pre>
+  </div>
+</div>
 <style>
-  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
-  .head { grid-column: 1 / span 4; display: grid; gap: 20px; align-content: start; }
-  .head .lead { color: var(--text-soft); }
-  .code { grid-column: 6 / span 7; display: grid; gap: 8px; min-width: 0; }
+  .code { display: grid; gap: 8px; min-width: 0; }
   .langs { display: flex; flex-wrap: wrap; gap: 6px; }
-  .langs button { border: 0; border-radius: 6px; padding: 9px 14px; background: var(--surface); color: var(--text-soft); font: 500 14px var(--font-body); cursor: pointer; transition: background 160ms, color 160ms; }
+  .langs button { border: 1px solid var(--line); border-radius: 6px; padding: 8px 13px; background: var(--surface); color: var(--text-soft); font: 500 14px var(--font-body); cursor: pointer; transition: background 160ms, color 160ms; }
   .langs button:hover { color: var(--text); }
-  .langs button[aria-selected="true"] { background: var(--text); color: var(--bg); }
-  pre { margin: 0; background: var(--surface-sunk); border-radius: var(--radius); padding: 24px; overflow-x: auto; font: 13.5px/1.6 var(--font-mono); color: var(--code); }
+  .langs button[aria-selected="true"] { background: var(--text); border-color: var(--text); color: var(--bg); }
+  pre { margin: 0; background: var(--surface-sunk); border-radius: var(--radius); padding: 22px; overflow-x: auto; font: 13px/1.6 var(--font-mono); color: var(--code); }
   .response { background: var(--surface-sunk); border-radius: var(--radius); padding: 16px 20px; display: grid; gap: 8px; }
   .response pre { background: transparent; padding: 0; color: var(--code-key); }
-  @media (max-width: 960px) { .head, .code { grid-column: 1 / -1; } }
 </style>
 <script>
   const root = document.querySelector("[data-tabs-code]");

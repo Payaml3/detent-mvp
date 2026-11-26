@@ -51,6 +51,8 @@ section { position: relative; }
 .st-READY, .st-SUBMITTED { color: var(--interactive-soft); background: color-mix(in srgb, var(--interactive) 16%, transparent); }
 .st-CONFIRMED { color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, transparent); }
 .st-BLOCKED, .st-FAILED, .st-FAILED_FINAL, .st-REJECTED { color: var(--danger); background: color-mix(in srgb, var(--signal) 16%, transparent); }
+/* a block always carries an icon as well as its word (B-02): a struck circle instead of the dot */
+.st-BLOCKED::before, .st-REJECTED::before { width: 9px; height: 9px; background: linear-gradient(45deg, transparent 43%, currentColor 43% 57%, transparent 57%); border: 1.5px solid currentColor; }
 
 /* entrance motion: content is visible without script; script adds .will-reveal first */
 .will-reveal [data-reveal] { opacity: 0; transform: translateY(24px); }

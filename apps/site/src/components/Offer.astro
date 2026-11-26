@@ -1,0 +1,68 @@
+---
+import config from "../../site.config.mjs";
+// Landing UX §3.6: the free shadow report (docs/product/shadow-report.md, I5) as the page's main offer.
+// Replaces the Pricing section on the home page; paid plans stay "Talk to us" (D-15).
+const steps = [
+  { n: "1", title: "You send", body: "One month of payout and deposit exports as CSV. We sign a DPA first, and names and account details are hashed on import." },
+  { n: "2", title: "We decide", body: "Every row runs through your rules, written down with you in a policy workshop. Nothing is sent anywhere." },
+  { n: "3", title: "You get", body: "A report within 5 working days: the decision mix, where we agreed with your team, unsafe approvals and unreconciled items." },
+];
+const rows = [
+  { who: "Payout, Quill Studio Ltd", amount: "£820.00", status: "ESCALATED", why: "Bank details changed 3 days ago. Your team: paid without review." },
+  { who: "Payout, Example Sanctioned Trading Co", amount: "500.00 USDC", status: "BLOCKED", why: "Screening hit on the address." },
+  { who: "Payout, Harbor Logistics GmbH", amount: "€2,400.00", status: "CONFIRMED", why: "Every check passed. Your team: paid." },
+];
+const plans = ["Pilot", "Growth", "Scale"];
+---
+<section class="section offer" id="shadow-report" data-section="offer" aria-labelledby="offer-title">
+  <div class="wrap grid">
+    <div class="head" data-reveal>
+      <p class="eyebrow">Free shadow report</p> {/* taste-skill-ignore: "shadow report" is a product name */}
+      <h2 id="offer-title">See your last month, decided by your rules.</h2>
+      <ol class="steps">
+        {steps.map((s) => (
+          <li><span class="n" aria-hidden="true">{s.n}</span><div><h3>{s.title}</h3><p>{s.body}</p></div></li>
+        ))}
+      </ol>
+      <div class="actions">
+        <a class="button" href="/design-partners/">Get a free shadow report</a> {/* taste-skill-ignore: "shadow report" is a product name */}
+        <p class="small soft">Paid plans after the pilot: {plans.join(", ")}. <a class="textlink" href={config.bookingUrl}>Talk to us</a>.</p>
+      </div>
+    </div>
+    <figure class="sample" data-ui data-reveal>
+      <figcaption class="sample-top"><span class="small">Sample report</span><span class="small soft">Fictional data</span></figcaption>
+      <div class="sum">
+        <div><span class="small soft">Payments read</span><strong>2,140</strong></div>
+        <div><span class="small soft">Unsafe approvals</span><strong>3</strong></div>
+        <div><span class="small soft">Sent</span><strong>0</strong></div>
+      </div>
+      <ul class="rows">
+        {rows.map((r) => (
+          <li><p class="who">{r.who} <span class="soft">· {r.amount}</span></p><span class={`chip st-${r.status}`}>{r.status}</span><p class="soft">{r.why}</p></li>
+        ))}
+      </ul>
+    </figure>
+  </div>
+</section>
+<style>
+  .offer { background: var(--bg-alt); margin-top: var(--section); padding-bottom: var(--section); border-block: 1px solid var(--line); }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: start; }
+  .head { grid-column: 1 / span 6; display: grid; gap: 32px; }
+  .eyebrow { font: 600 14px/1 var(--font-head); text-transform: uppercase; letter-spacing: 0.1em; color: var(--signal); }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+  .steps li { display: grid; grid-template-columns: 40px 1fr; gap: 16px; align-items: start; }
+  .n { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--text); display: grid; place-items: center; font: 600 14px/1 var(--font-head); }
+  .steps h3 { margin-bottom: 4px; }
+  .steps p { color: var(--text-soft); max-width: 48ch; }
+  .actions { display: grid; gap: 14px; justify-items: start; }
+  .actions .textlink { color: var(--interactive-soft); }
+  .sample { grid-column: 8 / span 5; margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; gap: 20px; transform: rotate(0.6deg); }
+  .sample-top { display: flex; justify-content: space-between; font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .sum { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .sum div { display: grid; gap: 4px; }
+  .sum strong { font: 600 28px/1 var(--font-head); letter-spacing: -0.02em; }
+  .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .rows li { display: grid; gap: 6px; justify-items: start; padding: 14px; background: var(--surface-sunk); border-radius: 8px; }
+  .who { font-weight: 600; }
+  @media (max-width: 960px) { .head, .sample { grid-column: 1 / -1; } .sample { transform: none; } }
+</style>
