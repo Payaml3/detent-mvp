@@ -18,6 +18,7 @@ from detent.exceptions.cases import CaseError, approve, reject
 from detent.intents.service import IntentRequest, submit_intent
 from detent.ledger.deposits import DepositRequest
 from detent.logging import request_id_var
+from detent.sandbox.generations import visible
 from detent.views.payments import payment_view
 
 router = APIRouter(prefix="/v1")
@@ -116,7 +117,7 @@ def list_payment_intents(
     starting_after: str | None = None,
 ) -> JSONResponse:
     require(principal, "read")
-    where = ["p.org_id = :o"]
+    where = ["p.org_id = :o", "p.generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"]
     params: dict[str, Any] = {"o": principal.org_id, "lim": limit + 1}
     if status:
         where.append("p.status = :status")
@@ -136,7 +137,10 @@ def list_payment_intents(
     with request.app.state.runtime.engine.connect() as conn:
         if starting_after:
             cur = conn.execute(
-                text("SELECT created_at, id FROM payment_intents WHERE org_id=:o AND id=:i"),
+                text(
+                    "SELECT created_at, id FROM payment_intents WHERE org_id=:o AND id=:i AND "
+                    "generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
+                ),
                 {"o": principal.org_id, "i": starting_after},
             ).one_or_none()
             if cur is None:
@@ -191,6 +195,9 @@ def _resolve_case(
         )
     rt = request.app.state.runtime
     actor = Actor(principal.user_id, principal.role)
+    with rt.engine.connect() as conn:
+        if not visible(conn, "exception_cases", principal.org_id, case_id):  # SBX-04: earlier generation
+            return error_response(404, "not_found", "not_found", "No such exception case.", request_id=_rid())
     try:
         if action == "approve":
             res = approve(
@@ -297,7 +304,8 @@ def list_request_logs(
         rows = conn.execute(
             text(
                 "SELECT id, key_id, method, path, status, latency_ms, idempotency_key, payment_id, "
-                "request_id, at FROM request_logs WHERE org_id = :o AND at >= :since "
+                "request_id, at FROM request_logs WHERE org_id = :o AND at >= :since AND "
+                "generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
                 "AND (CAST(:status AS INTEGER) IS NULL OR status = :status) "
                 "AND (CAST(:pay AS TEXT) IS NULL OR payment_id = :pay) "
                 "AND (CAST(:idem AS TEXT) IS NULL OR idempotency_key = :idem) "
@@ -413,6 +421,9 @@ def send_payment_intent(
 
     require(principal, "exceptions:approve")
     rt = request.app.state.runtime
+    with rt.engine.connect() as conn:
+        if not visible(conn, "payment_intents", principal.org_id, payment_id):
+            return error_response(404, "not_found", "not_found", "No such payment intent.", request_id=_rid())
     try:
         confirm_send(
             rt.engine,

@@ -193,12 +193,64 @@ def set_rails_mode(conn: Connection, clock: Clock, settings: Settings, *, by: Me
     return mode
 
 
+# A payment in one of these states can still reach a rail without anyone approving it, so a reset waits for
+# it: a hidden payment must never send. ESCALATED and HELD payments wait for an approval that no screen of
+# the new generation can give, so they stay held (invariant 7) and are hidden with the rest.
+_SENDING = ("READY", "SUBMITTED", "UNKNOWN", "FAILED")
+# Every dashboard organisation is on test networks in the prototype, client organisations included.
+_RESETTABLE = ("client", "evaluation", "sandbox")
+
+
+def reset_sandbox(conn: Connection, clock: Clock, *, by: Member, confirm: str) -> int:
+    """SBX-04 (C-04, D-08): start a new data generation. Earlier intents, cases, ledger entries, logs and
+    events are hidden from the API and dashboard and never deleted; keys, webhooks, members and settings
+    stay. Refused while a payout could still be sent. Returns the new generation."""
+    _require(by, "sandbox.control")
+    if confirm.strip().lower() != "reset":
+        raise AccessError("validation_error", "Type reset to confirm.")
+    org = conn.execute(
+        text("SELECT kind, data_generation FROM organisations WHERE org_id=:o FOR UPDATE"), {"o": by.org_id}
+    ).one()
+    if org.kind not in _RESETTABLE:  # the demo organisation has its own reset (CON-09, G-26)
+        raise AccessError("reset_not_allowed", "This organisation's data can't be reset here.", status=409)
+    busy = conn.execute(
+        text(
+            "SELECT count(*) FROM payment_intents p WHERE p.org_id=:o AND (p.status = ANY(:s) OR EXISTS "
+            "(SELECT 1 FROM attempts a WHERE a.org_id = p.org_id AND a.payment_id = p.id "
+            "AND a.status IN ('CREATED', 'SUBMITTED', 'UNKNOWN')))"
+        ),
+        {"o": by.org_id, "s": list(_SENDING)},
+    ).scalar_one()
+    if int(busy):
+        raise AccessError(
+            "payouts_in_flight",
+            f"{int(busy)} payout(s) can still be sent or are waiting for the rail. Reset once they are "
+            "confirmed, failed or cancelled.",
+            status=409,
+        )
+    new = int(org.data_generation) + 1
+    conn.execute(
+        text("UPDATE organisations SET data_generation=:g WHERE org_id=:o"), {"g": new, "o": by.org_id}
+    )
+    append(
+        conn,
+        clock,
+        org_id=by.org_id,
+        actor=by.actor,
+        kind="sandbox.reset",
+        subject_id=by.org_id,
+        payload={"from_generation": int(org.data_generation), "to_generation": new, "via": "dashboard"},
+    )
+    return new
+
+
 def recent_payouts(conn: Connection, org_id: str, limit: int = 15) -> list[dict[str, Any]]:
     """The latest payouts and their attempts: rail, outcome and, on a real test network, an explorer link."""
     pays = conn.execute(
         text(
             "SELECT id, status, amount_minor, currency, reference, created_at FROM payment_intents "
-            "WHERE org_id=:o ORDER BY created_at DESC, id DESC LIMIT :n"
+            "WHERE org_id=:o AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
+            "ORDER BY created_at DESC, id DESC LIMIT :n"
         ),
         {"o": org_id, "n": limit},
     ).all()

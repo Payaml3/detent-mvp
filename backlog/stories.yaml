@@ -1903,6 +1903,7 @@ stories:
   so: I can test every path on demand
   ac:
     - "Reset; force timeout to UNKNOWN, rail failure and flagged address; explorer links for real-testnet payments"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [SBX-01, SBX-04, DSH-02]
@@ -2047,6 +2048,7 @@ stories:
   so: I can start clean
   ac:
     - "Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08)"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [API-01]

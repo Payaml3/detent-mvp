@@ -17,7 +17,7 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | S8 Proof and release gate | done | `main` |
 | **S9 Demo-ready prototype in the EU** | **code merged; deploy and live testnet run pending** | `main` (the live-run fixes come back as one PR) |
 | P1 Sandbox API and webhooks | **built except WHK-02's per-language tests (DOC-04, P3)** | `main` |
-| P2 Dashboard and sandbox | **in progress: group 1 of 4 built** | branch from `main` |
+| P2 Dashboard and sandbox | **in progress: groups 1 to 3 built; group 4 next** | branch from `main` |
 | P3 Docs and SDKs, P4 Website launch | todo, in this order | |
 | L After launch (Should and Could) | todo | |
 
@@ -144,8 +144,11 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   SBX-02, SBX-03. The simulated chain in `detent/rails/simchain.py` (migration 0013), chosen per organisation in
   `rails/registry.build_adapters` (now takes `clock=`); the faucet caps in `execution/send._check_shared_wallet`;
   the sandbox page in `dashboard/developer.py` and `dashboard/sandbox.py`. See spec/08 "As built (P2 group 3a)".
-- **P2 next:** group 3b (SBX-04 reset as a new data generation, then DSH-07's reset button), group 4 (DSH-09 console per organisation, DSH-10 access requests,
-  DSH-12 verification). · Model: strongest for quotas and the rail; mid-tier for the screens
+- **P2 group 3b: built (PR from `claude/project-thread-babje1`, 2026-11-26):** SBX-04 and DSH-07. The reset is a new
+  data generation (migration 0014, `detent/sandbox/generations.py`, `dashboard/sandbox.reset_sandbox`); API and
+  dashboard reads filter on it. See spec/08 "As built (P2 group 3b)".
+- **P2 next:** group 4 (DSH-09 console per organisation, DSH-10 access requests, DSH-12 verification). DSH-09 must
+  add the generation filter to the console's own list queries. · Model: mid-tier for the screens
 - **Then:** P3, P4 (WEB-07 waits on the FND-07 deploy), L.
 
 ## Open founder items

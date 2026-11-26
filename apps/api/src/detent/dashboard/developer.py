@@ -23,6 +23,7 @@ from detent.db.engine import transaction
 from detent.domain.roles import allowed
 from detent.runtime import Runtime
 from detent.sandbox import usage
+from detent.sandbox.generations import CURRENT
 from detent.webhooks import delivery, endpoints
 from detent.webhooks.endpoints import EndpointError
 from detent.webhooks.events import ALL_TYPES, EVENT_TYPES
@@ -162,7 +163,7 @@ def logs_page(
     except AccessError as exc:
         return page(request, rt, "forbidden.html", member, message=str(exc), status_code=exc.status)
     where, params = (
-        ["org_id=:o", "at >= :since"],
+        ["org_id=:o", "at >= :since", CURRENT],
         {
             "o": member.org_id,
             "since": rt.clock.now() - timedelta(days=LOG_DAYS),
@@ -237,7 +238,7 @@ def log_detail(
     if log_id.isdigit():
         with rt.engine.connect() as conn:
             row = conn.execute(
-                text(f"SELECT {_LOG_COLS} FROM request_logs WHERE org_id=:o AND id=:i"),  # noqa: S608
+                text(f"SELECT {_LOG_COLS} FROM request_logs WHERE org_id=:o AND id=:i AND {CURRENT}"),  # noqa: S608
                 {"o": member.org_id, "i": int(log_id)},
             ).one_or_none()
     if row is None:
@@ -473,7 +474,8 @@ def _sandbox(
         )
     with rt.engine.connect() as conn:
         org = conn.execute(
-            text("SELECT mode, sandbox_rails FROM organisations WHERE org_id=:o"), {"o": member.org_id}
+            text("SELECT mode, kind, sandbox_rails, data_generation FROM organisations WHERE org_id=:o"),
+            {"o": member.org_id},
         ).one()
         payouts = sandbox.recent_payouts(conn, member.org_id)
     return page(
@@ -484,6 +486,8 @@ def _sandbox(
         scenarios=sandbox.SCENARIOS,
         mode=org.mode,
         rails=org.sandbox_rails,
+        kind=org.kind,
+        generation=org.data_generation,
         testnets=sandbox.testnet_available(rt.settings),
         payouts=payouts,
         faucet=(rt.settings.faucet_daily_cap, rt.settings.faucet_org_daily_cap),
@@ -530,3 +534,18 @@ def sandbox_rails(
     except AccessError as exc:
         return _sandbox(request, rt, member, error=str(exc), status=exc.status)
     return redirect("/dashboard/sandbox?notice=rails")
+
+
+@router.post("/sandbox/reset", response_model=None)
+def sandbox_reset(
+    request: Request,
+    confirm: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    member: Member = Depends(writable_member),  # noqa: B008
+) -> Response:
+    try:
+        with transaction(rt.engine) as conn:
+            sandbox.reset_sandbox(conn, rt.clock, by=member, confirm=confirm)
+    except AccessError as exc:
+        return _sandbox(request, rt, member, error=str(exc), status=exc.status)
+    return redirect("/dashboard/sandbox?notice=reset")

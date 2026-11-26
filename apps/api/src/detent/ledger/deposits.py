@@ -78,7 +78,8 @@ def view(conn: Connection, org_id: str, deposit_id: str) -> dict[str, Any] | Non
     d = conn.execute(
         text(
             "SELECT d.*, r.kind AS rail_kind, r.chain_id FROM deposit_intents d LEFT JOIN rails r "
-            "ON r.org_id = d.org_id AND r.id = d.rail_id WHERE d.org_id=:o AND d.id=:i"
+            "ON r.org_id = d.org_id AND r.id = d.rail_id WHERE d.org_id=:o AND d.id=:i AND "
+            "d.generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
         ),
         {"o": org_id, "i": deposit_id},
     ).one_or_none()

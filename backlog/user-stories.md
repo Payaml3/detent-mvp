@@ -1447,7 +1447,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Reset; force timeout to UNKNOWN, rail failure and flagged address; explorer links for real-testnet payments
+- [x] Reset; force timeout to UNKNOWN, rail failure and flagged address; explorer links for real-testnet payments
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** SBX-01, SBX-04, DSH-02 · **Traces to:** D.sandbox
 
@@ -1557,7 +1557,7 @@ _Developers trigger every path with test values, inside quotas_ · layer: All th
 
 **Acceptance criteria**
 
-- [ ] Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08)
+- [x] Starts a new data generation for the organisation: intents, cases, ledger and logs from earlier generations are hidden from the API and dashboard but never deleted (audit and ledger stay append-only); keeps keys, webhooks and settings; audited (D-08)
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-01 · **Traces to:** D.sandbox
 

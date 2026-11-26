@@ -396,8 +396,12 @@ def test_over_the_investigation_quota_the_case_goes_to_a_person(
     with engine.connect() as conn:
         a = latest_investigation(conn, dorg.id, first)
         b = latest_investigation(conn, dorg.id, second)
-    assert a and a["status"] == "recorded"
-    assert b and b["status"] == "needs_human" and b["flags"][0]["code"] == "QUOTA_EXCEEDED"
+    # The two jobs are due at the same frozen instant, so either can run first: one is investigated and the
+    # other, over the quota of one, goes to a person.
+    assert a and b
+    done = sorted([a, b], key=lambda i: i["status"] != "recorded")
+    assert done[0]["status"] == "recorded"
+    assert done[1]["status"] == "needs_human" and done[1]["flags"][0]["code"] == "QUOTA_EXCEEDED"
 
 
 # ------------------------------------------------------------------------------------------ DSH-08

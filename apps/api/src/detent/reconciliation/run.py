@@ -469,7 +469,8 @@ def run_all(engine: Engine, clock: Clock, settings: Any) -> dict[str, str]:
 def latest_runs(conn: Connection, org_id: str, limit: int = 20) -> list[dict[str, Any]]:
     rows = conn.execute(
         text(
-            "SELECT id, started_at, finished_at, stats FROM recon_runs WHERE org_id=:o ORDER BY "
+            "SELECT id, started_at, finished_at, stats FROM recon_runs WHERE org_id=:o AND "
+            "generation = (SELECT data_generation FROM organisations WHERE org_id = :o) ORDER BY "
             "started_at DESC, id DESC LIMIT :n"
         ),
         {"o": org_id, "n": limit},
@@ -491,6 +492,7 @@ def list_breaks(conn: Connection, org_id: str, status: str | None = None) -> lis
             "SELECT id, run_id, kind, subject_key, subject, proposed_fix, rationale, status, "
             "case_id, approved_by, "
             "decision_reason, applied_journal_id, created_at, decided_at FROM recon_breaks WHERE org_id=:o "
+            "AND generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
             "AND (CAST(:s AS text) IS NULL OR status=:s) ORDER BY created_at DESC, id DESC"
         ),
         {"o": org_id, "s": status},

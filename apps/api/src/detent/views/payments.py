@@ -47,14 +47,26 @@ def _open_case_ref(conn: Connection, org_id: str, payment_id: str) -> dict[str, 
 
 
 def payment_view(
-    conn: Connection, org_id: str, payment_id: str, *, detail: bool = False
+    conn: Connection,
+    org_id: str,
+    payment_id: str,
+    *,
+    detail: bool = False,
+    any_generation: bool = False,
 ) -> dict[str, Any] | None:
+    """None for a missing payment, or one from an earlier data generation (SBX-04) unless
+    `any_generation`: webhook events about a payment are built from it whichever generation it is in."""
+    gen = (
+        ""
+        if any_generation
+        else " AND p.generation = (SELECT data_generation FROM organisations WHERE org_id = :o)"
+    )
     p = conn.execute(
         text(
             "SELECT p.*, d.kind AS d_kind, d.network AS d_network, d.address AS d_address "
             "FROM payment_intents p LEFT JOIN destinations d ON d.org_id = p.org_id AND d.id = "
             "p.destination_id "
-            "WHERE p.org_id=:o AND p.id=:p"
+            "WHERE p.org_id=:o AND p.id=:p" + gen
         ),
         {"o": org_id, "p": payment_id},
     ).one_or_none()
