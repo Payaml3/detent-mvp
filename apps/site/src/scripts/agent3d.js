@@ -1,18 +1,12 @@
 // The hero's live scene: "Agents prepare. Your rules decide." An AI agent, a sphere of particles that
-// ripples while it works, prepares payments and streams them toward the "settled D" (B-03), the rules.
+// ripples while it works, prepares payments and streams them toward the D of the Route mark (B-03), the rules.
 // Each payment lands in the D and settles; the orange point is the one outcome the rules settle on and
 // pulses with each sent example payment. The agent leans toward the pointer and its surface swells
 // toward it; the D turns to face it and parts around it. Orange never marks a block (B-02).
 // three.js is bundled with the site; colours come from the palette roles. Original work.
 import * as THREE from "three";
+import { POINT, inD, inPoint } from "./markShape.js";
 
-const POINT = { cx: 22, cy: 30.5, r: 5.5 };
-const inD = (x, y) => {
-  const outer = y >= 4 && y <= 44 && x >= 5 && (x <= 23 || Math.hypot(x - 23, y - 24) <= 20);
-  const inner = y >= 12 && y <= 36 && x >= 13 && (x <= 23 || Math.hypot(x - 23, y - 24) <= 12);
-  return outer && !inner;
-};
-const inPoint = (x, y) => Math.hypot(x - POINT.cx, y - POINT.cy) <= POINT.r;
 
 function roles() {
   const css = getComputedStyle(document.body);
@@ -54,7 +48,7 @@ export function mountAgent(canvas) {
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 300);
   camera.position.set(0, 0, 150);
 
-  // ---- the rules: the settled D, lower right ----
+  // ---- the rules: the Route mark, lower right ----
   const S = 0.74, D_AT = new THREE.Vector3(20, -12, 0);
   const rules = new THREE.Group(); rules.position.copy(D_AT); scene.add(rules);
   const DN = 4600, home = [], isPoint = [];

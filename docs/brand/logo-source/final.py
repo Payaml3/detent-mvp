@@ -35,42 +35,32 @@ def main(key, out):
         write(f"{name}.svg", svg("0 0 48 48", mark(key, ink, dot)))
     write("mark-currentcolor.svg", f'{HDR} viewBox="0 0 48 48" aria-hidden="true">{mark(key)}</svg>')
 
-    cap, d = w["cap"], w["d"]
-    x0, _, x1, _ = w["bb"]
-    word_w = x1 - x0
-    for name, ink in [("wordmark", G), ("wordmark-reverse", P)]:
-        write(
-            f"{name}.svg", svg(f"{x0:.1f} {-cap:.1f} {word_w:.1f} {cap:.1f}", f'<path fill="{ink}" d="{d}"/>')
-        )
-
-    # Horizontal lockup: mark height = 1.42 x cap height, gap = 0.27 x mark height.
-    m = cap * 1.42
-    gap = m * 0.27
-    my = -cap / 2 - m / 2
-    for name, ink in [("lockup-horizontal", G), ("lockup-horizontal-reverse", P)]:
+    # The logo: the mark is the D of DekernAI. Its 40-unit-tall D matches the cap height and sits on the
+    # baseline; the rest of the name follows at the font's own D sidebearings.
+    cap, rest = w["cap"], w["rest"]
+    s = cap / 40
+    x0, x1 = (5.5, 43.5) if key == "R" else (5, 43)  # the D's extent on the 48-unit grid
+    mx = rest["d_lsb"] - x0 * s
+    ex = rest["d_lsb"] + (x1 - x0) * s + rest["d_rsb"]
+    total = ex + rest["bb"][2]
+    pad = cap * 0.12
+    for name, ink in [("logo", G), ("logo-reverse", P)]:
         body = (
-            f'<g transform="translate(0 {my:.2f}) scale({m / 48:.4f})">{mark(key, ink, OR)}</g>'
-            f'<path fill="{ink}" transform="translate({m + gap - x0:.2f} 0)" d="{d}"/>'
+            f'<g transform="translate({mx:.2f} {-cap - 4 * s:.2f}) scale({s:.4f})">{mark(key, ink, OR)}</g>'
+            f'<path fill="{ink}" transform="translate({ex:.2f} 0)" d="{rest["d"]}"/>'
         )
-        write(f"{name}.svg", svg(f"0 {my:.2f} {m + gap + word_w:.2f} {m:.2f}", body))
-
-    # Stacked lockup: mark 2.6 x cap height, centred above the wordmark.
-    m2 = cap * 2.6
-    gap2 = cap * 0.7
-    tw = max(word_w, m2)
-    h = m2 + gap2 + cap
-    for name, ink in [("lockup-stacked", G), ("lockup-stacked-reverse", P)]:
-        body = (
-            f'<g transform="translate({(tw - m2) / 2:.2f} 0) scale({m2 / 48:.4f})">{mark(key, ink, OR)}</g>'
-            f'<path fill="{ink}" transform="translate({(tw - word_w) / 2 - x0:.2f} {h:.2f})" d="{d}"/>'
-        )
-        write(f"{name}.svg", svg(f"0 0 {tw:.2f} {h:.2f}", body))
+        write(f"{name}.svg", svg(f"0 {-cap - pad:.2f} {total:.2f} {cap + 2 * pad:.2f}", body))
 
     # Favicon: ink follows the browser's light or dark chrome.
-    style = f"<style>.i{{fill:{G}}}@media (prefers-color-scheme:dark){{.i{{fill:{P}}}}}</style>"
+    style = (
+        f"<style>.i{{fill:{G}}}.s{{stroke:{G}}}"
+        f"@media (prefers-color-scheme:dark){{.i{{fill:{P}}}.s{{stroke:{P}}}}}</style>"
+    )
     write(
         "favicon.svg",
-        f'{HDR} viewBox="0 0 48 48">{style}' + mark(key, "X", OR).replace('fill="X"', 'class="i"') + "</svg>",
+        f'{HDR} viewBox="0 0 48 48">{style}'
+        + mark(key, "X", OR).replace('fill="X"', 'class="i"').replace('stroke="X"', 'class="s"')
+        + "</svg>",
     )
     tile = f'<rect width="48" height="48" fill="{G}"/>'
     write(

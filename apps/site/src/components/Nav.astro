@@ -1,6 +1,6 @@
 ---
 import config from "../../site.config.mjs";
-import Mark from "./Mark.astro";
+import Logo from "./Logo.astro";
 const links = [
   { href: "/product/", label: "Product" },
   { href: "/security/", label: "Security" },
@@ -12,8 +12,7 @@ const here = Astro.url.pathname;
 <header class="nav">
   <div class="wrap nav-row">
     <a class="wordmark" href="/" aria-label={`${config.brandName} home`}>
-      <Mark />
-      <span>{config.brandName}</span>
+      <Logo height={26} />
     </a>
     <nav aria-label="Main">
       <ul>
@@ -36,5 +35,5 @@ const here = Astro.url.pathname;
   .nav-demo { font-size: 15px; white-space: nowrap; }
   @media (max-width: 1020px) { .nav-demo { display: none; } }
   @media (max-width: 860px) { nav { display: none; } .nav-cta { margin-left: auto; } }
-  @media (max-width: 420px) { .nav-cta { padding: 0 12px; font-size: 14px; } .wordmark span { display: none; } }
+  @media (max-width: 420px) { .nav-cta { padding: 0 12px; font-size: 14px; } }
 </style>

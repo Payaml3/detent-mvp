@@ -1,20 +1,11 @@
-// The hero's live mark: the "settled D" (B-03) built from a few thousand particles, each one a payment.
+// The hero's live mark: the Route mark (B-03) built from a few thousand particles, each one a payment.
 // On load they sift down from above and settle into the monogram; the orange point in the counter is the
 // one outcome the rules settle on. The mark turns toward the pointer and parts around it, then closes
 // again. Each sent example payment pulses the point. three.js is bundled with the site; colours come from
-// the palette roles. Original work, drawn from the Mark.astro geometry (viewBox 48).
+// the palette roles. Original work, drawn from the Route mark geometry (markShape.js) (viewBox 48).
 import * as THREE from "three";
+import { POINT, inD, inPoint } from "./markShape.js";
 
-const OUTER = { cx: 23, cy: 24, r: 20, x0: 5 };
-const INNER = { cx: 23, cy: 24, r: 12, x0: 13, y0: 12, y1: 36 };
-const POINT = { cx: 22, cy: 30.5, r: 5.5 };
-
-const inD = (x, y) => {
-  const outer = y >= 4 && y <= 44 && x >= OUTER.x0 && (x <= OUTER.cx || Math.hypot(x - OUTER.cx, y - OUTER.cy) <= OUTER.r);
-  const inner = y >= INNER.y0 && y <= INNER.y1 && x >= INNER.x0 && (x <= INNER.cx || Math.hypot(x - INNER.cx, y - INNER.cy) <= INNER.r);
-  return outer && !inner;
-};
-const inPoint = (x, y) => Math.hypot(x - POINT.cx, y - POINT.cy) <= POINT.r;
 
 function roles() {
   const css = getComputedStyle(document.body);
