@@ -206,7 +206,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -285,6 +285,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -895,7 +908,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -974,6 +987,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -1367,7 +1393,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -1446,6 +1472,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -1950,7 +1989,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -2029,6 +2068,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -2271,7 +2323,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -2350,6 +2402,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -2889,7 +2954,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -2968,6 +3033,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -3483,7 +3561,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -3562,6 +3640,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -3758,7 +3849,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -3837,6 +3928,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -4143,7 +4247,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -4222,6 +4326,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -4583,7 +4700,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -4662,6 +4779,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -4874,7 +5004,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -4953,6 +5083,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -5172,7 +5315,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -5251,6 +5394,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -5463,7 +5619,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -5542,6 +5698,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -5775,7 +5944,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -5854,6 +6023,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -6233,7 +6415,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -6312,6 +6494,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -6816,7 +7011,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -6895,6 +7090,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -7113,7 +7321,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -7192,6 +7400,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -7411,7 +7632,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -7490,6 +7711,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -7866,7 +8100,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -7945,6 +8179,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -8196,7 +8443,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -8275,6 +8522,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -8811,7 +9071,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -8890,6 +9150,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -9102,7 +9375,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -9181,6 +9454,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -9412,7 +9698,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -9491,6 +9777,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -9724,7 +10023,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -9803,6 +10102,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -10217,7 +10529,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -10296,6 +10608,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -10707,7 +11032,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -10786,6 +11111,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -11280,7 +11618,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -11359,6 +11697,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -11734,7 +12085,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -11813,6 +12164,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -12160,7 +12524,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -12239,6 +12603,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -12615,7 +12992,7 @@
             }
           },
           "403": {
-            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `forbidden`",
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
             "content": {
               "application/json": {
                 "schema": {
@@ -12694,6 +13071,19 @@
                         "type": "permission",
                         "code": "organisation_expired",
                         "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -13734,6 +14124,7 @@
                   "self_approval_forbidden",
                   "mandate_mismatch",
                   "organisation_expired",
+                  "organisation_suspended",
                   "forbidden",
                   "not_found",
                   "conflict",

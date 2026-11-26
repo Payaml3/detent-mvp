@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Accept invite{% endblock %}
+{% block main %}
+<section class="card narrow">
+  {% if invite and invite.state == "open" %}
+  <h1>Join {{ invite.org_name }}</h1>
+  <p>Your email <strong>{{ invite.email }}</strong> is confirmed by this link. Set a password to finish.
+     Your role: {{ role_text.get(invite.role, invite.role.value) }}.</p>
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+  <form method="post" action="/dashboard/invite/{{ token }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="email" name="email" value="{{ invite.email }}" autocomplete="username" hidden>
+    <label>Your name <input name="display_name" autocomplete="name" maxlength="80" required autofocus></label>
+    <label>Password (12 characters or more) <input type="password" name="password" autocomplete="new-password" minlength="12" required></label>
+    <label>Password again <input type="password" name="password_again" autocomplete="new-password" minlength="12" required></label>
+    <button class="primary">Set password and continue</button>
+  </form>
+  {% else %}
+  <h1>Invite link</h1>
+  <p class="error" role="alert">{{ error or "This invite link is not valid." }}</p>
+  <p><a href="/dashboard/login">Sign in</a></p>
+  {% endif %}
+</section>
+{% endblock %}

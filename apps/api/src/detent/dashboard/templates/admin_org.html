@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ org.name }}{% endblock %}
+{% block main %}
+<h1>{{ org.name }}</h1>
+<p class="muted mono">{{ org.id }}</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if link %}
+<section class="card attention" role="status">
+  <h2>Account owner's invite link</h2>
+  <p>Shown once. The invite email is in the outbox (no email provider is configured yet); send this link to the owner yourself if needed. It works once and expires in 7 days.</p>
+  <p class="mono">{{ link }}</p>
+</section>
+{% endif %}
+<dl class="facts">
+  <dt>Kind</dt><dd>{{ org.kind }}</dd>
+  <dt>Status</dt><dd>{{ status }}{% if org.suspended_reason %}: {{ org.suspended_reason }}{% endif %}</dd>
+  <dt>KYB</dt><dd>{% if org.kyb_reference %}{{ org.kyb_reference }}, approved {{ org.kyb_approved_on }}{% else %}none (evaluation){% endif %}</dd>
+  <dt>Expires</dt><dd>{{ org.expires_at.strftime('%Y-%m-%d %H:%M') ~ ' UTC' if org.expires_at else 'never' }}</dd>
+  <dt>Created</dt><dd>{{ org.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</dd>
+</dl>
+<section class="card">
+  <h2>Access</h2>
+  {% if org.kind == 'evaluation' %}
+  <form method="post" action="/admin/organisations/{{ org.id }}/extend" class="inline">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Extend by days <input type="number" name="days" min="1" max="365" value="30" required></label>
+    <button>Extend</button>
+  </form>
+  {% endif %}
+  {% if org.suspended_at %}
+  <form method="post" action="/admin/organisations/{{ org.id }}/unsuspend">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Reason for reinstating <input name="reason" minlength="3" maxlength="500" required></label>
+    <button>Reinstate</button>
+  </form>
+  {% else %}
+  <form method="post" action="/admin/organisations/{{ org.id }}/suspend">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Reason for suspending (audited) <input name="reason" minlength="3" maxlength="500" required></label>
+    <button class="danger">Suspend</button>
+  </form>
+  {% endif %}
+  <form method="post" action="/admin/organisations/{{ org.id }}/invite_owner">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>Invite an account owner (replaces an open invite to the same address) <input type="email" name="email" required></label>
+    <button>Send owner invite</button>
+  </form>
+</section>
+<h2>Members</h2>
+<table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th></tr></thead><tbody>
+{% for m in members %}<tr><td>{{ m.display_name }}</td><td>{{ m.email }}</td><td>{{ m.role }}</td><td>{{ m.created_at.strftime('%Y-%m-%d') }}</td></tr>
+{% else %}<tr><td colspan="4" class="muted">Nobody has signed up yet.</td></tr>{% endfor %}
+</tbody></table>
+<h2>Invites</h2>
+<table><thead><tr><th>Email</th><th>Role</th><th>State</th><th>Expires</th></tr></thead><tbody>
+{% for i in invites %}<tr><td>{{ i.email }}</td><td>{{ i.role }}</td><td>{{ i.state }}</td><td>{{ i.expires_at.strftime('%Y-%m-%d %H:%M') }} UTC</td></tr>
+{% else %}<tr><td colspan="4" class="muted">No invites.</td></tr>{% endfor %}
+</tbody></table>
+{% endblock %}

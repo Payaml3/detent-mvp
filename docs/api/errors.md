@@ -50,6 +50,7 @@ people and may change. Quote `request_id` when you contact DekernAI; it is also 
 | `self_approval_forbidden` | 403 | The approver is the person who started the payment. | Ask a second person to approve. |
 | `mandate_mismatch` | 403 | The intent names a mandate that is not the one bound to this agent key. | Send the mandate ID bound to the key, or leave it out. |
 | `organisation_expired` | 403 | The sandbox organisation has passed its expiry date and is locked. | Contact DekernAI to extend the sandbox. |
+| `organisation_suspended` | 403 | DekernAI has suspended the organisation; it is read-only until reinstated. | Contact DekernAI. |
 | `forbidden` | 403 | The action is not allowed for this caller. | Check the scope and role the endpoint needs. |
 
 ## `not_found`

@@ -107,7 +107,7 @@ As built (S8, migration 0008): the `attempt_ready_guard` trigger refuses an atte
 
 | Table | Key fields | Notes |
 |---|---|---|
-| `organisations` | id, name, mode (shadow, assist, auto), fail_safe (hold, manual_queue), expires_at, api_version | Demo org plus sandbox orgs |
+| `organisations` | id, name, kind (demo, sandbox, test, client, evaluation), mode (shadow, assist, auto), fail_safe (hold, manual_queue), kyb_reference, kyb_approved_on, expires_at, suspended_at, suspended_reason, api_version | Demo org plus sandbox orgs. A client organisation needs the KYB reference and date and never expires; an evaluation always expires (database checks, DSH-01) |
 | `users` | id, org_id, email, role (account_owner, admin, developer, payments_lead, compliance_lead, reviewer, backup_owner, auditor (C-14), oncall (DekernAI only)), password_hash | Console demo users are seeded |
 | `api_keys` | id, org_id, prefix, hash, scopes[], last_used_at, revoked_at, expires_at | Shown once |
 | `counterparties` | id, org_id, name, kyb_status (verified, pending, failed), allowlisted, jurisdiction, payment_count, median_amount_minor, contact_email | Stats are refreshed on confirmation. `contact_email` is fictional and only ever used in the outbox (G-02) |
@@ -139,7 +139,7 @@ As built (S8, migration 0008): the `attempt_ready_guard` trigger refuses an atte
 | `request_logs` | org_id, key_id, method, path, status, latency_ms, idempotency_key, payment_id, request_id, at | 30 days |
 | `jobs` | id, kind, run_at, payload, attempts, locked_by, locked_until, done_at | Worker queue |
 | `incidents` | id, org_id, severity, trigger, opened_at, notified_at, root_cause | |
-| `invites`, `leads` | Dashboard onboarding and website access requests | Leads belong to the operator organisation `org_detent` |
+| `invites`, `leads` | Dashboard onboarding (invites: email, role, token hash, 7-day expiry, single use, one open invite per address) and website access requests | Leads belong to the operator organisation `org_detent` |
 | `idempotency_records` | org_id, key, request_hash, response jsonb | For all create endpoints |
 
 ## Ledger accounts and postings

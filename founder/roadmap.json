@@ -452,7 +452,7 @@
    "exit": "Admin invites an account owner after KYB, who signs up, invites a developer with a role; the developer gets keys, triggers every test value and sees results in their own console; DekernAI verifies the integration; an expired evaluation organisation is locked.",
    "stories": 18,
    "criteria": 29,
-   "criteria_done": 0
+   "criteria_done": 10
   },
   {
    "id": "P3",

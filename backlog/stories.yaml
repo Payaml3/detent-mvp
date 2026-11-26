@@ -1813,6 +1813,7 @@ stories:
     - "Admin screen: organisation name, KYB approval reference and date (required for a client organisation), account owner email; the invite link is single-use and expires in 7 days"
     - "An evaluation organisation (no KYB, sandbox only) can be created with an expiry (default 60 days, DSH-03)"
     - "No public sign-up route exists"
+  done: [0, 1, 2]
   pri: Must
   est: 0.5
   deps: [API-01]
@@ -1828,6 +1829,7 @@ stories:
     - "Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role"
     - "First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification"
     - "Emails go through a transactional email provider in production and the outbox in development"
+  done: [0, 1]
   pri: Must
   est: 0.5
   deps: [DSH-01]
@@ -1842,6 +1844,7 @@ stories:
   ac:
     - "After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend"
     - "Client organisations have no expiry; admin can suspend one (same 403 and read-only), with the reason audited"
+  done: [0, 1]
   pri: Must
   est: 0.25
   deps: [DSH-01]
@@ -1950,6 +1953,7 @@ stories:
     - "Owner and admin roles can invite, change roles and remove members; invites are single-use and expire in 7 days"
     - "Roles: account owner, admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor (spec/02); permissions follow spec/08; two-person rules still apply"
     - "An organisation always keeps at least one account owner; every change writes an audit event"
+  done: [0, 1, 2]
   pri: Must
   est: 0.5
   deps: [DSH-02]

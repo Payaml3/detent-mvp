@@ -1381,9 +1381,9 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Admin screen: organisation name, KYB approval reference and date (required for a client organisation), account owner email; the invite link is single-use and expires in 7 days
-- [ ] An evaluation organisation (no KYB, sandbox only) can be created with an expiry (default 60 days, DSH-03)
-- [ ] No public sign-up route exists
+- [x] Admin screen: organisation name, KYB approval reference and date (required for a client organisation), account owner email; the invite link is single-use and expires in 7 days
+- [x] An evaluation organisation (no KYB, sandbox only) can be created with an expiry (default 60 days, DSH-03)
+- [x] No public sign-up route exists
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** API-01 · **Traces to:** D.sales_led, B3.onboarding
 
@@ -1393,8 +1393,8 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role
-- [ ] First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification
+- [x] Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role
+- [x] First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification
 - [ ] Emails go through a transactional email provider in production and the outbox in development
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led
@@ -1405,8 +1405,8 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend
-- [ ] Client organisations have no expiry; admin can suspend one (same 403 and read-only), with the reason audited
+- [x] After expiry, API calls return 403 `organisation_expired` and the dashboard is read-only; admin can extend
+- [x] Client organisations have no expiry; admin can suspend one (same 403 and read-only), with the reason audited
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led, D.abuse
 
@@ -1487,9 +1487,9 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Owner and admin roles can invite, change roles and remove members; invites are single-use and expire in 7 days
-- [ ] Roles: account owner, admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor (spec/02); permissions follow spec/08; two-person rules still apply
-- [ ] An organisation always keeps at least one account owner; every change writes an audit event
+- [x] Owner and admin roles can invite, change roles and remove members; invites are single-use and expire in 7 days
+- [x] Roles: account owner, admin, developer, payments lead, compliance lead, reviewer, backup owner, auditor (spec/02); permissions follow spec/08; two-person rules still apply
+- [x] An organisation always keeps at least one account owner; every change writes an audit event
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-02 · **Traces to:** D.sales_led, B3.onboarding
 
