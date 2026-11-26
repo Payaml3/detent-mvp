@@ -12,7 +12,9 @@ RAW = re.compile(r"#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(")
 
 
 def test_tokens_css_matches_tokens_json() -> None:
-    out = subprocess.run([sys.executable, str(ROOT / "tools/build_tokens.py"), "--check"], capture_output=True, text=True)
+    out = subprocess.run(
+        [sys.executable, str(ROOT / "tools/build_tokens.py"), "--check"], capture_output=True, text=True
+    )
     assert out.returncode == 0, out.stdout + out.stderr
 
 
