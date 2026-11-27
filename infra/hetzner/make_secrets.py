@@ -23,6 +23,8 @@ def app_secrets() -> list[str]:
         f"CREDENTIALS_ENCRYPTION_KEY={base64.urlsafe_b64encode(secrets.token_bytes(32)).decode()}",
         f"MANDATE_SIGNING_KEY_DEMO={secrets.token_hex(32)}",
         f"WEBHOOK_SECRET_PEPPER={secrets.token_hex(32)}",
+        # The demo instruction agent's own test key; "Submit as agent" needs it (registered on Reset demo data).
+        f"AGENT_API_KEY=sk_test_{secrets.token_urlsafe(24)}",
     ]
 
 
