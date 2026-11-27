@@ -22,26 +22,35 @@ the current equivalent) is about €6 to €9 a month with its IPv4 address; Neo
 
 Secrets never go into a chat, ticket or this repository: type or paste them only into Coolify.
 
-1. **Hetzner server.** console.hetzner.com, new project `DekernAI`, Add Server: location Nuremberg or
+Server details (its IP address, root access, the Coolify admin login) live only in Hetzner, Coolify, GoDaddy
+and your password manager. Never commit them to this repository.
+
+1. **SSH key (on your own computer).** In Windows PowerShell: `ssh-keygen -t ed25519` and press Enter three
+   times. Then `Get-Content $HOME\.ssh\id_ed25519.pub` prints your **public** key (safe to paste into Hetzner;
+   the private file `id_ed25519` never leaves your computer).
+2. **Hetzner server.** console.hetzner.com, new project `DekernAI`, Add Server: location Nuremberg or
    Falkenstein (Germany), image **Ubuntu 24.04**, type shared vCPU x86 **4 vCPU / 8 GB**, public IPv4 on,
-   SSH key or root password (keep it in your password manager). Send back the server's **IPv4 address**.
-2. **Firewall.** In Hetzner, Firewalls, create one allowing inbound TCP 22, 80, 443 and 8000 (8000 only until
-   Coolify has its own domain), apply it to the server.
-3. **Coolify.** Open the server's web Console in Hetzner (or SSH), log in as root, run the installer from
-   coolify.io/docs (one `curl ... | bash` line). Open `http://<IPv4>:8000`, create the admin account.
-4. **DNS at GoDaddy.** Add A records to the server's IPv4: `app` (the app) and `coolify` (Coolify's own admin).
-   In Coolify, Settings, set the instance domain to `https://coolify.dekernai.com`, then close port 8000.
-5. **Neon.** console.neon.tech, new project `dekernai-demo`, Postgres 16, region **AWS Europe (Frankfurt)**.
+   **SSH keys: add the public key from step 1**. With a key chosen, Hetzner sets no root password and password
+   login is off.
+3. **Firewall.** Hetzner, Firewalls, Create: inbound TCP **22** (SSH; set Source to your own IP address if it
+   is stable), **80** and **443** (web), plus **8000** only for the first Coolify login. Apply it to the server.
+4. **Coolify.** `ssh root@<server IP>` from PowerShell, then run the installer one-liner from coolify.io/docs.
+   Open `http://<server IP>:8000` straight away and create the admin account (the first visitor becomes admin),
+   with a long password from your password manager, and turn on two-factor login in your Coolify profile.
+5. **DNS at GoDaddy, then close port 8000.** Add A records to the server IP: `app` (the app) and `coolify`
+   (Coolify's admin). In Coolify, Settings, set the instance domain to `https://coolify.dekernai.com`; once that
+   opens over HTTPS, delete the 8000 rule from the Hetzner firewall. Only 22, 80 and 443 stay open.
+6. **Neon.** console.neon.tech, new project `dekernai-demo`, Postgres 16, region **AWS Europe (Frankfurt)**.
    Copy the connection string (pooled is fine). It becomes `DATABASE_URL` in step 7, written as
    `postgresql+psycopg://...` (replace `postgresql://` at the start) with `?sslmode=require` kept.
-6. **Connect GitHub (the repository is private).** In Coolify, Sources, **+ Add**, GitHub App, keep the
+7. **Connect GitHub (the repository is private).** In Coolify, Sources, **+ Add**, GitHub App, keep the
    default name, Register. GitHub opens: create the app on your personal account, then on Install choose
    **Only select repositories**, `Payaml3/detent-mvp`, Install. Coolify then reads the private repository
    and gets a push webhook, with no deploy key or token to copy. In your project, **+ New Resource**,
    **Private Repository (with GitHub App)**, the app, the repository, branch `main`, build pack **Docker Compose**, Base Directory `/`, Compose
    file `/infra/hetzner/docker-compose.yml`. Domains: `app` service `https://app.dekernai.com:8000`
    (Coolify routes port 8000 and gets the certificate), `site` service empty for now.
-7. **Secrets.** The app refuses to start in demo mode without real secrets. In Coolify, Servers, your server,
+8. **Secrets.** The app refuses to start in demo mode without real secrets. In Coolify, Servers, your server,
    Terminal, paste this one line and press Enter. It prints six fresh secrets on your screen only (the same
    thing `make_secrets.py` does):
 
@@ -50,19 +59,19 @@ Secrets never go into a chat, ticket or this repository: type or paste them only
    ```
 
    Open the resource's Environment Variables, switch to the bulk (Developer) view, paste the six lines, add
-   `DATABASE_URL=` with the Neon string from step 5, keep `DEMO_PASSWORD` in your password manager. Save, Deploy.
-8. **Check.** Open `https://app.dekernai.com/healthz`: `database` must say `ok`. The chains say
-   `not_configured`/`unreachable` until step 9; that is expected. Log in to `/console/login` with the
+   `DATABASE_URL=` with the Neon string from step 6, keep `DEMO_PASSWORD` in your password manager. Save, Deploy.
+9. **Check.** Open `https://app.dekernai.com/healthz`: `database` must say `ok`. The chains say
+   `not_configured`/`unreachable` until step 10; that is expected. Log in to `/console/login` with the
    `DEMO_PASSWORD` you pasted.
-9. **Test wallets.** In Coolify, the `app` container's Terminal: `python infra/hetzner/make_secrets.py --wallets`.
+10. **Test wallets.** In Coolify, the `app` container's Terminal: `python infra/hetzner/make_secrets.py --wallets`.
    Paste the four `..._PRIVATE_KEY_...` lines into Environment Variables; the four addresses are safe to share.
    Get test ETH for gas from a Base Sepolia and an Ethereum Sepolia faucet for the two sending wallets and the
    two payer wallets. Then, in the app terminal: `detent demo token deploy --network base-sepolia` and
    `--network eth-sepolia`, set `USDC_ADDRESS_BASE_SEPOLIA` / `USDC_ADDRESS_ETH_SEPOLIA` to the printed
    addresses, redeploy, then `detent demo token fund --network <n>` and `detent demo check`.
-10. **AI agents.** Create an Anthropic API key at console.anthropic.com (set a monthly spend limit), paste it as
+11. **AI agents.** Create an Anthropic API key at console.anthropic.com (set a monthly spend limit), paste it as
     `ANTHROPIC_API_KEY`, redeploy. Until then the agents use recorded stand-ins (`AGENT_LLM=auto`).
-11. **Website (optional, last).** Set the `site` service domain to `https://dekernai.com,https://www.dekernai.com`,
+12. **Website (optional, last).** Set the `site` service domain to `https://dekernai.com,https://www.dekernai.com`,
     then at GoDaddy point `@` and `www` to the server instead of Vercel. Keep Vercel until the new one loads.
 
 ## Operating it
