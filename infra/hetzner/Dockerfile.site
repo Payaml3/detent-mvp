@@ -1,0 +1,14 @@
+# The marketing site (Astro, static), served by nginx on the same Hetzner server.
+FROM node:22-alpine AS build
+# Keep the repository layout: the site imports design/tokens.json from the repository root.
+WORKDIR /repo/apps/site
+COPY apps/site/package.json apps/site/package-lock.json ./
+RUN npm ci
+COPY design/ /repo/design/
+COPY apps/site/ ./
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY infra/hetzner/nginx-site.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /repo/apps/site/dist /usr/share/nginx/html
+EXPOSE 80
