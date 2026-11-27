@@ -47,8 +47,14 @@ def _bin(name: str) -> str:
 SOURCE = CHAIN_DIR / "src" / "MockUSDC.sol"
 
 
+def _have(name: str) -> bool:
+    return shutil.which(name) is not None or (Path.home() / ".foundry" / "bin" / name).exists()
+
+
 def build_contracts() -> None:
-    if ARTIFACT.exists() and ARTIFACT.stat().st_mtime >= SOURCE.stat().st_mtime:
+    """Compile the contracts with forge, unless the artifact is current. Without forge (the server image,
+    which ships an artifact compiled at image build), an existing artifact is used as it is."""
+    if ARTIFACT.exists() and (ARTIFACT.stat().st_mtime >= SOURCE.stat().st_mtime or not _have("forge")):
         return
     subprocess.run([_bin("forge"), "build", "--root", str(CHAIN_DIR)], check=True)  # noqa: S603
 

@@ -1,5 +1,15 @@
 # DekernAI back office: API + console + dashboard, worker, bank simulator, fault proxy (one image, four commands).
 # Built by Coolify on the Hetzner server from infra/hetzner/docker-compose.yml. Test networks and test keys only.
+
+# The demo test token (chain/src/MockUSDC.sol), compiled once here so `detent demo token deploy` works in the
+# image without Foundry. Multi-arch image (amd64 and arm64, for the CAX11).
+FROM ghcr.io/foundry-rs/foundry:v1.7.1 AS contracts
+USER root
+WORKDIR /chain
+COPY chain/foundry.toml ./
+COPY chain/src ./src
+RUN forge build
+
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -22,6 +32,7 @@ COPY sdks/python/pyproject.toml sdks/python/pyproject.toml
 RUN uv sync --frozen --all-packages --no-dev --no-install-workspace
 
 COPY . .
+COPY --from=contracts /chain/out ./chain/out
 RUN uv sync --frozen --all-packages --no-dev \
  && useradd --system --uid 10001 detent \
  && chown -R detent /app
