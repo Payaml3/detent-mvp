@@ -375,15 +375,24 @@ def expectations(  # noqa: PLR0912, PLR0915 - one block per assertion keyword
         if alias and env.world.chain is not None:
             addr = env.payees[alias]
             bal = env.world.chain.balance(addr)
-            n = c.execute(
+            # An attempt row does not record the address it sent to, and the destination's current address
+            # may have changed after a legitimate send to the old one. So an attempt whose transaction is on
+            # the chain counts only if that transaction paid the alias; one with no transaction yet still counts.
+            sent_to = env.world.chain.transfer_recipients()
+            rows = c.execute(
                 text(
-                    "SELECT count(*) FROM attempts a JOIN payment_intents p ON p.org_id=a.org_id AND "
+                    "SELECT a.tx_hash FROM attempts a JOIN payment_intents p ON p.org_id=a.org_id AND "
                     "p.id=a.payment_id JOIN destinations d ON d.org_id=p.org_id AND d.id=p.destination_id "
                     "WHERE a.org_id=:o AND lower(d.address)=:a AND a.status IN "
                     "('SUBMITTED','UNKNOWN','CONFIRMED')"
                 ),
                 {"o": org, "a": addr.lower()},
-            ).scalar_one()
+            ).all()
+            n = sum(
+                1
+                for (h,) in rows
+                if not h or sent_to.get(str(h).lower().removeprefix("0x"), addr.lower()) == addr.lower()
+            )
             if bal or n:
                 fails.append(f"{alias} wallet received {bal} minor units ({n} attempts)")
         for pair in want.get("same_decision", []):
