@@ -1,0 +1,43 @@
+---
+title: "Use the kill switch"
+description: "Stop every payout at once, and release it when you are ready."
+---
+
+The kill switch stops every payout in your organisation. It is checked inside the send lock just before each
+send, so nothing leaves once it is engaged. Decisions still run and are recorded; a payment that is cleared to
+send is held with `KILL_SWITCH_ENGAGED` instead.
+
+Both calls need a key with the `admin` scope that belongs to your payments lead: only the payments lead engages
+and releases it.
+
+## Engage
+
+```bash
+curl -s -X POST "$DEKERNAI_BASE_URL/v1/kill_switch" -H "Authorization: Bearer $LEAD_KEY"
+```
+
+```json engaged
+{"engaged": true}
+```
+
+`kill_switch.engaged` is sent to your webhooks. New payouts and payouts already waiting are held:
+
+```json
+{"status": "HELD"}
+```
+
+## Release
+
+```bash
+curl -s -X DELETE "$DEKERNAI_BASE_URL/v1/kill_switch" -H "Authorization: Bearer $LEAD_KEY"
+```
+
+```json released
+{"engaged": false}
+```
+
+Held payments go through the pre-send checks again, including your rules and the agent's mandate, before they
+are sent. `kill_switch.released` is sent to your webhooks.
+
+<Note>Engaging and releasing are in the audit log with the member and their role. The console has the same switch,
+on every screen.</Note>

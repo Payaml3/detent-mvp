@@ -41,7 +41,7 @@ jobs:
           fi
           files=$(git diff --name-only "$BASE" HEAD)
           echo "$files"
-          if echo "$files" | grep -qE '^(apps/(api|banksim|faultproxy)/|eval/|chain/|fixtures/|prompts/|spec/|docs/[^/]+\.mdx$|docs/(concepts|webhooks|limits|tools)/|pyproject\.toml$|uv\.lock$|tools/check_denylist\.py$|\.github/workflows/ci\.yml$)'; then
+          if echo "$files" | grep -qE '^(apps/(api|banksim|faultproxy)/|eval/|chain/|fixtures/|prompts/|spec/|docs/[^/]+\.mdx$|docs/(concepts|guides|webhooks|limits|tools)/|pyproject\.toml$|uv\.lock$|tools/check_denylist\.py$|\.github/workflows/ci\.yml$)'; then
             echo "engine=true" >> "$GITHUB_OUTPUT"; else echo "engine=false" >> "$GITHUB_OUTPUT"; fi
           if echo "$files" | grep -qE '^(apps/site/|eval/|\.github/workflows/ci\.yml$)'; then
             echo "site=true" >> "$GITHUB_OUTPUT"; else echo "site=false" >> "$GITHUB_OUTPUT"; fi

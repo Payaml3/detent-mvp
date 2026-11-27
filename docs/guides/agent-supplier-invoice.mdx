@@ -1,0 +1,83 @@
+---
+title: "Let an AI agent pay a supplier invoice"
+description: "An agent proposes an $18,500 USDC payout under its mandate; your rules decide; a person approves."
+---
+
+Your accounts-payable agent reads a supplier invoice from Bluefin Components Ltd (fictional) for 18,500.00 USDC.
+The agent proposes the payout. It can't send it, approve it or change your rules: the mandate says what it may
+ask for, and your policy decides.
+
+Your sandbox organisation comes with the agent's mandate, `mnd_demo_ap_agent`: it may pay `cpt_bluefin` and
+`cpt_harbor`, up to 20,000.00 USDC a payment and 50,000.00 USDC in total, on the test networks. Read it with
+`GET /v1/mandates`. The guide assumes your organisation is in auto mode; see
+[Move from shadow to auto mode](/guides/shadow-to-auto).
+
+## 1. Give the agent its own key
+
+Create a key in the dashboard (**Keys**) with only the `intents:create` scope, and give it to the agent. Its
+payouts are recorded as initiated by the member who owns the key, so that member can't approve them later.
+
+## 2. The agent proposes the payout
+
+The agent sends a payment intent with `"source": "agent"` and its mandate, and the invoice number as the
+reference:
+
+```json agent-intent.json
+{
+  "kind": "payout",
+  "source": "agent",
+  "mandate_id": "mnd_demo_ap_agent",
+  "counterparty_id": "cpt_bluefin",
+  "destination": {"kind": "evm_wallet", "network": "base-sepolia", "destination_id": "dst_bluefin_base"},
+  "amount": {"amount": "18500.00", "currency": "USDC"},
+  "reference": "INV-2026-0142"
+}
+```
+
+## 3. Read the decision
+
+The mandate check passes, because Bluefin is in scope and 18,500.00 is under the per-payment limit. Two of
+your rules escalate it: it is the first payment to Bluefin, and it is above your auto limit of 10,000.00 USDC.
+
+```json escalated
+{
+  "status": "ESCALATED",
+  "decision": {
+    "outcome": "ESCALATE",
+    "checks": [
+      {"check": "mandate_scope", "result": "PASS"},
+      {"check": "auto_limit", "result": "ESCALATE", "reason": "ABOVE_AUTO_LIMIT"},
+      {"check": "first_payment", "result": "ESCALATE", "reason": "FIRST_PAYMENT"}
+    ]
+  }
+}
+```
+
+An exception case opens, with an owner and a deadline, and `exception.created` is sent to your webhooks.
+
+## 4. A person approves
+
+A reviewer or your payments lead checks the invoice against the case and approves it, in the console or with
+[the API](/guides/approve-escalations). Approval runs your rules again; when nothing new has come up, the
+payment becomes `READY` and is sent, and `payment_intent.confirmed` follows. The mandate's `used` total goes up
+by 18,500.00.
+
+## What the agent can't do
+
+Ask for more than the mandate allows and the payout is blocked at once, with the reason:
+
+```json over-mandate.json
+{
+  "kind": "payout",
+  "source": "agent",
+  "mandate_id": "mnd_demo_ap_agent",
+  "counterparty_id": "cpt_bluefin",
+  "destination": {"kind": "evm_wallet", "network": "base-sepolia", "destination_id": "dst_bluefin_base"},
+  "amount": {"amount": "20000.01", "currency": "USDC"},
+  "reference": "INV-2026-0143"
+}
+```
+
+returns `BLOCKED` with `MANDATE_AMOUNT_EXCEEDED`. A block is final: it is never approved, retried or resent. The
+same goes for a payee outside the mandate (`MANDATE_PAYEE_OUT_OF_SCOPE`) or a revoked mandate
+(`MANDATE_REVOKED`). See [Mandates](/concepts/mandates).

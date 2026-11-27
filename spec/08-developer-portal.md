@@ -275,6 +275,25 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 - **As found:** the default sandbox rate limit is 120 requests a minute per key (`API_RATE_LIMIT_PER_MINUTE`), not
   the 60 estimated above; the docs say 120. In shadow mode an ESCALATE decision opens no exception case.
 
+## As built (P3 group 2)
+
+- **Guides (DOC-03):** six pages in `docs/guides/`: let an AI agent pay a supplier invoice (18,500.00 USDC to
+  `cpt_bluefin` under `mnd_demo_ap_agent`, escalated, approved by a second member, confirmed; 20,000.01 blocks
+  with `MANDATE_AMOUNT_EXCEEDED`), credit deposits safely, handle UNKNOWN payments, approve escalations by API,
+  use the kill switch, and move from shadow to auto mode (in the console's Settings, two people). Each guide's
+  request bodies and shown responses are read from the page and run against a sandbox organisation
+  (`tests/integration/test_docs_guides.py`).
+- **Try it (DOC-05):** Mintlify's interactive playground with bearer auth (`tools/try-it.mdx`). The OpenAPI file
+  names only local and sandbox servers, with no server variables, and the navbar has "Request sandbox access";
+  a test holds all three. The sandbox server is added when its address is known (founder item).
+- **Sandbox seed (G-18, as found):** a new sandbox organisation now also gets the fictional accounts-payable
+  agent's mandate (`mnd_demo_ap_agent`, valid for 365 days) when the mandate signing key is set, so the agent
+  guide and the "amount above mandate" test value work outside the demo organisation; there is no API to issue
+  mandates. It also gets travel-rule originator details (its name and a fictional `SANDBOX-<org_id>` account),
+  as the demo organisation has, so payouts over the threshold no longer escalate `TRAVEL_RULE_MISSING`.
+- **As found:** in a client organisation only the payments lead may engage or release the kill switch (on-call is
+  not a dashboard role), and the account owner may not approve, reject or engage.
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

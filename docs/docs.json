@@ -17,6 +17,17 @@
         "groups": [
           {"group": "Get started", "pages": ["index", "quickstart", "sandbox", "authentication"]},
           {
+            "group": "Guides",
+            "pages": [
+              "guides/agent-supplier-invoice",
+              "guides/credit-deposits",
+              "guides/handle-unknown",
+              "guides/approve-escalations",
+              "guides/kill-switch",
+              "guides/shadow-to-auto"
+            ]
+          },
+          {
             "group": "Concepts",
             "pages": [
               "concepts/payment-intents",
@@ -35,7 +46,7 @@
             "group": "Errors and limits",
             "pages": ["api/errors", "limits/idempotency", "limits/rate-limits", "limits/versioning"]
           },
-          {"group": "SDKs and tools", "pages": ["tools/postman-and-openapi"]},
+          {"group": "SDKs and tools", "pages": ["tools/try-it", "tools/postman-and-openapi"]},
           {"group": "Changelog", "pages": ["changelog"]}
         ]
       },

@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 100,
-   "pct": 67
+   "done": 102,
+   "pct": 68
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 262,
-   "pct": 82
+   "done": 265,
+   "pct": 83
   },
   {
    "order": 3,
@@ -54,9 +54,9 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 11,
+   "done": 14,
    "total": 23,
-   "pct_done": 48
+   "pct_done": 61
   }
  ],
  "initiatives": [
@@ -111,8 +111,8 @@
    "role": "growth",
    "stories": 6,
    "criteria": 8,
-   "criteria_done": 3,
-   "pct_done": 38
+   "criteria_done": 6,
+   "pct_done": 75
   },
   {
    "code": "DSH",
@@ -1597,9 +1597,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DOC-04",
@@ -1617,9 +1617,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DOC-06",

@@ -26,12 +26,12 @@ from detent.settings import REPO_ROOT
 FIXTURE = REPO_ROOT / "fixtures" / "mandates" / "ap-agent-mandate.json"
 
 
-def fixture_mandate(clock: Clock, org_id: str) -> dict[str, Any]:
-    """The demo accounts-payable agent's mandate, valid from yesterday for 30 days (unsigned)."""
+def fixture_mandate(clock: Clock, org_id: str, *, days: int = 30) -> dict[str, Any]:
+    """The demo accounts-payable agent's mandate, valid from yesterday for `days` days (unsigned)."""
     raw = FIXTURE.read_text()
     now = clock.now()
     raw = raw.replace("{{NOW_MINUS_1D}}", (now - timedelta(days=1)).isoformat()).replace(
-        "{{NOW_PLUS_30D}}", (now + timedelta(days=30)).isoformat()
+        "{{NOW_PLUS_30D}}", (now + timedelta(days=days)).isoformat()
     )
     doc: dict[str, Any] = json.loads(raw)
     doc["principal"]["org_id"] = org_id

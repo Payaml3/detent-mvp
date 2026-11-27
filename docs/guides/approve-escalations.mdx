@@ -1,0 +1,54 @@
+---
+title: "Approve escalations by API"
+description: "Find open exception cases, read the facts, and approve or reject with a reason."
+---
+
+When your rules escalate a payment, an exception case opens and the payment waits. Your own review tool can
+work the queue through the API. The key needs the `exceptions:approve` scope, and it must belong to a member who
+may approve (a reviewer, a backup owner or your payments lead).
+
+<Warning>The member who created a payment can't approve it. Use a key that belongs to a different member from
+the one your platform creates payments with.</Warning>
+
+## 1. Find open cases
+
+```bash
+curl -s "$DEKERNAI_BASE_URL/v1/exceptions?status=open" -H "Authorization: Bearer $REVIEWER_KEY"
+```
+
+Or subscribe to `exception.created`. Each case gives the payment, the reasons, the owner and the deadline.
+
+## 2. Read the facts
+
+`GET /v1/exceptions/{id}` returns the raw facts first (the amount, the payee, the destination), then the rule
+hits with their evidence, then any investigation the agent wrote. Decide on the facts.
+
+## 3. Approve or reject
+
+Both need a reason, which goes into the audit log:
+
+```json approve.json
+{"reason": "Invoice INV-2026-0142 matches the purchase order."}
+```
+
+```bash
+curl -s -X POST "$DEKERNAI_BASE_URL/v1/exceptions/$CASE_ID/approve" \
+  -H "Authorization: Bearer $REVIEWER_KEY" \
+  -H "Content-Type: application/json" \
+  -d @approve.json
+```
+
+The response says what happened to the payment:
+
+| `payment_status` | Meaning |
+|---|---|
+| `READY` | Your rules ran again and only the reasons you approved came up: the payment is sent (in assist mode, it waits for a person to click Send) |
+| `ESCALATED`, with `new_case_id` | Something changed since the case opened, such as a new reason: a new case opens for a fresh look |
+| `BLOCKED` | Your rules now block it. A block is final |
+
+`POST /v1/exceptions/{id}/reject` with a reason ends the payment as `REJECTED`. Nothing is sent.
+
+## Deadlines
+
+A deadline never approves anything. An overdue case stays held, `exception.overdue` is sent, and the backup
+owner takes over. See [Exceptions](/concepts/exceptions).
