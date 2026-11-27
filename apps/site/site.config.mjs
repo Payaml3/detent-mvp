@@ -11,7 +11,8 @@ export default {
   siteUrl: "https://dekernai.com",
   // Pre-launch: pages carry noindex and robots.txt blocks crawlers. Set true at launch (founder decision).
   indexable: false,
-  bookingUrl: "PLACEHOLDER:booking-url",
+  // Until a Calendly link is set, Book a demo opens an email to the sales inbox (founder, 2026-11-27).
+  bookingUrl: "mailto:sales@dekernai.com?subject=Demo%20request",
   accessFormAction: "PLACEHOLDER:access-endpoint",
-  salesInbox: "PLACEHOLDER:sales-inbox",
+  salesInbox: "sales@dekernai.com",
 };
