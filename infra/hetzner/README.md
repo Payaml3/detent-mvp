@@ -41,7 +41,7 @@ and your password manager. Never commit them to this repository.
    (Coolify's admin). In Coolify, Settings, set the instance domain to `https://coolify.dekernai.com`; once that
    opens over HTTPS, delete the 8000 rule from the Hetzner firewall. Only 22, 80 and 443 stay open.
 6. **Neon.** console.neon.tech, new project `dekernai-demo`, Postgres 16, region **AWS Europe (Frankfurt)**.
-   Copy the connection string (pooled is fine). It becomes `DATABASE_URL` in step 7, written as
+   Copy the connection string (pooled is fine). It becomes `DATABASE_URL` in step 8, written as
    `postgresql+psycopg://...` (replace `postgresql://` at the start) with `?sslmode=require` kept.
 7. **Connect GitHub (the repository is private).** In Coolify, Sources, **+ Add**, GitHub App, keep the
    default name, Register. GitHub opens: create the app on your personal account, then on Install choose
