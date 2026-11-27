@@ -132,14 +132,23 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   }
   @media (max-width: 680px) {
-    .art, .art-label, .art-tool { display: none; }
-    .hero-grid { padding-top: 112px; }
-    .intro, .cards { grid-column: 1 / -1; }
+    /* phones: the grid steps aside (display: contents) so the art sits in the flow, between the actions and
+       the example payment, at full width. The canvas stays a child of .hero, so its labels still place by offsetTop. */
+    .hero { display: flex; flex-direction: column; padding: 112px var(--gutter) 40px; }
+    .hero-grid { display: contents; }
+    .intro { order: 1; position: relative; z-index: 2; }
+    .art { order: 2; position: relative; inset: auto; width: calc(100% + 2 * var(--gutter)); height: clamp(280px, 84vw, 380px);
+      margin: 8px calc(-1 * var(--gutter)) 0; opacity: 1; }
+    .cards { order: 3; position: relative; z-index: 2; }
+    .art-bubble { width: 150px; font-size: 10.5px; padding: 6px 9px; }
+    .art-verdict { max-width: 200px; font-size: 12px; padding: 6px 10px; }
+    .art-label { font-size: 12px; }
+    .card-top { flex-wrap: wrap; gap: 2px 12px; }
+    .art-tool { font-size: 10px; }
     .headline { font-size: clamp(28px, 7.8vw, 52px); }
     .line, .line > span { display: inline; animation: none; white-space: normal; }
     .line + .line::before { content: " "; }
     .actions .button { width: 100%; justify-content: center; }
-    .cards { margin-top: 48px; }
   }
 </style>
 
