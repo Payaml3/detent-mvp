@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 import secrets
+import threading
 import uuid
 from collections.abc import Callable
 from datetime import datetime
@@ -72,6 +73,22 @@ def _decode(s: str) -> int:
     return n
 
 
+_last: list[tuple[int, int, int]] = [(-1, 0, 0)]  # the last (ms, rand_a, rand_b) made in this process
+_last_lock = threading.Lock()
+
+
+def _monotonic(ms: int, rand_a: int, rand_b: int) -> tuple[int, int]:
+    """RFC 9562 section 6.2, method 1: within one millisecond, each ID is the previous one plus one, so IDs
+    made in the same process sort in the order they were made. A frozen or fast clock otherwise gives
+    same-millisecond IDs a random order, and "the latest decision" becomes a coin toss."""
+    with _last_lock:
+        last_ms, last_a, last_b = _last[0]
+        if ms == last_ms and last_b < (1 << 62) - 1:
+            rand_a, rand_b = last_a, last_b + 1
+        _last[0] = (ms, rand_a, rand_b)
+    return rand_a, rand_b
+
+
 def uuid7(at: datetime, rand: Callable[[int], bytes] = secrets.token_bytes) -> uuid.UUID:
     """RFC 9562 UUIDv7 from a timezone-aware datetime (from the Clock)."""
     if at.tzinfo is None:
@@ -82,6 +99,8 @@ def uuid7(at: datetime, rand: Callable[[int], bytes] = secrets.token_bytes) -> u
     rnd = int.from_bytes(rand(10), "big")  # 80 random bits; 74 are used
     rand_a = (rnd >> 62) & 0xFFF
     rand_b = rnd & ((1 << 62) - 1)
+    if rand is secrets.token_bytes:
+        rand_a, rand_b = _monotonic(ms, rand_a, rand_b)
     value = (ms << 80) | (0x7 << 76) | (rand_a << 64) | (0b10 << 62) | rand_b
     return uuid.UUID(int=value)
 

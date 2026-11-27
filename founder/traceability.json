@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 102,
-   "pct": 68
+   "done": 104,
+   "pct": 70
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 265,
-   "pct": 83
+   "done": 268,
+   "pct": 84
   },
   {
    "order": 3,
@@ -54,9 +54,9 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 14,
+   "done": 17,
    "total": 23,
-   "pct_done": 61
+   "pct_done": 74
   }
  ],
  "initiatives": [
@@ -219,8 +219,8 @@
    "role": "growth",
    "stories": 3,
    "criteria": 4,
-   "criteria_done": 1,
-   "pct_done": 25
+   "criteria_done": 4,
+   "pct_done": 100
   },
   {
    "code": "SHD",
@@ -1637,9 +1637,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SDK-02",
@@ -1647,9 +1647,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SDK-03",

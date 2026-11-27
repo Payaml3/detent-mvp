@@ -144,13 +144,16 @@ def data_model_rows() -> dict[str, str]:
 
 
 def test_ids() -> set[str]:
-    """Every test function and fixture name, as 'relative/path.py::name'."""
+    """Every test function and fixture name, as 'relative/path.py::name': relative to apps/api/tests, or to the
+    repository for the SDK's own tests (sdks/python/tests/...)."""
     ids: set[str] = set()
-    for p in TESTS.rglob("*.py"):
-        rel = p.relative_to(TESTS).as_posix()
-        for node in ast.walk(ast.parse(p.read_text())):
-            if isinstance(node, ast.FunctionDef):
-                ids.add(f"{rel}::{node.name}")
+    sdk_tests = ROOT / "sdks" / "python" / "tests"
+    for base, files in ((TESTS, TESTS.rglob("*.py")), (ROOT, sdk_tests.rglob("*.py"))):
+        for p in files:
+            rel = p.relative_to(base).as_posix()
+            for node in ast.walk(ast.parse(p.read_text())):
+                if isinstance(node, ast.FunctionDef):
+                    ids.add(f"{rel}::{node.name}")
     return ids
 
 

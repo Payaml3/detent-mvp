@@ -1323,7 +1323,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
+                  "$ref": "#/components/schemas/Decision"
                 }
               }
             },

@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV ?= uv
 export PATH := $(HOME)/.foundry/bin:$(PATH)
 
-.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck error-docs openapi docs-check eval backlog spec roadmap roadmap-page site site-dev site-test denylist governance secrets check
+.PHONY: setup db db-reset migrate seed chain chain-build dev test test-fast lint typecheck error-docs openapi sdk-test docs-check eval backlog spec roadmap roadmap-page site site-dev site-test denylist governance secrets check
 
 setup:            ## install dependencies and pre-commit hooks
 	$(UV) sync --all-packages
@@ -50,9 +50,14 @@ lint:
 error-docs:       ## API-02: regenerate docs/api/errors.md from the error-code catalogue
 	$(UV) run python -m detent.api.error_codes > docs/api/errors.md
 
-openapi:          ## API-05: regenerate docs/api/openapi.json from the routes, and the Postman collection (SDK-03)
+openapi:          ## API-05: regenerate docs/api/openapi.json from the routes, the Postman collection (SDK-03) and the SDKs' generated code
 	$(UV) run python -m detent.api.openapi > docs/api/openapi.json
 	$(UV) run python tools/build_docs.py
+	$(UV) run python tools/build_sdks.py
+
+sdk-test:         ## SDK-01, SDK-02: the Python SDK's tests, then the TypeScript SDK's builds and tests
+	$(UV) run pytest sdks/python/tests apps/api/tests/integration/test_sdk_python.py -q
+	cd sdks/typescript && npm ci && npm test
 
 docs-check:       ## DOC-01: the docs site is complete, publishes nothing internal, and the Postman file is current
 	$(UV) run python tools/build_docs.py --check

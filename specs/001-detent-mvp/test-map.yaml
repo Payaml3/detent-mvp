@@ -427,6 +427,11 @@ DOC-05:
   1: ["integration/test_docs_guides.py::test_try_it_reaches_only_the_sandbox"]
 DOC-06:
   0: ["manual:docs/changelog.mdx has the 2026-12-01 entry; the OpenAPI description links it", "unit/test_docs_site.py::test_the_docs_site_is_complete_and_publishes_nothing_internal"]
+SDK-01:
+  0: ["ci:tools/build_sdks.py --check (the models and methods are generated from docs/api/openapi.json)", "sdks/python/tests/test_client.py::test_requests_carry_the_key_the_version_and_an_idempotency_key_on_creates", "sdks/python/tests/test_client.py::test_429_and_503_are_retried_with_the_same_idempotency_key", "sdks/python/tests/test_client.py::test_connection_errors_before_the_request_arrives_are_retried_and_read_timeouts_are_not", "sdks/python/tests/test_client.py::test_other_errors_are_never_retried", "sdks/python/tests/test_client.py::test_verify_webhook_returns_the_event_and_refuses_bad_signatures", "sdks/python/tests/test_client.py::test_every_api_operation_has_a_method"]
+  1: ["integration/test_sdk_python.py::test_create_retrieve_list_and_idempotency", "integration/test_sdk_python.py::test_escalation_approval_kill_switch_and_mandates", "integration/test_sdk_python.py::test_deposits_and_webhook_endpoints", "integration/test_sdk_python.py::test_api_errors_carry_the_error_fields", "ci:.github/workflows/ci.yml 'The Python SDK builds and installs from the repo' step"]
+SDK-02:
+  0: ["ci:sdks/typescript/test/client.test.mjs (the same behaviour as SDK-01)", "ci:sdks/typescript/test/cjs.test.cjs (ESM and CommonJS builds)", "ci:sdks/typescript/test/sandbox.test.mjs against the sandbox API the 'sdks' job starts"]
 SDK-03:
   0: ["unit/test_docs_site.py::test_the_docs_site_is_complete_and_publishes_nothing_internal", "ci:.github/workflows/ci.yml 'Docs site is complete' step (docs/api/postman.json is current)"]
 SBX-02:

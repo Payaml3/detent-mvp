@@ -5,6 +5,7 @@ requires-python = "==3.12.*"
 [manifest]
 members = [
     "banksim",
+    "dekernai",
     "detent",
     "detent-eval",
     "detent-workspace",
@@ -477,6 +478,17 @@ wheels = [
 ]
 
 [[package]]
+name = "dekernai"
+version = "0.1.0"
+source = { editable = "sdks/python" }
+dependencies = [
+    { name = "httpx" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "httpx", specifier = ">=0.27" }]
+
+[[package]]
 name = "detent"
 version = "0.1.0"
 source = { editable = "apps/api" }
@@ -554,6 +566,7 @@ source = { virtual = "." }
 [package.dev-dependencies]
 dev = [
     { name = "banksim" },
+    { name = "dekernai" },
     { name = "detent" },
     { name = "detent-eval" },
     { name = "faultproxy" },
@@ -573,6 +586,7 @@ dev = [
 [package.metadata.requires-dev]
 dev = [
     { name = "banksim", editable = "apps/banksim" },
+    { name = "dekernai", editable = "sdks/python" },
     { name = "detent", editable = "apps/api" },
     { name = "detent-eval", editable = "eval" },
     { name = "faultproxy", editable = "apps/faultproxy" },

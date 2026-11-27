@@ -35,13 +35,13 @@ jobs:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') && github.event.before) || '' }}
         run: |
           # The engine: the API, simulators, eval, chain, fixtures, prompts, the spec the tests read, dependencies,
-          # the denylist script a test runs, the public docs pages (their examples run as tests), and this workflow. Anything unknown (no base) runs everything.
+          # the denylist script a test runs, the public docs pages (their examples run as tests), the SDKs, and this workflow. Anything unknown (no base) runs everything.
           if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
             echo "engine=true" >> "$GITHUB_OUTPUT"; echo "site=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           files=$(git diff --name-only "$BASE" HEAD)
           echo "$files"
-          if echo "$files" | grep -qE '^(apps/(api|banksim|faultproxy)/|eval/|chain/|fixtures/|prompts/|spec/|docs/[^/]+\.mdx$|docs/(concepts|guides|webhooks|limits|tools)/|pyproject\.toml$|uv\.lock$|tools/check_denylist\.py$|\.github/workflows/ci\.yml$)'; then
+          if echo "$files" | grep -qE '^(apps/(api|banksim|faultproxy)/|eval/|chain/|fixtures/|prompts/|spec/|docs/[^/]+\.mdx$|docs/(concepts|guides|webhooks|limits|tools)/|docs/api/|sdks/|tools/build_sdks\.py$|pyproject\.toml$|uv\.lock$|tools/check_denylist\.py$|\.github/workflows/ci\.yml$)'; then
             echo "engine=true" >> "$GITHUB_OUTPUT"; else echo "engine=false" >> "$GITHUB_OUTPUT"; fi
           if echo "$files" | grep -qE '^(apps/site/|eval/|\.github/workflows/ci\.yml$)'; then
             echo "site=true" >> "$GITHUB_OUTPUT"; else echo "site=false" >> "$GITHUB_OUTPUT"; fi
@@ -67,6 +67,8 @@ jobs:
         run: npx --yes @redocly/cli@2.80.0 lint docs/api/openapi.json
       - name: Docs site is complete and the Postman collection is current (DOC-01, SDK-03)
         run: uv run python tools/build_docs.py --check
+      - name: The SDKs' generated code is current (SDK-01, SDK-02)
+        run: uv run python tools/build_sdks.py --check
       - name: Roadmap is up to date
         run: uv run python tools/build_roadmap_page.py --check
       - name: Backlog documents are up to date
@@ -166,6 +168,65 @@ jobs:
           name: eval-report-${{ github.sha }}
           path: eval/out/
           if-no-files-found: warn
+
+  sdks:
+    name: SDKs against the CI sandbox
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: detent
+          POSTGRES_PASSWORD: detent
+          POSTGRES_DB: detent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U detent" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg://detent:detent@localhost:5432/detent
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python and dependencies
+        run: |
+          uv python install 3.12
+          uv sync --all-packages --frozen
+      - name: The Python SDK builds and installs from the repo (SDK-01)
+        run: |
+          uv build --package dekernai --out-dir "$RUNNER_TEMP/dist"
+          python3 -m venv "$RUNNER_TEMP/sdk-venv"
+          "$RUNNER_TEMP/sdk-venv/bin/pip" install --quiet "$RUNNER_TEMP"/dist/dekernai-*.whl
+          "$RUNNER_TEMP/sdk-venv/bin/python" -c "import dekernai; print('dekernai', dekernai.__version__, dekernai.API_VERSION)"
+      - name: Start the sandbox API with the demo organisation and a throwaway key
+        run: |
+          pepper=$(openssl rand -hex 24)
+          echo "::add-mask::$pepper"
+          echo "API_KEY_PEPPER=$pepper" >> "$GITHUB_ENV"
+          export API_KEY_PEPPER="$pepper"
+          uv run alembic -c apps/api/alembic.ini upgrade head
+          uv run detent seed
+          key=$(uv run detent keys create --user usr_pl --scopes read,intents:create | tail -n1)
+          echo "::add-mask::$key"
+          echo "DEKERNAI_API_KEY=$key" >> "$GITHUB_ENV"
+          echo "DEKERNAI_BASE_URL=http://localhost:8000" >> "$GITHUB_ENV"
+          nohup uv run detent api --port 8000 > "$RUNNER_TEMP/api.log" 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:8000/healthz > /dev/null && exit 0; sleep 1; done
+          cat "$RUNNER_TEMP/api.log"; exit 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: sdks/typescript/package-lock.json
+      - name: "TypeScript SDK: ESM and CommonJS builds, unit tests and sandbox tests (SDK-02)"
+        working-directory: sdks/typescript
+        run: |
+          npm ci
+          npm test
 
   site:
     name: marketing site

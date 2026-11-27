@@ -2155,6 +2155,7 @@ stories:
   ac:
     - "Generated from openapi.yaml then polished: typed models, automatic idempotency keys on creates, safe retries, webhook verify helper"
     - "Tests run against the CI sandbox; package builds and installs from the repo"
+  done: [0, 1]
   pri: Must
   est: 1.0
   deps: [API-05, WHK-02]
@@ -2168,6 +2169,7 @@ stories:
   so: Node teams integrate as easily as Python teams
   ac:
     - "Same features as SDK-01; ESM and CJS builds; tests in CI"
+  done: [0]
   pri: Must
   est: 1.0
   deps: [API-05, WHK-02]
