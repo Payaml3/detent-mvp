@@ -3,6 +3,8 @@ import config from "../../site.config.mjs";
 import Board from "./Board.astro";
 // The payments board, then the questions buyers ask first. Who it's for lives in Platforms.astro, higher on the page.
 const faq = [
+  // A plain definition first, so search and AI answers can quote what it is, who it's for and where (SEO/GEO audit).
+  { q: `What is ${config.brandName}?`, a: `${config.brandName} is agentic payment controls software for UK and EU platforms that hold user balances: payout platforms, brokers, marketplaces and crypto services. It sits beside your payment rails, starting with stablecoins and instant bank payouts. For every deposit and payout it decides under your rules whether it should happen, routes it to the best rail, sends it exactly once and keeps an audit trail you can replay. It never holds your funds or keys.` },
   { q: `Does ${config.brandName} move or hold the money?`, a: `No. ${config.brandName} is agentic payment controls: it sits beside the rails and custody you already use, and your rules decide what they should do. It never holds client funds or keys.` },
   { q: "Does the AI approve payments?", a: "No. Agents prepare intents, investigate escalations and draft reconciliation fixes. Your rules make every decision, and a person approves anything the rules escalate." },
   { q: "Do we have to change the rails we use?", a: `No. ${config.brandName} works beside the rails and contracts you already have and tells them what to do. You add a control layer; you don’t move your money.` },

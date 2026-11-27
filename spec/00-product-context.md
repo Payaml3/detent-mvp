@@ -76,7 +76,7 @@ Then a client's developer, invited by their account owner after KYB, can get san
 - DekernAI is "agentic payment controls" software, never a "payments company" or "payment provider". "Agentic" describes how the work is done, never who decides.
 - No client logos, testimonials, customer counts or volume figures.
 - No certification badges and no "licensed" or "regulated" claims. Roadmap items are labelled as roadmap.
-- Every measured result is labelled "test-network evaluation on synthetic data, [date]".
+- Every measured result is labelled "evaluation on synthetic data, [date]. Not production results." The public site never says "test" or "prototype" (founder, 2026-11-27).
 - Demo data uses invented names, marked as fictional.
 - No former-employer names, documents or API designs, anywhere.
 - The founder's prior-company figures may appear only as personal experience on an About section, never as DekernAI's traction.

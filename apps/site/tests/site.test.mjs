@@ -191,3 +191,10 @@ test("pre-launch: every page is no-index and robots.txt blocks crawlers until co
   for (const [p, html] of allHtml()) assert.match(html, /<meta name="robots" content="noindex, nofollow"/, p);
   assert.match(read("robots.txt"), /Disallow: \//);
 });
+
+test("home: a quotable definition of the product, and no test or prototype wording in the copy", () => {
+  const t = text(read(PAGES.home));
+  assert.match(t, new RegExp(`What is ${config.brandName}\\?`));
+  assert.match(t, new RegExp(`${config.brandName} is agentic payment controls software for UK and EU platforms`));
+  for (const [p, html] of allHtml()) assert.ok(!/test.networks?|prototype/i.test(text(html)), `${p} says test network or prototype`);
+});
