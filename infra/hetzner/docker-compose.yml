@@ -1,0 +1,101 @@
+# S9 / FND-07: the live EU demo on one Hetzner Cloud server in Germany, deployed by Coolify from GitHub.
+# Database: Neon Postgres, AWS Europe (Frankfurt) eu-central-1 (DATABASE_URL). Test networks and test keys only.
+#
+# Coolify: Docker Compose build pack, Base Directory "/", Compose Location "/infra/hetzner/docker-compose.yml".
+# Coolify runs compose with --project-directory set to the repository root, so build contexts are ".".
+# Locally: docker compose --project-directory . -f infra/hetzner/docker-compose.yml build
+#
+# Every ${VAR} without a default is a secret or account value: Coolify lists it under Environment Variables,
+# where the founder types it in. Never put a value in this file.
+# Only `app` and `site` get public domains (set in Coolify). banksim and faultproxy have no domain, so they are
+# reachable only from the other containers on this server.
+
+x-app-env: &app-env
+  APP_ENV: demo
+  BRAND_NAME: DekernAI
+  HOSTING_REGION: "Hetzner Cloud, Germany (EU)"
+  DATABASE_REGION: "Neon, AWS Europe (Frankfurt) eu-central-1"
+  AGENT_LLM: ${AGENT_LLM:-auto}                 # recorded stand-ins until ANTHROPIC_API_KEY is set
+  DASHBOARD_URL: ${DASHBOARD_URL:-https://app.dekernai.com}   # invite links
+  BANKSIM_URL: http://banksim:8100
+  FAULTPROXY_URL: http://faultproxy:8200
+  BASE_SEPOLIA_RPC_URL: http://faultproxy:8200  # faults only via the scenario runner
+  ETH_SEPOLIA_RPC_URL: ${ETH_SEPOLIA_RPC_URL:-https://ethereum-sepolia-rpc.publicnode.com}
+  DATABASE_URL: ${DATABASE_URL}
+  DEMO_PASSWORD: ${DEMO_PASSWORD}
+  SESSION_SECRET: ${SESSION_SECRET}
+  API_KEY_PEPPER: ${API_KEY_PEPPER}
+  CREDENTIALS_ENCRYPTION_KEY: ${CREDENTIALS_ENCRYPTION_KEY}
+  MANDATE_SIGNING_KEY_DEMO: ${MANDATE_SIGNING_KEY_DEMO}
+  WEBHOOK_SECRET_PEPPER: ${WEBHOOK_SECRET_PEPPER}
+  AGENT_API_KEY: ${AGENT_API_KEY:-}
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  TEST_WALLET_PRIVATE_KEY_BASE: ${TEST_WALLET_PRIVATE_KEY_BASE:-}
+  TEST_WALLET_PRIVATE_KEY_ETH: ${TEST_WALLET_PRIVATE_KEY_ETH:-}
+  DEMO_PAYER_PRIVATE_KEY_BASE: ${DEMO_PAYER_PRIVATE_KEY_BASE:-}
+  DEMO_PAYER_PRIVATE_KEY_ETH: ${DEMO_PAYER_PRIVATE_KEY_ETH:-}
+  USDC_ADDRESS_BASE_SEPOLIA: ${USDC_ADDRESS_BASE_SEPOLIA:-0x036CbD53842c5426634e7929541eC2318f3dCF7e}
+  USDC_ADDRESS_ETH_SEPOLIA: ${USDC_ADDRESS_ETH_SEPOLIA:-0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238}
+  SALES_INBOX: ${SALES_INBOX:-}
+  FORWARDED_ALLOW_IPS: "*"                      # trust X-Forwarded-* from Coolify's proxy (the only way in)
+
+services:
+  app:                                          # API (/v1), console (/console), dashboard (/dashboard, /admin)
+    build:
+      context: .
+      dockerfile: infra/hetzner/Dockerfile.app
+    environment: *app-env
+    command: >-
+      sh -c "alembic -c apps/api/alembic.ini upgrade head
+      && detent seed
+      && exec detent api --host 0.0.0.0 --port 8000"
+    expose: ["8000"]
+    depends_on:
+      banksim: {condition: service_started}
+      faultproxy: {condition: service_started}
+    healthcheck:
+      # Alive = the server answers. /healthz says 503 "degraded" until both testnet RPCs are set: read it, don't gate on it.
+      test: ["CMD", "python", "-c", "import urllib.request as u, urllib.error as e\ntry: u.urlopen('http://127.0.0.1:8000/healthz', timeout=5)\nexcept e.HTTPError: pass"]
+      interval: 30s
+      timeout: 10s
+      start_period: 90s
+      retries: 3
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: infra/hetzner/Dockerfile.app
+    environment: *app-env
+    command: ["detent", "worker"]
+    depends_on:
+      app: {condition: service_healthy}         # migrations have run
+    restart: unless-stopped
+
+  banksim:                                      # private: no domain
+    build:
+      context: .
+      dockerfile: infra/hetzner/Dockerfile.app
+    environment:
+      DATABASE_URL: ${DATABASE_URL}             # the same Neon database; banksim keeps its own schema
+    command: ["uvicorn", "banksim.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8100"]
+    expose: ["8100"]
+    restart: unless-stopped
+
+  faultproxy:                                   # private: no domain
+    build:
+      context: .
+      dockerfile: infra/hetzner/Dockerfile.app
+    environment:
+      FAULTPROXY_DEMO_MODE: "1"                 # only the scenario runner can arm a fault
+      FAULTPROXY_UPSTREAM: ${BASE_SEPOLIA_UPSTREAM_RPC_URL:-https://sepolia.base.org}   # real Base Sepolia RPC
+    command: ["uvicorn", "faultproxy.app:app", "--host", "0.0.0.0", "--port", "8200"]
+    expose: ["8200"]
+    restart: unless-stopped
+
+  site:                                         # dekernai.com, static
+    build:
+      context: .
+      dockerfile: infra/hetzner/Dockerfile.site
+    expose: ["80"]
+    restart: unless-stopped

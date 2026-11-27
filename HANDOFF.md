@@ -119,7 +119,7 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 
 ## Next: P1 now, the S9 live run when the founder items are in
 
-- **S9 live run** (needs the founder items below): deploy `render.yaml`, set the secrets, `detent demo check`,
+- **S9 live run** (needs the founder items below): deploy on Hetzner + Neon (`infra/hetzner/README.md`; replaces `render.yaml`), set the secrets, `detent demo check`,
   then run spec/11 on Base Sepolia and Ethereum Sepolia and fix any mismatch in spec/11; then mark S9 done
   (FND-07 criterion 0 and the slice exit). · Model: mid-tier
 - **P1 group 1: built (PR from `claude/project-thread-babje1`, 2026-11-26):** API-01 to API-04 and API-06. The
@@ -177,9 +177,9 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 
 ## Open founder items
 
-- **S9 live run:** a Render account (Frankfurt) and a Neon project in an EU region; the plans (Render's free plan
-  covers the web service only; the worker and the two private services need a paid instance type: Proposed);
-  the secrets in `render.yaml`; funded test wallets (four: sender and payer on each chain).
+- **S9 live run (host chosen 27 Nov: Hetzner + Neon):** a Hetzner Cloud server in Germany with Coolify and a
+  Neon project in AWS Frankfurt, set up step by step in `infra/hetzner/README.md`; the secrets typed into
+  Coolify; funded test wallets (four: sender and payer on each chain); `ANTHROPIC_API_KEY`.
 - **G-27 Confirmed (D-33):** the live demo pays in its own labelled test token (tUSDC). Before the live run, per
   network: `detent demo token deploy --network <n>`, set `USDC_ADDRESS_*` to the printed address, then
   `detent demo token fund --network <n>`; gas comes from a faucet.

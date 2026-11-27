@@ -65,6 +65,16 @@ The two testnet USDC contract addresses were checked against Circle's "USDC on T
 
 Recheck free-tier limits and prices when you deploy; they change.
 
+### Chosen host (27 Nov 2026): Hetzner + Neon
+
+The founder chose one Hetzner Cloud server in Germany over Render, to pay less, with everything on it: the
+API, console, dashboard and admin (one `app` container), the worker, the bank simulator and fault proxy
+(private, no domain) and the static website. Coolify deploys `infra/hetzner/docker-compose.yml` from `main`
+and ends TLS. Neon Postgres stays in AWS Europe (Frankfurt) `eu-central-1`. `HOSTING_REGION` says
+"Hetzner Cloud, Germany (EU)". The step-by-step setup is `infra/hetzner/README.md`. Empty environment
+variables count as unset (`env_ignore_empty`), so optional secrets can stay blank until they exist. The Render
+notes below describe `render.yaml`, which was never deployed and is kept only as a fallback.
+
 ### As built (S9, FND-07)
 
 - **Blueprint:** `render.yaml` at the repository root. Four services, all in Render's **Frankfurt (EU Central)**

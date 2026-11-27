@@ -64,3 +64,12 @@ def test_demo_needs_real_secrets() -> None:
 def test_secret_values_listed_for_redaction() -> None:
     s = make(api_key_pepper=SecretStr("pepper-123456"))
     assert "pepper-123456" in s.secret_values()
+
+
+def test_empty_environment_variables_count_as_unset(monkeypatch: pytest.MonkeyPatch) -> None:
+    """FND-07: the Hetzner deploy passes optional secrets as empty strings until the founder sets them."""
+    monkeypatch.setenv("TEST_WALLET_PRIVATE_KEY_BASE", "")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "")
+    s = make()
+    assert s.test_wallet_private_key_base is None
+    assert s.anthropic_api_key is None

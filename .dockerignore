@@ -1,0 +1,19 @@
+# Keep secrets, local state and build output out of Docker images.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.git
+.venv
+**/__pycache__
+**/node_modules
+apps/site/dist
+chain/out
+chain/cache
+chain/lib
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.hypothesis
+build
