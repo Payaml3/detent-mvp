@@ -140,6 +140,11 @@ class Chain:
     def balance(self, address: str) -> int:
         return int(self.token().functions.balanceOf(address).call())
 
+    def transfer_recipients(self) -> dict[str, str]:
+        """Transaction hash to recipient for every MockUSDC transfer on the chain."""
+        evs = self.token().events.Transfer().get_logs(from_block=0)
+        return {e["transactionHash"].hex().removeprefix("0x"): str(e["args"]["to"]).lower() for e in evs}
+
     def transfers_from(self, sender: str) -> list[dict[str, Any]]:
         """Every MockUSDC transfer the wallet made, read from the chain's own logs."""
         evs = self.token().events.Transfer().get_logs(from_block=0, argument_filters={"from": sender})
