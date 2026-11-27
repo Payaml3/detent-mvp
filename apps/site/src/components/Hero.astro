@@ -42,14 +42,38 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
       </div>
       <p class="honesty small" data-reveal>Sits beside your rails · never holds your funds or keys</p>
     </div>
-    <div class="cards" data-ui data-hero-cards aria-label="Example payment, step by step">
+    <div class="cards" data-ui data-hero-cards data-phase={phases.length - 1} style="--pos:2;--fill:1" aria-label="Example payment, step by step">
       <p class="card-top"><span class="small soft">Example payment</span><span class="mono pid">{PAYMENT_ID}</span></p>
+      <div class="track" aria-hidden="true">
+        <span class="track-line"><span class="track-fill"></span></span>
+        {cards.map((c) => <span class="node reached" data-node={c.id}><i></i></span>)}
+        <span class="token-slot"><span class="token" data-token data-state={phases.at(-1).status}><span class="token-ring"></span>$18,500</span></span>
+      </div>
       {cards.map((c) => {
         const f = finalFor(c.id);
         return (
-          <article class="card" data-card={c.id}>
+          <article class={`card stage-${c.id}`} data-stage={c.id} data-mode="done" data-state={f.status}>
             <p class="card-name"><span class="word">{c.word}</span><span class="soft">{c.name}</span></p>
             <h2 class="card-q">{c.question}</h2>
+            {c.id === "decision" && (
+              <div class="fx fx-limit" aria-hidden="true">
+                <span class="scan"></span>
+                <span class="meter"><span class="meter-fill"></span><span class="meter-mark"></span></span>
+                <span class="fx-cap mono"><span>Auto limit $10,000</span><span class="fx-who">Approved by Sam</span></span>
+              </div>
+            )}
+            {c.id === "orchestration" && (
+              <div class="fx fx-rail" aria-hidden="true">
+                <span class="rail"><span class="rail-end"></span><span class="rail-lost"></span><span class="packet-lane"><span class="packet"><span class="packet-ring"></span></span></span><span class="rail-end"></span></span>
+                <span class="fx-cap mono"><span>Base</span><span class="pips">{[1, 2, 3].map(() => <i></i>)}</span></span>
+              </div>
+            )}
+            {c.id === "operations" && (
+              <div class="fx fx-chain" aria-hidden="true">
+                <span class="chain">{[0, 1, 2, 3].map((k) => <i style={`--k:${k}`}></i>)}<span class="replay"></span></span>
+                <span class="fx-cap mono"><span>Audit chain</span><span class="seal"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5" /></svg>verified</span></span>
+              </div>
+            )}
             <p class="card-agent"><span class="agent-dot" aria-hidden="true"></span><span data-agent-line>{f.agent}</span></p>
             <p class="card-rule"><span class={`chip st-${f.status}`} data-chip>{f.status}</span><span data-rule-line>{f.rule}</span></p>
           </article>
@@ -111,25 +135,130 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   .lead { max-width: 36ch; color: var(--text-soft); }
   .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .honesty { color: var(--text-soft); letter-spacing: 0.01em; }
-  .cards { grid-column: 1 / -1; align-self: end; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  /* Example payment (the three layers): one payment token rides a track over the cards, and each card has its
+     own motion character. Sift scans and stamps, Settle sends once along a rail, Prove links a hash chain and
+     replays it. Server render is the final state, so it reads without script and with reduced motion. */
+  .cards { grid-column: 1 / -1; align-self: end; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; --pos: 0; --fill: 0; }
   .card-top, .foot { grid-column: 1 / -1; display: flex; gap: 12px; align-items: baseline; }
-  .card-top { padding: 0 4px 4px; }
+  .card-top { padding: 0 4px 2px; }
   .pid { color: var(--text-soft); word-break: break-all; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; /* taste-skill-ignore: inside a data-ui interface fragment */
-    transition: border-color 300ms, transform 300ms var(--ease-out), opacity 300ms; }
-  .card.idle { --text: var(--ink-soft); }
-  .card.active { border-color: var(--interactive); transform: translateX(-6px); }
+  .track { grid-column: 1 / -1; position: relative; display: grid; grid-template-columns: repeat(3, 1fr); height: 22px; margin: 4px 0 -19px; z-index: 3; pointer-events: none; }
+  .track-line { position: absolute; left: calc(100% / 6); right: calc(100% / 6); top: 10px; height: 2px; border-radius: 2px;
+    background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--paper) 26%, transparent) 0 6px, transparent 6px 11px); overflow: hidden; }
+  .track-fill { position: absolute; inset: 0; background: var(--signal); transform-origin: 0 50%; transform: scaleX(var(--fill));
+    transition: transform 1100ms var(--ease-out); }
+  .node { position: relative; display: grid; justify-items: center; align-content: start; }
+  .node i { width: 12px; height: 12px; margin-top: 5px; border-radius: 50%; background: var(--ink); border: 2px solid color-mix(in srgb, var(--paper) 34%, transparent);
+    transition: border-color 400ms, background 400ms, transform 400ms var(--ease-out); }
+  .node.reached i { border-color: var(--signal); background: var(--signal); }
+  .node.here i { transform: scale(1.25); }
+  .token-slot { position: absolute; left: 0; top: 0; width: calc(100% / 3); display: grid; justify-items: center;
+    transform: translateX(calc(var(--pos) * 100%)); transition: transform 1100ms cubic-bezier(0.65, 0, 0.35, 1); }
+  .token { position: relative; margin-top: 1px; padding: 2px 9px; border-radius: 999px; font: 600 11px/1.3 var(--font-mono); letter-spacing: 0.02em; font-variant-numeric: tabular-nums;
+    background: var(--paper); color: var(--ink); box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--signal) 70%, transparent); transition: background 400ms, color 400ms; }
+  .token[data-state="ESCALATED"], .token[data-state="UNKNOWN"] { background: var(--wait); }
+  .token[data-state="CONFIRMED"] { background: var(--ok); }
+  .token-ring { position: absolute; inset: -5px; border-radius: inherit; border: 1.5px solid var(--wait); opacity: 0; }
+  .token[data-state="UNKNOWN"] .token-ring, .token[data-state="ESCALATED"] .token-ring { animation: ring 1.4s var(--ease-out) infinite; }
+  @keyframes ring { from { transform: scale(0.9); opacity: 0.9; } to { transform: scale(1.45, 1.8); opacity: 0; } }
+
+  .card { position: relative; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 8px; align-content: start; /* taste-skill-ignore: inside a data-ui interface fragment */
+    transition: border-color 400ms, transform 500ms var(--ease-out), box-shadow 500ms var(--ease-out); }
+  .card > :not(.fx) { transition: opacity 400ms; }
+  .card[data-mode="pending"] { border-style: dashed; }
+  .card[data-mode="pending"] > :not(.card-name, .card-q) { opacity: 0.28; }
+  .card[data-mode="active"] { border-color: var(--signal); transform: translateY(-6px); box-shadow: 0 28px 48px -30px color-mix(in srgb, var(--signal) 80%, transparent); }
   .card-name { display: flex; gap: 8px; align-items: baseline; font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
   .word { color: var(--interactive); font: 600 15px/1 var(--font-head); }
   .card-q { font: 600 18px/1.2 var(--font-head); letter-spacing: -0.01em; }
   .card-agent { display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: start; color: var(--text); }
   .agent-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: var(--text-soft); }
+  .card[data-mode="active"] .agent-dot { background: var(--signal); animation: blink 1.2s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0.25; } }
   .card-rule { display: grid; gap: 6px; justify-items: start; color: var(--text-soft); }
+  .chip.stamp { animation: stamp 520ms cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+  @keyframes stamp { from { transform: scale(1.7) rotate(-6deg); opacity: 0; } 60% { opacity: 1; } }
   .foot { padding: 4px; }
+
+  /* per-card visuals */
+  .fx { display: grid; gap: 6px; padding: 4px 0 2px; }
+  .fx-cap { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.04em; color: var(--text-soft); }
+
+  /* Sift: the amount against the auto limit, a scan beam, then the reviewer's stamp */
+  .scan { position: absolute; left: 0; right: 0; top: 0; height: 40%; pointer-events: none; opacity: 0;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--signal) 16%, transparent) 80%, color-mix(in srgb, var(--signal) 60%, transparent));
+    border-bottom: 1px solid var(--signal); transform: translateY(-100%); }
+  .card.go .scan { animation: scan 1100ms cubic-bezier(0.45, 0, 0.2, 1) both; }
+  @keyframes scan { 10% { opacity: 1; } 85% { opacity: 1; } to { transform: translateY(260%); opacity: 0; } }
+  .meter { position: relative; height: 6px; border-radius: 3px; background: color-mix(in srgb, var(--text-soft) 18%, transparent); overflow: hidden; }
+  .meter-fill { position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(1); border-radius: inherit;
+    background: linear-gradient(90deg, var(--interactive) 0 54%, var(--wait) 54% 100%); }
+  .meter-mark { position: absolute; left: 54%; top: -2px; bottom: -2px; width: 2px; background: var(--text); }
+  .card.go .meter-fill { animation: fill 900ms 200ms var(--ease-out) both; }
+  @keyframes fill { from { transform: scaleX(0); } }
+  .fx-who { color: var(--ok); font-weight: 600; opacity: 0; transform: translateX(8px); transition: opacity 300ms, transform 400ms var(--ease-out); }
+  .stage-decision:not([data-state="ESCALATED"]) .fx-who { opacity: 1; transform: none; }
+  .stage-decision:not([data-state="ESCALATED"]) .meter-fill { background: linear-gradient(90deg, var(--interactive) 0 54%, var(--ok) 54% 100%); }
+
+  /* Settle: one packet, sent once; the answer is lost (UNKNOWN), then three confirmations */
+  .rail { position: relative; display: flex; justify-content: space-between; align-items: center; height: 14px; }
+  .rail::before { content: ""; position: absolute; left: 5px; right: 5px; top: 6px; height: 2px; background: color-mix(in srgb, var(--text-soft) 30%, transparent); }
+  .rail-end { position: relative; width: 10px; height: 10px; border-radius: 2px; border: 2px solid var(--text-soft); background: var(--surface); }
+  .rail-lost { position: absolute; left: 62%; right: 5px; top: 6px; height: 2px; opacity: 0; transition: opacity 300ms;
+    background: repeating-linear-gradient(90deg, var(--wait) 0 4px, transparent 4px 8px); }
+  .packet-lane { position: absolute; z-index: 1; left: 0; top: 2px; width: calc(100% - 10px); height: 10px; transform: translateX(calc(var(--pf, 1) * 100%));
+    transition: transform 1500ms cubic-bezier(0.65, 0, 0.35, 1); }
+  .packet { position: absolute; z-index: 1; left: 0; top: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--interactive); transition: background 300ms; }
+  .packet-ring { position: absolute; inset: -4px; border-radius: 50%; border: 1.5px solid var(--wait); opacity: 0; }
+  .stage-orchestration[data-state="UNKNOWN"] .packet { background: var(--wait); }
+  .stage-orchestration[data-state="UNKNOWN"] .packet-ring { animation: ring 1.2s var(--ease-out) infinite; }
+  .stage-orchestration[data-state="UNKNOWN"] .rail-lost { opacity: 1; }
+  .stage-orchestration[data-state="CONFIRMED"] .packet { background: var(--ok); }
+  .pips { display: inline-flex; gap: 4px; }
+  .pips i { width: 14px; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text-soft) 25%, transparent); }
+  .stage-orchestration[data-state="CONFIRMED"] .pips i { background: var(--ok); }
+  .stage-orchestration.go[data-state="CONFIRMED"] .pips i { animation: pip 300ms var(--ease-out) both; }
+  .stage-orchestration.go[data-state="CONFIRMED"] .pips i:nth-child(2) { animation-delay: 280ms; }
+  .stage-orchestration.go[data-state="CONFIRMED"] .pips i:nth-child(3) { animation-delay: 560ms; }
+  @keyframes pip { from { background: color-mix(in srgb, var(--text-soft) 25%, transparent); transform: scaleX(0.3); } }
+
+  /* Prove: the audit chain links block by block, a replay runs back to the decision, then the seal */
+  .chain { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; height: 14px; }
+  .chain i { position: relative; border-radius: 3px; background: var(--ok); }
+  .chain i + i::before { content: ""; position: absolute; right: 100%; top: 6px; width: 10px; height: 2px; background: var(--ok); }
+  .card.go .chain i { animation: link 420ms calc(var(--k) * 180ms + 120ms) var(--ease-out) both; }
+  @keyframes link { from { transform: translateY(-10px) scale(0.6); opacity: 0; } }
+  .replay { position: absolute; top: -3px; bottom: -3px; width: 26%; right: 0; border-radius: 4px; opacity: 0; pointer-events: none;
+    background: linear-gradient(270deg, transparent, color-mix(in srgb, var(--paper) 85%, transparent), transparent); mix-blend-mode: soft-light; }
+  .card.go .replay { animation: replay 1000ms 1000ms cubic-bezier(0.45, 0, 0.2, 1) both; }
+  @keyframes replay { 10% { opacity: 1; } 90% { opacity: 1; } to { transform: translateX(-290%); opacity: 0; } }
+  .seal { display: inline-flex; align-items: center; gap: 4px; color: var(--ok); font-weight: 600; }
+  .seal svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 16; }
+  .card.go .seal { animation: fade 300ms 1900ms both; }
+  .card.go .seal svg { animation: draw 500ms 1900ms var(--ease-out) both; }
+  @keyframes draw { from { stroke-dashoffset: 16; } }
+  @keyframes fade { from { opacity: 0; } }
+
+  /* entrance: each card arrives in its own way, when the row comes into view */
+  .cards.pre .card, .cards.pre .track { opacity: 0; }
+  .cards.enter .track { animation: fade 600ms var(--ease-out) both; }
+  .cards.enter .stage-decision { animation: drop 700ms 120ms cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+  .cards.enter .stage-orchestration { animation: slide 800ms 300ms var(--ease-out) both; }
+  .cards.enter .stage-operations { animation: assemble 800ms 480ms var(--ease-out) both; }
+  .cards.enter .stage-operations > * { animation: rise-in 600ms calc(560ms + var(--i, 0) * 70ms) var(--ease-out) both; }
+  .stage-operations > :nth-child(2) { --i: 1; } .stage-operations > :nth-child(3) { --i: 2; } .stage-operations > :nth-child(4) { --i: 3; } .stage-operations > :nth-child(5) { --i: 4; }
+  @keyframes drop { from { opacity: 0; transform: translateY(-28px) scale(1.04); } }
+  @keyframes slide { from { opacity: 0; transform: translateX(-48px); } }
+  @keyframes assemble { from { opacity: 0; transform: translateY(24px); } }
+  @keyframes rise-in { from { opacity: 0; transform: translateY(12px); } }
+  .cards.paused *, .cards.paused *::before, .cards.paused *::after { animation-play-state: paused !important; }
+  @media (prefers-reduced-motion: reduce) {
+    .cards .card, .cards .track { opacity: 1; animation: none; }
+    .token-slot, .track-fill, .packet-lane { transition: none; }
+  }
   @media (max-width: 1100px) {
     .art { width: 60%; height: 52%; top: 10%; opacity: 0.55; }
     .intro { grid-column: 1 / span 9; }
-    .cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   }
   @media (max-width: 680px) {
     /* phones: the grid steps aside (display: contents) so the art leads the first screen, full width, above the
@@ -144,6 +273,11 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .art-verdict { max-width: 200px; font-size: 12px; padding: 6px 10px; }
     .art-label { font-size: 12px; }
     .card-top { flex-wrap: wrap; gap: 2px 12px; }
+    /* phones: the cards stack in order, so the track steps aside; the active card still lifts */
+    .cards { grid-template-columns: 1fr; gap: 10px; }
+    .track { display: none; }
+    .card[data-mode="active"] { transform: translateY(-3px); }
+    .card[data-mode="pending"] > :not(.card-name, .card-q) { opacity: 0.4; }
     .art-tool, .art-bubble { display: none; } /* phones: fewer captions so the figure reads at a glance */
     .headline { font-size: clamp(28px, 7.8vw, 52px); }
     .line, .line > span { display: inline; animation: none; white-space: normal; }
@@ -156,29 +290,63 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   const root = document.querySelector("[data-hero-cards]");
   const phases = JSON.parse(document.querySelector("[data-hero-phases]").textContent);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const cards = Object.fromEntries([...root.querySelectorAll("[data-card]")].map((c) => [c.dataset.card, c]));
+  const cards = Object.fromEntries([...root.querySelectorAll("[data-stage]")].map((c) => [c.dataset.stage, c]));
   let sift = null;
   const canvas = document.querySelector("[data-hero-sift]");
   if (canvas && getComputedStyle(canvas).display !== "none") (canvas.dataset.art === "layers" ? import("../scripts/gate3d.js").then((m) => m.mountGate(canvas)) : canvas.dataset.art === "mark" ? import("../scripts/mark3d.js").then((m) => m.mountMark(canvas)) : import("../scripts/agent3d.js").then((m) => m.mountAgent(canvas))).then((art) => { sift = art; sift?.setState(phases.at(-1).status, true); });
   else canvas?.remove();
+  const order = ["decision", "orchestration", "operations"];
+  const nodes = [...root.querySelectorAll("[data-node]")];
+  const token = root.querySelector("[data-token]");
+  const lane = root.querySelector(".packet-lane");
+  // where the packet sits on the Settle rail: sent (to the far end), answer lost (stops short), confirmed (arrives)
+  const packetAt = { SUBMITTED: 0.62, UNKNOWN: 0.62, CONFIRMED: 1 };
+  const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
   const show = (i) => {
     const p = phases[i];
+    const at = order.indexOf(p.layer);
+    // the token rides the track; within a layer the fill creeps forward phase by phase
+    const inLayer = phases.filter((x) => x.layer === p.layer);
+    const step = inLayer.indexOf(p) / Math.max(1, inLayer.length);
+    root.style.setProperty("--pos", String(at));
+    root.style.setProperty("--fill", (Math.min(2, at + (at < 2 ? step : 0)) / 2).toFixed(3));
+    nodes.forEach((n, k) => { n.classList.toggle("reached", k <= at); n.classList.toggle("here", k === at); });
+    token.dataset.state = p.status;
     for (const [id, card] of Object.entries(cards)) {
-      card.classList.toggle("active", id === p.layer);
       const latest = [...phases.slice(0, i + 1)].reverse().find((x) => x.layer === id);
-      card.classList.toggle("idle", !latest && id !== p.layer);
+      const k = order.indexOf(id);
+      card.dataset.mode = k === at ? "active" : k < at ? "done" : "pending";
       if (!latest) continue;
+      card.dataset.state = latest.status;
       card.querySelector("[data-agent-line]").textContent = latest.agent;
       card.querySelector("[data-rule-line]").textContent = latest.rule;
       const chip = card.querySelector("[data-chip]");
       chip.textContent = latest.status;
       chip.className = `chip st-${latest.status}`;
+      if (p === latest) { restart(chip, "stamp"); restart(card, "go"); }
+    }
+    if (lane) {
+      lane.style.transition = at < 1 ? "none" : "";
+      lane.style.setProperty("--pf", String(at < 1 ? 0 : packetAt[cards.orchestration.dataset.state] ?? 0));
     }
     sift?.setState(p.status, p.status === "CONFIRMED");
   };
   if (!reduce) {
-    let i = 0;
-    const tick = () => { show(i); const last = i === phases.length - 1; i = last ? 0 : i + 1; setTimeout(tick, last ? 5200 : 2600); };
-    tick();
+    // start from the first phase, play the entrance when the row comes into view, and only run while it is on screen
+    root.classList.add("pre");
+    for (const card of Object.values(cards)) delete card.dataset.state;
+    let i = 0, timer = 0, visible = false, started = false;
+    const tick = () => { show(i); const last = i === phases.length - 1; i = last ? 0 : i + 1; timer = setTimeout(tick, last ? 5200 : 2800); };
+    const run = () => {
+      const on = visible && !document.hidden;
+      root.classList.toggle("paused", !on);
+      clearTimeout(timer);
+      if (!on) return;
+      if (!started) { started = true; root.classList.replace("pre", "enter"); timer = setTimeout(tick, 900); }
+      else timer = setTimeout(tick, 600);
+    };
+    show(0);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }, { threshold: 0.2 }).observe(root);
+    document.addEventListener("visibilitychange", run);
   }
 </script>
