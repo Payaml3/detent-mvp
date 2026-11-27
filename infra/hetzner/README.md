@@ -39,8 +39,9 @@ and your password manager. Never commit them to this repository.
 4. **Coolify.** `ssh root@<server IP>` from PowerShell, then run the installer one-liner from coolify.io/docs.
    Open `http://<server IP>:8000` straight away and create the admin account (the first visitor becomes admin),
    with a long password from your password manager, and turn on two-factor login in your Coolify profile.
-5. **DNS at GoDaddy, then close port 8000.** Add A records to the server IP: `app` (the app) and `coolify`
-   (Coolify's admin). In Coolify, Settings, set the instance domain to `https://coolify.dekernai.com`; once that
+5. **DNS at GoDaddy, then close port 8000.** Add A records to the server IP: `app` (the app) and a
+   non-obvious subdomain for Coolify's admin, chosen by the founder and kept out of this repository (it is
+   recorded only in the password manager). In Coolify, Settings, set the instance domain to it over `https://`; once that
    opens over HTTPS, delete the 8000 rule from the Hetzner firewall. Only 22, 80 and 443 stay open.
 6. **Neon.** console.neon.tech, new project `dekernai-demo`, Postgres 16, region **AWS Europe (Frankfurt)**.
    Copy the connection string (pooled is fine). It becomes `DATABASE_URL` in step 8, written as
