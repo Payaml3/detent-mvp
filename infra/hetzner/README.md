@@ -34,8 +34,11 @@ Secrets never go into a chat, ticket or this repository: type or paste them only
 5. **Neon.** console.neon.tech, new project `dekernai-demo`, Postgres 16, region **AWS Europe (Frankfurt)**.
    Copy the connection string (pooled is fine). It becomes `DATABASE_URL` in step 7, written as
    `postgresql+psycopg://...` (replace `postgresql://` at the start) with `?sslmode=require` kept.
-6. **Connect GitHub.** In Coolify, Sources, add a GitHub App, install it on `Payaml3/detent-mvp` only.
-   New Resource, the repository, branch `main`, build pack **Docker Compose**, Base Directory `/`, Compose
+6. **Connect GitHub (the repository is private).** In Coolify, Sources, **+ Add**, GitHub App, keep the
+   default name, Register. GitHub opens: create the app on your personal account, then on Install choose
+   **Only select repositories**, `Payaml3/detent-mvp`, Install. Coolify then reads the private repository
+   and gets a push webhook, with no deploy key or token to copy. In your project, **+ New Resource**,
+   **Private Repository (with GitHub App)**, the app, the repository, branch `main`, build pack **Docker Compose**, Base Directory `/`, Compose
    file `/infra/hetzner/docker-compose.yml`. Domains: `app` service `https://app.dekernai.com:8000`
    (Coolify routes port 8000 and gets the certificate), `site` service empty for now.
 7. **Secrets.** The app refuses to start in demo mode without real secrets. In Coolify, Servers, your server,
