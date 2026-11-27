@@ -1784,6 +1784,7 @@ stories:
   so: I can trust that events come from DekernAI
   ac:
     - "`DekernAI-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [WHK-01]
@@ -2110,6 +2111,7 @@ stories:
   ac:
     - "Guide and webhook-verification samples live as files under docs/snippets/<lang>/ and run in CI against a sandbox started in the pipeline"
     - "Reference request samples are generated from the OpenAPI file"
+  done: [0, 1]
   pri: Must
   est: 1.25
   deps: [DOC-03, WHK-02]

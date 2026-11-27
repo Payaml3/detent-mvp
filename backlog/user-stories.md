@@ -1357,7 +1357,7 @@ _Signed, retried, logged event delivery_ · layer: All three (public API) · tra
 
 **Acceptance criteria**
 
-- [ ] `DekernAI-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)
+- [x] `DekernAI-Signature: t=<unix>,v1=<hex>`; the verify helper rejects bad signatures and stale timestamps (tests in every docs language)
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** WHK-01 · **Traces to:** D.webhooks
 
@@ -1601,8 +1601,8 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 **Acceptance criteria**
 
-- [ ] Guide and webhook-verification samples live as files under docs/snippets/<lang>/ and run in CI against a sandbox started in the pipeline
-- [ ] Reference request samples are generated from the OpenAPI file
+- [x] Guide and webhook-verification samples live as files under docs/snippets/<lang>/ and run in CI against a sandbox started in the pipeline
+- [x] Reference request samples are generated from the OpenAPI file
 
 **Priority:** Must · **Estimate:** 1.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-03, WHK-02 · **Traces to:** D.samples
 

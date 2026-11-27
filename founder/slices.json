@@ -989,7 +989,7 @@
    "epic": "WHK",
    "slice": "P1",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "WHK-03",
@@ -1143,7 +1143,7 @@
    "epic": "DOC",
    "slice": "P3",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "DOC-05",

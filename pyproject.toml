@@ -83,6 +83,8 @@ ignore = [
 "sdks/python/tests/**" = ["S", "PLR", "TID251", "PT018", "E501"]
 "tools/**" = ["S", "PLR", "T20", "TID251", "DTZ", "E501"]  # generators hold long Markdown templates
 "tools/tests/**" = ["S", "PLR", "TID251", "DTZ", "E501", "PT018"]  # hook and governance tests, as apps/api/tests
+# Docs samples are standalone programs for integrators: they read the wall clock and open sandbox URLs.
+"docs/snippets/**" = ["S310", "T20", "TID251"]
 "apps/banksim/**" = ["TID251"]
 "apps/faultproxy/**" = ["TID251"]
 

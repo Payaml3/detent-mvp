@@ -18,7 +18,7 @@ Credit a user's balance when the money has arrived and passed your checks, not w
 
 ```bash
 curl -s "$DEKERNAI_BASE_URL/v1/deposit_intents" \
-  -H "Authorization: Bearer $DEKERNAI_KEY" \
+  -H "Authorization: Bearer $DEKERNAI_API_KEY" \
   -H "Idempotency-Key: $(uuidgen)" \
   -H "Content-Type: application/json" \
   -d @deposit.json
