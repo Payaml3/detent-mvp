@@ -86,4 +86,15 @@ section { position: relative; }
   transition: opacity 300ms var(--ease-out);
 }
 .cards-live [data-card]:hover::after { opacity: 1; }
+@media (max-width: 699px) {
+  /* phones: same show and hide on scroll, lighter so a flick scroll stays smooth (no blur, less tilt) */
+  .cards-live [data-card] {
+    transform: perspective(900px) translateY(calc(var(--in) * 40px - var(--out) * 20px)) rotateX(calc(var(--in) * 10deg))
+      scale(calc(1 - var(--in) * 0.06 - var(--out) * 0.05));
+    opacity: calc(1 - var(--in) * 0.85 - var(--out) * 0.7);
+    filter: none; transition: none; will-change: transform, opacity;
+  }
+  .will-reveal [data-reveal] { transform: translateY(16px); }
+  .will-reveal [data-reveal].revealed { transition-duration: 500ms; }
+}
 .cards-live [data-card]:hover { box-shadow: 0 24px 48px -28px color-mix(in srgb, var(--text) 45%, transparent); }

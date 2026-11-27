@@ -1,9 +1,9 @@
 // Scroll-linked cards: each card rises, untilts and sharpens as it comes up the screen, and sinks back and
 // fades as it leaves at the top, in both directions, so scrolling feels like moving through a stack. A card
-// also leans toward the pointer while hovered. Content is fully visible without script, on phones and with
-// reduced motion: the effect only runs where it is a pleasure, not a risk.
+// also leans toward the pointer while hovered. Content is fully visible without script and with reduced
+// motion. Phones get a lighter version (site.css: no blur, less tilt) so scrolling stays smooth.
 const cards = [...document.querySelectorAll("[data-card]")];
-if (cards.length && innerWidth >= 700 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+if (cards.length && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   document.documentElement.classList.add("cards-live");
   // cards in one row enter one after another, left to right
   const rows = new Map();

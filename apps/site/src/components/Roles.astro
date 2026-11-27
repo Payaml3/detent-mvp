@@ -52,6 +52,7 @@ const roles = [
   h2 { max-width: 22ch; }
   .tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface-sunk); border-radius: 8px; }
   .tabs[hidden] { display: none; }
+  @media (max-width: 680px) { .tabs { overflow-x: auto; scrollbar-width: none; } .tabs button { flex: 1 0 auto; padding: 11px 12px; } }
   .tabs button { border: 0; border-radius: 6px; padding: 11px 18px; background: transparent; color: var(--text-soft); font: 600 15px var(--font-head); cursor: pointer; transition: background 160ms, color 160ms; }
   .tabs button:hover { color: var(--text); }
   .tabs button[aria-selected="true"] { background: var(--text); color: var(--bg); }

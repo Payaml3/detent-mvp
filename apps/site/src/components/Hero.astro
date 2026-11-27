@@ -144,7 +144,7 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .art-verdict { max-width: 200px; font-size: 12px; padding: 6px 10px; }
     .art-label { font-size: 12px; }
     .card-top { flex-wrap: wrap; gap: 2px 12px; }
-    .art-tool { font-size: 10px; }
+    .art-tool, .art-bubble { display: none; } /* phones: fewer captions so the figure reads at a glance */
     .headline { font-size: clamp(28px, 7.8vw, 52px); }
     .line, .line > span { display: inline; animation: none; white-space: normal; }
     .line + .line::before { content: " "; }
