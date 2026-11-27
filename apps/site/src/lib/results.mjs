@@ -11,6 +11,6 @@ export function readResults(data) {
   return {
     published: true,
     figures,
-    label: `Test-network evaluation on synthetic data, ${data.date}. Not production results.`,
+    label: `Evaluation on synthetic data, ${data.date}. Not production results.`,
   };
 }

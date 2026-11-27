@@ -68,10 +68,10 @@ test("results: absent file means not published and no figures", () => {
   assert.deepEqual(r.figures, []);
 });
 
-test("results: every figure carries the dated test-network label", () => {
+test("results: every figure carries the dated synthetic-data label", () => {
   const r = readResults({ date: "2026-12-20", figures: [{ value: "0", caption: "unauthorised executions in 112 attack scenarios" }] });
   assert.equal(r.published, true);
-  assert.match(r.label, /^Test-network evaluation on synthetic data, 2026-12-20/);
+  assert.match(r.label, /^Evaluation on synthetic data, 2026-12-20\. Not production results/);
   for (const f of r.figures) assert.ok(f.caption.length > 0);
 });
 
