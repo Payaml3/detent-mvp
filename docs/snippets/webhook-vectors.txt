@@ -1,0 +1,17 @@
+# Webhook signature test vectors (WHK-02, DOC-04). One case per line:
+# name|expect|secret|now|header|body   (expect is ok or fail; the body is the rest of the line)
+valid|ok|whsec_test-vector-secret|1764756000|t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+edge_after|ok|whsec_test-vector-secret|1764756300|t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+edge_before|ok|whsec_test-vector-secret|1764755700|t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+stale|fail|whsec_test-vector-secret|1764756301|t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+future|fail|whsec_test-vector-secret|1764755699|t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+rotated|ok|whsec_test-vector-secret|1764756000|t=1764756000,v1=0000000000000000000000000000000000000000000000000000000000000000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+changed_body|fail|whsec_test-vector-secret|1764756000|t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_2","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+wrong_secret|fail|whsec_test-vector-secretx|1764756000|t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+changed_timestamp|fail|whsec_test-vector-secret|1764756000|t=1764756001,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+no_timestamp|fail|whsec_test-vector-secret|1764756000|v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+no_signature|fail|whsec_test-vector-secret|1764756000|t=1764756000|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+empty_header|fail|whsec_test-vector-secret|1764756000||{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+bad_timestamp|fail|whsec_test-vector-secret|1764756000|t=abc,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+two_timestamps|fail|whsec_test-vector-secret|1764756000|t=1764756000,t=1764756000,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}
+garbage_part|fail|whsec_test-vector-secret|1764756000|t=1764756000,garbage,v1=884e8cea83e369fac21d07f3605547aeec4baad7bc32096d34cdf9f2c968934d|{"id":"evt_1","type":"payment_intent.unknown","data":{"object":{"id":"pay_1"}}}

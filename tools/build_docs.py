@@ -1,7 +1,11 @@
-"""Build and check the public docs site (DOC-01, SDK-03).
+"""Build and check the public docs site (DOC-01, DOC-04, SDK-03).
 
-    python tools/build_docs.py           # write docs/api/postman.json from docs/api/openapi.json
-    python tools/build_docs.py --check   # fail if the collection is stale or the site is incomplete
+    python tools/build_docs.py           # write docs/api/postman.json and the pages' code samples
+    python tools/build_docs.py --check   # fail if either is stale or the site is incomplete
+
+Code samples are files under docs/snippets/<lang>/, run in CI by tools/run_snippets.py. A page shows one as a
+<CodeGroup> between `{/* snippet: <name> */}` and `{/* /snippet */}`; this tool writes the group from the files'
+`docs:start` ... `docs:end` regions, so a page never shows code that was not run.
 
 The site is Mintlify, from `docs/` (`docs/docs.json`). `docs/` also holds internal documents (brand, design,
 product, engineering standards), so the check makes sure every Markdown page is either in the navigation or
@@ -13,6 +17,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import textwrap
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +27,18 @@ OPENAPI = DOCS / "api" / "openapi.json"
 POSTMAN = DOCS / "api" / "postman.json"
 PAGE_SUFFIXES = (".mdx", ".md")
 _METHODS = ("get", "post", "put", "patch", "delete")
+SNIPPETS = DOCS / "snippets"
+# (tab title, fence language, folder) in the order the tabs are shown
+SNIPPET_LANGS = [("cURL", "bash", "curl"), ("Python", "python", "python"), ("TypeScript", "typescript", "typescript"),
+                 ("Go", "go", "go"), ("Java", "java", "java"), ("C#", "csharp", "csharp"), ("PHP", "php", "php"),
+                 ("Ruby", "ruby", "ruby")]  # fmt: skip
+SNIPPET_FILES = {
+    "verify_webhook": ["verify_webhook.sh", "verify_webhook.py", "verify_webhook.ts", "verify_webhook/verify.go",
+                       "VerifyWebhook.java", "VerifyWebhook/Webhooks.cs", "verify_webhook.php", "verify_webhook.rb"],
+    "create_payout": ["create_payout.sh", "create_payout.py", "create_payout.ts", "create_payout/main.go",
+                      "CreatePayout.java", "CreatePayout/Program.cs", "create_payout.php", "create_payout.rb"],
+}  # fmt: skip
+_SNIPPET_BLOCK = re.compile(r"(\{/\* snippet: (\w+) \*/\}\n)(.*?)(\{/\* /snippet \*/\})", re.S)
 
 
 def nav_pages(config: dict[str, Any]) -> list[str]:
@@ -58,12 +75,42 @@ def _page_file(page: str) -> Path | None:
     return None
 
 
+def snippet_region(path: Path) -> str:
+    """The `docs:start` ... `docs:end` regions of a sample file, each dedented, joined by a blank line."""
+    regions: list[list[str]] = []
+    current: list[str] | None = None
+    for line in path.read_text().splitlines():
+        if "docs:start" in line:
+            current = []
+        elif "docs:end" in line:
+            assert current is not None, f"{path}: docs:end without docs:start"
+            regions.append(current)
+            current = None
+        elif current is not None:
+            current.append(line)
+    assert regions, f"{path}: needs docs:start ... docs:end"
+    assert current is None, f"{path}: docs:start without docs:end"
+    return "\n\n".join(textwrap.dedent("\n".join(r)).strip("\n") for r in regions)
+
+
+def render_snippet(name: str) -> str:
+    blocks = [f"```{fence} {title}\n{snippet_region(SNIPPETS / folder / file)}\n```"
+              for (title, fence, folder), file in zip(SNIPPET_LANGS, SNIPPET_FILES[name], strict=True)]  # fmt: skip
+    return "<CodeGroup>\n\n" + "\n\n".join(blocks) + "\n\n</CodeGroup>\n"
+
+
+def render_page(source: str) -> str:
+    """The page with every snippet group rewritten from its files."""
+    return _SNIPPET_BLOCK.sub(lambda m: m.group(1) + render_snippet(m.group(2)) + m.group(4), source)
+
+
 def mdx_issues(source: str) -> list[str]:
     """Characters that MDX reads as code outside code blocks and spans: a brace starts an expression and a
     lower-case `<` an HTML tag, and either breaks the page's build."""
     body = re.sub(r"\A---\n.*?\n---\n", "", source, flags=re.S)
     body = re.sub(r"```.*?```", "", body, flags=re.S)
     body = re.sub(r"`[^`\n]*`", "", body)
+    body = re.sub(r"\{/\*.*?\*/\}", "", body, flags=re.S)  # MDX comments
     body = re.sub(
         r"<[A-Z][^>]*>|</[A-Z][A-Za-z]*>", "", body
     )  # components such as <Note> and <CardGroup cols={2}>
@@ -140,7 +187,10 @@ def problems() -> list[str]:
     for page in pages:
         f = _page_file(page)
         if f is not None:
-            out += [f"{page}: {issue}" for issue in mdx_issues(f.read_text())]
+            source = f.read_text()
+            out += [f"{page}: {issue}" for issue in mdx_issues(source)]
+            if render_page(source) != source:
+                out.append(f"{page}: its code samples are stale: run python tools/build_docs.py")
     if not POSTMAN.is_file() or POSTMAN.read_text() != render_postman():
         out.append("docs/api/postman.json is stale: run python tools/build_docs.py")
     return out
@@ -155,6 +205,11 @@ def main(argv: list[str]) -> int:
         return 1 if found else 0
     POSTMAN.write_text(render_postman())
     print(f"wrote {POSTMAN.relative_to(ROOT)}")
+    for page in nav_pages(json.loads((DOCS / "docs.json").read_text())):
+        f = _page_file(page)
+        if f is not None and render_page(source := f.read_text()) != source:
+            f.write_text(render_page(source))
+            print(f"wrote the code samples in {f.relative_to(ROOT)}")
     return 0
 
 

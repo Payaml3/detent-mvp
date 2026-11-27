@@ -15,7 +15,7 @@ you run DekernAI beside your current payouts and compare.
 ## 1. Review the shadow decisions
 
 ```bash
-curl -s "$DEKERNAI_BASE_URL/v1/payment_intents?status=SHADOWED" -H "Authorization: Bearer $DEKERNAI_KEY"
+curl -s "$DEKERNAI_BASE_URL/v1/payment_intents?status=SHADOWED" -H "Authorization: Bearer $DEKERNAI_API_KEY"
 ```
 
 Each one has the full decision: the outcome and every check with its evidence. Compare them with what your team

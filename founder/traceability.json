@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 149,
-   "done": 104,
-   "pct": 70
+   "done": 106,
+   "pct": 71
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 320,
-   "done": 268,
-   "pct": 84
+   "done": 271,
+   "pct": 85
   },
   {
    "order": 3,
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 208,
+   "done": 209,
    "total": 244,
-   "pct_done": 85
+   "pct_done": 86
   },
   {
    "function": "05 QA",
@@ -54,9 +54,9 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 17,
+   "done": 19,
    "total": 23,
-   "pct_done": 74
+   "pct_done": 83
   }
  ],
  "initiatives": [
@@ -111,8 +111,8 @@
    "role": "growth",
    "stories": 6,
    "criteria": 8,
-   "criteria_done": 6,
-   "pct_done": 75
+   "criteria_done": 8,
+   "pct_done": 100
   },
   {
    "code": "DSH",
@@ -246,8 +246,8 @@
    "role": "engineer",
    "stories": 3,
    "criteria": 4,
-   "criteria_done": 3,
-   "pct_done": 75
+   "criteria_done": 4,
+   "pct_done": 100
   }
  ],
  "stories": [
@@ -1387,9 +1387,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "WHK-03",
@@ -1607,9 +1607,9 @@
    "function": "06 GTM",
    "slice": "P3",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "DOC-05",

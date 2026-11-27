@@ -384,6 +384,8 @@ DEM-05:
 WHK-01:
   0: ["unit/test_webhook_rules.py::test_event_types_match_spec_03", "unit/test_webhook_rules.py::test_payment_status_changes_map_to_event_types"]
   1: ["integration/test_webhooks.py::test_the_secret_is_shown_once_and_stored_encrypted", "integration/test_webhooks.py::test_events_carry_id_and_a_per_payment_sequence"]
+WHK-02:
+  0: ["unit/test_webhook_signing.py::test_stale_or_future_timestamps_are_rejected", "unit/test_webhook_signing.py::test_a_changed_body_or_wrong_secret_is_rejected", "unit/test_webhook_signing.py::test_malformed_headers_are_rejected", "unit/test_docs_snippets.py::test_every_signature_vector_agrees_with_the_api_signing_code", "ci:.github/workflows/ci.yml 'Docs samples in 8 languages' step (each language's verify_webhook against docs/snippets/webhook-vectors.txt)"]
 WHK-03:
   0: ["integration/test_webhooks.py::test_deliveries_are_signed_and_logged", "integration/test_webhooks.py::test_failures_retry_on_the_g20_schedule_then_fail",
       "integration/test_webhooks.py::test_send_test_event_and_manual_resend"]
@@ -422,6 +424,9 @@ DOC-02:
   0: ["integration/test_docs_examples.py::test_the_quickstart_request_works_as_written", "integration/test_docs_examples.py::test_the_quickstart_table_of_other_outcomes_holds", "unit/test_docs_site.py::test_the_signature_sample_matches_the_signing_code", "manual:docs/concepts/ has the nine concept pages of spec/08"]
 DOC-03:
   0: ["integration/test_docs_guides.py::test_the_agent_invoice_guide_runs_as_written", "integration/test_docs_guides.py::test_the_deposit_guide_holds", "integration/test_docs_guides.py::test_the_unknown_guide_holds", "integration/test_docs_guides.py::test_the_approval_guide_holds", "integration/test_docs_guides.py::test_the_kill_switch_guide_holds", "integration/test_docs_guides.py::test_the_shadow_to_auto_guide_holds"]
+DOC-04:
+  0: ["ci:.github/workflows/ci.yml 'Docs samples in 8 languages' step runs tools/run_snippets.py against the sandbox the job starts (every language's verify_webhook against docs/snippets/webhook-vectors.txt, then its create_payout)", "unit/test_docs_snippets.py::test_every_language_has_every_sample_and_the_pages_show_exactly_the_files", "unit/test_docs_snippets.py::test_the_python_sample_passes_the_vectors"]
+  1: ["unit/test_docs_snippets.py::test_reference_request_samples_are_generated_from_openapi_in_the_eight_languages", "manual:once Mintlify is connected, a reference page shows request samples in the eight languages"]
 DOC-05:
   0: ["integration/test_docs_guides.py::test_try_it_reaches_only_the_sandbox", "manual:once Mintlify is connected, a pasted sk_test_ key sends a request from a reference page; without one the page shows examples and the 'Request sandbox access' button"]
   1: ["integration/test_docs_guides.py::test_try_it_reaches_only_the_sandbox"]

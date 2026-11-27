@@ -319,6 +319,24 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   UUIDv7): with a frozen clock, "the latest decision" was a coin toss, so releasing the kill switch right after an
   approval could re-escalate the payment.
 
+## As built (P3 group 4)
+
+- **Samples are files (DOC-04):** `docs/snippets/<lang>/` holds a `create_payout` (the quickstart's
+  `payout.json`, with a fresh `Idempotency-Key`) and a `verify_webhook` sample in cURL (bash and openssl), Python,
+  TypeScript (Node 22, run as is), Go, Java (single-file programs), C#, PHP and Ruby, each with its language's
+  standard library only. The part a page shows sits between `docs:start` and `docs:end`; `tools/build_docs.py`
+  writes it into the page between `{/* snippet: <name> */}` and `{/* /snippet */}` as a `<CodeGroup>`, and its
+  `--check` fails when a page differs from the files.
+- **Run in CI (DOC-04, WHK-02):** `tools/run_snippets.py` runs every language's `verify_webhook` against the shared
+  cases in `docs/snippets/webhook-vectors.txt` (valid, edge of the window, rotated, stale, future, changed body,
+  secret or timestamp, malformed headers), then its `create_payout` against the sandbox API that CI's SDK job
+  starts, and needs a `pay_` ID back. A unit test checks each vector against the API's own signing code.
+  `--vectors-only` needs no sandbox.
+- **Reference samples (DOC-04):** Mintlify generates the API reference's request samples from
+  `docs/api/openapi.json` in the same eight languages (`api.examples.languages` in `docs/docs.json`).
+- **Changed on the way:** the docs name the key variable `DEKERNAI_API_KEY`, as the SDKs do. The site's developers
+  page still has its own pre-launch request sample (WEB-04).
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain
