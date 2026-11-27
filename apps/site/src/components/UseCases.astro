@@ -93,6 +93,13 @@ const railWord = { chosen: "Chosen", fallback: "Fallback", option: "Option", exc
 const verdictStatus = { EXECUTE: "CONFIRMED", ESCALATE: "ESCALATED", BLOCK: "BLOCKED" };
 ---
 <div class="uc" data-uc>
+  <div class="uc-nav" data-uc-nav hidden>
+    <p class="small soft"><span data-uc-count>1</span> of {cases.length} platforms · swipe to see all</p>
+    <span class="uc-arrows">
+      <button type="button" class="uc-arrow" data-uc-step="-1" aria-label="Previous platform">←</button>
+      <button type="button" class="uc-arrow" data-uc-step="1" aria-label="Next platform">→</button>
+    </span>
+  </div>
   <div class="tabs" role="tablist" aria-label="Use cases" data-uc-tabs hidden>
     {cases.map((c, i) => (
       <button type="button" role="tab" id={`uc-tab-${c.id}`} aria-controls={`uc-${c.id}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
@@ -147,17 +154,36 @@ const verdictStatus = { EXECUTE: "CONFIRMED", ESCALATE: "ESCALATED", BLOCK: "BLO
   if (root) {
     const tabs = [...root.querySelectorAll<HTMLButtonElement>("[role=tab]")];
     const panels = [...root.querySelectorAll<HTMLElement>("[data-uc-panel]")];
-    root.querySelector<HTMLElement>("[data-uc-tabs]")!.hidden = false;
+    const strip = root.querySelector<HTMLElement>("[data-uc-tabs]")!;
+    strip.hidden = false;
+    root.querySelector<HTMLElement>("[data-uc-nav]")!.hidden = false;
+    const count = root.querySelector<HTMLElement>("[data-uc-count]")!;
+    // phones: the tabs are one swipeable row; keep the chosen one in view and fade whichever edge has more
+    const edges = () => {
+      const over = strip.scrollWidth > strip.clientWidth + 1;
+      strip.classList.toggle("more-right", over && strip.scrollLeft + strip.clientWidth < strip.scrollWidth - 4);
+      strip.classList.toggle("more-left", over && strip.scrollLeft > 4);
+    };
+    strip.addEventListener("scroll", edges, { passive: true });
+    addEventListener("resize", edges);
     root.classList.add("uc-live");
     let at = 0, touched = false, timer = 0;
     const show = (i: number, focus = false) => {
       at = (i + tabs.length) % tabs.length;
       tabs.forEach((t, k) => { t.setAttribute("aria-selected", String(k === at)); t.tabIndex = k === at ? 0 : -1; });
       panels.forEach((p, k) => { if (k === at) { p.removeAttribute("data-on"); void p.offsetWidth; p.setAttribute("data-on", ""); } else p.removeAttribute("data-on"); });
+      count.textContent = String(at + 1);
+      if (strip.scrollWidth > strip.clientWidth + 1) {
+        const t = tabs[at];
+        strip.scrollTo({ left: t.offsetLeft - strip.offsetLeft - 24, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      }
+      edges();
       if (focus) tabs[at].focus();
     };
     const stop = () => { touched = true; clearInterval(timer); };
     tabs.forEach((t, k) => t.addEventListener("click", () => { stop(); show(k); }));
+    root.querySelectorAll<HTMLButtonElement>("[data-uc-step]").forEach((b) => b.addEventListener("click", () => { stop(); show(at + Number(b.dataset.ucStep)); }));
+    strip.addEventListener("touchstart", stop, { passive: true, once: true });
     root.querySelector("[role=tablist]")!.addEventListener("keydown", (e) => {
       const k = (e as KeyboardEvent).key;
       const d = k === "ArrowDown" || k === "ArrowRight" ? 1 : k === "ArrowUp" || k === "ArrowLeft" ? -1 : 0;
@@ -177,6 +203,7 @@ const verdictStatus = { EXECUTE: "CONFIRMED", ESCALATE: "ESCALATED", BLOCK: "BLO
 <style>
   .uc { display: grid; grid-template-columns: minmax(220px, 3.2fr) 8.8fr; gap: 16px; align-items: start; }
   .uc:not(.uc-live) { grid-template-columns: 1fr; }
+  .uc-nav { display: none; }
   .uc:not(.uc-live) .panels { display: grid; gap: 16px; }
   .tabs { display: grid; gap: 2px; position: sticky; top: 96px; }
   .tabs button { all: unset; cursor: pointer; display: grid; gap: 2px; padding: 11px 14px; border-radius: 8px; border-left: 2px solid transparent; transition: background 160ms, border-color 160ms; }
@@ -258,8 +285,18 @@ const verdictStatus = { EXECUTE: "CONFIRMED", ESCALATE: "ESCALATED", BLOCK: "BLO
   @media (max-width: 1100px) { .lanes { grid-template-columns: 1fr 1fr; } .lane:nth-child(3) { grid-column: 1 / -1; } .lane:nth-child(3)::before { display: none; } }
   @media (max-width: 860px) {
     .uc { grid-template-columns: 1fr; }
-    .tabs { position: static; display: flex; overflow-x: auto; gap: 6px; padding-bottom: 6px; scrollbar-width: none; }
-    .tabs button { flex: none; border-left: 0; border-bottom: 2px solid transparent; background: var(--surface); }
+    .uc-nav:not([hidden]) { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .uc-arrows { display: flex; gap: 8px; flex: none; }
+    .uc-arrow { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--text);
+      font: 600 18px/1 var(--font-head); cursor: pointer; display: grid; place-items: center; }
+    .uc-arrow:focus-visible { outline: 2px solid var(--interactive); outline-offset: 2px; }
+    .tabs { position: static; display: flex; overflow-x: auto; gap: 6px; padding-bottom: 6px; scrollbar-width: none;
+      scroll-snap-type: x proximity; scroll-padding-inline: 24px; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tabs.more-right { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 56px), transparent); }
+    .tabs.more-left { -webkit-mask-image: linear-gradient(90deg, transparent, #000 56px); mask-image: linear-gradient(90deg, transparent, #000 56px); }
+    .tabs.more-left.more-right { -webkit-mask-image: linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(90deg, transparent, #000 56px, #000 calc(100% - 56px), transparent); }
+    .tabs button { flex: none; scroll-snap-align: start; border-left: 0; border-bottom: 2px solid transparent; background: var(--surface); }
     .tabs button[aria-selected="true"] { border-bottom-color: var(--signal); }
     .t-tag { display: none; }
     .lanes { grid-template-columns: 1fr; }
