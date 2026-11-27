@@ -552,6 +552,8 @@ def github_data(root: Path, cfg_dash: dict[str, Any], month: str, now: dt.dateti
             ctl = control.read(hub, root)
         except (subprocess.CalledProcessError, ValueError, KeyError, TypeError):
             ctl = {"all": None, "roles": {}, "url": "", "unknown": True}
+        at = now or dt.datetime.now(dt.timezone.utc)  # a /wake the next run hasn't spent yet shows on its agent
+        ctl["woken"] = {r: w for r in tickets.ROLES if (w := control.woken(ctl, r, c["entries"], at))}
         return {"ok": True, "control": ctl, "repo": repo, "activity": activity[-limit:], "tickets": open_tickets,
                 "approvals": approvals(hub, root), "costs": c, "merged": merged,
                 "trends": trends(recent_runs + c["entries"], activity, merged, now),
@@ -599,6 +601,7 @@ def build(root: Path, offline: bool = False, now: dt.datetime | None = None) -> 
                   "portfolio_name": " ".join(str(cfg_dash.get("portfolio_name") or "").split())[:80]},
         "repo": repo_data(root, cfg_dash),
         "theme": theme.build(cfg_dash),
+        "brand": theme.logos(root, cfg_dash),
         "setup": setup(root, offline, now),
         "github": {"ok": False, "why": "built offline"} if offline else github_data(root, cfg_dash, month, now),
     }
@@ -629,7 +632,7 @@ def page(data: dict[str, Any]) -> str:
     name = data["project"]["name"] or "Startup"
     before, _, after = s.read(PAGE).partition("__S2S_DATA__")
     before = before.replace("__S2S_TITLE__", html.escape(f"{name} dashboard"))
-    style = theme.css(data.get("theme") or {})
+    style = theme.css(data.get("theme") or {}) + theme.icon_link(data.get("brand") or {})
     if style:
         before = before.replace("</head>", style + "</head>", 1)
     return before + embed(data) + after
