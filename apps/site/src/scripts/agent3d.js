@@ -296,7 +296,7 @@ export function mountAgent(canvas) {
     camera.aspect = w / h;
     // narrow canvases (phones): pull back and pan toward the middle of the agent + rules pair so both stay in frame
     const fit = Math.max(1, 1.05 / camera.aspect);
-    camera.position.set(w < 700 ? 8 : 0, w < 700 ? -2 : 0, 150 * fit);
+    camera.position.set(w < 700 ? 8 : 0, w < 700 ? -2 : 0, 150 * fit * (w < 700 ? 0.86 : 1));
     camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(canvas);
