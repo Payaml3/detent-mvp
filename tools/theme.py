@@ -19,6 +19,7 @@ URI, the only images the page's security policy loads, and an SVG in an <img> ne
     "logo": "apps/site/public/brand/logo.svg", "logo_dark": "apps/site/public/brand/logo-reverse.svg",
     "icon": "apps/site/public/brand/mark.svg"
 """
+
 from __future__ import annotations
 
 import base64
@@ -27,8 +28,24 @@ import re
 from pathlib import Path
 from typing import Any
 
-KEYS = ("paper", "surface", "sunk", "ink", "muted", "line", "line-strong", "accent", "on-accent", "link",
-        "series", "miss", "done", "progress", "todo", "waiting")
+KEYS = (
+    "paper",
+    "surface",
+    "sunk",
+    "ink",
+    "muted",
+    "line",
+    "line-strong",
+    "accent",
+    "on-accent",
+    "link",
+    "series",
+    "miss",
+    "done",
+    "progress",
+    "todo",
+    "waiting",
+)
 HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
 PAGE = Path(__file__).resolve().parent / "dashboard.html"
 BAND = {"light": (0.43, 0.78), "dark": (0.48, 0.70)}
@@ -50,13 +67,14 @@ def _lin(c: float) -> float:
 
 
 def _rgb(hexs: str) -> tuple[float, float, float]:
-    return tuple(_lin(int(hexs[i:i + 2], 16) / 255) for i in (1, 3, 5))  # type: ignore[return-value]
+    return tuple(_lin(int(hexs[i : i + 2], 16) / 255) for i in (1, 3, 5))  # type: ignore[return-value]
 
 
 def contrast(a: str, b: str) -> float:
     def lum(h: str) -> float:
         r, g, bl = _rgb(h)
         return 0.2126 * r + 0.7152 * g + 0.0722 * bl
+
     hi, lo = sorted((lum(a), lum(b)), reverse=True)
     return (hi + 0.05) / (lo + 0.05)
 
@@ -66,15 +84,31 @@ def _oklab(rgb: tuple[float, float, float]) -> tuple[float, float, float]:
     l_ = (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b) ** (1 / 3)
     m_ = (0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b) ** (1 / 3)
     s_ = (0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b) ** (1 / 3)
-    return (0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_,
-            1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_,
-            0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_)
+    return (
+        0.2104542553 * l_ + 0.7936177850 * m_ - 0.0040720468 * s_,
+        1.9779984951 * l_ - 2.4285922050 * m_ + 0.4505937099 * s_,
+        0.0259040371 * l_ + 0.7827717662 * m_ - 0.8086757660 * s_,
+    )
 
 
 # Machado, Oliveira and Fernandes (2009), full severity, in linear RGB.
-CVD = {"protan": ((0.152286, 1.052583, -0.204868), (0.114503, 0.786281, 0.099216), (-0.003882, -0.048116, 1.051998)),
-       "deutan": ((0.367322, 0.860646, -0.227968), (0.280085, 0.672501, 0.047413), (-0.011820, 0.042940, 0.968881)),
-       "tritan": ((1.255528, -0.076749, -0.178779), (-0.078411, 0.930809, 0.147602), (0.004733, 0.691367, 0.303900))}
+CVD = {
+    "protan": (
+        (0.152286, 1.052583, -0.204868),
+        (0.114503, 0.786281, 0.099216),
+        (-0.003882, -0.048116, 1.051998),
+    ),
+    "deutan": (
+        (0.367322, 0.860646, -0.227968),
+        (0.280085, 0.672501, 0.047413),
+        (-0.011820, 0.042940, 0.968881),
+    ),
+    "tritan": (
+        (1.255528, -0.076749, -0.178779),
+        (-0.078411, 0.930809, 0.147602),
+        (0.004733, 0.691367, 0.303900),
+    ),
+}
 
 
 def _sim(rgb: tuple[float, float, float], kind: str) -> tuple[float, float, float]:
@@ -92,8 +126,14 @@ def delta_e(a: str, b: str, kind: str = "") -> float:
 def problems(mode: str, t: dict[str, str]) -> list[str]:
     """Why a merged palette isn't readable, or []."""
     out = []
-    for fg, bg, need in (("ink", "paper", 4.5), ("ink", "surface", 4.5), ("muted", "surface", 4.5), ("link", "surface", 4.5),
-                         ("series", "surface", 3.0), ("miss", "surface", 3.0)):
+    for fg, bg, need in (
+        ("ink", "paper", 4.5),
+        ("ink", "surface", 4.5),
+        ("muted", "surface", 4.5),
+        ("link", "surface", 4.5),
+        ("series", "surface", 3.0),
+        ("miss", "surface", 3.0),
+    ):
         c = contrast(t[fg], t[bg])
         if c < need:
             out.append(f"{fg} on {bg} is {c:.1f}:1, needs {need}:1")
@@ -104,7 +144,9 @@ def problems(mode: str, t: dict[str, str]) -> list[str]:
             out.append(f"{k} lightness {L:.2f} is outside {lo}–{hi} for {mode} charts")
     worst = min((delta_e(t["series"], t["miss"], k), k) for k in CVD)
     if worst[0] < 8:
-        out.append(f"series and miss are too alike for {worst[1]} colour blindness (ΔE {worst[0]:.1f}, needs 8)")
+        out.append(
+            f"series and miss are too alike for {worst[1]} colour blindness (ΔE {worst[0]:.1f}, needs 8)"
+        )
     return out
 
 
@@ -120,7 +162,9 @@ def build(cfg_dash: dict[str, Any]) -> dict[str, Any]:
         bad = sorted(k for k, v in given.items() if k not in KEYS or not HEX.match(str(v)))
         tokens = {k: str(v).lower() for k, v in given.items() if k in KEYS and HEX.match(str(v))}
         if bad:
-            out["warnings"].append(f"{mode}: ignored {', '.join(b[:24] for b in bad[:5])} (unknown token or not #rrggbb)")
+            out["warnings"].append(
+                f"{mode}: ignored {', '.join(b[:24] for b in bad[:5])} (unknown token or not #rrggbb)"
+            )
         why = problems(mode, {**base[mode], **tokens}) if tokens else []
         if why:
             out["warnings"].append(f"{mode} theme not applied: " + "; ".join(why))
@@ -131,14 +175,20 @@ def build(cfg_dash: dict[str, Any]) -> dict[str, Any]:
 
 def css(theme: dict[str, Any]) -> str:
     """The <style> block that overrides the page's tokens; empty when there is no theme."""
+
     def block(tokens: dict[str, str]) -> str:
         return " ".join(f"--{k}: {v};" for k, v in sorted(tokens.items()) if k in KEYS and HEX.match(v))
+
     light, dark = block(theme.get("light") or {}), block(theme.get("dark") or {})
     if not light and not dark:
         return ""
-    parts = [f":root {{ {light} }}" if light else "",
-             f'@media (prefers-color-scheme: dark) {{ :root:not([data-theme="light"]) {{ {dark} }} }}' if dark else "",
-             f':root[data-theme="dark"] {{ {dark} }}' if dark else ""]
+    parts = [
+        f":root {{ {light} }}" if light else "",
+        f'@media (prefers-color-scheme: dark) {{ :root:not([data-theme="light"]) {{ {dark} }} }}'
+        if dark
+        else "",
+        f':root[data-theme="dark"] {{ {dark} }}' if dark else "",
+    ]
     return '<style id="s2s-theme">' + " ".join(p for p in parts if p) + "</style>\n"
 
 
@@ -167,9 +217,11 @@ def _image(root: Path, rel: Any) -> tuple[str, str]:
     if len(raw) > LOGO_LIMIT:
         return "", f"{rel[:60]} is {len(raw) // 1024} KB, over {LOGO_LIMIT // 1024} KB"
     head = raw[:512].lstrip()
-    ok = {"image/svg+xml": head.startswith((b"<svg", b"<?xml")) and b"<svg" in raw,
-          "image/png": raw.startswith(b"\x89PNG\r\n\x1a\n"),
-          "image/webp": raw[:4] == b"RIFF" and raw[8:12] == b"WEBP"}[mime]
+    ok = {
+        "image/svg+xml": head.startswith((b"<svg", b"<?xml")) and b"<svg" in raw,
+        "image/png": raw.startswith(b"\x89PNG\r\n\x1a\n"),
+        "image/webp": raw[:4] == b"RIFF" and raw[8:12] == b"WEBP",
+    }[mime]
     if not ok:
         return "", f"{rel[:60]} is not a valid {path.suffix.lower()[1:].upper()} file"
     return f"data:{mime};base64," + base64.b64encode(raw).decode("ascii"), ""
