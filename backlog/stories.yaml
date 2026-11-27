@@ -2246,6 +2246,7 @@ stories:
   so: my developers see it's real
   ac:
     - "Uses the same tested snippets as DOC-04"
+  done: [0]
   pri: Must
   est: 0.25
   deps: [DOC-04, WEB-01]

@@ -334,8 +334,10 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   `--vectors-only` needs no sandbox.
 - **Reference samples (DOC-04):** Mintlify generates the API reference's request samples from
   `docs/api/openapi.json` in the same eight languages (`api.examples.languages` in `docs/docs.json`).
-- **Changed on the way:** the docs name the key variable `DEKERNAI_API_KEY`, as the SDKs do. The site's developers
-  page still has its own pre-launch request sample (WEB-04).
+- **Changed on the way:** the docs name the key variable `DEKERNAI_API_KEY`, as the SDKs do.
+- **Website code tabs (WEB-04):** `tools/build_docs.py` also writes `apps/site/src/data/snippets.json` (the
+  `create_payout` regions, the quickstart's `payout.json` and its response) and `--check` fails when it is stale;
+  the home page's engineering panel renders it, so the site shows the same tested code as the docs.
 
 ## Needed from the founder before M8 to M11
 

@@ -86,6 +86,15 @@ test("developers: one request in eight languages, with the sandbox, in the engin
   assert.match(section, /<pre[\s\S]*payment_intents/);
 });
 
+test("developers: the code tabs are the docs' tested samples (WEB-04, DOC-04)", () => {
+  const snippets = JSON.parse(readFileSync(new URL("../src/data/snippets.json", import.meta.url), "utf8"));
+  assert.deepEqual(snippets.samples.map((s) => s.lang), ["cURL", "Python", "TypeScript", "Go", "Java", "C#", "PHP", "Ruby"]);
+  const section = text(read(PAGES.home).split('id="panel-engineering"')[1].split("data-section=")[0]);
+  const flat = (s) => s.replace(/\s+/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  for (const s of snippets.samples) assert.ok(flat(section).includes(flat(s.code)), `${s.lang} sample is not the tested file`);
+  assert.ok(flat(section).includes(flat(snippets.payout)), "payout.json");
+});
+
 test("onboarding: the seven phases of the client journey, plans 'Talk to us', no prices (B-04)", () => {
   const html = read(PAGES.home);
   const section = text(html.split('data-section="onboarding"')[1].split("data-section=")[0]);

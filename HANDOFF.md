@@ -19,7 +19,7 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | P1 Sandbox API and webhooks | done | `main` |
 | P2 Dashboard and sandbox | done | `main` |
 | P3 Docs and SDKs | done (Mintlify connection and SDK publishing wait on the founder) | `main` |
-| P4 Website launch | next (WEB-07 waits on the S9 deploy) | branch from `main` |
+| P4 Website launch | in progress: WEB-04 built; WEB-06 needs the booking URL, WEB-07 waits on the S9 deploy | branch from `main` |
 | L After launch (Should and Could) | todo | |
 
 Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
@@ -170,7 +170,10 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   TypeScript, Go, Java, C#, PHP, Ruby; standard library only). `tools/run_snippets.py` runs each language against
   `docs/snippets/webhook-vectors.txt` and the CI sandbox; `tools/build_docs.py` writes them into the pages. See
   spec/08 "As built (P3 group 4)". P3 is complete.
-- **Next:** P4 (WEB-07 waits on the FND-07 deploy), then L. · Model: mid-tier
+- **P4 WEB-04: built (PR from `claude/project-thread-babje1`, 2026-11-27):** the site's code tabs come from the
+  docs' tested samples (`apps/site/src/data/snippets.json`, written by `tools/build_docs.py`).
+- **Next:** the rest of P4: WEB-06 needs the founder's booking URL, WEB-07 waits on the FND-07 deploy; then L.
+  · Model: mid-tier
 
 ## Open founder items
 

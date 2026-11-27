@@ -1705,7 +1705,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Acceptance criteria**
 
-- [ ] Uses the same tested snippets as DOC-04
+- [x] Uses the same tested snippets as DOC-04
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** DOC-04, WEB-01 · **Traces to:** D.site, D.samples
 
