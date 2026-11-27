@@ -377,7 +377,8 @@ def expectations(  # noqa: PLR0912, PLR0915 - one block per assertion keyword
             bal = env.world.chain.balance(addr)
             # An attempt row does not record the address it sent to, and the destination's current address
             # may have changed after a legitimate send to the old one. So an attempt whose transaction is on
-            # the chain counts only if that transaction paid the alias; one with no transaction yet still counts.
+            # the chain counts only if that transaction paid the alias; one with no transaction yet still
+            # counts.
             sent_to = env.world.chain.transfer_recipients()
             rows = c.execute(
                 text(
