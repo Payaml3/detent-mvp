@@ -1,8 +1,8 @@
 // Section entrances: parts rise in order as they enter. Content is visible without script, and anything
 // already scrolled past (a jump from a link, a fast scroll) is shown at once, so nothing can stay hidden.
 const items = [...document.querySelectorAll("[data-reveal]")];
-// Phones get no entrances: long pages and flick scrolling make delayed content a risk, not a pleasure.
-if (items.length && "IntersectionObserver" in window && innerWidth >= 700 && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+// Phones get a shorter, lighter entrance (site.css); the sweep below shows anything a flick scroll skipped.
+if (items.length && "IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   document.documentElement.classList.add("will-reveal");
   const show = (el) => { el.classList.add("revealed"); io.unobserve(el); };
   const io = new IntersectionObserver((entries) => {
