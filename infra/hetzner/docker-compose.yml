@@ -1,4 +1,4 @@
-# S9 / FND-07: the live EU demo on one Hetzner Cloud server in Germany, deployed by Coolify from GitHub.
+# S9 / FND-07: the live EU demo on one Hetzner Cloud server in Helsinki, Finland (EU), deployed by Coolify from GitHub.
 # Database: Neon Postgres, AWS Europe (Frankfurt) eu-central-1 (DATABASE_URL). Test networks and test keys only.
 #
 # Coolify: Docker Compose build pack, Base Directory "/", Compose Location "/infra/hetzner/docker-compose.yml".
@@ -13,7 +13,7 @@
 x-app-env: &app-env
   APP_ENV: demo
   BRAND_NAME: DekernAI
-  HOSTING_REGION: "Hetzner Cloud, Germany (EU)"
+  HOSTING_REGION: "Hetzner Cloud, Helsinki, Finland (EU)"
   DATABASE_REGION: "Neon, AWS Europe (Frankfurt) eu-central-1"
   AGENT_LLM: ${AGENT_LLM:-auto}                 # recorded stand-ins until ANTHROPIC_API_KEY is set
   DASHBOARD_URL: ${DASHBOARD_URL:-https://app.dekernai.com}   # invite links

@@ -177,7 +177,7 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 
 ## Open founder items
 
-- **S9 live run (host chosen 27 Nov: Hetzner + Neon):** a Hetzner Cloud server in Germany with Coolify and a
+- **S9 live run (host chosen 27 Nov: Hetzner + Neon):** a Hetzner Cloud server (CAX11, Helsinki) with Coolify and a
   Neon project in AWS Frankfurt, set up step by step in `infra/hetzner/README.md`; the secrets typed into
   Coolify; funded test wallets (four: sender and payer on each chain); `ANTHROPIC_API_KEY`.
 - **G-27 Confirmed (D-33):** the live demo pays in its own labelled test token (tUSDC). Before the live run, per

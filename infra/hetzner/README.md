@@ -1,6 +1,6 @@
 # The live EU demo on Hetzner + Neon (S9, FND-07)
 
-Everything runs on **one Hetzner Cloud server in Germany**, deployed by **Coolify** (free, self-hosted) straight
+Everything runs on **one Hetzner Cloud server in Helsinki, Finland (EU)**, deployed by **Coolify** (free, self-hosted) straight
 from GitHub. The database is **Neon Postgres in AWS Europe (Frankfurt) `eu-central-1`**. Test networks and test
 keys only (invariant 14). This replaces the Render plan in `render.yaml`, which was never deployed.
 
@@ -15,8 +15,9 @@ keys only (invariant 14). This replaces the Render plan in `render.yaml`, which 
 Files: `docker-compose.yml` (what Coolify deploys), `Dockerfile.app`, `Dockerfile.site`, `nginx-site.conf`,
 `make_secrets.py` (prints fresh secrets and test wallets on your own screen).
 
-Cost (check the price on screen before you buy): a Hetzner shared-vCPU server with 4 vCPU and 8 GB (CX33 or
-the current equivalent) is about €6 to €9 a month with its IPv4 address; Neon's free plan; Coolify is free.
+Cost: a Hetzner Cost-Optimized **CAX11** (Arm64, 2 vCPU, 4 GB) at about €7.79 a month with its IPv4 address
+(Nov 2026, incl. VAT); Neon's free plan; Coolify is free. Grow it later with Hetzner's Rescale ("CPU and RAM
+only", so it can shrink again). Every dependency ships Arm64 wheels, so the images build the same on Arm.
 
 ## Steps
 
@@ -28,8 +29,9 @@ and your password manager. Never commit them to this repository.
 1. **SSH key (on your own computer).** In Windows PowerShell: `ssh-keygen -t ed25519` and press Enter three
    times. Then `Get-Content $HOME\.ssh\id_ed25519.pub` prints your **public** key (safe to paste into Hetzner;
    the private file `id_ed25519` never leaves your computer).
-2. **Hetzner server.** console.hetzner.com, new project `DekernAI`, Add Server: location Nuremberg or
-   Falkenstein (Germany), image **Ubuntu 24.04**, type shared vCPU x86 **4 vCPU / 8 GB**, public IPv4 on,
+2. **Hetzner server.** console.hetzner.com, new project `DekernAI`, Add Server: Cost-Optimized, Arm64,
+   **CAX11**, location **Helsinki** (where it was in stock; any EU location works, then update `HOSTING_REGION`),
+   image **Ubuntu 24.04**, public IPv4 on,
    **SSH keys: add the public key from step 1**. With a key chosen, Hetzner sets no root password and password
    login is off.
 3. **Firewall.** Hetzner, Firewalls, Create: inbound TCP **22** (SSH; set Source to your own IP address if it
