@@ -14,5 +14,27 @@
   ],
   "activity_limit": 200,
   "portfolio_url": "",
-  "portfolio_name": ""
+  "portfolio_name": "",
+  "theme": {
+    "light": {
+      "paper": "#F3F3F1",
+      "ink": "#18191B",
+      "accent": "#18191B",
+      "link": "#C2360F",
+      "series": "#237A46",
+      "miss": "#C2360F",
+      "done": "#237A46"
+    },
+    "dark": {
+      "paper": "#18191B",
+      "surface": "#232427",
+      "sunk": "#2c2d31",
+      "ink": "#F3F3F1",
+      "accent": "#F3F3F1",
+      "on-accent": "#18191B",
+      "link": "#FF4A1F",
+      "series": "#3c9a62",
+      "miss": "#FF4A1F"
+    }
+  }
 }
