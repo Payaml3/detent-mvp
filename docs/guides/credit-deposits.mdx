@@ -1,0 +1,54 @@
+---
+title: "Credit deposits safely"
+description: "Give each user deposit instructions, and credit their balance only on deposit.credited."
+---
+
+Credit a user's balance when the money has arrived and passed your checks, not when the user says they sent it.
+
+## 1. Create deposit instructions
+
+```json deposit.json
+{
+  "account_ref": "acct_u1001",
+  "currency": "USDC",
+  "network": "base-sepolia",
+  "expected_amount": {"amount": "250.00", "currency": "USDC"}
+}
+```
+
+```bash
+curl -s "$DEKERNAI_BASE_URL/v1/deposit_intents" \
+  -H "Authorization: Bearer $DEKERNAI_KEY" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -H "Content-Type: application/json" \
+  -d @deposit.json
+```
+
+`account_ref` is your own reference for the user's account. The response is `OPEN`, with the instructions to show
+your user: a test-network address for that account, the chain and the token. They expire after 7 days.
+
+```json deposit-response
+{
+  "object": "deposit_intent",
+  "status": "OPEN",
+  "instructions": {"kind": "evm_address", "network": "base-sepolia", "chain_id": 84532, "token": "USDC"}
+}
+```
+
+## 2. Credit on the event, not before
+
+Subscribe to `deposit.credited` and `deposit.exception`, and verify each event's
+[signature](/webhooks/signatures).
+
+- On `deposit.credited`, credit the user's balance with the amount in the event, once: use the event `id` to
+  ignore a repeat delivery.
+- On `deposit.exception`, credit nothing. The deposit went to a suspense account because a check failed (the
+  wrong token or network, a sender on a screening list, or an amount outside your tolerance). Your payments lead
+  resolves the case in the console by approving a fix: credit the account, or mark the money to be returned to
+  the sender. Either way the fix is a new ledger entry. Read the deposit again to see a credit made this way.
+
+`GET /v1/deposit_intents/{id}` shows the instructions and every credit made against them.
+
+<Note>Inbound transfers need a real test network: the simulated chain has no deposits.</Note>
+
+See [Deposits and reconciliation](/concepts/deposits-and-reconciliation).

@@ -1591,7 +1591,7 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 **Acceptance criteria**
 
-- [ ] Let an AI agent pay a supplier invoice ($18,500 USDC); credit deposits safely; handle UNKNOWN payments; approve escalations by API; use the kill switch; move from shadow to auto
+- [x] Let an AI agent pay a supplier invoice ($18,500 USDC); credit deposits safely; handle UNKNOWN payments; approve escalations by API; use the kill switch; move from shadow to auto
 
 **Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs
 
@@ -1612,8 +1612,8 @@ _Concepts, guides and reference with tested samples in 8 languages_ · layer: Al
 
 **Acceptance criteria**
 
-- [ ] Works with a pasted sandbox key; visitors without a key see examples and a 'Request sandbox access' button
-- [ ] Only the sandbox base URL is configurable
+- [x] Works with a pasted sandbox key; visitors without a key see examples and a 'Request sandbox access' button
+- [x] Only the sandbox base URL is configurable
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** DOC-01 · **Traces to:** D.docs, D.sales_led
 

@@ -1,0 +1,41 @@
+---
+title: "Move from shadow to auto mode"
+description: "Watch your rules decide in shadow mode, then let them send, with two people agreeing."
+---
+
+Every organisation starts in **shadow mode**: each payment is decided and recorded, and nothing is sent. It lets
+you run DekernAI beside your current payouts and compare.
+
+| Mode | What happens after the decision |
+|---|---|
+| `shadow` | Recorded only. The status is `SHADOWED` |
+| `assist` | Cleared payments wait for a person to click Send, who can't be the person who created them |
+| `auto` | Cleared payments are sent |
+
+## 1. Review the shadow decisions
+
+```bash
+curl -s "$DEKERNAI_BASE_URL/v1/payment_intents?status=SHADOWED" -H "Authorization: Bearer $DEKERNAI_KEY"
+```
+
+Each one has the full decision: the outcome and every check with its evidence. Compare them with what your team
+did. Where a rule escalates too often or not enough, change it in the console's **Policy** screen.
+
+## 2. Change the mode
+
+A mode change needs two people: your payments lead and your compliance lead. One proposes it and the other
+approves it.
+
+1. In the dashboard, open **Console**, then **Settings**.
+2. One of them chooses `auto` (or `assist`), gives a reason and proposes.
+3. The other opens **Settings** and approves.
+
+Both steps are in the audit log. From then on the same request that returned `SHADOWED` returns `READY` and is
+sent:
+
+```json auto
+{"status": "READY"}
+```
+
+The mode is read again inside the send lock, so a payment cleared under auto waits for a click if the mode has
+moved to assist, and nothing is sent once you go back to shadow.

@@ -201,8 +201,11 @@ def create_organisation(
 
 def seed_sandbox_data(conn: Connection, clock: Clock, settings: Settings, org_id: str) -> dict[str, int]:
     """G-18: a new organisation starts with the fictional counterparties, the simulated rails and the default
-    rule set (version 1), so every test value works from the first call."""
+    rule set (version 1), so every test value works from the first call. With the mandate signing key set, it
+    also gets the fictional accounts-payable agent's mandate, valid for a year, so the agent guide and the
+    mandate test values work too (DOC-03, SBX-01)."""
     from detent.intents.registry import seed_registry
+    from detent.mandates.store import fixture_mandate, issue_mandate
     from detent.policy.schema import load_ruleset
     from detent.policy.store import install_ruleset
     from detent.rails.registry import seed_rails
@@ -210,8 +213,27 @@ def seed_sandbox_data(conn: Connection, clock: Clock, settings: Settings, org_id
 
     counterparties = seed_registry(conn, clock, org_id)
     rails = seed_rails(conn, org_id, settings)
+    # The travel-rule originator (spec/04): the organisation's name and a fictional account reference, as the
+    # demo organisation has, so a payout over the threshold is not escalated for missing originator data.
+    conn.execute(
+        text(
+            "UPDATE organisations SET registered_name = coalesce(registered_name, name), "
+            "registered_account = coalesce(registered_account, :a) WHERE org_id = :o"
+        ),
+        {"a": f"SANDBOX-{org_id} (fictional)", "o": org_id},
+    )
     install_ruleset(conn, clock, org_id, load_ruleset(POLICY.read_text()), proposed_by="system:seed")
-    return {"counterparties": len(counterparties), "rails": len(rails), "policy_versions": 1}
+    mandates = 0
+    if settings.mandate_signing_key_demo is not None:
+        doc = fixture_mandate(clock, org_id, days=365)
+        issue_mandate(conn, clock, org_id, doc, settings.mandate_signing_key_demo, actor=Actor.system("seed"))
+        mandates = 1
+    return {
+        "counterparties": len(counterparties),
+        "rails": len(rails),
+        "policy_versions": 1,
+        "mandates": mandates,
+    }
 
 
 def extend(conn: Connection, clock: Clock, *, staff: Member, org_id: str, days: int) -> datetime:

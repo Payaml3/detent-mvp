@@ -1,0 +1,38 @@
+---
+title: "Handle UNKNOWN payments"
+description: "When a rail does not answer, the payment is UNKNOWN: never resend it, wait for the evidence."
+---
+
+A payout is `UNKNOWN` when DekernAI sent it and the rail did not answer in time. The money may have moved. It is
+not a failure, and treating it as one is how payouts get paid twice.
+
+## Try it
+
+In auto mode, send a payout to `cpt_lumen` for an amount ending in `.13`, such as `90.13`:
+
+```json unknown.json
+{
+  "kind": "payout",
+  "source": "platform",
+  "counterparty_id": "cpt_lumen",
+  "destination": {"kind": "evm_wallet", "network": "base-sepolia", "destination_id": "dst_lumen_base"},
+  "amount": {"amount": "90.13", "currency": "USDC"}
+}
+```
+
+The simulated chain takes the payout and does not answer, so the payment becomes `UNKNOWN` and
+`payment_intent.unknown` is sent. A little later DekernAI finds the transfer on the chain, and the payment
+becomes `CONFIRMED`, with a single attempt.
+
+## What your platform should do
+
+- **Don't resend.** Don't create a new payment intent for the same payout, and don't retry with a new
+  `Idempotency-Key`. DekernAI never sends again while any attempt is UNKNOWN.
+- **Keep the user's funds reserved.** An UNKNOWN payout keeps its ledger reservation.
+- **Show it as pending** to your user, not as failed.
+- **Wait for the evidence.** DekernAI checks the rail until it has a definitive answer, and then sends
+  `payment_intent.confirmed` or `payment_intent.failed`. Only definitive rail evidence settles it.
+- **If it lasts,** an exception case opens for your team with what is known.
+
+Use `sequence` on webhook events to tell the latest state, or poll `GET /v1/payment_intents/{id}`. See
+[Payment states](/concepts/payment-states#unknown-is-not-failed).

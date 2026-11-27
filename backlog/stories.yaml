@@ -2095,6 +2095,7 @@ stories:
   so: I can complete common jobs end to end
   ac:
     - "Let an AI agent pay a supplier invoice ($18,500 USDC); credit deposits safely; handle UNKNOWN payments; approve escalations by API; use the kill switch; move from shadow to auto"
+  done: [0]
   pri: Must
   est: 1.0
   deps: [DOC-01]
@@ -2123,6 +2124,7 @@ stories:
   ac:
     - "Works with a pasted sandbox key; visitors without a key see examples and a 'Request sandbox access' button"
     - "Only the sandbox base URL is configurable"
+  done: [0, 1]
   pri: Must
   est: 0.25
   deps: [DOC-01]
