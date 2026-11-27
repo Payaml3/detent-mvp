@@ -45,12 +45,12 @@
       "cycle": "C1",
       "owner": "product",
       "status": "planned",
-      "why": "The business model rests on shadow report to pilot. Source: docs/product/business-model.md.",
+      "why": "Clients join through the onboarding process (B-04), not a free shadow report. The first design partner is one that passes due diligence (KYB) and signs up in the dashboard. Source: docs/product/client-journey.md.",
       "key_results": [
         {
           "id": "O2.1",
-          "metric": "Free shadow reports delivered on a real export",
-          "unit": "reports",
+          "metric": "Design partners through KYB and signed up in the dashboard (onboarding phases 2 and 3)",
+          "unit": "partners",
           "baseline": 0,
           "target": 1,
           "current": 0
@@ -151,11 +151,11 @@
     },
     {
       "id": "I5",
-      "title": "Define the shadow report format and produce it from an export with the existing import, decide and replay",
+      "title": "Specify and build the onboarding path to the first design partner: KYB approval, account creation and dashboard sign-up (client-journey phases 2 and 3)",
       "key_result": "O2.1",
       "owner": "product",
       "status": "planned",
-      "epic": "SHD"
+      "epic": "DSH"
     },
     {
       "id": "I6",
