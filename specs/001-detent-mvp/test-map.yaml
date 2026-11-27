@@ -58,7 +58,7 @@ WEB-02:
 WEB-03:
   0: ["ci:apps/site/tests/logic.test.mjs results: every figure carries the dated test-network label", "ci:apps/site/tests/logic.test.mjs results: absent file means not published and no figures", "ci:apps/site/tests/site.test.mjs results: not published, and no figures, while there is no results file"]
 WEB-04:
-  0: ["ci:apps/site/tests/site.test.mjs developers: one request in eight languages, labelled pre-launch (snippets not yet the DOC-04 tested set)"]
+  0: ["ci:apps/site/tests/site.test.mjs developers: the code tabs are the docs' tested samples (WEB-04, DOC-04)", "ci:tools/build_docs.py --check (apps/site/src/data/snippets.json is current)"]
 WEB-05:
   0: ["ci:apps/site/tests/site.test.mjs legal pages are marked draft for legal review", "ci:apps/site/tests/site.test.mjs no third-party requests: scripts, styles and fonts are served locally", "manual:apps/site sets no cookies and has no analytics configured"]
 WEB-06:
