@@ -1,0 +1,53 @@
+---
+title: "Python and TypeScript SDKs"
+description: "Typed clients with idempotency keys, safe retries and webhook verification built in."
+---
+
+Both SDKs are generated from the same OpenAPI file as the [API reference](/api-reference), so every endpoint has a
+typed method, and the rest is written by hand. They are not on a package index yet: install them from the
+repository.
+
+<CodeGroup>
+
+```python Python
+from dekernai import DekernAI
+
+client = DekernAI(api_key="sk_test_...", base_url="http://localhost:8000")
+intent = client.payment_intents.create({
+    "kind": "payout",
+    "source": "platform",
+    "counterparty_id": "cpt_lumen",
+    "destination": {"kind": "evm_wallet", "network": "base-sepolia", "destination_id": "dst_lumen_base"},
+    "amount": {"amount": "50.00", "currency": "USDC"},
+})
+print(intent["status"])
+```
+
+```ts TypeScript
+import { DekernAI } from "dekernai";
+
+const client = new DekernAI({ apiKey: "sk_test_...", baseUrl: "http://localhost:8000" });
+const intent = await client.paymentIntents.create({
+  kind: "payout",
+  source: "platform",
+  counterparty_id: "cpt_lumen",
+  destination: { kind: "evm_wallet", network: "base-sepolia", destination_id: "dst_lumen_base" },
+  amount: { amount: "50.00", currency: "USDC" },
+});
+console.log(intent.status);
+```
+
+</CodeGroup>
+
+## What they do for you
+
+| | |
+|---|---|
+| **Idempotency keys** | Every create sends an `Idempotency-Key`. It is a new UUID unless you pass your own. |
+| **Safe retries** | Only on 429, 503 and connection errors before the request reaches the API, with the same idempotency key, so a retry never creates a second payment. A timeout is never retried, because the request may have arrived. |
+| **Errors** | An API error carries the status, `type`, `code`, `message`, `param` and request ID from the [error body](/api/errors). |
+| **Webhooks** | `verify_webhook` (Python) and `verifyWebhook` (TypeScript) check the [signature](/webhooks/signatures) and return the event. |
+| **Test networks only** | A live key (`sk_live_...`) is refused when the client is created. |
+
+Methods follow the resources: `payment_intents.create`, `exceptions.approve`, `kill_switch.engage`,
+`deposit_intents.create`, `events.list` and so on (camelCase in TypeScript, such as `paymentIntents.create`).

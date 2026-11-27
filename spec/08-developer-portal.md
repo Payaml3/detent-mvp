@@ -294,6 +294,31 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 - **As found:** in a client organisation only the payments lead may engage or release the kill switch (on-call is
   not a dashboard role), and the account owner may not approve, reject or engage.
 
+## As built (P3 group 3)
+
+- **Generated, then polished (SDK-01, SDK-02):** `tools/build_sdks.py` writes each SDK's typed models and one
+  method per API operation from `docs/api/openapi.json` (`sdks/python/src/dekernai/_generated.py`,
+  `sdks/typescript/src/generated.ts`); `NAMES` there gives each operation its resource and method name, and the
+  build fails on an operation without one. CI checks the files are current (`--check`); `make openapi` rebuilds
+  them. The client itself is hand-written: `dekernai/_client.py` and `src/client.ts`.
+- **Behaviour (both):** an `Idempotency-Key` on every create (UUIDv4 unless given); retries only on 429, 503 and
+  connection errors before the request arrives (refused, DNS, connect timeout), with the same key, `Retry-After`
+  honoured, 2 retries by default; never a read timeout or a dropped connection. Errors carry the error body's
+  fields. `verify_webhook(secret, header, body, tolerance=300)` / `verifyWebhook(...)` return the event. A
+  `sk_live_` key is refused when the client is created.
+- **Python:** `sdks/python`, package `dekernai`, Python 3.11 or later, `httpx` only; a workspace member, so
+  `apps/api/tests/integration/test_sdk_python.py` runs it against the real app and database in process, and
+  `sdks/python/tests` against a fake transport. CI builds the wheel and installs it in a clean environment.
+- **TypeScript:** `sdks/typescript`, Node 18 or later, no runtime dependencies, ESM and CommonJS builds. CI's
+  `sdks` job starts the sandbox API with the seeded demo organisation and a throwaway key and runs the unit, CJS
+  and sandbox tests against it.
+- **Not published:** no licence and no package index release yet (`private`, "Do Not Upload"); both are founder
+  decisions. The docs page `tools/sdks.mdx` says to install from the repository.
+- **Fixed on the way:** `POST /v1/decisions` returns a decision, not a payment intent; the OpenAPI file now says
+  so. IDs made in the same millisecond in one process now sort in the order they were made (RFC 9562 monotonic
+  UUIDv7): with a frozen clock, "the latest decision" was a coin toss, so releasing the kill switch right after an
+  approval could re-escalate the payment.
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

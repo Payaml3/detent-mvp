@@ -1164,14 +1164,14 @@
    "epic": "SDK",
    "slice": "P3",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "SDK-02",
    "epic": "SDK",
    "slice": "P3",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SDK-03",

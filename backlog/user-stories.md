@@ -1637,8 +1637,8 @@ _Typed Python and TypeScript clients with automatic idempotency and webhook help
 
 **Acceptance criteria**
 
-- [ ] Generated from openapi.yaml then polished: typed models, automatic idempotency keys on creates, safe retries, webhook verify helper
-- [ ] Tests run against the CI sandbox; package builds and installs from the repo
+- [x] Generated from openapi.yaml then polished: typed models, automatic idempotency keys on creates, safe retries, webhook verify helper
+- [x] Tests run against the CI sandbox; package builds and installs from the repo
 
 **Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05, WHK-02 · **Traces to:** D.sdks
 
@@ -1648,7 +1648,7 @@ _Typed Python and TypeScript clients with automatic idempotency and webhook help
 
 **Acceptance criteria**
 
-- [ ] Same features as SDK-01; ESM and CJS builds; tests in CI
+- [x] Same features as SDK-01; ESM and CJS builds; tests in CI
 
 **Priority:** Must · **Estimate:** 1 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05, WHK-02 · **Traces to:** D.sdks
 

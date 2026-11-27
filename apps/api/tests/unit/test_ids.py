@@ -36,3 +36,9 @@ def test_seeded_readable_ids_are_valid_but_not_uuids() -> None:
 def test_naive_datetime_rejected() -> None:
     with pytest.raises(ValueError, match="timezone"):
         new_id(Prefix.PAY, datetime(2026, 1, 1))
+
+
+def test_ids_made_in_the_same_millisecond_sort_in_the_order_they_were_made() -> None:
+    at = datetime(2026, 12, 3, 10, 0, tzinfo=UTC)
+    ids = [new_id(Prefix.DEC, at) for _ in range(200)]
+    assert ids == sorted(ids) and len(set(ids)) == 200

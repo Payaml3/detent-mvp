@@ -9,13 +9,14 @@ dependencies = []
 package = false
 
 [tool.uv.workspace]
-members = ["apps/api", "apps/banksim", "apps/faultproxy", "eval"]
+members = ["apps/api", "apps/banksim", "apps/faultproxy", "eval", "sdks/python"]
 
 [tool.uv.sources]
 detent = { workspace = true }
 banksim = { workspace = true }
 faultproxy = { workspace = true }
 detent-eval = { workspace = true }
+dekernai = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -23,6 +24,7 @@ dev = [
   "banksim",
   "faultproxy",
   "detent-eval",
+  "dekernai",
   "pytest>=8.3",
   "pytest-timeout>=2.3",
   "hypothesis>=6.112",
@@ -75,6 +77,10 @@ ignore = [
 "apps/api/src/detent/clock.py" = ["TID251"]
 "apps/api/tests/**" = ["S", "PLR", "PLW1510", "TID251", "DTZ", "PT012", "PT018", "E501"]
 "apps/api/migrations/**" = ["E501"]
+# The SDK is a client library, not the engine: it supports Python 3.11 (no PEP 695 type parameters) and reads
+# the wall clock (invariant 17 is about detent/).
+"sdks/python/**" = ["UP046", "TID251"]
+"sdks/python/tests/**" = ["S", "PLR", "TID251", "PT018", "E501"]
 "tools/**" = ["S", "PLR", "T20", "TID251", "DTZ", "E501"]  # generators hold long Markdown templates
 "tools/tests/**" = ["S", "PLR", "TID251", "DTZ", "E501", "PT018"]  # hook and governance tests, as apps/api/tests
 "apps/banksim/**" = ["TID251"]
@@ -84,8 +90,8 @@ ignore = [
 [tool.mypy]
 python_version = "3.12"
 strict = true
-mypy_path = "apps/api/src:eval/src"
-packages = ["detent", "detent_eval"]
+mypy_path = "apps/api/src:eval/src:sdks/python/src"
+packages = ["detent", "detent_eval", "dekernai"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
@@ -102,7 +108,7 @@ follow_imports = "skip"
 
 # ---------------------------------------------------------------- pytest
 [tool.pytest.ini_options]
-testpaths = ["apps/api/tests"]
+testpaths = ["apps/api/tests", "sdks/python/tests"]
 pythonpath = ["apps/api/tests"]
 addopts = "-ra --strict-markers"
 timeout = 120

@@ -301,7 +301,7 @@ SCHEMAS: dict[str, Any] = {
 OPS: dict[tuple[str, str], tuple[str, str, tuple[int, ...]]] = {
     ("post", "/v1/payment_intents"): ("Create and decide a payout intent", "PaymentIntent", (409, 422)),
     ("get", "/v1/payment_intents"): ("List payment intents", "list:PaymentIntent", (422,)),
-    ("post", "/v1/decisions"): ("Decide without creating a payment (dry run)", "PaymentIntent", (409, 422)),
+    ("post", "/v1/decisions"): ("Decide without creating a payment (dry run)", "Decision", (409, 422)),
     ("get", "/v1/payment_intents/{payment_id}"): (
         "Get a payment intent with its history",
         "PaymentIntent",

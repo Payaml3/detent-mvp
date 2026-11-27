@@ -462,7 +462,7 @@
    "exit": "The docs site is live; the quickstart works in 5 minutes; all 8-language snippets pass in CI; both SDKs pass against the sandbox.",
    "stories": 9,
    "criteria": 12,
-   "criteria_done": 7
+   "criteria_done": 10
   },
   {
    "id": "P4",

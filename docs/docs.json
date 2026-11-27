@@ -46,7 +46,7 @@
             "group": "Errors and limits",
             "pages": ["api/errors", "limits/idempotency", "limits/rate-limits", "limits/versioning"]
           },
-          {"group": "SDKs and tools", "pages": ["tools/try-it", "tools/postman-and-openapi"]},
+          {"group": "SDKs and tools", "pages": ["tools/sdks", "tools/try-it", "tools/postman-and-openapi"]},
           {"group": "Changelog", "pages": ["changelog"]}
         ]
       },
