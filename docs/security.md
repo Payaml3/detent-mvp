@@ -32,6 +32,10 @@ Tests:
 - `unit/test_dashboard_rules.py::test_passwords_are_argon2id_and_verify`
 - `unit/test_dashboard_rules.py::test_weak_passwords_are_refused`
 - `integration/test_dashboard_access.py::test_first_login_shows_the_onboarding_checklist`
+- `integration/test_email_delivery.py::test_outbox_provider_only_stores`
+- `integration/test_email_delivery.py::test_zeptomail_sends_once_from_the_job`
+- `integration/test_email_delivery.py::test_provider_outage_is_retried_then_sent`
+- `integration/test_email_delivery.py::test_rejected_email_is_recorded_and_not_retried`
 - `unit/test_webhook_rules.py::test_event_types_match_spec_03`
 - `unit/test_webhook_rules.py::test_payment_status_changes_map_to_event_types`
 - `integration/test_webhooks.py::test_the_secret_is_shown_once_and_stored_encrypted`
