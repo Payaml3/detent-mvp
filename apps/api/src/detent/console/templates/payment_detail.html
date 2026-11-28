@@ -2,7 +2,7 @@
 {% block title %}Payment {{ p.id }}{% endblock %}
 {% block main %}
 <h1>Payment <span class="mono">{{ p.id }}</span></h1>
-<p><span class="st st-{{ p.status|lower }}">{{ p.status }}</span> · {{ p.amount.amount }} {{ p.amount.currency }} · {{ p.source }}{% if p.reference %} · {{ p.reference }}{% endif %}
+<p><span class="st st-{{ p.status|lower }}">{{ p.status }}</span> · {{ p.amount.amount|amount }} {{ p.amount.currency }} · {{ p.source }}{% if p.reference %} · {{ p.reference }}{% endif %}
   {% if p.exception %} · <a href="/console/exceptions/{{ p.exception.id }}">Open case</a>{% endif %}
   <a class="button" href="/console/payments/{{ p.id }}/replay" title="Re-evaluate every recorded decision from its stored inputs; no model is called">Replay</a></p>
 <p data-section="payee">{% if p.user_account_ref %}Payee: user account <span class="mono">{{ p.user_account_ref }}</span> · decided under the <strong>user payout profile</strong> (counterparty checks do not apply; the platform's user_verified flag does){% elif p.counterparty_id %}Payee: counterparty <span class="mono">{{ p.counterparty_id }}</span>{% endif %}</p>
@@ -61,7 +61,7 @@
 
 <h2>Ledger postings</h2>
 {% if p.postings %}
-<table><thead><tr><th>Entry</th><th>Account</th><th>Side</th><th class="num">Amount</th></tr></thead><tbody>{% for x in p.postings %}<tr><td class="mono">{{ x.entry }}</td><td class="mono">{{ x.account }}</td><td>{{ x.direction }}</td><td class="num">{{ x.amount.amount }} {{ x.amount.currency }}</td></tr>{% endfor %}</tbody></table>
+<table><thead><tr><th>Entry</th><th>Account</th><th>Side</th><th class="num">Amount</th></tr></thead><tbody>{% for x in p.postings %}<tr><td class="mono">{{ x.entry }}</td><td class="mono">{{ x.account }}</td><td>{{ x.direction }}</td><td class="num">{{ x.amount.amount|amount }} {{ x.amount.currency }}</td></tr>{% endfor %}</tbody></table>
 {% else %}<p class="muted">No postings: money is reserved when the payment is submitted.</p>{% endif %}
 
 <h2>Timeline</h2>

@@ -26,7 +26,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* a link inside running text is underlined, so it is never shown by colour alone (WCAG 1.4.1) */
 p a, li a, dd a, .lead a, .small a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--control); }
 p a:hover, li a:hover, dd a:hover, .lead a:hover, .small a:hover { text-decoration-color: currentColor; }
-.nav a, .checklist a, .who, .brand, .back { text-decoration: none; }
+.nav a, .checklist a, .who, .brand, .back, a.button, p a.button:hover { text-decoration: none; }
 .skip { position: absolute; left: 8px; top: -48px; z-index: 10; padding: 8px 12px; background: var(--surface); color: var(--text);
   border: 1px solid var(--control); border-radius: var(--radius-control); }
 .skip:focus { top: 36px; }
@@ -159,9 +159,10 @@ pre.yaml { background: var(--raised); border: 1px solid var(--border); border-ra
 textarea.yaml { min-height: 360px; font: 12px/18px var(--font-mono); }
 
 /* KPIs: one container split by 1px dividers; figures are type, not tiles */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin: 12px 0 8px;
+/* flex, not grid: the last row's figures widen to fill it, so the panel never ends in empty half-cells */
+.stats { display: flex; flex-wrap: wrap; margin: 12px 0 8px;
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; }
-.stat { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 6px; padding: 16px 20px;
+.stat { flex: 1 1 170px; display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 6px; padding: 16px 20px;
   box-shadow: -1px 0 0 var(--border), 0 -1px 0 var(--border); }
 .stat b { font: 500 var(--fs-kpi)/28px var(--font-body); letter-spacing: -0.01em; }
 .stat span { color: var(--muted); font-size: var(--fs-small); line-height: 16px; }

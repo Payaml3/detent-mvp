@@ -196,7 +196,7 @@ def test_console_invoice_drop_and_submit(engine: Engine, d: DecisionOrg, client:
     html = client.get(r.headers["location"]).text
     assert "18500.00" in html and "<mark" in html and "No flags" in html
     assert "Recorded response" in html  # offline: the page says the answer was not a live model call
-    assert "mnd_demo_ap_agent" in html and "20000.00 USDC" in html
+    assert "mnd_demo_ap_agent" in html and "20,000.00 USDC" in html
     pid = r.headers["location"].rsplit("/", 1)[1]
     s = client.post(f"/console/invoices/{pid}/submit", follow_redirects=False)
     assert s.status_code == 303

@@ -15,7 +15,7 @@
   {% for c in cases %}
     <tr><td class="mono"><a href="/console/exceptions/{{ c.id }}">{{ c.id }}</a></td><td class="mono">{{ c.payment_id }}</td>
       <td>{% if c.user_account_ref %}User <span class="mono">{{ c.user_account_ref }}</span> <span class="small muted">user payout profile</span>{% else %}{{ c.payee or '' }}{% endif %}</td>
-      <td>{{ c.reasons|join(', ') }}</td><td class="num">{{ c.amount }}</td><td>{{ c.tier }}</td><td>{{ c.owner_name or '' }}</td>
+      <td>{{ c.reasons|join(', ') }}</td><td class="num">{{ c.amount|amount }}</td><td>{{ c.tier }}</td><td>{{ c.owner_name or '' }}</td>
       <td class="{{ 'late' if c.late }}">{{ c.countdown }}</td></tr>
   {% else %}<tr><td colspan="8" class="empty"><strong>Nothing waiting.</strong> <span>Escalated and held payments land here for a person to decide.</span></td></tr>{% endfor %}
   </tbody>

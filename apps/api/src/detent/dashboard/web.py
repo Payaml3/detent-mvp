@@ -19,8 +19,10 @@ from fastapi.templating import Jinja2Templates
 from detent.api.limits import RateLimiter
 from detent.dashboard.access import LOCKED_MESSAGES, Member, load_member, load_org, org_status
 from detent.runtime import Runtime
+from detent.views.display import install as install_display_filters
 
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+install_display_filters(templates.env)
 
 SESSION_USER = "dash_user"
 SESSION_ORG = "dash_org"

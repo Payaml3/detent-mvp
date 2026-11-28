@@ -4,6 +4,7 @@
   "name": "DekernAI docs",
   "description": "Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules.",
   "colors": {"primary": "#C2360F", "light": "#FF4A1F", "dark": "#C2360F"},
+  "fonts": {"heading": {"family": "Space Grotesk", "weight": 600}, "body": {"family": "Inter", "weight": 400}},
   "favicon": "/favicon.svg",
   "logo": {"light": "/logo/light.svg", "dark": "/logo/dark.svg"},
   "api": {

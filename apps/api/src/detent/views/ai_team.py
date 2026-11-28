@@ -17,6 +17,8 @@ from typing import Any
 
 from sqlalchemy import Connection, text
 
+from detent.views.display import group_amount
+
 
 @dataclass(frozen=True, slots=True)
 class AgentProfile:
@@ -135,7 +137,7 @@ class TeamMember:
 
 
 def _amount(v: Any) -> str:
-    return str(v) if v not in (None, "") else "?"
+    return group_amount(v) if v not in (None, "") else "?"
 
 
 def _summary(kind: str, parsed: dict[str, Any] | None) -> tuple[str, list[str]]:
@@ -291,8 +293,8 @@ def ai_team(
                 limits.append(
                     (
                         f"Mandate {m.id}",
-                        f"up to {per.get('amount')} {per.get('currency')} per payment, "
-                        f"{tot.get('amount')} {tot.get('currency')} in total; "
+                        f"up to {_amount(per.get('amount'))} {per.get('currency')} per payment, "
+                        f"{_amount(tot.get('amount'))} {tot.get('currency')} in total; "
                         f"{len(s.get('payees') or [])} payee(s) on {', '.join(s.get('networks') or [])}",
                     )
                 )
