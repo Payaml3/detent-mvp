@@ -1,6 +1,7 @@
 ---
-// The client's console, drawn as a working screen inside a glass window that tilts flat as it scrolls in and
-// leans toward the pointer. Sample data for an example client, labelled as such. The
+// The client's console, drawn as a light working screen whose panels float at different depths: the window
+// tilts flat as it scrolls in and leans toward the pointer, and the panels move apart in 3D as it does, with
+// the escalated case lifted highest. The chart bars are extruded blocks on a perspective floor. Sample data for an example client, labelled as such. The
 // numbers add up: executed + escalated + blocked = decided, hour by hour. Pick an escalation to read the
 // agent's case; the approve button is a picture of the real one, which re-runs the rules first (spec/07).
 const hours = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17"];
@@ -24,6 +25,12 @@ const cases = [
 ];
 const rails = [["Faster Payments", "ok", "Healthy"], ["SEPA Instant", "ok", "Healthy"], ["Base", "wait", "1 UNKNOWN, checking the chain"]];
 const n = (x) => x.toLocaleString("en-GB");
+// one extruded bar, bottom up: executed, escalated, blocked; the top segment gets the cap
+const bar3 = (i) => {
+  const parts = [["x", executed[i]], ["e", escalated[i]], ["b", blocked[i]]].filter(([, v]) => v > 0);
+  let y = 108;
+  return parts.map(([k, v], j) => { const hgt = (v / peak) * 100; const seg = { k, bot: y, top: y - hgt, cap: j === parts.length - 1 }; y -= hgt; return seg; });
+};
 ---
 <section class="section console" id="console" data-section="console" aria-labelledby="console-title">
   <div class="wrap">
@@ -31,7 +38,7 @@ const n = (x) => x.toLocaleString("en-GB");
       <h2 id="console-title">Your Tuesday, on one screen.</h2>
       <p class="lead">Routine payouts go straight through. The few that need judgement wait in one queue, with the agent’s notes already written and the rule that held them named.</p>
     </div>
-    <figure class="window" data-card data-console aria-label="Console illustration with sample data">
+    <div class="scene"><figure class="window" data-card data-console aria-label="Console illustration with sample data">
       <div class="bar">
         <span class="brand"><span class="mk" aria-hidden="true"></span>Console</span>
         <span class="client">Kestrel Market</span>
@@ -49,6 +56,7 @@ const n = (x) => x.toLocaleString("en-GB");
             <div class="esc"><dt>Escalated</dt><dd>{totals.escalated}</dd></div>
             <div class="blk"><dt>Blocked</dt><dd>{totals.blocked}</dd></div>
           </dl>
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><pattern id="console-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" class="hb" /><rect width="2" height="5" class="hl" /></pattern></defs></svg>
           <div class="chart" data-chart>
             <p class="cap"><span>Decisions by hour</span><span class="mut" data-chart-read>Point at an hour</span></p>
             <div class="bars">
@@ -56,11 +64,13 @@ const n = (x) => x.toLocaleString("en-GB");
                 const t = executed[i] + escalated[i] + blocked[i];
                 return (
                   <button type="button" class="col" style={`--h:${(t / peak) * 100}%`} data-read={`${h}:00 · ${t} decided: ${executed[i]} executed, ${escalated[i]} escalated, ${blocked[i]} blocked`} aria-label={`${h}:00, ${t} decided`}>
-                    <span class="stack">
-                      {blocked[i] > 0 && <span class="b" style={`flex:${blocked[i]}`}></span>}
-                      <span class="e" style={`flex:${escalated[i]}`}></span>
-                      <span class="x" style={`flex:${executed[i]}`}></span>
-                    </span>
+                    <svg class="bar3" viewBox="0 0 40 108" preserveAspectRatio="none" aria-hidden="true">
+                      {bar3(i).map((seg) => <g class={seg.k}>
+                        <rect class="f" x="0" y={seg.top} width="30" height={seg.bot - seg.top} />
+                        <polygon class="s" points={`30,${seg.top} 38,${seg.top - 8} 38,${seg.bot - 8} 30,${seg.bot}`} />
+                        {seg.cap && <polygon class="t" points={`0,${seg.top} 8,${seg.top - 8} 38,${seg.top - 8} 30,${seg.top}`} />}
+                      </g>)}
+                    </svg>
                     <span class="h">{h}</span>
                   </button>
                 );
@@ -96,7 +106,7 @@ const n = (x) => x.toLocaleString("en-GB");
           </ul>
         </div>
       </div>
-    </figure>
+    </figure></div>
     <p class="small soft foot">Illustration with sample data. The agent writes the notes; your rules make the decision, and approving re-runs them first.</p>
   </div>
 </section>
@@ -104,73 +114,113 @@ const n = (x) => x.toLocaleString("en-GB");
   .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; }
   .head h2 { grid-column: 1 / span 6; }
   .head .lead { grid-column: 8 / -1; margin: 0; }
-  .window { margin: 56px 0 0; border-radius: 16px; background: var(--text); color: var(--bg); overflow: hidden;
-    --mut: color-mix(in srgb, var(--bg) 58%, var(--text)); --tile: color-mix(in srgb, var(--bg) 7%, var(--text));
-    --line: color-mix(in srgb, var(--bg) 14%, var(--text));
-    box-shadow: 0 60px 120px -60px color-mix(in srgb, var(--text) 70%, transparent); font-size: 14px; }
+  /* the stage: a perspective floor under the window, fading into the page */
+  .scene { position: relative; margin-top: 56px; isolation: isolate; }
+  .scene::before { content: ""; position: absolute; z-index: -1; left: -8%; right: -8%; bottom: -130px; height: 380px; pointer-events: none;
+    background:
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 56px 56px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 56px 56px;
+    transform: perspective(700px) rotateX(68deg); transform-origin: 50% 100%;
+    -webkit-mask-image: radial-gradient(60% 70% at 50% 60%, #000 30%, transparent 75%); mask-image: radial-gradient(60% 70% at 50% 60%, #000 30%, transparent 75%); }
+  .scene::after { content: ""; position: absolute; z-index: -1; left: 12%; right: 12%; bottom: -40px; height: 120px; pointer-events: none;
+    background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--signal) 16%, transparent), transparent 70%); filter: blur(20px); }
+
+  .window { margin: 0; border-radius: 18px; color: var(--text); font-size: 14px; transform-style: preserve-3d;
+    --mut: var(--text-soft); --tile: var(--surface); --line: color-mix(in srgb, var(--line-strong) 28%, var(--surface));
+    --lift: 0 1px 0 color-mix(in srgb, var(--text) 4%, transparent), 0 18px 30px -22px color-mix(in srgb, var(--text) 45%, transparent);
+    background: linear-gradient(180deg, var(--bg-alt), color-mix(in srgb, var(--bg-alt) 70%, var(--bg)));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line-strong) 30%, transparent), 0 60px 120px -60px color-mix(in srgb, var(--text) 45%, transparent); }
   :global(.cards-live) .window[data-card] {
-    transform: perspective(1800px) translateY(calc(var(--in) * 80px)) rotateX(calc(var(--in) * 34deg + var(--ty) * -3deg)) rotateY(calc(var(--tx) * 4deg)) scale(calc(1 - var(--in) * 0.14 - var(--out) * 0.04));
+    transform: perspective(1800px) translateY(calc(var(--in) * 80px)) rotateX(calc(var(--in) * 34deg + var(--ty) * -5deg)) rotateY(calc(var(--tx) * 7deg)) scale(calc(1 - var(--in) * 0.14 - var(--out) * 0.04));
     transform-origin: 50% 0%;
+    filter: none; /* a filter would flatten the floating panels */
   }
+  :global(.cards-live) .window[data-card]::after { border-radius: 18px; }
+  .body, .main { transform-style: preserve-3d; }
+  /* panels float apart as the window scrolls in and when you point at it, then settle flat so text stays sharp;
+     the open case is lifted highest */
+  .kpis div, .chart, .queue, .case, .rails li { --z: 0px; box-shadow: var(--lift), inset 0 0 0 1px var(--line);
+    transform: translateZ(calc(var(--z) * (var(--in, 0) * 2.4 + var(--pop, 0)))); transition: transform 500ms var(--ease-out), box-shadow 500ms var(--ease-out); }
+  :global(.cards-live) .window:hover { --pop: 1; }
+  .kpis div { --z: 26px; }
+  .chart { --z: 14px; }
+  .queue { --z: 34px; }
+  .case { --z: 64px; position: relative;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--text) 4%, transparent), 0 40px 60px -34px color-mix(in srgb, var(--text) 55%, transparent), inset 0 0 0 1px var(--line), inset 0 3px 0 var(--signal); }
+  .rails li { --z: 20px; }
   .mut { color: var(--mut); }
-  .bar { display: flex; align-items: center; gap: 20px; padding: 14px 20px; border-bottom: 1px solid var(--line); }
+  .bar { display: flex; align-items: center; gap: 20px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--surface); border-radius: 18px 18px 0 0; }
   .brand { display: flex; align-items: center; gap: 8px; font: 600 15px/1 var(--font-head); }
-  .mk { width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
+  .mk { width: 10px; height: 10px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 20%, transparent); }
   .client { font-weight: 600; }
   .tag { margin-left: auto; font-size: 12px; }
   .body { display: grid; grid-template-columns: 180px 1fr; }
   .side { display: grid; align-content: start; gap: 2px; padding: 16px 12px; border-right: 1px solid var(--line); color: var(--mut); }
-  .side span { padding: 8px 10px; border-radius: 6px; display: flex; justify-content: space-between; }
-  .side .on { background: var(--tile); color: var(--bg); }
+  .side span { padding: 8px 10px; border-radius: 8px; display: flex; justify-content: space-between; }
+  .side .on { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--lift), inset 0 0 0 1px var(--line); }
   .side b { background: var(--signal); color: var(--on-signal); border-radius: 10px; padding: 0 7px; font-size: 12px; }
   .side i { font-style: normal; font-size: 12px; }
   .side .kill { margin-top: 24px; justify-content: flex-start; gap: 8px; font-size: 12px; }
-  .sw { width: 26px; height: 14px; border-radius: 8px; background: var(--line); position: relative; }
-  .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--mut); }
+  .sw { width: 26px; height: 14px; border-radius: 8px; background: color-mix(in srgb, var(--line-strong) 45%, var(--surface)); position: relative; }
+  .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); }
   .main { display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; padding: 16px; }
-  .kpis { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0; }
-  .kpis div { background: var(--tile); border-radius: 10px; padding: 14px 16px; }
+  .kpis { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0; transform-style: preserve-3d; }
+  .kpis div { background: var(--tile); border-radius: 12px; padding: 14px 16px; }
   .kpis dt { color: var(--mut); font-size: 12px; }
   .kpis dd { margin: 6px 0 0; font: 600 30px/1 var(--font-head); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-  .kpis .esc dd { color: var(--signal); }
+  .kpis .esc { background: var(--signal); color: var(--on-signal); }
+  .kpis .esc dt { color: var(--on-signal); opacity: 0.75; }
   .cap { display: flex; justify-content: space-between; gap: 12px; margin: 0 0 12px; font-weight: 600; font-size: 13px; }
   .cap .mut { font-weight: 500; }
-  .chart, .queue, .case { background: var(--tile); border-radius: 10px; padding: 14px 16px; }
+  .chart, .queue, .case { background: var(--tile); border-radius: 12px; padding: 14px 16px; }
   .chart { grid-row: span 2; display: grid; grid-template-rows: auto 1fr auto; }
-  .bars { display: grid; grid-template-columns: repeat(10, 1fr); gap: 8px; align-items: end; min-height: 200px; }
-  .col { all: unset; height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 6px; cursor: pointer; }
-  .stack { align-self: end; height: var(--h); display: flex; flex-direction: column; border-radius: 3px; overflow: hidden; transition: filter 160ms; }
-  :global(.cards-live) .stack { height: calc(var(--h) * (1 - var(--in, 0))); }
-  .col:hover .stack, .col:focus-visible .stack { filter: brightness(1.25); }
+  /* extruded bars: a front face, a darker side and a top cap, on a faint floor grid */
+  .bars { display: grid; grid-template-columns: repeat(10, 1fr); gap: 12px; align-items: end; min-height: 200px; padding: 10px 8px 0 0;
+    background: linear-gradient(var(--line) 1px, transparent 1px) 0 100% / 100% 25%; }
+  .col { all: unset; height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 8px; cursor: pointer; }
+  .bar3 { width: 100%; height: 100%; display: block; overflow: visible; transform-origin: 50% 100%; transition: transform 200ms var(--ease-out); }
+  :global(.cards-live) .bar3 { transform: scaleY(calc(1 - var(--in, 0))); }
+  .col:hover .bar3, .col:focus-visible .bar3 { transform: translateY(-4px); }
   .col:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; border-radius: 3px; }
-  .x { background: color-mix(in srgb, var(--bg) 42%, var(--text)); }
+  .bar3 .x .f { fill: color-mix(in srgb, var(--line-strong) 55%, var(--text)); }
+  .bar3 .x .s { fill: color-mix(in srgb, var(--line-strong) 30%, var(--text)); }
+  .bar3 .x .t { fill: var(--line-strong); }
+  .bar3 .e .f { fill: var(--signal); }
+  .bar3 .e .s { fill: var(--signal-press); }
+  .bar3 .e .t { fill: var(--signal-hover); }
+  .bar3 .b .f, .bar3 .b .t { fill: url(#console-hatch); }
+  .bar3 .b .s { fill: color-mix(in srgb, var(--line-strong) 60%, var(--surface)); }
+  :global(#console-hatch) .hb { fill: color-mix(in srgb, var(--line-strong) 22%, var(--surface)); }
+  :global(#console-hatch) .hl { fill: var(--line-strong); }
+  .x { background: color-mix(in srgb, var(--line-strong) 55%, var(--text)); }
   .e { background: var(--signal); }
-  .b { background: repeating-linear-gradient(135deg, var(--mut) 0 2px, transparent 2px 5px); }
+  .b { background: repeating-linear-gradient(135deg, var(--line-strong) 0 2px, color-mix(in srgb, var(--line-strong) 25%, var(--surface)) 2px 5px); }
   .h { text-align: center; color: var(--mut); font-size: 11px; font-variant-numeric: tabular-nums; }
   .legend { display: flex; gap: 16px; margin: 12px 0 0; font-size: 12px; }
   .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
   .queue ul, .checks, .rails { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-  .queue button { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 160ms; }
-  .queue button:hover { background: var(--line); }
-  .queue button[aria-pressed="true"] { background: var(--line); box-shadow: inset 3px 0 0 var(--signal); }
+  .queue button { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 160ms, transform 200ms var(--ease-out); }
+  .queue button:hover { background: var(--bg); }
+  .queue button[aria-pressed="true"] { background: var(--bg); box-shadow: inset 3px 0 0 var(--signal); transform: translateX(4px); }
   .queue button:focus-visible { outline: 2px solid var(--signal); }
-  .who { font-weight: 600; } .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .who { font-weight: 600; } .amt { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
   .code { font-size: 11px; letter-spacing: 0.04em; color: var(--mut); font-weight: 600; }
   .queue .mut { text-align: right; font-size: 12px; }
-  .note { margin: 0 0 12px; line-height: 1.5; }
+  .note { margin: 0 0 12px; line-height: 1.5; padding: 10px 12px; border-radius: 8px; background: var(--bg); }
   .by { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mut); margin-bottom: 4px; }
   .checks li { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); color: var(--mut); }
-  .checks li.over { color: var(--bg); } .checks li.over span:last-child { color: var(--signal); font-weight: 600; }
+  .checks li.over { color: var(--text); } .checks li.over span:last-child { color: var(--interactive); font-weight: 600; }
   .acts { display: flex; gap: 8px; margin: 14px 0 0; }
-  .btn-a, .btn-b { padding: 9px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; }
-  .btn-a { background: var(--signal); color: var(--on-signal); } .btn-b { background: var(--line); }
-  .rails { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .rails li { display: flex; align-items: center; gap: 8px; background: var(--tile); border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+  .btn-a, .btn-b { padding: 9px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; }
+  .btn-a { background: var(--signal); color: var(--on-signal); box-shadow: 0 8px 18px -10px var(--signal); } .btn-b { background: var(--bg); box-shadow: inset 0 0 0 1px var(--line); }
+  .rails { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); gap: 10px; transform-style: preserve-3d; }
+  .rails li { display: flex; align-items: center; gap: 8px; background: var(--tile); border-radius: 12px; padding: 12px 14px; font-size: 13px; }
   .rails .mut { margin-left: auto; font-size: 12px; text-align: right; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; }
-  .rails .wait .dot { background: var(--signal); animation: blink 1.6s ease-in-out infinite; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 18%, transparent); }
+  .rails .wait .dot { background: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 22%, transparent); animation: blink 1.6s ease-in-out infinite; }
   @keyframes blink { 50% { opacity: 0.3; } }
-  .foot { margin-top: 16px; }
+  @media (prefers-reduced-motion: reduce) { .rails .wait .dot { animation: none; } }
+  .foot { margin-top: 28px; }
   @media (max-width: 1000px) {
     .head h2, .head .lead { grid-column: 1 / -1; }
     .body { grid-template-columns: 1fr; } .side { display: none; }
@@ -180,7 +230,8 @@ const n = (x) => x.toLocaleString("en-GB");
   @media (max-width: 600px) {
     .kpis { grid-template-columns: repeat(2, 1fr); }
     .tag { display: none; } .bar { flex-wrap: wrap; }
-    .bars { min-height: 140px; gap: 4px; }
+    .bars { min-height: 140px; gap: 6px; }
+    .scene::before { bottom: -120px; height: 260px; }
   }
 </style>
 <script>
