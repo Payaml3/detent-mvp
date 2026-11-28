@@ -337,3 +337,39 @@ def test_an_unreadable_stored_signature_is_invalid_not_a_crash(
         c.execute(text("UPDATE mandates SET signature='not json' WHERE org_id=:o"), {"o": d.id})
     body = decide(engine, clock, d, bluefin(d, "100.00"))
     assert body["status"] == "BLOCKED" and mandate_check(body)["reason"] == "MANDATE_SIGNATURE_INVALID"
+
+
+# ---------------------------------------------------------------------------------------- RAL-07
+@pytest.mark.parametrize(("networks", "eth_reason"), [(["base-sepolia", "eth-sepolia"], "no adapter configured"),
+                                                       (["base-sepolia"], "network constraint")])  # fmt: skip
+def test_a_mandate_can_allow_a_network_switch_only_inside_its_networks(
+    engine: Engine, clock: FrozenClock, d: DecisionOrg, networks: list[str], eth_reason: str
+) -> None:
+    from detent.rails.registry import install_rail
+    from detent.routing.engine import route
+
+    doc = fixture_mandate(clock, d.id)
+    doc["mandate_id"] = "mnd_switch"
+    doc["scope"]["networks"], doc["scope"]["allow_network_switch"] = networks, True
+    with engine.begin() as c:
+        issue_mandate(c, clock, d.id, doc, KEY, actor=Actor.system("seed"))
+        for net, chain_id in (("base-sepolia", 84532), ("eth-sepolia", 11155111)):
+            install_rail(c, d.id, rail_id=net, kind="evm", network=net, currency="USDC", chain_id=chain_id)
+        c.execute(  # the payee also has a verified wallet on Ethereum Sepolia
+            text(
+                "INSERT INTO destinations (id, org_id, counterparty_id, kind, network, address, verified, "
+                "first_seen_at, last_changed_at) VALUES ('dst_bluefin_eth2', :o, 'cpt_bluefin', 'evm_wallet', "
+                "'eth-sepolia', :a, true, :t, :t)"
+            ),
+            {"o": d.id, "a": "0x" + "5e" * 20, "t": clock.now() - timedelta(days=90)},
+        )
+    body = decide(engine, clock, d, bluefin(d, "100.00", mandate="mnd_switch"))
+    with engine.connect() as c:
+        p = c.execute(
+            text("SELECT p.*, NULL AS address FROM payment_intents p WHERE org_id=:o AND id=:p"),
+            {"o": d.id, "p": body["id"]},
+        ).one()
+        assert p.allow_network_switch is True  # from the signed mandate, not the request
+        rt = route(c, {}, org_id=d.id, payment=p, day=clock.now().date().isoformat())
+    eth = next(x for x in rt.candidates if x.rail == "eth-sepolia")
+    assert eth.reason == eth_reason

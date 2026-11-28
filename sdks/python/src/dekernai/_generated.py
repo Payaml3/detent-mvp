@@ -27,6 +27,11 @@ class AmountIn(TypedDict):
     currency: Currency
 
 
+class ApprovalIn(TypedDict):
+    reason: str
+    allow_network_switch: NotRequired[bool]
+
+
 Currency = Literal["USDC", "GBP", "EUR"]
 
 
@@ -358,7 +363,7 @@ class Decisions(_Resource):
 
 
 class Exceptions(_Resource):
-    def approve(self, case_id: str, params: ResolutionIn) -> Resolution:
+    def approve(self, case_id: str, params: ApprovalIn) -> Resolution:
         """Approve an exception (re-runs the policy) (`POST /v1/exceptions/{case_id}/approve`)."""
         return cast(
             "Resolution",

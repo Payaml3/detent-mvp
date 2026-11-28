@@ -380,3 +380,37 @@ def test_api_approving_a_blocked_payment_is_409(
         f"/v1/exceptions/{case.id}/approve", json={"reason": "x"}, headers={"Authorization": f"Bearer {rkey}"}
     )  # type: ignore[attr-defined]
     assert r.status_code == 409 and r.json()["error"]["code"] == "payment_blocked"
+
+
+def test_send_cancel_and_retry_on_a_blocked_payment_change_nothing(
+    api: TestClient, dorg: DecisionOrg, engine: Engine, clock: FrozenClock
+) -> None:
+    """POL-06: every action on a BLOCKED payment answers 409 payment_blocked or does nothing at all."""
+    from detent.api.auth import issue_key
+    from detent.execution.retry import after_failure
+
+    with engine.begin() as c:
+        rkey = issue_key(c, clock, dorg.id, dorg.org.users[Role.REVIEWER], ["exceptions:approve"], PEPPER)
+    pid = str(create(api, dorg, bluefin(dorg))["id"])
+    with engine.begin() as c:
+        c.execute(
+            text("UPDATE payment_intents SET status='BLOCKED' WHERE org_id=:o AND id=:p"),
+            {"o": dorg.id, "p": pid},
+        )
+    send = api.post(f"/v1/payment_intents/{pid}/send", headers={"Authorization": f"Bearer {rkey}"})
+    assert send.status_code == 409 and send.json()["error"]["code"] == "payment_blocked"
+    cancel = api.post(f"/v1/payment_intents/{pid}/cancel", json={"reason": "x"}, headers=dorg.auth())
+    assert cancel.status_code == 409 and cancel.json()["error"]["code"] == "payment_blocked"
+    # Retry and re-route live only in the execution layer: on a block they return at once and queue nothing.
+    assert after_failure(engine, clock, {}, org_id=dorg.id, payment_id=pid).value == "BLOCKED"
+    with engine.connect() as c:
+        st = c.execute(
+            text("SELECT status FROM payment_intents WHERE org_id=:o AND id=:p"), {"o": dorg.id, "p": pid}
+        ).scalar()
+        jobs = c.execute(
+            text("SELECT count(*) FROM jobs WHERE org_id=:o AND payment_id=:p"), {"o": dorg.id, "p": pid}
+        ).scalar()
+        attempts = c.execute(
+            text("SELECT count(*) FROM attempts WHERE org_id=:o AND payment_id=:p"), {"o": dorg.id, "p": pid}
+        ).scalar()
+    assert st == "BLOCKED" and jobs == 0 and attempts == 0

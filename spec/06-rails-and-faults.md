@@ -78,6 +78,11 @@ When a destination is a specific wallet on one network, routing is effectively f
   - another eligible rail exists
 - Failover keeps the payment ID. `attempt_no` increments.
 - Failover never happens from UNKNOWN, after a BLOCK, or after `REJECTED_BY_RAIL`.
+- As built (2026-11-28): the three ways to allow a switch are the intent's `allow_network_switch`, a signed
+  mandate whose `scope.allow_network_switch` is true (set on the agent's intent when it is created; routing then
+  keeps any switch inside the mandate's `networks`), and an approver's `allow_network_switch: true` on
+  `POST /v1/exceptions/{case_id}/approve`, audited as `payment.network_switch_approved`. Without any of them a
+  technical failure ends FAILED_FINAL.
 
 ## Rail health and the circuit breaker (RAL-08)
 
@@ -103,6 +108,8 @@ When a destination is a specific wallet on one network, routing is effectively f
   offers it. Both are audited (`rail.connected`, `rail.disconnected`).
 
 ## Daily adapter contract tests (RAL-10)
+
+As built (2026-11-28): the contract suite runs once per USDC rail configuration (`local-evm`, `base-sepolia` and `eth-sepolia`, with each rail's confirmations) on the local chain. Running it against the public testnets needs funded test wallets (a founder item).
 
 - `.github/workflows/rail-contracts.yml` runs the shared contract suite (local chain) and the simulated bank suite
   every day at 05:41 UTC and on demand. A failure opens an issue naming each failing adapter and test

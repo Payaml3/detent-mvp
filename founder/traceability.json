@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 155,
-   "done": 134,
-   "pct": 86
+   "done": 150,
+   "pct": 97
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 332,
-   "done": 311,
-   "pct": 94
+   "done": 327,
+   "pct": 98
   },
   {
    "order": 3,
@@ -33,16 +33,16 @@
   {
    "function": "03 Architecture",
    "measure": "Acceptance criteria done in the architect's epics",
-   "done": 36,
+   "done": 39,
    "total": 40,
-   "pct_done": 90
+   "pct_done": 98
   },
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 239,
+   "done": 252,
    "total": 254,
-   "pct_done": 94
+   "pct_done": 99
   },
   {
    "function": "05 QA",
@@ -66,8 +66,8 @@
    "role": "engineer",
    "stories": 9,
    "criteria": 27,
-   "criteria_done": 25,
-   "pct_done": 93
+   "criteria_done": 26,
+   "pct_done": 96
   },
   {
    "code": "API",
@@ -75,8 +75,8 @@
    "role": "engineer",
    "stories": 7,
    "criteria": 10,
-   "criteria_done": 9,
-   "pct_done": 90
+   "criteria_done": 10,
+   "pct_done": 100
   },
   {
    "code": "AUD",
@@ -84,8 +84,8 @@
    "role": "architect",
    "stories": 3,
    "criteria": 7,
-   "criteria_done": 6,
-   "pct_done": 86
+   "criteria_done": 7,
+   "pct_done": 100
   },
   {
    "code": "CON",
@@ -93,8 +93,8 @@
    "role": "engineer",
    "stories": 11,
    "criteria": 19,
-   "criteria_done": 17,
-   "pct_done": 89
+   "criteria_done": 19,
+   "pct_done": 100
   },
   {
    "code": "DEM",
@@ -138,8 +138,8 @@
    "role": "engineer",
    "stories": 9,
    "criteria": 21,
-   "criteria_done": 19,
-   "pct_done": 90
+   "criteria_done": 21,
+   "pct_done": 100
   },
   {
    "code": "EXE",
@@ -147,8 +147,8 @@
    "role": "engineer",
    "stories": 10,
    "criteria": 32,
-   "criteria_done": 31,
-   "pct_done": 97
+   "criteria_done": 32,
+   "pct_done": 100
   },
   {
    "code": "FND",
@@ -156,8 +156,8 @@
    "role": "architect",
    "stories": 9,
    "criteria": 29,
-   "criteria_done": 26,
-   "pct_done": 90
+   "criteria_done": 28,
+   "pct_done": 97
   },
   {
    "code": "INT",
@@ -165,8 +165,8 @@
    "role": "engineer",
    "stories": 5,
    "criteria": 15,
-   "criteria_done": 14,
-   "pct_done": 93
+   "criteria_done": 15,
+   "pct_done": 100
   },
   {
    "code": "LED",
@@ -174,8 +174,8 @@
    "role": "engineer",
    "stories": 8,
    "criteria": 20,
-   "criteria_done": 19,
-   "pct_done": 95
+   "criteria_done": 20,
+   "pct_done": 100
   },
   {
    "code": "OPS",
@@ -192,8 +192,8 @@
    "role": "engineer",
    "stories": 9,
    "criteria": 31,
-   "criteria_done": 29,
-   "pct_done": 94
+   "criteria_done": 31,
+   "pct_done": 100
   },
   {
    "code": "RAL",
@@ -201,8 +201,8 @@
    "role": "engineer",
    "stories": 11,
    "criteria": 28,
-   "criteria_done": 25,
-   "pct_done": 89
+   "criteria_done": 27,
+   "pct_done": 96
   },
   {
    "code": "SBX",
@@ -336,9 +336,9 @@
    "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "FND-09",
@@ -346,9 +346,9 @@
    "function": "03 Architecture",
    "slice": "S0",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "INT-01",
@@ -356,9 +356,9 @@
    "function": "04 Engineering",
    "slice": "S1",
    "criteria": 4,
-   "criteria_done": 3,
+   "criteria_done": 4,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "INT-02",
@@ -416,9 +416,9 @@
    "function": "04 Engineering",
    "slice": "S1",
    "criteria": 4,
-   "criteria_done": 3,
+   "criteria_done": 4,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "POL-03",
@@ -456,9 +456,9 @@
    "function": "04 Engineering",
    "slice": "S3",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "POL-07",
@@ -556,9 +556,9 @@
    "function": "04 Engineering",
    "slice": "S5",
    "criteria": 4,
-   "criteria_done": 3,
+   "criteria_done": 4,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "AGT-05",
@@ -606,9 +606,9 @@
    "function": "04 Engineering",
    "slice": "S2",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "EXE-04",
@@ -706,9 +706,9 @@
    "function": "04 Engineering",
    "slice": "S4",
    "criteria": 2,
-   "criteria_done": 1,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "RAL-04",
@@ -746,9 +746,9 @@
    "function": "04 Engineering",
    "slice": "S4",
    "criteria": 4,
-   "criteria_done": 3,
+   "criteria_done": 4,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "RAL-08",
@@ -796,9 +796,9 @@
    "function": "04 Engineering",
    "slice": "S3",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "EXC-02",
@@ -856,9 +856,9 @@
    "function": "04 Engineering",
    "slice": "S3",
    "criteria": 2,
-   "criteria_done": 1,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "EXC-08",
@@ -936,9 +936,9 @@
    "function": "04 Engineering",
    "slice": "S7",
    "criteria": 5,
-   "criteria_done": 4,
+   "criteria_done": 5,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "LED-07",
@@ -966,9 +966,9 @@
    "function": "03 Architecture",
    "slice": "S1",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "AUD-02",
@@ -1016,9 +1016,9 @@
    "function": "04 Engineering",
    "slice": "S3",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "CON-04",
@@ -1036,9 +1036,9 @@
    "function": "04 Engineering",
    "slice": "S5",
    "criteria": 2,
-   "criteria_done": 1,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "CON-06",
@@ -1326,9 +1326,9 @@
    "function": "04 Engineering",
    "slice": "P1",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "API-02",

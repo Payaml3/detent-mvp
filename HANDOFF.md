@@ -3,7 +3,7 @@
 One repository, one session per slice. A new session reads `CLAUDE.md`, then this file, and then only
 the specs and code the slice needs. At the end of the slice, update this file and push it with the slice.
 
-Last updated: 2026-11-28: P4 built except the booking URL and go-live (founder). Earlier, 2026-11-25: The founder passed playbook stage 8 (specify): every C- and G- item is Confirmed (D-38); the G-19 legal review is still due before P4.
+Last updated: 2026-11-28: every acceptance criterion that can be met in code is done (326 of 331, `make spec`); the 5 open ones are founder items (deploy, live testnet runs, a live model run, publishing results). Earlier the same day: P4 built except the booking URL and go-live (founder). Earlier, 2026-11-25: The founder passed playbook stage 8 (specify): every C- and G- item is Confirmed (D-38); the G-19 legal review is still due before P4.
 
 Earlier, 2026-11-24: the founder confirmed DekernAI is in MVP development (TRL 4) and passed playbook stages 7 (MVP scope), 9 (screen specs: every criterion linked to a story in `traceability.md`) and 12 (tasks and story groups); stages 1 to 6, 10 and 11 wait on the founder's Passed or Deferred call. The founder chose the full MVP scope on 2026-11-23 (D-37). The dashboard runs on Vercel behind its login, on solo-to-scale 2.7.0.
 
@@ -206,6 +206,12 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 - **Slice T: built (2026-11-28):** CON-11 the AI team page (`/console/agents`, `detent/views/ai_team.py`), linked
   from the console and dashboard navigation: the three agents with their limits, latest work and the people and
   policy decisions that followed each item. Read-only. See spec/07 "As built (slice T)".
+- **Criteria finalised (2026-11-28):** the last code-side criteria were closed with tests or fixes: a BLOCKED
+  payment answers 409 `payment_blocked` on send and cancel (POL-06); keys and invoice text never reach the logs
+  (FND-08); the payment page shows route candidates with scores (CON-03); a PDF invoice drop (CON-05); the
+  contract suite runs for each USDC rail configuration (RAL-03); a network switch can come from the intent, the
+  mandate or the approver (RAL-07, spec/06); every ledger entry writes `ledger.posted` (AUD-01). Open, all founder
+  items: FND-07 0, RAL-02 2, AGT-01 3, EVL-06 1, EVL-07 0.
 - **Next:** the backlog is built. Open founder items below (deploy, live testnet run, publishing). · Model: mid-tier
 
 ## Open founder items
@@ -230,10 +236,8 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   `apps/site/src/data/results.json` from a passing full run (EVL-06 criterion 1 stays open until then).
 - Nightly eval against public testnets needs funded test wallets and RPC endpoints as secrets (EVL-07 criterion 0).
 - A funded test wallet for Base Sepolia and Ethereum Sepolia (RAL-02, RAL-03, S9).
-- User payouts are deferred (founder, before S1); the demo batch now pays counterparties instead (D-32).
 - C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 Confirmed as proposed (D-38, 2026-11-24); G-19 retention still
-  needs the founder's legal review before the P4 launch. With G-10 decided, user payouts (D-26) can be built; no story
-  covers them yet and the API still returns 422 `user_payouts_unavailable`. Ask the founder which slice takes them.
+  needs the founder's legal review before the P4 launch. User payouts (D-26, G-10) are built in slice U.
 - NDA (D-45): live with interim parties chosen by the founder on 2026-11-28 (Payam Rahimi trading as DekernAI, signed as Founder). Legal review still advised; a changed text goes in a new `dashboard/nda/<version>.txt` with a new `VERSION`. Final name and domain (`BRAND_NAME`), legal review of the site.
 - Delete the stale remote branch `s3-unknown-resolved` (the proxy refused).
 - Delete the merged branches (all are in `main`): `m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`.

@@ -183,8 +183,16 @@ class ResolutionIn(BaseModel):
     reason: str = Field(min_length=1, max_length=2000)
 
 
+class ApprovalIn(ResolutionIn):
+    allow_network_switch: bool = Field(
+        default=False,
+        description="Also allow failover to the payee's verified destination on another network, "
+        "after a technical failure only.",
+    )
+
+
 def _resolve_case(
-    request: Request, case_id: str, body: ResolutionIn, principal: Principal, action: str
+    request: Request, case_id: str, body: ResolutionIn | ApprovalIn, principal: Principal, action: str
 ) -> JSONResponse:
     require(principal, "exceptions:approve")
     if not body.reason.strip():
@@ -211,6 +219,7 @@ def _resolve_case(
                 actor=actor,
                 reason=body.reason,
                 mandate_key=rt.settings.mandate_signing_key_demo,
+                allow_network_switch=isinstance(body, ApprovalIn) and body.allow_network_switch,
             )
         else:
             res = reject(
@@ -237,7 +246,7 @@ def _resolve_case(
 
 @router.post("/exceptions/{case_id}/approve")
 def approve_exception(
-    request: Request, case_id: str, body: ResolutionIn, principal: Annotated[Principal, Depends(authenticate)]
+    request: Request, case_id: str, body: ApprovalIn, principal: Annotated[Principal, Depends(authenticate)]
 ) -> JSONResponse:
     return _resolve_case(request, case_id, body, principal, "approve")
 

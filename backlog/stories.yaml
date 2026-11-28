@@ -154,7 +154,7 @@ stories:
     - "Keys, secrets, full wallet private data and invoice bodies are never logged (tested with a log capture)"
   pri: Should
   est: 0.25
-  done: [0, 1]
+  done: [0, 1, 2]
   deps: [FND-01]
   trace: [B5.security, B3.incident]
   ms: S0
@@ -170,7 +170,7 @@ stories:
     - "Public testnets are used only in nightly runs and the live demo"
   pri: Must
   est: 0.5
-  done: [0, 2]
+  done: [0, 1, 2]
   deps: [FND-01]
   trace: [L3, A5.gate]
   ms: S0
@@ -192,7 +192,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Intent, A2b.states]
   ms: S1
-  done: [0, 2, 3]
+  done: [0, 1, 2, 3]
 - id: INT-02
   epic: INT
   title: Idempotent creates
@@ -290,7 +290,7 @@ stories:
   deps: [POL-01, INT-01]
   trace: [A2.Decide, A6.block_final, A1.reviews]
   ms: S1
-  done: [0, 1, 2]
+  done: [0, 1, 2, 3]
 - id: POL-03
   epic: POL
   title: Compliance checks (KYB, allowlist, screening, Travel Rule, network)
@@ -358,7 +358,7 @@ stories:
   deps: [POL-02, EXE-01]
   trace: [A6.block_final, A2b.rule, L5]
   ms: S3
-  done: [0, 2]
+  done: [0, 1, 2]
 - id: POL-07
   epic: POL
   title: Versioned rule changes with two approvers
@@ -520,7 +520,7 @@ stories:
   deps: [AGT-01]
   trace: [A5.injection, L2, B6.ai]
   ms: S5
-  done: [0, 1, 2]
+  done: [0, 1, 2, 3]
 - id: AGT-05
   epic: AGT
   title: Record every agent call for replay
@@ -602,7 +602,7 @@ stories:
   deps: [EXE-02, POL-02]
   trace: [A2.Execute, A2b.custody]
   ms: S2
-  done: [1, 2]
+  done: [0, 1, 2]
 - id: EXE-04
   epic: EXE
   title: Nonce manager
@@ -764,7 +764,7 @@ stories:
   deps: [RAL-02]
   trace: [A2.Connect]
   ms: S4
-  done: [0]
+  done: [0, 1]
 - id: RAL-04
   epic: RAL
   title: Simulated instant bank rail
@@ -829,7 +829,7 @@ stories:
   deps: [RAL-06, EXE-07]
   trace: [A2.Route, A6.block_final, L5, A1.cost]
   ms: S4
-  done: [0, 1, 3]
+  done: [0, 1, 2, 3]
 - id: RAL-08
   epic: RAL
   title: Rail health and circuit breaker
@@ -906,7 +906,7 @@ stories:
   deps: [POL-02, FND-05]
   trace: [A2.Exceptions, B3.exceptions]
   ms: S3
-  done: [0, 2]
+  done: [0, 1, 2]
 - id: EXC-02
   epic: EXC
   title: Raw facts first
@@ -999,7 +999,7 @@ stories:
   deps: [FND-03]
   trace: [B3.exceptions]
   ms: S3
-  done: [1]
+  done: [0, 1]
 - id: EXC-08
   epic: EXC
   title: Exceptions by API
@@ -1126,7 +1126,7 @@ stories:
   deps: [LED-02, LED-05, LED-07, EXC-01]
   trace: [A2.Reconcile, L7, B7.recon]
   ms: S7
-  done: [0, 1, 2, 3]
+  done: [0, 1, 2, 3, 4]
 - id: LED-07
   epic: LED
   title: Bank statement import
@@ -1172,7 +1172,7 @@ stories:
   deps: [FND-03]
   trace: [A2.Prove, B5.security, A1.evidence]
   ms: S1
-  done: [1, 2]
+  done: [0, 1, 2]
 - id: AUD-02
   epic: AUD
   title: Replay any payment
@@ -1249,6 +1249,7 @@ stories:
   deps: [CON-01, AUD-01]
   trace: [A2.Prove, A2.Decide]
   ms: S3
+  done: [0]
 - id: CON-04
   epic: CON
   title: Exceptions queue screen
@@ -1277,7 +1278,7 @@ stories:
   deps: [CON-01, AGT-02, MND-02]
   trace: [MVP.flow, A5.proposes]
   ms: S5
-  done: [1]
+  done: [0, 1]
 - id: CON-06
   epic: CON
   title: Policy and mandates screens
@@ -1707,7 +1708,6 @@ stories:
   deps: [FND-03]
   trace: [D.keys, D.standards, B5.security]
   ms: P1
-  done: [0, 1]
 - id: API-02
   epic: API
   title: Error model

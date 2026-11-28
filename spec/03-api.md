@@ -2,7 +2,7 @@
 
 **Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** the public API for all three layers. Decision: `/payment_intents`, `/decisions`, `/mandates`, `/policy`. Orchestration: `/send`, `/kill_switch`. Operations: `/exceptions`, `/deposit_intents`, `/reconciliation`, `/replay`, `/events`.
 
-Base URL (placeholder): `https://sandbox.api.<domain>/v1`. Every request uses TLS and carries `Authorization: Bearer sk_test_...`. The OpenAPI 3.1 file is generated from the code and then polished (API-05). This page is the contract it must match.
+Base URL (hosted sandbox, founder 2026-11-28): `https://app.dekernai.com/v1`. Every request uses TLS and carries `Authorization: Bearer sk_test_...`. The OpenAPI 3.1 file is generated from the code and then polished (API-05). This page is the contract it must match.
 
 ## Standards
 
@@ -24,13 +24,13 @@ Base URL (placeholder): `https://sandbox.api.<domain>/v1`. Every request uses TL
 | POST `/payment_intents` | intents:create | INT-01, INT-02 | Create a payout intent, decide it synchronously and return the decision |
 | GET `/payment_intents/{id}` | read | INT-03 | Intent with decisions, checks, route, attempts, postings and events |
 | GET `/payment_intents` | read | INT-03 | List with filters `status`, `rail`, `created[gte]`, `created[lte]` |
-| POST `/payment_intents/{id}/cancel` | intents:create | INT-05 | Cancel before sending |
-| POST `/payment_intents/{id}/send` | exceptions:approve | EXE-09 | Assist mode: a human confirms sending |
+| POST `/payment_intents/{id}/cancel` | intents:create | INT-05 | Cancel before sending; a BLOCKED payment answers 409 `payment_blocked` |
+| POST `/payment_intents/{id}/send` | exceptions:approve | EXE-09 | Assist mode: a human confirms sending; a BLOCKED payment answers 409 `payment_blocked` |
 | GET `/payment_intents/{id}/replay` | read | AUD-02 | Step-by-step replay and its match result |
 | POST `/decisions` | intents:create | POL-08 | Decision only; nothing is executed |
 | GET `/exceptions` | read | EXC-08 | List cases; filters `status`, `owner`, `tier`, `overdue` |
 | GET `/exceptions/{id}` | read | EXC-08 | Raw facts, rule hits and agent evidence |
-| POST `/exceptions/{id}/approve` | exceptions:approve | EXC-04, EXC-08 | Approve with `reason`; re-runs policy |
+| POST `/exceptions/{id}/approve` | exceptions:approve | EXC-04, EXC-08, RAL-07 | Approve with `reason`; re-runs policy. Optional `allow_network_switch: true` approves a failover to another network |
 | POST `/exceptions/{id}/reject` | exceptions:approve | EXC-04, EXC-08 | Reject with `reason` |
 | POST `/deposit_intents` | intents:create | LED-03 | Create deposit instructions |
 | GET `/deposit_intents/{id}` | read | LED-03 | Status and credits |

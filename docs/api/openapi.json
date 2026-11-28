@@ -12,8 +12,12 @@
   },
   "servers": [
     {
+      "url": "https://app.dekernai.com",
+      "description": "The hosted sandbox: test networks and a simulated bank rail only. Use the sandbox key you got from the dashboard."
+    },
+    {
       "url": "http://localhost:8000",
-      "description": "Local development (make dev). The public sandbox address is published at launch."
+      "description": "Local development (make dev)."
     }
   ],
   "security": [
@@ -2259,7 +2263,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResolutionIn"
+                "$ref": "#/components/schemas/ApprovalIn"
               }
             }
           }
@@ -15819,6 +15823,28 @@
           "currency"
         ],
         "title": "AmountIn"
+      },
+      "ApprovalIn": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Reason"
+          },
+          "allow_network_switch": {
+            "type": "boolean",
+            "title": "Allow Network Switch",
+            "description": "Also allow failover to the payee's verified destination on another network, after a technical failure only.",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "ApprovalIn"
       },
       "Currency": {
         "type": "string",

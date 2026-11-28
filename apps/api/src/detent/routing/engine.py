@@ -107,6 +107,16 @@ def _norm(v: int, top: int) -> Decimal:
     return Decimal(v) / Decimal(top) if top else Decimal(0)
 
 
+def _mandate_networks(conn: Connection, org_id: str, mandate_id: str | None) -> set[str] | None:
+    if not mandate_id:
+        return None
+    nets = conn.execute(
+        text("SELECT payload->'scope'->'networks' FROM mandates WHERE org_id=:o AND id=:m"),
+        {"o": org_id, "m": mandate_id},
+    ).scalar_one_or_none()
+    return set(nets or [])
+
+
 def route(
     conn: Connection,
     adapters: Mapping[str, RailAdapter],
@@ -146,6 +156,7 @@ def route(
         if payment.counterparty_id
         else {}
     )
+    mandate_networks = _mandate_networks(conn, org_id, getattr(payment, "mandate_id", None))
     weights = DEFAULT_WEIGHTS
     out: list[Candidate] = []
     for r in rails:
@@ -157,7 +168,11 @@ def route(
             weights = {k: Decimal(str(v)) for k, v in dict(r.weights).items()}
         if r.id == payment.network_constraint:
             c.destination_address = payment.address or getattr(payment, "account_masked", None)
-        elif payment.allow_network_switch and r.id in dests:
+        elif (
+            payment.allow_network_switch
+            and r.id in dests
+            and (mandate_networks is None or r.id in mandate_networks)
+        ):  # an agent payment never switches outside its mandate's networks
             c.destination_address = dests[r.id]
         else:
             c.reason = "network constraint"

@@ -206,6 +206,48 @@ def test_point_42_without_a_network_switch_ends_failed(
     assert status in ("FAILED", "FAILED_FINAL") and len(attempts) == 1
 
 
+def test_an_approver_can_allow_the_network_switch_and_it_is_audited(
+    api: TestClient, owner: Member, engine: Engine, clock: FrozenClock
+) -> None:
+    """RAL-07: without the intent's flag, a human approval of the switch lets the payment fail over."""
+    from detent.audit.log import Actor
+    from detent.exceptions.cases import approve
+
+    with engine.begin() as conn:  # a first payment to the payee, so the payout escalates for a person
+        conn.execute(
+            text("UPDATE counterparties SET payment_count=0 WHERE org_id=:o AND id='cpt_lumen'"),
+            {"o": owner.org_id},
+        )
+    out = pay(api, key_for(engine, clock, owner), "90.42", switch=False)
+    assert out["status"] == "ESCALATED", out
+    approve(
+        engine,
+        clock,
+        case_id=out["exception"]["id"],
+        org_id=owner.org_id,
+        actor=Actor("usr_switch_approver", Role.REVIEWER.value),
+        reason="Payee confirmed both wallets",
+        allow_network_switch=True,
+    )
+    drain(engine, clock, owner.org_id, seconds=5, rounds=3)
+    status, attempts, _chain = state(engine, owner.org_id, out["id"])
+    assert status == "CONFIRMED"
+    assert [(a.rail_id, a.status) for a in attempts] == [
+        ("base-sepolia", "FAILED"),
+        ("eth-sepolia", "CONFIRMED"),
+    ]
+    assert "payment.network_switch_approved" in audit_kinds(engine, owner.org_id)
+
+
+def test_the_approval_api_takes_the_network_switch_flag(api: TestClient) -> None:
+    from detent.api.openapi import build
+
+    schema = build(api.app)  # type: ignore[arg-type]
+    body = schema["paths"]["/v1/exceptions/{case_id}/approve"]["post"]["requestBody"]["content"]
+    ref = body["application/json"]["schema"]["$ref"].rsplit("/", 1)[1]
+    assert "allow_network_switch" in schema["components"]["schemas"][ref]["properties"]
+
+
 def test_flagged_address_blocks_and_a_payee_off_the_allowlist_escalates(
     api: TestClient, owner: Member, engine: Engine, clock: FrozenClock
 ) -> None:
