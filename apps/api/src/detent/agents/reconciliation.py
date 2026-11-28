@@ -24,7 +24,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import Connection, Engine, text
 
 from detent.agents.investigation import _escape
-from detent.agents.llm import LLMClient, LLMResult
+from detent.agents.llm import LLMClient, LLMResult, describe_error
 from detent.audit.log import Actor, append
 from detent.clock import Clock
 from detent.domain.ids import Prefix, new_id
@@ -171,7 +171,7 @@ def propose_fix(
             try:
                 result = llm.complete(model=model, system=system, user=user, schema=SCHEMA)
             except Exception as exc:
-                flags.append({"code": "MODEL_UNAVAILABLE", "detail": type(exc).__name__})
+                flags.append({"code": "MODEL_UNAVAILABLE", "detail": describe_error(exc)})
                 break
             try:
                 parsed = _Output.model_validate(json.loads(result.raw_text))
