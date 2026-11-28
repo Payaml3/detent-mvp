@@ -14,7 +14,7 @@ const cases: { id: string; name: string; tag: string; flow: string; pay: string;
     checks: [["Settled cash covers it", "ok"], ["Destination owned by the client", "ok"], ["Market-spike pause is off", "ok"]],
     verdict: "EXECUTE", why: "Within your limits",
     rails: [["Faster Payments", "chosen", "instant, under its limit"], ["CHAPS", "fallback", "on a technical error only"], ["Bacs", "excluded", "too slow for your withdrawal promise"]],
-    ops: [["Reconcile", "Bank confirmation matched to the ledger posting"], ["Client money", "Daily check of client balances against the bank"], ["Audit", "The decision replays exactly as it ran"]],
+    ops: [["Reconcile", "Bank confirmation matched to the ledger posting"], ["Exceptions", "A withdrawal your rules hold opens a case with an owner and a deadline"], ["Audit", "The decision replays exactly as it ran"]],
     auto: "Withdrawals inside your limits go out on their own. A market spike pauses them with one switch." },
   { id: "wealth", name: "Investment and wealth", tag: "Transfers out", flow: "ISA transfer out",
     pay: "£48,000.00 · client W-0817 → receiving provider",
@@ -54,7 +54,7 @@ const cases: { id: string; name: string; tag: string; flow: string; pay: string;
     checks: [["Back to the deposit account", "ok"], ["Source of funds on file", "ok"], ["Above the affordability band", "flag"]],
     verdict: "ESCALATE", why: "Affordability check first",
     rails: [["Faster Payments", "chosen", "to the account they paid in from"], ["Push to card", "fallback", "card deposits return to the card"], ["Stablecoins", "excluded", "not allowed by your rules"]],
-    ops: [["Exceptions", "The safer-gambling team gets the case with the facts"], ["Reconcile", "Player wallet matched to the bank"], ["Audit", "A record ready for your regulator"]],
+    ops: [["Exceptions", "The safer-gambling team gets the case with the facts"], ["Reconcile", "Player wallet matched to the bank"], ["Audit", "Who decided, when, and under which rule version"]],
     auto: "Closed-loop withdrawals run on their own. Affordability and source-of-funds flags reach the right team." },
   { id: "neobanks", name: "Neobanks and EMIs", tag: "Outbound transfers", flow: "Outbound transfer",
     pay: "£9,800.00 · customer N-1207 → new payee",
@@ -62,7 +62,7 @@ const cases: { id: string; name: string; tag: string; flow: string; pay: string;
     checks: [["Balance covers it", "ok"], ["Payee added under an hour ago", "flag"], ["Confirmation of Payee: partial match", "flag"]],
     verdict: "ESCALATE", why: "Held: possible APP fraud",
     rails: [["Faster Payments", "chosen", "once the hold clears"], ["CHAPS", "fallback", "on a technical error only"], ["Bacs", "excluded", "too slow for this customer promise"]],
-    ops: [["Exceptions", "The customer is warned; a person reviews before anything moves"], ["Safeguarding", "Safeguarded funds reconciled every day"], ["Audit", "Each step on the record for a reimbursement claim"]],
+    ops: [["Exceptions", "The customer is warned; a person reviews before anything moves"], ["Reconcile", "Bank confirmation matched to the ledger posting"], ["Audit", "Each step on the record for a reimbursement claim"]],
     auto: "Ordinary transfers flow. A new payee with a weak name match waits, and the customer hears why." },
   { id: "remittance", name: "Remittance and FX apps", tag: "Corridors", flow: "Corridor payout",
     pay: "£500.00 → ₱36,120.00 · sender R-3381 → family account in Manila",
@@ -147,7 +147,7 @@ const verdictStatus = { EXECUTE: "CONFIRMED", ESCALATE: "ESCALATED", BLOCK: "BLO
       </article>
     ))}
   </div>
-  <p class="small soft foot">Sample data. The agent prepares and proposes; your rules decide, and a person approves anything they escalate.</p>
+  <p class="small soft foot">Sample data. These show how the controls are designed to work on each kind of platform; the sandbox today covers stablecoins and a simulated instant bank rail, with no real money, and other rails are on the roadmap. The agent prepares and proposes; your rules decide, and a person approves anything they escalate.</p>
 </div>
 <script>
   const root = document.querySelector<HTMLElement>("[data-uc]");

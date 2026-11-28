@@ -219,3 +219,15 @@ test("status page: sandbox API, dashboard and docs, fed by the deploy's health c
   assert.ok(html.includes(`data-url="${config.statusUrl}"`));
   assert.match(read("index.html"), /href="\/status\/"/, "the footer links the status page");
 });
+
+test("legal review 2026-11-28: no regulated-function claims; the access form says how its data is used", () => {
+  for (const [p, html] of allHtml()) {
+    const t = text(html);
+    for (const rx of [/safeguarded funds/i, /client money/i, /ready for your regulator/i, /never paid twice/i])
+      assert.ok(!rx.test(t), `${p} contains ${rx}`);
+  }
+  const access = read(PAGES.access);
+  assert.match(access, /href="\/privacy\/"/, "the access form links the privacy notice at the point of collection");
+  assert.match(text(access), /don.t add you to a mailing list/i);
+  assert.match(text(read(PAGES.home)), /Pre-launch\./, "the footer says the product is pre-launch");
+});
