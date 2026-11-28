@@ -16,7 +16,6 @@ TOOLS: dict[str, dict[str, Any]] = {
     "find_counterparty": {
         "name": "find_counterparty",
         "description": "Look up registered payees whose name contains the given text. Read-only.",
-        "strict": True,
         "input_schema": {
             "type": "object",
             "properties": {"name": {"type": "string"}},
@@ -27,7 +26,6 @@ TOOLS: dict[str, dict[str, Any]] = {
     "get_destinations": {
         "name": "get_destinations",
         "description": "List a registered payee's payout destinations (network and address). Read-only.",
-        "strict": True,
         "input_schema": {
             "type": "object",
             "properties": {"counterparty_id": {"type": "string"}},
@@ -38,7 +36,6 @@ TOOLS: dict[str, dict[str, Any]] = {
     "get_mandate": {
         "name": "get_mandate",
         "description": "Read the scope of the mandate the agent works under. Read-only.",
-        "strict": True,
         "input_schema": {
             "type": "object",
             "properties": {"mandate_id": {"type": "string"}},

@@ -59,7 +59,7 @@ def test_request_shape_and_tool_loop() -> None:
     assert req["model"] == "claude-sonnet-5-5" and req["output_config"]["format"]["type"] == "json_schema"
     assert not {"temperature", "top_p", "top_k", "tool_choice", "thinking"} & set(req)
     assert req["fallbacks"] == "default" and "server-side-fallback-2026-07-01" in req["betas"]
-    assert all(t["strict"] for t in req["tools"])
+    assert not any(t.get("strict") for t in req["tools"])  # grammar size limit; see _string_args
     second = fake.requests[1]["messages"]
     assert second[-1]["content"][0] == {"type": "tool_result", "tool_use_id": "tu_1", "content": "[]"}
 
@@ -87,3 +87,25 @@ def test_describe_error_gives_the_api_reason_without_secrets() -> None:
     leaked = RuntimeError("key sk-ant-api03-abcdefghijk rejected")
     assert "abcdefghijk" not in describe_error(leaked)
     assert describe_error(RuntimeError()) == "RuntimeError"
+
+
+def test_tool_arguments_keep_only_strings() -> None:
+    a, _ = llm_with(
+        [
+            reply(
+                "tool_use",
+                [NS(type="tool_use", id="tu_1", name="get_mandate", input={"mandate_id": 7, "x": "y"})],
+            ),
+            reply("end_turn", [NS(type="text", text="{}")]),
+        ]
+    )
+    seen: list[dict[str, Any]] = []
+    a.complete(
+        model="m",
+        system="s",
+        user="u",
+        schema=SCHEMA,
+        tools=list(TOOLS.values()),
+        tool_handler=lambda n, args: (seen.append(args), "[]")[1],
+    )
+    assert seen == [{"x": "y"}]
