@@ -119,9 +119,12 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 
 ## As built (P2 group 1)
 
-- **Who is a DekernAI admin:** an admin of the operator organisation (`org_detent`). Only the command line creates
-  one (`detent staff add --email --name`; the password is read from the terminal). They sign in on the same page as
-  everyone else and land on `/admin/`.
+- **Who is a DekernAI admin:** an admin of the operator organisation (`org_detent`). The first one comes from
+  `detent staff add --email --name` (the password is read from the terminal) or, without a terminal, from
+  `FOUNDER_ADMIN_EMAIL`: while no admin exists, the app emails that address a single-use admin invite when it starts
+  (founder, 2026-11-28). After that, an admin invites others on `/admin/staff` (Admins); every invite is single-use,
+  expires like any other and the new admin sets their own password. They sign in on the same page as everyone else
+  and land on `/admin/`.
 - **Organisations (DSH-01, DSH-03):** `/admin/organisations/new` creates a client organisation (KYB reference and
   approval date required, no expiry; the database refuses anything else) or an evaluation organisation (expiry,
   60 days by default). A new organisation starts with the fictional counterparties, the simulated rails and rule

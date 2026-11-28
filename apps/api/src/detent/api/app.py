@@ -37,7 +37,7 @@ from detent.dashboard import mount as dashboard
 from detent.intents.service import IdempotencyConflict, RequestProblem
 from detent.logging import request_id_var
 from detent.policy.screening import MockScreening
-from detent.runtime import build_runtime
+from detent.runtime import Runtime, build_runtime
 from detent.sandbox.usage import QuotaExceeded
 from detent.settings import Settings, get_settings
 
@@ -62,6 +62,22 @@ def _conflict(request: Request, exc: IdempotencyConflict) -> Response:
         request_id=request_id_var.get(),
         param="Idempotency-Key",
     )
+
+
+def _bootstrap_admin(rt: Runtime) -> None:
+    """FOUNDER_ADMIN_EMAIL: invite the first DekernAI admin. Never stops the app from starting."""
+    if not rt.settings.founder_admin_email:
+        return
+    from detent.dashboard.access import bootstrap_founder_admin
+    from detent.db.engine import transaction
+
+    try:
+        with transaction(rt.engine) as conn:
+            sent = bootstrap_founder_admin(conn, rt.clock, rt.settings)
+        if sent:
+            logging.getLogger(__name__).info("first admin invite sent to FOUNDER_ADMIN_EMAIL")
+    except Exception:
+        logging.getLogger(__name__).exception("could not send the first admin invite")
 
 
 def create_app(
@@ -113,6 +129,7 @@ def create_app(
     for router in routers:
         app.include_router(router)
     dashboard.install(app)
+    _bootstrap_admin(rt)
     app.state.screening = MockScreening.from_fixture()
 
     def _err(status: int, type_: str, code: str, message: str, param: str | None = None) -> Response:

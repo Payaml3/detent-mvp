@@ -10,6 +10,8 @@
 
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
+/* The hidden attribute always wins, even over a class that sets display (p.error is flex). */
+[hidden] { display: none !important; }
 html { caret-color: var(--text); accent-color: var(--primary); scrollbar-color: var(--control) var(--ground); }
 body { margin: 0; background: var(--ground); color: var(--text); font: 400 var(--fs-body)/20px var(--font-body);
   -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }

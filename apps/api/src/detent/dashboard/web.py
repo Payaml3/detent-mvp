@@ -137,6 +137,7 @@ def writable_member(
 def page(request: Request, rt: Runtime, name: str, member: Member | None, **ctx: Any) -> HTMLResponse:
     base = {
         "brand": rt.settings.brand_name,
+        "website_url": rt.settings.website_url.rstrip("/"),
         "member": member,
         "csrf": csrf_token(request),
         "now": rt.clock.now(),

@@ -101,6 +101,10 @@ class Settings(BaseSettings):
     faucet_daily_cap: str = "500.00"
     faucet_org_daily_cap: str = "50.00"
     sales_inbox: str | None = None
+    website_url: str = "https://dekernai.com"  # the marketing site; the sign-in page links to its access form
+    # The first DekernAI admin without a terminal: while no admin exists, the app emails this address a
+    # one-time admin invite when it starts (founder, 2026-11-28). Empty: use `detent staff add` instead.
+    founder_admin_email: str | None = None
 
     # FND-07: where this instance and its database run, as stated in the console footer and /healthz.
     # WEB-07: the public status page also checks the docs site; empty means "not monitored".

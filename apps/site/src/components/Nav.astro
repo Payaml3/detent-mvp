@@ -20,7 +20,10 @@ const here = Astro.url.pathname;
         {links.map((l) => <li><a href={l.href} aria-current={here === l.href ? "page" : undefined}>{l.label}</a></li>)}
       </ul>
     </nav>
-    <a class="button nav-cta" href="/access/">Request access</a>
+    <div class="nav-actions">
+      <a class="nav-signin" href={config.signInUrl}>Sign in</a>
+      <a class="button nav-cta" href="/access/">Request access</a>
+    </div>
   </div>
 </header>
 <style>
@@ -31,7 +34,12 @@ const here = Astro.url.pathname;
   ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
   nav a { color: var(--text-soft); text-decoration: none; font-size: 15px; font-weight: 500; transition: color 160ms; }
   nav a:hover, nav a[aria-current] { color: var(--text); }
+  /* Sign in is quiet text; Request access stays the one filled button (there is no public sign-up). */
+  .nav-actions { display: flex; align-items: center; gap: 20px; }
+  .nav-signin, .nav-cta { white-space: nowrap; }
+  .nav-signin { display: inline-flex; align-items: center; min-height: 44px; color: var(--text); text-decoration: none; font-size: 15px; font-weight: 500; }
+  .nav-signin:hover { text-decoration: underline; text-underline-offset: 4px; }
   .nav-cta { min-height: 44px; padding: 0 18px; font-size: 15px; }
-  @media (max-width: 860px) { nav { display: none; } .nav-cta { margin-left: auto; } }
-  @media (max-width: 420px) { .nav-cta { padding: 0 12px; font-size: 14px; } }
+  @media (max-width: 860px) { nav { display: none; } .nav-actions { margin-left: auto; } }
+  @media (max-width: 420px) { .nav-row { gap: 12px; } .nav-actions { gap: 12px; } .nav-signin { font-size: 14px; } .nav-cta { padding: 0 12px; font-size: 14px; } }
 </style>

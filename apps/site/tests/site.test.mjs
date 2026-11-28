@@ -264,3 +264,12 @@ test("nav: Developers opens the developer docs portal (founder, 2026-11-28)", ()
     assert.match(nav, new RegExp(`href="${config.docsUrl}"[^>]*>Developers<`), p);
   }
 });
+
+test("every page offers Sign in beside Request access, and no public sign-up (founder, 2026-11-28)", () => {
+  for (const [p, html] of allHtml()) {
+    const header = html.split("</header>")[0];
+    assert.ok(header.includes(`href="${config.signInUrl}"`) && />\s*Sign in\s*</.test(header), `${p}: no Sign in in the header`);
+    assert.ok(header.includes('href="/access/"'), `${p}: no Request access in the header`);
+    assert.doesNotMatch(text(header), /\bsign[ -]?up\b/i, `${p}: a sign-up action in the header`);
+  }
+});

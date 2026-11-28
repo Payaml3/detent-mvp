@@ -34,6 +34,7 @@ BANKSIM_URL=http://localhost:8100
 FAULTPROXY_URL=http://localhost:8200
 EMAIL_PROVIDER=outbox                # outbox | <provider>
 SALES_INBOX=...
+FOUNDER_ADMIN_EMAIL=...              # while no DekernAI admin exists, emailed a one-time admin invite at start
 ```
 
 The two testnet USDC contract addresses were checked against Circle's "USDC on Test Networks" page on 17 Nov 2026 (https://developers.circle.com/docs/usdc-on-testnet). Re-check them if a transfer fails. The live demo instead sets both to its own test token (D-33): `detent demo token deploy --network <n>` deploys `chain/src/MockUSDC.sol` ("DekernAI Demo USD (test stand-in, not USDC)", symbol `tUSDC`) from the sending wallet and prints the address to set. The contract reverts on any chain but 31337, 84532 and 11155111, and only its deployer can mint. Startup fails if a configured chain ID is not in `ALLOWED_CHAIN_IDS`.
