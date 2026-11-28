@@ -9,8 +9,8 @@ export default {
   heroArt: "agent",
   // Primary domain (B-01, registered 2026-11-26). www.dekernai.com and dekernai.co.uk redirect here in Vercel.
   siteUrl: "https://dekernai.com",
-  // Pre-launch: pages carry noindex and robots.txt blocks crawlers. Set true at launch (founder decision).
-  indexable: false,
+  // Open to search since 2026-11-28 (founder: "open it"). false puts noindex back on every page and blocks crawlers.
+  indexable: true,
   // WEB-06: the access form posts to the dashboard's DSH-10 endpoint on the live deploy (FND-07).
   accessFormAction: "https://app.dekernai.com/access-requests",
   // WEB-07: the status page reads the deploy's public health summary from the visitor's browser.
