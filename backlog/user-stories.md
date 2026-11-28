@@ -1685,7 +1685,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 **Acceptance criteria**
 
 - [x] Security page: non-custodial, audit and replay, kill switch, EU hosting; roadmap items labelled roadmap (for example 'SOC 2: planned')
-- [ ] Onboarding page explains the seven onboarding phases and data handling (B-04)
+- [x] Onboarding page explains the seven onboarding phases and data handling (B-04)
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** D.site, D.honesty, B3.lead_shadow, B5.hosting
 
@@ -1735,7 +1735,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 **Acceptance criteria**
 
-- [ ] Fed by health checks; shows sandbox API, dashboard and docs
+- [x] Fed by health checks; shows sandbox API, dashboard and docs
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** FND-07 · **Traces to:** D.ops_pages, B7.reliability
 

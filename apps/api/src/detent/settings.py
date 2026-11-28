@@ -100,6 +100,9 @@ class Settings(BaseSettings):
     sales_inbox: str | None = None
 
     # FND-07: where this instance and its database run, as stated in the console footer and /healthz.
+    # WEB-07: the public status page also checks the docs site; empty means "not monitored".
+    status_docs_url: str = ""
+    status_cache_seconds: int = 60  # how long one round of status checks is reused
     hosting_region: str = "local machine (not deployed)"
     database_region: str = "local machine (not deployed)"
 
