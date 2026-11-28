@@ -73,3 +73,28 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 - **Settings (CON-10):** the fail-safe is proposed by one lead and approved by the other, like the mode (`mode_changes`
   now has a `setting` column, migration 0016). Deadlines come from the active rule version and routing weights from
   the routing defaults and any per-rail overrides; both are read-only.
+
+## As built (L group 2: SHD-01 to SHD-04, EXC-09)
+
+- **Shadow import (SHD-01):** `/console/shadow` (payments lead and compliance lead; `detent/console/shadow.py`,
+  `detent/shadow/imports.py`). Upload a CSV, map its columns (the mapping is guessed from the header), see the
+  validation report (rows read, valid, invalid with reasons, duplicates), then decide. Decisions run in memory with
+  the active rule version; no payment, decision row, destination, attempt or job is created (`shadow.imported`
+  records `executed: false`). Daily caps are counted per UTC day inside the import.
+- **Anonymise (SHD-04):** names, destinations and free text are hashed with a per-import salt that is never stored,
+  so hashes match inside one import and differ across imports. A counterparty reference that is a registry ID
+  (`cpt_...`) is kept; anything else is treated as unregistered.
+- **Report (SHD-02):** `/console/shadow/{id}` with a weekly view (`?week=2026-W48`), and HTML and PDF exports
+  (`report.html`, `report.pdf`). Sections: summary, decision mix, agreement, unsafe approvals (DekernAI would execute,
+  the platform rejected), the platform's approvals the rules would stop, unreconciled rows, simulated routing saving
+  (fee paid minus the lowest estimated fee among connected rails in the same currency), method and limits. The report
+  reads stored rows only, so it is replayable.
+- **Mode gate (SHD-03, D-41):** `/console/shadow` lists gates. A gate measures the last 30 days of shadow rows (the
+  newest import wins for a repeated reference) against the organisation's `gate_agreement_bp` (9500) and zero unsafe
+  approvals, and is frozen when created. The payments lead and the compliance lead each sign a passed gate, as two
+  different people. Settings offers signed gates when a lead proposes a move up; a production organisation can't move up
+  without one. The applied mode change is linked to the gate (`mode_gates.mode_change_id`, migration 0017).
+- **Agreement sample (EXC-09):** `/console/agreement?days=30` compares the newest recorded investigation's
+  recommendation with the final decision for cases approved or rejected in the period, and lists disagreements with
+  the agent's cited claims and the person's reason. `needs_information` and cases with no investigation are counted
+  but not compared.

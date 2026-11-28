@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Agent agreement{% endblock %}
+{% block main %}
+<h1>Agent-versus-human agreement</h1>
+<form method="get" class="filters"><label>Period (days)<input name="days" type="number" min="1" max="366" value="{{ days }}"></label><button>Show</button></form>
+<p>{{ s.period_from.strftime('%Y-%m-%d') }} to {{ s.period_to.strftime('%Y-%m-%d') }} (UTC): {{ s.cases }} cases approved or rejected; {{ s.compared }} had an agent recommendation to compare ({{ s.not_compared }} had none or asked for more information).</p>
+<p>Agreement: <strong>{{ s.rate }}</strong> ({{ s.agreed }} of {{ s.compared }}).</p>
+<h2>Disagreements</h2>
+<table>
+  <thead><tr><th>Case</th><th>Agent</th><th>Agent's rationale (cited claims)</th><th>Decision</th><th>Person's reason</th></tr></thead>
+  <tbody>{% for d in s.disagreements %}<tr><td><a class="mono" href="/console/exceptions/{{ d.case_id }}">{{ d.case_id }}</a></td><td>{{ d.agent }}{% if d.agent_confidence is not none %} ({{ d.agent_confidence }}){% endif %}</td>
+    <td class="small">{% for c in d.agent_rationale %}{{ c }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td>{{ d.human }} by <span class="mono">{{ d.resolved_by }}</span></td><td class="small">{{ d.human_rationale }}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">No disagreements.</td></tr>{% endfor %}</tbody>
+</table>
+<p class="small muted">Agent text is untrusted and shown as data. Agent answers in the prototype are labelled stand-ins until real model runs are recorded.</p>
+{% endblock %}

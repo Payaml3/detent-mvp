@@ -23,9 +23,13 @@
     <label>Change to
       <select name="to_mode">{% for m in ['shadow', 'assist', 'auto'] if m != mode %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>
     </label>
+    <label>Mode gate (for a move up)
+      <select name="gate_id"><option value="">(none)</option>{% for g in ready_gates %}<option value="{{ g.id }}">{{ g.id }} → {{ g.to_mode }}</option>{% endfor %}</select>
+    </label>
     <label>Reason (required)<input name="reason" required maxlength="500"></label>
     <button class="primary">Propose</button>
   </form>
+  <p class="small muted">A move up (shadow to assist or auto, assist to auto) names a mode gate signed by both leads on the <a href="/console/shadow">Shadow</a> screen; a production organisation must have one.</p>
   {% else %}<p class="muted small">Only the payments lead and the compliance lead change the mode.</p>{% endif %}
 </section>
 <section class="card" data-section="fail-safe">

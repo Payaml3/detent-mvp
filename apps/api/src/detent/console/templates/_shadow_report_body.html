@@ -1,0 +1,42 @@
+{% set imp = rep.import %}{% set agr = rep.agreement %}
+<section class="card" data-section="summary">
+  <h2>Summary</h2>
+  <p>{{ rep.rows_read }} rows read; {{ rep.rows_decided }} payouts decided; {{ rep.deposits }} deposits; {{ rep.unreconciled|length }} rows not decided.
+  {% if rep.period[0] %}Period {{ rep.period[0].strftime('%Y-%m-%d') }} to {{ rep.period[1].strftime('%Y-%m-%d') }} (UTC).{% endif %}
+  Rule version {{ imp.policy_version }}. <strong>Nothing was sent.</strong></p>
+</section>
+<section class="card" data-section="mix">
+  <h2>Decision mix</h2>
+  <table><thead><tr><th>Outcome</th><th>Count</th><th>Amount</th><th>Top reason</th></tr></thead><tbody>
+  {% for m in rep.mix %}<tr><td>{{ m.label }}</td><td>{{ m.count }}</td><td>{{ m.amounts|join(', ') or '0' }}</td><td class="mono">{{ m.top_reason or '' }}</td></tr>{% endfor %}
+  </tbody></table>
+</section>
+<section class="card" data-section="agreement">
+  <h2>Agreement with your decisions</h2>
+  {% if agr.compared %}
+  <p><strong>{{ agr.rate }}</strong>: {{ agr.agreed }} of {{ agr.compared }} matched (approved = execute, held = escalate, rejected = block).</p>
+  {% if agr.disagreements %}<table><thead><tr><th>Ref</th><th>You</th><th>{{ brand }}</th><th>Reasons</th></tr></thead><tbody>
+  {% for r in agr.disagreements[:200] %}<tr><td class="mono">{{ r.platform_ref }}</td><td>{{ r.platform_decision }}</td><td>{{ words[r.outcome] }}</td><td class="mono small">{{ r.reasons|join(', ') }}</td></tr>{% endfor %}
+  </tbody></table>{% endif %}
+  {% else %}<p class="muted">The export has no decisions of your own, so agreement can't be measured.</p>{% endif %}
+</section>
+<section class="card" data-section="unsafe">
+  <h2>Unsafe approvals</h2>
+  <p class="small muted">Payments {{ brand }} would have executed that you rejected. A mode gate needs zero.</p>
+  <ul>{% for r in agr.unsafe %}<li class="mono">{{ r.platform_ref }}: {{ r.amount_minor }} {{ r.currency }} (minor units)</li>{% else %}<li>None.</li>{% endfor %}</ul>
+  <h3>Your approvals the rules would stop</h3>
+  <ul>{% for r in agr.stopped %}<li><span class="mono">{{ r.platform_ref }}</span>: {{ words[r.outcome] }} ({{ r.reasons|join(', ') }})</li>{% else %}<li>None.</li>{% endfor %}</ul>
+</section>
+<section class="card" data-section="unreconciled">
+  <h2>Unreconciled items</h2>
+  <ul>{% for r in rep.unreconciled %}<li>Row {{ r.row_no }} <span class="mono">{{ r.platform_ref or '' }}</span>: {{ r.problems|join(', ') }}</li>{% else %}<li>None.</li>{% endfor %}</ul>
+</section>
+<section class="card" data-section="routing">
+  <h2>Simulated routing saving</h2>
+  {% if rep.routing.rows %}<p>A simulation over {{ rep.routing.rows }} payouts with a fee: {{ rep.routing.saving|join(', ') }} (fee paid minus the lowest estimated fee among your connected rails in the same currency).</p>
+  {% else %}<p class="muted">Not shown: the export has no fee column, or no connected rail matches.</p>{% endif %}
+</section>
+<section class="card" data-section="method">
+  <h2>Method and limits</h2>
+  <ul>{% for m in method %}<li>{{ m }}</li>{% endfor %}</ul>
+</section>

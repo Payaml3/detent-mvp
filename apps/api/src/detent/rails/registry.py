@@ -192,6 +192,29 @@ def seed_rails(conn: Connection, org_id: str, settings: Settings) -> list[str]:
     """Install the fixture rails for an organisation. EVM rails get their token address from settings
     (and from chain/local.json for the local chain)."""
     data = yaml.safe_load((REPO_ROOT / "fixtures" / "rails.yaml").read_text())
+    installed = []
+    for r in data["rails"]:
+        if r.get("sandbox_only") or r["id"] == "local-evm-b":  # local-evm-b exists only for failover tests
+            continue
+        install_fixture_rail(conn, org_id, settings, r, weights=data.get("routing_weights"))
+        installed.append(r["id"])
+    return installed
+
+
+def fixture_rails() -> list[dict[str, Any]]:
+    """The rail entries in fixtures/rails.yaml."""
+    return list(yaml.safe_load((REPO_ROOT / "fixtures" / "rails.yaml").read_text())["rails"])
+
+
+def install_fixture_rail(
+    conn: Connection,
+    org_id: str,
+    settings: Settings,
+    r: dict[str, Any],
+    *,
+    weights: dict[str, Any] | None = None,
+) -> None:
+    """One fixtures/rails.yaml entry, installed (or updated) for an organisation."""
     local = local_chain_config() or {}
     tokens = {
         "base-sepolia": settings.usdc_address_base_sepolia,
@@ -203,34 +226,28 @@ def seed_rails(conn: Connection, org_id: str, settings: Settings) -> list[str]:
         "eth-sepolia": settings.test_wallet_private_key_eth,
         "local-evm": settings.test_wallet_private_key_local,
     }
-    installed = []
-    for r in data["rails"]:
-        if r.get("sandbox_only") or r["id"] == "local-evm-b":  # local-evm-b exists only for failover tests
-            continue
-        lim = r.get("prefunded_daily_limit")
-        fee = r.get("fee") or {}
-        ppl, dl = r.get("per_payment_limit"), r.get("daily_limit")
-        install_rail(
-            conn,
-            org_id,
-            rail_id=r["id"],
-            kind=r["kind"],
-            network=r["id"],
-            currency=r["currency"],
-            chain_id=r.get("chain_id"),
-            token_address=tokens.get(r["id"]),
-            # The sending wallet, so the watcher records the rail's own payouts for reconciliation (S9 found
-            # seeded rails had none, so every chain payout showed as missing on the rail).
-            from_address=_address_of(senders.get(r["id"])),
-            confirmations=int(r.get("confirmations", 1)),
-            prefunded_daily_limit=Money.parse(lim, r["currency"]) if lim else None,
-            weights=data.get("routing_weights"),
-            per_payment_limit=Money.parse(ppl, r["currency"]) if ppl else None,
-            daily_limit=Money.parse(dl, r["currency"]) if dl else None,
-            fee_flat_minor=int(fee.get("flat_minor", 0)),
-            fee_bps=int(fee.get("bps", 0)),
-            est_fee_minor=int(r.get("est_fee_minor", fee.get("flat_minor", 0))),
-            est_seconds=int(r.get("est_seconds", 1)),
-        )
-        installed.append(r["id"])
-    return installed
+    lim = r.get("prefunded_daily_limit")
+    fee = r.get("fee") or {}
+    ppl, dl = r.get("per_payment_limit"), r.get("daily_limit")
+    install_rail(
+        conn,
+        org_id,
+        rail_id=r["id"],
+        kind=r["kind"],
+        network=r["id"],
+        currency=r["currency"],
+        chain_id=r.get("chain_id"),
+        token_address=tokens.get(r["id"]),
+        # The sending wallet, so the watcher records the rail's own payouts for reconciliation (S9 found
+        # seeded rails had none, so every chain payout showed as missing on the rail).
+        from_address=_address_of(senders.get(r["id"])),
+        confirmations=int(r.get("confirmations", 1)),
+        prefunded_daily_limit=Money.parse(lim, r["currency"]) if lim else None,
+        weights=weights,
+        per_payment_limit=Money.parse(ppl, r["currency"]) if ppl else None,
+        daily_limit=Money.parse(dl, r["currency"]) if dl else None,
+        fee_flat_minor=int(fee.get("flat_minor", 0)),
+        fee_bps=int(fee.get("bps", 0)),
+        est_fee_minor=int(r.get("est_fee_minor", fee.get("flat_minor", 0))),
+        est_seconds=int(r.get("est_seconds", 1)),
+    )

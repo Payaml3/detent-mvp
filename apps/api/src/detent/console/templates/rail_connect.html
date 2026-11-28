@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Connect a rail{% endblock %}
+{% block main %}
+<h1>Connect a rail</h1>
+<p class="muted">Prototype: you keep your own rail accounts and give DekernAI a scoped credential. The consent screen is a mock and every rail is a test network or the simulated bank. Live keys are refused.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if note %}<p class="note" role="status">{{ note }}</p>{% endif %}
+<table>
+  <thead><tr><th>Rail</th><th>Provider</th><th>How</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for c in catalogue %}{% set l = live.get(c.rail_id) %}
+  <tr data-rail="{{ c.rail_id }}"><td class="mono">{{ c.label }}</td><td>{{ c.provider }}</td><td>{{ 'Consent screen' if c.method == 'consent' else 'Scoped API key' }}</td>
+    <td>{% if l %}Connected {{ l.connected_at.strftime('%Y-%m-%d %H:%M') }} UTC by <span class="mono">{{ l.connected_by }}</span>; scopes {{ l.scopes | join(', ') }}; credential {{ l.credential_hint }}{% else %}Not connected{% endif %}</td>
+    <td>{% if can_connect %}{% if l %}<form method="post" action="/console/rails/{{ c.rail_id }}/disconnect" class="inline"><button class="danger">Disconnect</button></form>{% else %}<a class="button" href="/console/rails/connect/{{ c.rail_id }}">Connect</a>{% endif %}{% endif %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if not can_connect %}<p class="small muted">Only the payments lead connects or disconnects a rail.</p>{% endif %}
+<h2>History</h2>
+<table>
+  <thead><tr><th>Rail</th><th>How</th><th>Scopes</th><th>Connected</th><th>Disconnected</th></tr></thead>
+  <tbody>{% for h in past %}<tr><td class="mono">{{ h.rail_id }}</td><td>{{ h.method }}</td><td>{{ h.scopes | join(', ') }}</td>
+    <td>{{ h.connected_at.strftime('%Y-%m-%d %H:%M') }} by <span class="mono">{{ h.connected_by }}</span></td>
+    <td>{% if h.disconnected_at %}{{ h.disconnected_at.strftime('%Y-%m-%d %H:%M') }} by <span class="mono">{{ h.disconnected_by }}</span>{% endif %}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">No connections yet.</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

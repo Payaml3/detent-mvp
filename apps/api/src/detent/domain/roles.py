@@ -65,6 +65,14 @@ PERMISSIONS: dict[str, frozenset[Role]] = {
     "team.grant_account_owner": frozenset({R.ACCOUNT_OWNER}),
     "settings.manage": _OWNERS,
     "verification.request": _OWNERS,
+    # DSH-13: only the account owner asks for production mode.
+    "production.request": frozenset({R.ACCOUNT_OWNER}),
+    # SHD-01, SHD-02: the two leads import an export; anyone in the console reads the report.
+    "shadow.import": frozenset({R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
+    # SHD-03: either lead prepares a mode-gate report; each signs it in their own role.
+    "mode_gate.create": frozenset({R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
+    # RAL-09: the payments lead connects and disconnects the organisation's rails.
+    "rail.connect": frozenset({R.PAYMENTS_LEAD}),
     "keys.manage": _BUILDERS,
     "webhooks.manage": _BUILDERS,
     "request_logs.read": _BUILDERS,

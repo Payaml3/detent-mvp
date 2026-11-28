@@ -682,8 +682,12 @@ def rails_screen(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
-    """CON-08: per rail, the network or currency, balance, pre-funded limit usage and the last 20 attempts."""
+    """CON-08: per rail, the network or currency, balance, pre-funded limit usage and the last 20 attempts.
+
+    RAL-08 adds the rolling success rate, p95 latency and the circuit breaker's state."""
     from detent.domain.money import Currency, Money
+    from detent.rails.health import is_open as rail_is_open
+    from detent.rails.health import stats as rail_stats
     from detent.rails.registry import build_adapters
 
     day = rt.clock.now().date().isoformat()
@@ -733,7 +737,15 @@ def rails_screen(
                 else None
             )
             rails.append(
-                {"row": r, "usage": usage, "attempts": attempts, "balance": balance, "per_payment": ppl}
+                {
+                    "row": r,
+                    "usage": usage,
+                    "attempts": attempts,
+                    "balance": balance,
+                    "per_payment": ppl,
+                    "health": rail_stats(conn, user.org_id, r.id),
+                    "circuit_open": rail_is_open(conn, user.org_id, r),
+                }
             )
     return page(request, rt, "rails.html", user, rails=rails)
 
@@ -1148,6 +1160,15 @@ def settings_page(
             deadlines, policy_version = dict(pol.rules.deadlines), pol.version
         except NoActivePolicy:
             deadlines, policy_version = {}, None
+        ready_gates = conn.execute(
+            text(
+                "SELECT id, to_mode FROM mode_gates WHERE org_id=:o AND from_mode=:m AND passed "
+                "AND payments_lead_id IS NOT NULL AND compliance_lead_id IS NOT NULL AND "
+                "mode_change_id IS NULL "
+                "ORDER BY created_at DESC"
+            ),
+            {"o": user.org_id, "m": mode},
+        ).all()
         rail_weights = conn.execute(
             text("SELECT id, weights FROM rails WHERE org_id=:o AND weights IS NOT NULL ORDER BY id"),
             {"o": user.org_id},
@@ -1181,6 +1202,7 @@ def settings_page(
         policy_version=policy_version,
         default_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
         rail_weights=rail_weights,
+        ready_gates=ready_gates,
         error=request.query_params.get("error"),
     )
 
@@ -1199,6 +1221,7 @@ def console_propose_mode(
     to_mode: str = Form(""),
     reason: str = Form(""),
     setting: str = Form("mode"),
+    gate_id: str = Form(""),
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(require_permission("org.change_mode.propose")),  # noqa: B008
 ) -> RedirectResponse:
@@ -1213,6 +1236,7 @@ def console_propose_mode(
             to_mode=to_mode,
             reason=reason,
             setting=setting,
+            gate_id=gate_id or None,
         )
     except ModeError as exc:
         return _settings_redirect(exc)

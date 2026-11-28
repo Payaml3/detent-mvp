@@ -122,6 +122,9 @@ class Settings(BaseSettings):
     # EXE-10: the invariant monitor's cadence, and whether a hit engages the kill switch (on by default).
     invariant_monitor_seconds: float = 60.0
     invariant_monitor_kill_switch: bool = True
+    # RAL-08: how often the worker checks rail circuits, and the least time between probes of an open one.
+    rail_health_seconds: float = 30.0
+    rail_probe_seconds: float = 60.0
     # API-04: requests per key per minute (the per-address ceiling is 10 times this).
     api_rate_limit_per_minute: int = 120
     # WHK-03: webhook delivery. Plain http:// and private or loopback addresses are refused unless this is

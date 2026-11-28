@@ -36,6 +36,7 @@ class Worker:
         self._last_recon: float | None = time.monotonic()
         self._last_log_purge: float | None = None
         self._last_invariants: float | None = None
+        self._last_rail_health: float | None = None
         importlib.import_module("detent.execution.jobs")  # payment.send, payment.confirm
         importlib.import_module("detent.exceptions.investigation_job")  # case.investigate (EXC-03)
         importlib.import_module("detent.webhooks.delivery")  # webhook.deliver (WHK-03)
@@ -94,6 +95,10 @@ class Worker:
             self.check_invariants(force=force)
         except Exception:
             log.exception("invariant monitor failed")  # never stops the sweeper or job loop
+        try:
+            self.check_rails(force=force)
+        except Exception:
+            log.exception("rail health check failed")  # never stops the sweeper or job loop
         mono = time.monotonic()  # scheduling cadence only; the sweep itself reads the Clock
         recent = (
             self._last_sweep is not None and mono - self._last_sweep < self.rt.settings.deadline_sweep_seconds
@@ -156,6 +161,17 @@ class Worker:
         if opened:
             log.error("Sev 1: an invariant broke", extra={"incidents": sum(len(v) for v in opened.values())})
         return opened
+
+    def check_rails(self, *, force: bool = False) -> dict[str, dict[str, str]]:
+        """RAL-08: open, probe and close rail circuits."""
+        from detent.rails.health import check_all
+
+        mono = time.monotonic()
+        last = self._last_rail_health
+        if not force and last is not None and mono - last < self.rt.settings.rail_health_seconds:
+            return {}
+        self._last_rail_health = mono
+        return check_all(self.rt.engine, self.rt.clock, self.rt.settings)
 
     def run(self) -> None:
         log.info("worker started", extra={"worker_id": self.worker_id, "handlers": registry.kinds()})

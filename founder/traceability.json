@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 153,
-   "done": 113,
-   "pct": 74
+   "done": 122,
+   "pct": 80
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 327,
-   "done": 280,
-   "pct": 86
+   "done": 293,
+   "pct": 90
   },
   {
    "order": 3,
@@ -27,8 +27,8 @@
    "function": "00 Founder HQ",
    "measure": "Decisions resolved",
    "done": 49,
-   "total": 97,
-   "pct_done": 51
+   "total": 98,
+   "pct_done": 50
   },
   {
    "function": "03 Architecture",
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 214,
+   "done": 227,
    "total": 251,
-   "pct_done": 85
+   "pct_done": 90
   },
   {
    "function": "05 QA",
@@ -120,8 +120,8 @@
    "role": "engineer",
    "stories": 13,
    "criteria": 24,
-   "criteria_done": 20,
-   "pct_done": 83
+   "criteria_done": 23,
+   "pct_done": 96
   },
   {
    "code": "EVL",
@@ -138,8 +138,8 @@
    "role": "engineer",
    "stories": 9,
    "criteria": 21,
-   "criteria_done": 18,
-   "pct_done": 86
+   "criteria_done": 19,
+   "pct_done": 90
   },
   {
    "code": "EXE",
@@ -201,8 +201,8 @@
    "role": "engineer",
    "stories": 11,
    "criteria": 28,
-   "criteria_done": 20,
-   "pct_done": 71
+   "criteria_done": 25,
+   "pct_done": 89
   },
   {
    "code": "SBX",
@@ -228,8 +228,8 @@
    "role": "engineer",
    "stories": 4,
    "criteria": 4,
-   "criteria_done": 0,
-   "pct_done": 0
+   "criteria_done": 4,
+   "pct_done": 100
   },
   {
    "code": "USR",
@@ -756,9 +756,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "RAL-09",
@@ -766,9 +766,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "RAL-10",
@@ -776,9 +776,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "RAL-11",
@@ -876,9 +876,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "LED-01",
@@ -1236,9 +1236,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SHD-02",
@@ -1246,9 +1246,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SHD-03",
@@ -1256,9 +1256,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SHD-04",
@@ -1266,9 +1266,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "OPS-01",
@@ -1536,9 +1536,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 3,
-   "criteria_done": 0,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SBX-01",

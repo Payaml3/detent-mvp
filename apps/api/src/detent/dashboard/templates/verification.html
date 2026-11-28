@@ -31,4 +31,22 @@
     {% elif not can_request %}<p class="small muted">The account owner or an admin requests verification.</p>{% endif %}
   {% endif %}
 </section>
+<section class="card" data-section="production">
+  <h2>Production mode</h2>
+  {% if request.query_params.get('notice') == 'production' %}<p class="note" role="status">Request recorded. Production mode is not available in the prototype, so nothing has changed.</p>{% endif %}
+  <p>Production is not available in the prototype. When it is, it starts in <strong>Shadow</strong> mode: every live payment is decided and nothing is sent. Moves to Assist and Auto need a signed mode gate (30-day agreement and zero unsafe approvals). No live key is ever issued here.</p>
+  <ul>
+    <li>Integration verified: {% if prod.verified %}<span class="st st-confirmed">yes</span>{% else %}<span class="st st-held">not yet</span>{% endif %}</li>
+    <li>Rule set signed off by your compliance lead: {% if prod.rules_signed %}<span class="st st-confirmed">yes</span> (version {{ prod.policy_version }}){% else %}<span class="st st-held">not yet</span> (activate a rule version with the compliance lead's attestation){% endif %}</li>
+  </ul>
+  {% if prod.request %}
+    <p><span class="st">recorded</span> on {{ prod.request.requested_at.strftime('%Y-%m-%d %H:%M') }} UTC, for rule version {{ prod.request.policy_version }}.</p>
+  {% elif can_request_production and not lock %}
+  <form method="post" action="/dashboard/production/request">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <button{% if not prod.ready %} disabled{% endif %}>Request production mode</button>
+    <span class="small muted">Not available in the prototype: the request is recorded.</span>
+  </form>
+  {% elif not can_request_production %}<p class="small muted">The account owner requests production mode.</p>{% endif %}
+</section>
 {% endblock %}
