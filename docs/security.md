@@ -104,6 +104,13 @@ Tests:
 - `integration/test_audit.py::test_tampering_is_detected`
 - `integration/test_audit_cli.py::test_verify_command`
 - `integration/test_audit.py::test_chain_appends_and_verifies`
+- `integration/test_audit.py::test_rolled_back_change_leaves_no_audit_event`
+- `integration/test_agent_submit.py::test_an_agent_payment_audits_every_step_on_one_verified_chain`
+- `integration/test_intents_api.py::test_every_step_is_audited_and_the_chain_verifies`
+- `integration/test_ledger.py::test_every_posting_is_audited_in_its_own_transaction`
+- `chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms`
+- `chain/test_kill_switch.py::test_api_engage_and_release`
+- `integration/test_rule_changes.py::test_activation_records_attestation_and_supersedes`
 - `integration/test_ledger.py::test_post_refuses_unbalanced_or_unreferenced`
 - `integration/test_ledger.py::test_database_refuses_an_unbalanced_entry_at_commit`
 - `integration/test_ledger.py::test_confirmed_payout_reserves_then_settles_with_the_actual_fee`
@@ -120,8 +127,8 @@ Tests:
 - `integration/test_api.py::test_every_response_has_a_request_id`
 - `unit/test_logging.py::test_context_ids_on_every_line`
 - `integration/test_worker.py::test_job_runs_once_and_is_done`
-- `integration/test_api.py::test_request_logs_carry_request_id_and_never_keys`
-- `unit/test_logging.py::test_keys_and_bearer_tokens_redacted`
+- `chain/test_send_once.py::test_a_send_never_logs_the_wallet_private_key`
+- `integration/test_agent_submit.py::test_an_invoice_body_is_never_logged`
 
 ### Rate limits and quotas
 
