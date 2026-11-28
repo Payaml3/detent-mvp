@@ -10,6 +10,7 @@ import pytest
 from conftest import OrgFixture, make_settings
 from detent.clock import FrozenClock
 from detent.dashboard.email import SEND_JOB, send_email
+from detent.dashboard.email_delivery import api_key
 from detent.runtime import build_runtime
 from detent.settings import Settings
 from detent.worker.loop import Worker
@@ -89,7 +90,7 @@ def test_zeptomail_sends_once_from_the_job(
     row = _row(engine, org, mid)
     assert row.sent_at is not None and row.provider_message_id == "zm_123" and row.last_error is None
     (call,) = fake.calls
-    assert call["url"] == "https://api.zeptomail.uk/v1.1/email"
+    assert call["url"] == "https://cpaas.zoho.uk/v1.1/email"
     assert call["headers"]["Authorization"] == f"Zoho-enczapikey {TOKEN}"
     body = call["json"]
     assert body["from"] == {"address": "notifications@dekernai.com", "name": "DekernAI"}
@@ -143,3 +144,10 @@ def test_zeptomail_needs_a_token(org: OrgFixture) -> None:
 
 def test_the_token_never_reaches_the_logs(org: OrgFixture) -> None:
     assert TOKEN in _live(org).secret_values()
+
+
+def test_a_token_pasted_with_its_prefix_is_not_doubled(org: OrgFixture) -> None:
+    settings = make_settings(
+        org.id, email_provider="zeptomail", zeptomail_token=SecretStr(f"Zoho-enczapikey {TOKEN}")
+    )
+    assert api_key(settings) == TOKEN
