@@ -137,6 +137,6 @@ ALL_TABLE_NAMES: frozenset[str] = frozenset(
         "incidents", "invites", "leads", "demo_clock", "wallet_nonces", "mode_changes", "watch_cursors",
         "rail_records", "bank_statements", "demo_generations", "usage_daily", "simchain_transfers",
         "verification_requests", "incident_events", "shadow_imports", "shadow_rows", "mode_gates",
-        "production_requests", "rail_connections", "user_accounts",
+        "production_requests", "rail_connections", "user_accounts", "nda_signatures",
     }
 )  # fmt: skip

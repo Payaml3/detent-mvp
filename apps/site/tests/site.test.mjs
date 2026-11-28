@@ -73,6 +73,13 @@ test("home: the AI team, the three agents with what each does and can't do; orch
   assert.match(section, /Orchestration has no agent/);
   assert.equal((section.match(/What you get/g) || []).length, 3);
   assert.equal((section.match(/What it can’t do/g) || []).length, 3);
+  // the team network shows the three layers, and each agent's message says its layer
+  const html = read(PAGES.home).split('data-section="ai-team"')[1];
+  for (const l of ["decision", "orchestration", "operations"]) assert.match(html, new RegExp(`class="layer-col" data-layer="${l}"`));
+  for (const [step, layer] of [[0, "decision"], [2, "operations"], [5, "orchestration"], [6, "operations"]]) {
+    const msg = html.split(`data-step="${step}"`)[1].split("</li>")[0];
+    assert.match(msg, new RegExp(`data-in-layer="${layer}"`));
+  }
 });
 
 test("home: the demonstration's scenarios are readable without JavaScript", () => {

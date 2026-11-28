@@ -354,8 +354,11 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   `https://app.dekernai.com/access-requests` (DSH-10); a plain form post, so the visitor lands on the dashboard's
   thank-you page. "Request access" is the site's one entry action (D-44); there is no booking page. The
   requester gets an automatic confirmation (`access_request.received`, `leads.confirmation_body`) that repeats
-  nothing they typed and lists the next steps: NDA (with the signing link once `NDA_URL` is set), commercial call,
-  then, if it fits, sandbox and dashboard access.
+  nothing they typed and lists the next steps: NDA, commercial call, then, if it fits, sandbox and dashboard access.
+- **NDA signing (D-45):** once the NDA text has no [placeholders], the confirmation carries a one-time link to
+  `/nda/<token>` (`dashboard/nda.py`): the requester reads the NDA, types name, job title and company, draws a
+  signature and ticks "I agree". The append-only `nda_signatures` row keeps the NDA version and SHA-256, time, IP
+  and user agent; copies go to the requester and the sales inbox; the admin inbox shows "NDA signed" and the record.
 - **Status page (WEB-07):** `GET /status.json` (`detent/api/status.py`) reports `sandbox_api`, `dashboard` and
   `docs` as `operational`, `down` or `not_monitored`, with `checked_at`. API and dashboard share the database check
   (one process); docs is an HTTP GET of `STATUS_DOCS_URL` (empty: not monitored). Results are reused for
@@ -380,6 +383,10 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   demo (`apps/site/src/components/AiTeam.astro`): the three AI agents, each with what it does, what the client gets
   and what it can't do, a note that orchestration has no agent, and the built-in limits. The spine's orchestration
   column now says no agent works there, matching the product (the investigation agent runs on held payout cases).
+  The section opens on an animated team channel (sample data, labelled): a network drawn in three layer columns
+  (decision, orchestration with no AI agent, operations) with the client's rules as one bar across all three, with each message travelling to the rules before the
+  next one appears, through one payment from invoice to reconciliation. Without JavaScript or with reduced motion,
+  every message shows at once.
 
 ## Needed from the founder before M8 to M11
 

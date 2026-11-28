@@ -17,9 +17,9 @@ from typing import Any
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, Response
 
-from detent.dashboard import access, leads, verification
+from detent.dashboard import access, leads, nda, verification
 from detent.dashboard.access import AccessError, Member
-from detent.dashboard.web import check_csrf, page, redirect, runtime, staff_member
+from detent.dashboard.web import Forbidden, check_csrf, page, redirect, runtime, staff_member
 from detent.db.engine import transaction
 from detent.domain.roles import Role
 from detent.runtime import Runtime
@@ -287,6 +287,38 @@ def access_request_status(
         resp.status_code = exc.status
         return resp
     return redirect("/admin/access-requests")
+
+
+@router.get("/access-requests/{lead_id}/nda", response_class=HTMLResponse)
+def access_request_nda(
+    lead_id: str,
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+) -> HTMLResponse:
+    """D-45: the signed NDA record, with the signature drawn on the page."""
+    with rt.engine.connect() as conn:
+        sig = nda.signature(conn, lead_id)
+    if sig is None:
+        raise Forbidden("No signed NDA for this access request.", status=404)
+    return page(request, rt, "admin_nda.html", staff, sig=sig)
+
+
+@router.get("/access-requests/{lead_id}/nda.png", response_model=None)
+def access_request_nda_png(
+    lead_id: str,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+) -> Response:
+    with rt.engine.connect() as conn:
+        sig = nda.signature(conn, lead_id)
+    if sig is None:
+        return Response(status_code=404)
+    return Response(
+        bytes(sig.signature_png),
+        media_type="image/png",
+        headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"},
+    )
 
 
 # ------------------------------------------------------------------------------------ verification (DSH-12)

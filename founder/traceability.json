@@ -10,14 +10,14 @@
   {
    "order": 2,
    "level": "Acceptance criteria",
-   "total": 331,
-   "done": 326,
+   "total": 332,
+   "done": 327,
    "pct": 98
   },
   {
    "order": 3,
    "level": "Criteria with test evidence",
-   "total": 331,
+   "total": 332,
    "done": 0,
    "pct": 0
   }
@@ -27,8 +27,8 @@
    "function": "00 Founder HQ",
    "measure": "Decisions resolved",
    "done": 49,
-   "total": 101,
-   "pct_done": 49
+   "total": 102,
+   "pct_done": 48
   },
   {
    "function": "03 Architecture",
@@ -54,8 +54,8 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 24,
-   "total": 24,
+   "done": 25,
+   "total": 25,
    "pct_done": 100
   }
  ],
@@ -245,8 +245,8 @@
    "initiative": "Marketing site",
    "role": "growth",
    "stories": 9,
-   "criteria": 12,
-   "criteria_done": 12,
+   "criteria": 13,
+   "criteria_done": 13,
    "pct_done": 100
   },
   {
@@ -1735,8 +1735,8 @@
    "epic": "WEB",
    "function": "06 GTM",
    "slice": "P4",
-   "criteria": 1,
-   "criteria_done": 1,
+   "criteria": 2,
+   "criteria_done": 2,
    "criteria_tested": 0,
    "status": "Done"
   },
