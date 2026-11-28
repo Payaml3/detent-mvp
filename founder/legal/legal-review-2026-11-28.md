@@ -74,3 +74,14 @@ Drafts for the solicitor sit beside this file: `privacy-notice-draft.md`, `terms
 2. Decide whether to pause the access form until the full privacy notice is live (item 1).
 3. Confirm the on-call and named-role wording, or let it be softened (item 8).
 4. Check the fictional company names on Companies House (item 15).
+
+## Founder decisions (28 Nov 2026)
+
+- **Payment licence:** not needed for now (item 6); a perimeter opinion before the first live pilot.
+- **Access form:** stays live with the interim note (item 1).
+- **Entity:** the company will be **DekernAI Ltd**, not registered yet. The founder will register it before
+  official operation and fundraising, and the footer, privacy notice and terms get its name, number and
+  registered office then (items 2 and 3). No sole-trader wording on the site in the meantime. Register it before
+  taking money, signing anything in DekernAI's name or promising equity.
+- **Announcement:** a personal LinkedIn announcement as "Founder, DekernAI" is fine before incorporation; it must
+  not say "Ltd" and must present the product as pre-launch.
