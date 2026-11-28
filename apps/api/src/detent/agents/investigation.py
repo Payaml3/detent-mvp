@@ -114,7 +114,6 @@ TOOLS: dict[str, dict[str, Any]] = {
     name: {
         "name": name,
         "description": desc + " Read-only; returns evidence records with evidence_id.",
-        "strict": True,
         "input_schema": {
             "type": "object",
             "properties": {arg: {"type": "string"}},

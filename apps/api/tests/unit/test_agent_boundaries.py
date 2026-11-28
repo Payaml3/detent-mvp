@@ -60,7 +60,9 @@ def test_agent_tools_are_read_only_except_propose() -> None:
     assert {"propose_payment_intent"} == WRITE_TOOLS
     assert {"find_counterparty", "get_destinations", "get_mandate"} <= set(TOOLS)
     for name, tool in TOOLS.items():
-        assert tool["strict"] is True and tool["input_schema"]["additionalProperties"] is False, name
+        # Not strict: strict tools plus the structured output exceed the API's grammar limit (live demo,
+        # 400 "compiled grammar is too large"); AnthropicLLM keeps only string arguments instead.
+        assert "strict" not in tool and tool["input_schema"]["additionalProperties"] is False, name
 
 
 def test_models_come_from_settings() -> None:

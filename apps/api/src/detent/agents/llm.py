@@ -44,6 +44,13 @@ def describe_error(exc: BaseException) -> str:
     return reason
 
 
+def _string_args(raw: Any) -> dict[str, str]:
+    """Tool inputs, keeping only string values. The tools are not sent as strict (with the structured
+    output that made the API's compiled grammar too large), so their input is checked here instead:
+    every tool takes string arguments, and a tool that misses one returns an error, not data."""
+    return {k: v for k, v in dict(raw or {}).items() if isinstance(k, str) and isinstance(v, str)}
+
+
 # Read-only tools the model may call while extracting; the handler runs them and returns JSON text.
 ToolHandler = Callable[[str, dict[str, Any]], str]
 
@@ -73,8 +80,9 @@ class LLMClient(Protocol):
 
 
 class AnthropicLLM:
-    """Claude through the Anthropic SDK: structured output (a JSON schema), read-only tools with
-    ``strict: true``, and the server-side refusal fallback. No sampling parameters are sent."""
+    """Claude through the Anthropic SDK: structured output (a JSON schema), read-only tools (not
+    strict; inputs are checked here), and the server-side refusal fallback.
+    No sampling parameters are sent."""
 
     MAX_TOOL_TURNS = 6
 
@@ -130,7 +138,7 @@ class AnthropicLLM:
                             {
                                 "type": "tool_result",
                                 "tool_use_id": block.id,
-                                "content": tool_handler(block.name, dict(block.input)),
+                                "content": tool_handler(block.name, _string_args(block.input)),
                             }
                         )
                 messages.append({"role": "user", "content": results})
