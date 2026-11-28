@@ -257,3 +257,10 @@ test("footer: Docs links to the published developer docs on every page", () => {
   assert.ok(config.docsUrl.startsWith("https://"));
   for (const [p, html] of allHtml()) assert.ok(html.includes(`href="${config.docsUrl}"`), p);
 });
+
+test("nav: Developers opens the developer docs portal (founder, 2026-11-28)", () => {
+  for (const [p, html] of allHtml()) {
+    const nav = html.split('aria-label="Main"')[1]?.split("</nav>")[0] ?? "";
+    assert.match(nav, new RegExp(`href="${config.docsUrl}"[^>]*>Developers<`), p);
+  }
+});
