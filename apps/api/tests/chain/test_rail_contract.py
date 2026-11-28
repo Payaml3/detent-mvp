@@ -15,6 +15,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 import pytest
 from chain_helpers import balance, needs_chain, new_wallet
+from chain_helpers import w3 as chain_w3
 from detent import devchain
 from detent.domain.money import Money
 from detent.domain.states import FailureClass
@@ -26,17 +27,22 @@ from detent.settings import TestNetworkGuardError
 pytestmark = needs_chain
 
 
-@pytest.fixture(params=["local-evm"])
+# RAL-02 and RAL-03: the same contract for each USDC rail's configuration (rail ID and confirmations from
+# fixtures/rails.yaml), on the local chain. The public testnets need funded wallets (a founder item).
+RAIL_CONFIGS = {"local-evm": 1, "base-sepolia": 1, "eth-sepolia": 2}
+
+
+@pytest.fixture(params=list(RAIL_CONFIGS))
 def adapter(request: pytest.FixtureRequest, chain: devchain.LocalChain) -> tuple[RailAdapter, str]:
     sender, key = new_wallet(chain, usdc_minor=1_000 * 10**6)
     return (
         EvmAdapter(
-            rail_id="local-evm",
+            rail_id=request.param,
             rpc_url=chain.rpc_url,
             expected_chain_id=31337,
             token_address=chain.usdc_address,
             signer=LocalKeySigner(key),
-            confirmations=1,
+            confirmations=RAIL_CONFIGS[request.param],
         ),
         sender,
     )
@@ -51,12 +57,12 @@ def intent(payee: str, amount: str = "5.00", network: str = "local-evm") -> Inte
     )
 
 
-def view(payee: str, nonce: int | None = None, amount: str = "5.00") -> AttemptView:
+def view(payee: str, nonce: int | None = None, amount: str = "5.00", rail: str = "local-evm") -> AttemptView:
     return AttemptView(
         attempt_id="att_C",
         payment_id="pay_CONTRACT",
         attempt_no=1,
-        rail_id="local-evm",
+        rail_id=rail,
         idempotency_key="pay_CONTRACT",
         amount=Money.parse(amount, "USDC"),
         destination_address=payee,
@@ -69,10 +75,12 @@ def view(payee: str, nonce: int | None = None, amount: str = "5.00") -> AttemptV
 def test_eligible_quote_health(adapter: tuple[RailAdapter, str], chain: devchain.LocalChain) -> None:
     a, _ = adapter
     payee, _ = new_wallet(chain, eth_wei=0)
-    assert a.eligible(intent(payee)).eligible
-    assert not a.eligible(intent(payee, network="eth-sepolia")).eligible
-    assert not a.eligible(intent(payee, amount="5000.00")).eligible  # more than the wallet holds
-    q = a.quote(intent(payee))
+    assert isinstance(a, EvmAdapter)
+    other = "local-evm-b" if a.rail_id != "local-evm-b" else "local-evm"
+    assert a.eligible(intent(payee, network=a.rail_id)).eligible
+    assert not a.eligible(intent(payee, network=other)).eligible
+    assert not a.eligible(intent(payee, amount="5000.00", network=a.rail_id)).eligible  # more than it holds
+    q = a.quote(intent(payee, network=a.rail_id))
     assert isinstance(q.fee_minor, int) and q.expected_seconds >= 0
     h = a.health()
     assert h.ok and h.balance == Money.parse("1000.00", "USDC")
@@ -82,8 +90,8 @@ def test_prepare_submit_status(adapter: tuple[RailAdapter, str], chain: devchain
     a, _sender = adapter
     payee, _ = new_wallet(chain, eth_wei=0)
     assert isinstance(a, EvmAdapter)
-    p = a.prepare(view(payee), nonce=a.pending_nonce())
-    v = view(payee, nonce=p.nonce)
+    p = a.prepare(view(payee, rail=a.rail_id), nonce=a.pending_nonce())
+    v = view(payee, nonce=p.nonce, rail=a.rail_id)
     v = dataclasses.replace(v, raw_tx=p.raw_tx, tx_hash=p.tx_hash)
     assert a.status(v).state == "NOT_FOUND"  # signed, not yet broadcast
     res = a.submit(v)
@@ -92,9 +100,13 @@ def test_prepare_submit_status(adapter: tuple[RailAdapter, str], chain: devchain
     for _ in range(50):  # the receipt can lag the broadcast slightly on a busy machine
         if st.state == "CONFIRMED":
             break
+        if (
+            st.state == "PENDING"
+        ):  # anvil mines on demand: give a rail that needs more confirmations its blocks
+            chain_w3(chain).provider.make_request("evm_mine", [])  # type: ignore[arg-type]
         time.sleep(0.1)
         st = a.status(v)
-    assert st.state == "CONFIRMED" and st.confirmations >= 1
+    assert st.state == "CONFIRMED" and st.confirmations >= a.confirmations
     assert balance(chain, payee) == 5_000_000
     # Re-broadcasting the same signed transaction is the same transaction: no second transfer.
     with contextlib.suppress(RailError):

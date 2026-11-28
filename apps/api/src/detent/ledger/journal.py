@@ -16,6 +16,7 @@ from typing import Literal
 
 from sqlalchemy import Connection, text
 
+from detent.audit.log import Actor, append
 from detent.clock import Clock
 from detent.domain.ids import Prefix, new_id
 from detent.domain.money import Currency
@@ -60,6 +61,9 @@ def account(
             {"o": org_id, "k": kind, "r": ref, "c": cur},
         ).scalar_one()
     )
+
+
+LEDGER = Actor.system("ledger")
 
 
 def post(
@@ -122,6 +126,25 @@ def post(
                 "c": cur,
             },
         )
+    # AUD-01: every posting is audited in the same transaction as the entry it belongs to.
+    append(
+        conn,
+        clock,
+        org_id=org_id,
+        actor=LEDGER,
+        kind="ledger.posted",
+        subject_id=payment_id or deposit_id or adjustment_of or jid,
+        payload={
+            "journal_id": jid,
+            "kind": kind,
+            "currency": cur,
+            "lines": [
+                {"account_id": ln.account_id, "side": ln.side, "amount_minor": ln.amount_minor}
+                for ln in lines
+            ],
+            "adjustment_of": adjustment_of,
+        },
+    )
     return jid
 
 

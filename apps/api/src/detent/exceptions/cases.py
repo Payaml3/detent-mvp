@@ -355,7 +355,10 @@ def approve(
     reason: str,
     screening: Screening | None = None,
     mandate_key: SecretStr | None = None,
+    allow_network_switch: bool = False,
 ) -> Resolution:
+    """Approve with a policy re-run. ``allow_network_switch`` is the human approval of a network switch
+    (RAL-07): it lets a later technical failure fail over to another network, and is audited."""
     from detent.intents.service import SEND_JOB, add_to_counters, load_org, reevaluate
 
     why = _need_reason(reason)
@@ -402,6 +405,20 @@ def approve(
             )
             return Resolution(case.id, pid, Status.ESCALATED.value, new)
         _resolve(conn, clock, org_id, case, "approved", why, actor)
+        if allow_network_switch:
+            conn.execute(
+                text("UPDATE payment_intents SET allow_network_switch=true WHERE org_id=:o AND id=:p"),
+                {"o": org_id, "p": pid},
+            )
+            append(
+                conn,
+                clock,
+                org_id=org_id,
+                actor=actor,
+                kind="payment.network_switch_approved",
+                subject_id=pid,
+                payload={"case_id": case.id, "reason": why},
+            )
         org = load_org(conn, org_id)
         awaiting = org.mode == "assist"
         p = conn.execute(

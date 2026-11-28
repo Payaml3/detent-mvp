@@ -154,3 +154,31 @@ def test_console_exports_json_html_and_pdf(
     r = api.get(f"/console/audit/evidence.json?start={clock.now().date()}&end={clock.now().date()}")
     assert [x["id"] for x in r.json()["payments"]] == [pid]
     assert api.get("/console/audit/evidence.json").status_code == 422
+
+
+def test_console_payment_detail_shows_checks_route_scores_attempts_and_timeline(
+    setup: tuple[DecisionOrg, TestClient], engine: Engine, clock: FrozenClock
+) -> None:
+    """CON-03: each check with its evidence, route candidates with scores, the attempt with its hash and
+    explorer link, ledger postings, the timeline and the replay button, on one page."""
+    from decimal import Decimal
+
+    from detent.routing.engine import Candidate, Route, store_route
+
+    d, api = setup
+    pid = approved_and_sent(api, d, engine, clock)
+    won = Candidate("banksim-fps", True, fee_minor=20, expected_seconds=5)
+    won.score = Decimal("0.1250")
+    lost = Candidate("banksim-sepa-inst", False, fee_minor=35, expected_seconds=10)
+    lost.reason = "network constraint"
+    with engine.begin() as c:
+        store_route(c, d.id, pid, Route(won, [won, lost]))
+    login(api, d.org.users[Role.REVIEWER])
+    html = api.get(f"/console/payments/{pid}").text
+    assert "<th>Evidence</th>" in html and "screening" in html
+    route = html[html.index('data-section="route"') :]
+    assert "banksim-fps" in route and "0.1250" in route and "network constraint" in route
+    assert "Chosen: <strong" in html and "lowest score 0.1250" in html
+    assert f'href="https://sepolia.basescan.org/tx/{TX}"' in html
+    assert "Ledger postings" in html and "Timeline" in html and "payment.status_changed" in html
+    assert f'href="/console/payments/{pid}/replay"' in html

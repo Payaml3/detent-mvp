@@ -41,10 +41,12 @@ FND-08:
   0: ["integration/test_api.py::test_every_response_has_a_request_id"]
   1: ["unit/test_logging.py::test_context_ids_on_every_line", "integration/test_worker.py::test_job_runs_once_and_is_done"]
   2: ["integration/test_api.py::test_request_logs_carry_request_id_and_never_keys", "unit/test_logging.py::test_keys_and_bearer_tokens_redacted"]
+  2: ["chain/test_send_once.py::test_a_send_never_logs_the_wallet_private_key", "integration/test_agent_submit.py::test_an_invoice_body_is_never_logged"]
 FND-09:
   0: ["integration/test_chain.py::test_local_chain_is_31337", "integration/test_chain.py::test_mock_usdc_has_6_decimals_and_funded_accounts",
       "integration/test_chain.py::test_write_config"]
   2: ["manual:.github/workflows/ci.yml uses no public RPC"]
+  1: ["ci:.github/workflows/ci.yml test job runs with REQUIRE_CHAIN=1 against anvil and MockUSDC", "chain/test_rail_contract.py::test_prepare_submit_status"]
 OPS-02:
   0: ["unit/test_denylist.py::test_term_in_code_docs_or_fixtures_fails", "unit/test_denylist.py::test_missing_denylist_fails_closed",
       "ci:.github/workflows/ci.yml 'independence check' job (fails until INDEPENDENCE_DENYLIST is set)"]
@@ -72,6 +74,7 @@ INT-01:
   2: ["integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing", "integration/test_intents_api.py::test_idempotency_key_is_required"]
   3: ["integration/test_intents_api.py::test_invalid_input_is_422_and_creates_nothing", "integration/test_intents_api.py::test_agent_intent_with_unknown_mandate_is_refused",
       "integration/test_intents_api.py::test_agent_intent_without_a_mandate_key_fails_closed"]
+  1: ["chain/test_retry_failover.py::test_retryable_failure_retries_with_the_same_nonce", "chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id", "integration/test_sandbox_rails.py::test_point_42_reverts_on_the_first_rail_and_fails_over_under_the_same_id", "integration/test_cases.py::test_approval_reruns_policy_and_proceeds"]
 INT-02:
   0: ["integration/test_intents_api.py::test_same_key_same_body_returns_the_original"]
   1: ["integration/test_intents_api.py::test_same_key_different_body_conflicts"]
@@ -94,6 +97,7 @@ POL-02:
   1: ["unit/test_policy_engine.py::test_precedence_block_beats_escalate", "unit/test_policy_engine.py::test_every_check_runs_even_after_a_block",
       "property/test_policy_property.py::test_precedence"]
   2: ["property/test_policy_property.py::test_same_inputs_same_decision"]
+  3: ["ci:detent eval run --suite latency (EVL-08): rules-only p95 47.8 ms locally, 2026-11-28"]
 POL-03:
   0: ["unit/test_policy_engine.py::test_kyb"]
   1: ["unit/test_policy_engine.py::test_not_allowlisted_escalates", "integration/test_intents_api.py::test_nova_escalates"]
@@ -119,6 +123,7 @@ POL-09:
 AUD-01:
   1: ["integration/test_audit_cli.py::test_trigger_rejects_update_and_delete", "integration/test_audit.py::test_tampering_is_detected"]
   2: ["integration/test_audit_cli.py::test_verify_command", "integration/test_audit.py::test_chain_appends_and_verifies"]
+  0: ["integration/test_audit.py::test_rolled_back_change_leaves_no_audit_event", "integration/test_agent_submit.py::test_an_agent_payment_audits_every_step_on_one_verified_chain", "integration/test_intents_api.py::test_every_step_is_audited_and_the_chain_verifies", "integration/test_ledger.py::test_every_posting_is_audited_in_its_own_transaction", "chain/test_send_once.py::test_execute_payout_sends_one_transfer_and_confirms", "chain/test_kill_switch.py::test_api_engage_and_release", "integration/test_rule_changes.py::test_activation_records_attestation_and_supersedes"]
 API-01:
   0: ["integration/test_intents_api.py::test_requests_need_a_valid_key", "integration/test_intents_api.py::test_wrong_scope_is_403"]
   1: ["integration/test_intents_api.py::test_wrong_scope_is_403", "integration/test_api.py::test_live_keys_are_always_rejected"]
@@ -159,6 +164,7 @@ EXE-03:
       "chain/test_send_once.py::test_fresh_decision_is_not_rerun"]
   2: ["chain/test_send_once.py::test_kill_switch_holds_before_sending", "chain/test_send_once.py::test_insufficient_balance_holds_before_sending",
       "chain/test_send_once.py::test_prefunded_daily_limit_holds"]
+  0: ["chain/test_send_once.py::test_kill_switch_holds_before_sending", "chain/test_send_once.py::test_insufficient_balance_holds_before_sending", "chain/test_send_once.py::test_prefunded_daily_limit_holds", "integration/test_mandates.py::test_revocation_blocks_an_approved_intent_before_sending"]
 EXE-04:
   0: ["chain/test_send_once.py::test_nonce_and_signed_tx_are_stored_before_broadcast"]
   1: ["chain/test_send_once.py::test_nonce_disagreement_refuses_to_send", "chain/test_worker_send.py::test_worker_startup_reconciles_nonces"]
@@ -180,12 +186,14 @@ POL-05:
 POL-06:
   0: ["integration/test_transition.py::test_terminal_states_never_change", "integration/test_schema.py::test_terminal_payment_status_is_frozen"]
   2: ["unit/test_policy_engine.py::test_resubmission_after_block_escalates"]
+  1: ["integration/test_cases.py::test_api_approving_a_blocked_payment_is_409", "integration/test_cases.py::test_send_cancel_and_retry_on_a_blocked_payment_change_nothing", "chain/test_retry_failover.py::test_a_block_never_reaches_routing"]
 EXC-08:
   0: ["integration/test_exceptions_api.py::test_filters_and_paging", "integration/test_exceptions_api.py::test_approving_needs_the_approve_scope"]
   1: ["integration/test_cases.py::test_api_approval_errors", "integration/test_cases.py::test_parallel_approvals_through_api_and_console", "integration/test_cases.py::test_initiator_cannot_approve"]
 EXC-01:
   0: ["integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline", "integration/test_cases.py::test_owner_is_the_reviewer_with_fewest_open_cases"]
   2: ["integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline", "integration/test_cases.py::test_approval_reruns_policy_and_proceeds"]
+  1: ["integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline", "integration/test_cases.py::test_other_payout_gets_tier_2_and_four_hours", "integration/test_deposits.py::test_each_mismatch_goes_to_suspense_and_opens_a_deposit_exception", "integration/test_deposits.py::test_business_days_skip_weekends"]
 EXC-02:
   0: ["integration/test_console_review.py::test_case_page_shows_raw_facts_first"]
   1: ["integration/test_console_review.py::test_case_page_shows_raw_facts_first"]
@@ -199,6 +207,7 @@ EXC-05:
   1: ["integration/test_cases.py::test_parallel_approvals_through_api_and_console"]
 EXC-07:
   1: ["integration/test_console_review.py::test_outbox_lists_assignment_notices", "manual:the prototype has no email provider; outbox rows are never sent"]
+  0: ["integration/test_deadlines.py::test_overdue_case_is_held_counterparty_told_and_backup_owner_takes_over", "integration/test_cases.py::test_escalation_opens_a_case_with_owner_tier_and_deadline", "integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies"]
 CON-01:
   0: ["integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording", "integration/test_console_review.py::test_unbuilt_sections_say_so"]
   1: ["integration/test_console_review.py::test_every_page_has_the_banner_nav_and_honest_wording"]
@@ -227,6 +236,7 @@ EXE-08:
   3: ["chain/test_kill_switch.py::test_console_banner_and_buttons", "chain/test_kill_switch.py::test_kill_switch_stops_a_batch_and_release_resumes_it"]
 RAL-03:
   0: ["unit/test_s4_config.py::test_eth_sepolia_has_its_own_fee_profile_and_threshold"]
+  1: ["chain/test_rail_contract.py::test_eligible_quote_health", "chain/test_rail_contract.py::test_prepare_submit_status", "chain/test_rail_contract.py::test_adapter_refuses_a_non_test_chain"]
 RAL-04:
   0: ["integration/test_banksim.py::test_contract", "integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted"]
   1: ["integration/test_banksim.py::test_settlement_callback", "integration/test_banksim.py::test_detent_sends_a_euro_payout_on_the_bank_rail"]
@@ -245,6 +255,7 @@ RAL-07:
   0: ["chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id", "chain/test_unknown.py::test_stuck_opens_a_case_and_cancel_by_replacement_resolves_it"]
   1: ["integration/test_banksim.py::test_rail_rejection_is_never_retried_or_rerouted", "chain/test_retry_failover.py::test_a_block_never_reaches_routing"]
   3: ["chain/test_retry_failover.py::test_reverted_transaction_fails_over_under_the_same_payment_id"]
+  2: ["integration/test_sandbox_rails.py::test_point_42_without_a_network_switch_ends_failed", "chain/test_retry_failover.py::test_no_failover_without_permission", "integration/test_sandbox_rails.py::test_an_approver_can_allow_the_network_switch_and_it_is_audited", "integration/test_mandates.py::test_a_mandate_can_allow_a_network_switch_only_inside_its_networks"]
 CON-08:
   0: ["integration/test_console_rails.py::test_rails_screen"]
 DEM-02:
@@ -280,6 +291,7 @@ AGT-04:
   1: ["unit/test_policy_engine.py::test_checks_never_see_free_text"]
   2: ["integration/test_instruction_agent.py::test_each_fixture_gives_its_expected_fields_and_flags",
       "integration/test_agent_submit.py::test_injected_invoice_submits_only_what_the_document_says"]
+  3: ["ci:detent eval run --suite attacks: injection-fields.yaml and injection-invoice-body.yaml pass (129 of 129 attacks, 2026-11-28)"]
 AGT-05:
   0: ["integration/test_instruction_agent.py::test_every_call_is_recorded_and_replay_never_calls_the_model"]
   1: ["integration/test_instruction_agent.py::test_every_call_is_recorded_and_replay_never_calls_the_model"]
@@ -289,6 +301,7 @@ AGT-06:
   2: ["integration/test_instruction_agent.py::test_over_budget_returns_needs_human_without_calling_the_model"]
 CON-05:
   1: ["integration/test_agent_submit.py::test_console_invoice_drop_and_submit"]
+  0: ["integration/test_agent_submit.py::test_console_invoice_drop_reads_a_pdf", "integration/test_agent_submit.py::test_console_invoice_drop_and_submit", "integration/test_agent_submit.py::test_console_flagged_invoice_shows_flags_and_blocks_submit"]
 POL-07:
   0: ["integration/test_rule_changes.py::test_draft_does_not_change_the_active_version", "integration/test_console_operations.py::test_policy_screen_propose_diff_and_two_person_activation", "unit/test_policy_diff.py::test_diff_lists_changed_paths_with_old_and_new_values"]
   1: ["integration/test_rule_changes.py::test_proposer_cannot_approve_their_own_draft", "integration/test_rule_changes.py::test_compliance_lead_must_be_one_of_the_two", "integration/test_rule_changes.py::test_roles_outside_the_leads_cannot_propose_or_approve", "unit/test_policy_diff.py::test_each_loosening_kind_is_detected", "unit/test_policy_diff.py::test_tightening_is_not_loosening"]
@@ -335,6 +348,7 @@ LED-06:
   1: ["integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix"]
   2: ["integration/test_reconciliation.py::test_fixes_apply_only_after_approval_as_new_entries", "integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix"]
   3: ["integration/test_reconciliation.py::test_500_items_match_at_least_99_percent_and_every_break_gets_a_fix"]
+  4: ["chain/test_demo_batch_recon.py::test_demo_batch_credits_once_and_dep07_is_the_only_break"]
 LED-07:
   0: ["integration/test_reconciliation.py::test_statement_import_is_idempotent_per_date_json_and_csv"]
 AUD-02:
@@ -519,3 +533,5 @@ CON-11:
   2: ["integration/test_ai_team.py::test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide", "integration/test_ai_team.py::test_a_dashboard_member_reaches_the_ai_team_without_demo_links"]
 WEB-09:
   0: ["ci:apps/site/tests/site.test.mjs home: the AI team, the three agents with what each does and can't do; orchestration has none (CON-11)", "ci:apps/site/tests/site.test.mjs home: the sections of docs/design/landing-page-ux.md, in order"]
+CON-03:
+  0: ["integration/test_evidence.py::test_console_payment_detail_shows_checks_route_scores_attempts_and_timeline", "integration/test_console_review.py::test_payments_list_and_detail"]

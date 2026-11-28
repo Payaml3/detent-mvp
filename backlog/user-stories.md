@@ -102,7 +102,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 
 - [x] Every HTTP request gets a `request_id`, returned in the `Request-Id` header
 - [x] Log lines include `payment_id` when one is in context
-- [ ] Keys, secrets, full wallet private data and invoice bodies are never logged (tested with a log capture)
+- [x] Keys, secrets, full wallet private data and invoice bodies are never logged (tested with a log capture)
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** B5.security, B3.incident
 
@@ -113,7 +113,7 @@ _A tested, deployable skeleton with the safety guards in place from day one_ · 
 **Acceptance criteria**
 
 - [x] `make chain` starts anvil and deploys MockUSDC; addresses are written to a test config
-- [ ] The EVM adapter runs its contract tests against the local chain in CI
+- [x] The EVM adapter runs its contract tests against the local chain in CI
 - [x] Public testnets are used only in nightly runs and the live demo
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S0 Foundation (done) · **Depends on:** FND-01 · **Traces to:** L3, A5.gate
@@ -129,7 +129,7 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 **Acceptance criteria**
 
 - [x] POST /v1/payment_intents returns 201 with a `pay_` ID, the decision and the status
-- [ ] The payment ID is assigned once and never changes through retries, failovers or approvals
+- [x] The payment ID is assigned once and never changes through retries, failovers or approvals
 - [x] Invalid input returns 422 with the standard error body and no intent is created
 - [x] `source` is `platform` or `agent`; `agent` requires a `mandate_id`
 
@@ -207,7 +207,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 - [x] Each check returns PASS, ESCALATE or BLOCK with a reason code, parameters and evidence references
 - [x] Final decision: BLOCK if any check blocks; else ESCALATE if any escalates; else EXECUTE
 - [x] Same inputs and rule version always give the same decision (property-based test)
-- [ ] Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08)
+- [x] Rules-only evaluation p95 under 50 ms locally (benchmark in EVL-08)
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S1 A platform payout is decided through the API (done) · **Depends on:** POL-01, INT-01 · **Traces to:** A2.Decide, A6.block_final, A1.reviews
 
@@ -258,7 +258,7 @@ _A deterministic, versioned, client-owned policy layer decides execute, escalate
 **Acceptance criteria**
 
 - [x] BLOCKED has no outgoing transitions in the state machine and a database trigger rejects any status change away from it
-- [ ] Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked`
+- [x] Approve, retry, reroute or resubmit on a blocked payment returns 409 `payment_blocked`
 - [x] A new intent to the same counterparty or the same destination address within 24 h of a block, whatever the amount, is escalated RESUBMISSION_AFTER_BLOCK with a link to the blocked one (D-10)
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** POL-02, EXE-01 · **Traces to:** A6.block_final, A2b.rule, L5
@@ -383,7 +383,7 @@ _An AI agent can propose payments from invoices, only inside a signed mandate, a
 - [x] Untrusted text reaches the model only inside delimited data blocks, after the instructions, with an explicit data-only rule
 - [x] The policy never reads agent free text; it reads only typed fields
 - [x] Instruction-like content in a document is reported as a `possible_injection` flag and never followed
-- [ ] All injection scenarios in the attack suite pass (EVL-02)
+- [x] All injection scenarios in the attack suite pass (EVL-02)
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** AGT-01 · **Traces to:** A5.injection, L2, B6.ai
 
@@ -445,7 +445,7 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid
+- [x] Inside the lock: kill switch off, source balance covers amount plus fees or gas, the wallet's daily pre-funded limit has room, mandate valid
 - [x] If the decision is older than the configured age or the rule version changed, policy re-runs first
 - [x] Any failed check moves the payment to HELD with the reason; nothing is sent
 
@@ -571,7 +571,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 **Acceptance criteria**
 
 - [x] Shares an EVM base class with RAL-02; its own fee profile and confirmation threshold
-- [ ] Contract tests pass
+- [x] Contract tests pass
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** RAL-02 · **Traces to:** A2.Connect
 
@@ -619,7 +619,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 - [x] Failover needs the previous attempt definitively FAILED with a technical code; never from UNKNOWN
 - [x] Never after BLOCK or REJECTED_BY_RAIL
-- [ ] Network switches need `allow_network_switch` on the intent or mandate, or a human approval
+- [x] Network switches need `allow_network_switch` on the intent or mandate, or a human approval
 - [x] The new attempt keeps the payment ID
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S4 Never paid twice (done) · **Depends on:** RAL-06, EXE-07 · **Traces to:** A2.Route, A6.block_final, L5, A1.cost
@@ -678,7 +678,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 **Acceptance criteria**
 
 - [x] Owner assignment rules by case type and amount, in config
-- [ ] Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions)
+- [x] Deadlines by tier from config (defaults: 2 h for payouts above the auto limit, 1 business day for deposit exceptions)
 - [x] Statuses OPEN, HELD_OVERDUE, RESOLVED; every change audited
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** POL-02, FND-05 · **Traces to:** A2.Exceptions, B3.exceptions
@@ -747,7 +747,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Counterparty updates, owner assignments and incident notices are stored with recipient, template and body
+- [x] Counterparty updates, owner assignments and incident notices are stored with recipient, template and body
 - [x] Nothing in the prototype sends real email
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** FND-03 · **Traces to:** B3.exceptions
@@ -845,7 +845,7 @@ _One ledger across rails; deposits credited once; mismatches become exceptions w
 - [x] Each break becomes an exception with a fix drafted by the reconciliation agent (for example, credit account X, or return to sender)
 - [x] A fix is applied only after human approval, as a new adjustment entry
 - [x] On a generated set of 500 synthetic deposits and payouts with 3 designed breaks, automatic matching is 99% or more and each break gets a proposed fix
-- [ ] The demo batch (20 payouts, 8 deposits) shows exactly one designed break, dep-07
+- [x] The demo batch (20 payouts, 8 deposits) shows exactly one designed break, dep-07
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S7 One ledger, deposits credited once, reconciliation, replay (done) · **Depends on:** LED-02, LED-05, LED-07, EXC-01 · **Traces to:** A2.Reconcile, L7, B7.recon
 
@@ -879,7 +879,7 @@ _Every step is recorded append-only and any payment can be replayed and exported
 
 **Acceptance criteria**
 
-- [ ] Events written in the same transaction as the change they describe: intent, agent output, decision with rule version and checks, case events, approvals, transitions, rail requests and responses, postings, kill switch, policy changes
+- [x] Events written in the same transaction as the change they describe: intent, agent output, decision with rule version and checks, case events, approvals, transitions, rail requests and responses, postings, kill switch, policy changes
 - [x] A database trigger rejects UPDATE and DELETE on audit rows
 - [x] Each row stores a hash of the previous row; `detent audit verify` detects a tampered row (tested)
 
@@ -940,7 +940,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button
+- [x] Each check with result, reason and evidence; route candidates and scores; attempts with hash and explorer link; ledger postings; timeline; replay button
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** S3 Escalate, review raw facts, approve with a policy re-run (done) · **Depends on:** CON-01, AUD-01 · **Traces to:** A2.Prove, A2.Decide
 
@@ -960,7 +960,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force
+- [x] Upload text or PDF; extracted fields with confidence and highlighted source text; flags; the mandate in force
 - [x] 'Submit as agent' calls the public API with the agent's key and shows the decision
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** S5 An AI agent proposes the $18,500 invoice inside a mandate (done) · **Depends on:** CON-01, AGT-02, MND-02 · **Traces to:** MVP.flow, A5.proposes
@@ -1283,7 +1283,7 @@ _A provider-grade API: keys, scopes, errors, versioning, limits, logs, OpenAPI_ 
 
 - [x] `Authorization: Bearer sk_test_...`; keys hashed at rest; scopes read, intents:create, exceptions:approve, admin
 - [x] Wrong scope -> 403 `insufficient_scope`; live keys -> 403 `live_mode_unavailable`
-- [ ] Every data access filters by the key's organisation (cross-organisation tests in EVL-02)
+- [x] Every data access filters by the key's organisation (cross-organisation tests in EVL-02)
 
 **Priority:** Must · **Estimate:** 0.75 d · **Milestone:** P1 Public sandbox API and webhooks · **Depends on:** FND-03 · **Traces to:** D.keys, D.standards, B5.security
 

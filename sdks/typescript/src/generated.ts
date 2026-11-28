@@ -20,6 +20,11 @@ export interface AmountIn {
   currency: Currency;
 }
 
+export interface ApprovalIn {
+  reason: string;
+  allow_network_switch?: boolean;
+}
+
 export type Currency = "USDC" | "GBP" | "EUR";
 
 export interface Decision {
@@ -260,7 +265,7 @@ export class Exceptions {
   constructor(private readonly client: Requester) {}
 
   /** Approve an exception (re-runs the policy) (`POST /v1/exceptions/{case_id}/approve`). */
-  approve(caseId: string, params: ResolutionIn): Promise<Resolution> {
+  approve(caseId: string, params: ApprovalIn): Promise<Resolution> {
     return this.client.request<Resolution>({ method: "POST", path: `/v1/exceptions/${encodeURIComponent(String(caseId))}/approve`, body: params });
   }
 

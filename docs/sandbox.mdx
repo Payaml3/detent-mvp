@@ -17,7 +17,7 @@ mainnet, a real bank or real money.
 | Input | What happens |
 |---|---|
 | Amount ending in `.13` (for example `90.13`) | The rail takes the payout but the answer is lost (`timeout_after_forward`). The attempt is UNKNOWN, then CONFIRMED from the rail's evidence a few seconds later. Nothing is sent twice |
-| Amount ending in `.42` | The first rail's transaction reverts (`receipt_status_0`): the attempt FAILS with `TECHNICAL_FINAL`. If the intent sets `"allow_network_switch": true` and the payee has a verified destination on the other network, the payout fails over under the same payment ID; otherwise it is FAILED_FINAL |
+| Amount ending in `.42` | The first rail's transaction reverts (`receipt_status_0`): the attempt FAILS with `TECHNICAL_FINAL`. If the intent sets `"allow_network_switch": true` (or its mandate does, or an approver approved the switch) and the payee has a verified destination on the other network, the payout fails over under the same payment ID; otherwise it is FAILED_FINAL |
 | Payee wallet `0x000000000000000000000000000000000000dEaD` (fixture payee `cpt_flagged`) | A screening hit: BLOCK `SCREENING_HIT`. A block is final |
 | Payee not on your allowlist, or a first payment to a payee | ESCALATE `NOT_ALLOWLISTED` or `FIRST_PAYMENT` |
 | An agent payout above its mandate's per-payment limit | BLOCK `MANDATE_AMOUNT_EXCEEDED` |

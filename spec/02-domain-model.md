@@ -130,7 +130,7 @@ As built (S8, migration 0008): the `attempt_ready_guard` trigger refuses an atte
 | `journal_entries`, `postings` | Balanced double entry; postings reference payment, deposit or adjustment IDs | Append-only |
 | `recon_runs`, `recon_breaks` | Run stats; each break has a proposed fix, status and approver | |
 | `agent_calls` | id, kind, subject_id, model, prompt_version, input_hash, raw_output, parsed jsonb, tokens, latency_ms | Used by replay |
-| `audit_events` | id, org_id, seq, at, actor, actor_role, kind, subject_id, payload jsonb, prev_hash, hash | Append-only (UPDATE, DELETE and TRUNCATE raise), hash-chained per org. Payloads are JSON-native with no floats |
+| `audit_events` | id, org_id, seq, at, actor, actor_role, kind, subject_id, payload jsonb, prev_hash, hash | Append-only (UPDATE, DELETE and TRUNCATE raise), hash-chained per org. Payloads are JSON-native with no floats. Every ledger entry also writes `ledger.posted` (journal ID, kind, currency, lines) in its transaction (AUD-01) |
 | `audit_heads` | org_id, seq, hash | Head of each chain; appending locks it, so `seq` has no gaps |
 | `demo_clock` | org_id, offset_seconds | Demo-mode clock offset (FND-05) |
 | `mode_changes` | id, org_id, from_mode, to_mode, reason, proposed_by, proposed_role, approved_by, approved_role, status (proposed, applied, withdrawn) | One lead proposes, the other approves (EXE-09, C-09); at most one open proposal |

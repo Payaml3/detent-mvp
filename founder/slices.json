@@ -265,21 +265,21 @@
    "epic": "FND",
    "slice": "S0",
    "criteria": 3,
-   "done": 2
+   "done": 3
   },
   {
    "id": "FND-09",
    "epic": "FND",
    "slice": "S0",
    "criteria": 3,
-   "done": 2
+   "done": 3
   },
   {
    "id": "INT-01",
    "epic": "INT",
    "slice": "S1",
    "criteria": 4,
-   "done": 3
+   "done": 4
   },
   {
    "id": "INT-02",
@@ -321,7 +321,7 @@
    "epic": "POL",
    "slice": "S1",
    "criteria": 4,
-   "done": 3
+   "done": 4
   },
   {
    "id": "POL-03",
@@ -349,7 +349,7 @@
    "epic": "POL",
    "slice": "S3",
    "criteria": 3,
-   "done": 2
+   "done": 3
   },
   {
    "id": "POL-07",
@@ -419,7 +419,7 @@
    "epic": "AGT",
    "slice": "S5",
    "criteria": 4,
-   "done": 3
+   "done": 4
   },
   {
    "id": "AGT-05",
@@ -454,7 +454,7 @@
    "epic": "EXE",
    "slice": "S2",
    "criteria": 3,
-   "done": 2
+   "done": 3
   },
   {
    "id": "EXE-04",
@@ -524,7 +524,7 @@
    "epic": "RAL",
    "slice": "S4",
    "criteria": 2,
-   "done": 1
+   "done": 2
   },
   {
    "id": "RAL-04",
@@ -552,7 +552,7 @@
    "epic": "RAL",
    "slice": "S4",
    "criteria": 4,
-   "done": 3
+   "done": 4
   },
   {
    "id": "RAL-08",
@@ -587,7 +587,7 @@
    "epic": "EXC",
    "slice": "S3",
    "criteria": 3,
-   "done": 2
+   "done": 3
   },
   {
    "id": "EXC-02",
@@ -629,7 +629,7 @@
    "epic": "EXC",
    "slice": "S3",
    "criteria": 2,
-   "done": 1
+   "done": 2
   },
   {
    "id": "EXC-08",
@@ -685,7 +685,7 @@
    "epic": "LED",
    "slice": "S7",
    "criteria": 5,
-   "done": 4
+   "done": 5
   },
   {
    "id": "LED-07",
@@ -706,7 +706,7 @@
    "epic": "AUD",
    "slice": "S1",
    "criteria": 3,
-   "done": 2
+   "done": 3
   },
   {
    "id": "AUD-02",
@@ -741,7 +741,7 @@
    "epic": "CON",
    "slice": "S3",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "CON-04",
@@ -755,7 +755,7 @@
    "epic": "CON",
    "slice": "S5",
    "criteria": 2,
-   "done": 1
+   "done": 2
   },
   {
    "id": "CON-06",
@@ -958,7 +958,7 @@
    "epic": "API",
    "slice": "P1",
    "criteria": 3,
-   "done": 2
+   "done": 3
   },
   {
    "id": "API-02",

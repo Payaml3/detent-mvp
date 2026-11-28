@@ -498,6 +498,18 @@ def _validate_refs(conn: Connection, c: _Ctx) -> str | None:
     return req.counterparty_id
 
 
+def _mandate_allows_switch(conn: Connection, org_id: str, req: IntentRequest) -> bool:
+    """RAL-07: an agent intent may switch networks when its signed mandate says so
+    (``scope.allow_network_switch``); routing still keeps the switch inside the mandate's networks."""
+    if req.source != "agent" or not req.mandate_id:
+        return False
+    v = conn.execute(
+        text("SELECT payload->'scope'->>'allow_network_switch' FROM mandates WHERE org_id=:o AND id=:m"),
+        {"o": org_id, "m": req.mandate_id},
+    ).scalar_one_or_none()
+    return v == "true"
+
+
 def _insert_intent(conn: Connection, clock: Clock, c: _Ctx, cpt: str | None, dest_id: str | None) -> str:
     now = clock.now()
     pid = new_id(Prefix.PAY, now)
@@ -524,7 +536,7 @@ def _insert_intent(conn: Connection, clock: Clock, c: _Ctx, cpt: str | None, des
             "a": amount.amount_minor,
             "cur": amount.currency.value,
             "net": c.req.destination.network,
-            "sw": c.req.allow_network_switch,
+            "sw": c.req.allow_network_switch or _mandate_allows_switch(conn, c.org_id, c.req),
             "ref": c.req.reference,
             "notes": c.req.notes,
             "tr": json.dumps(c.req.travel_rule) if c.req.travel_rule is not None else None,

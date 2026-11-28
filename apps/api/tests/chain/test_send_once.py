@@ -282,3 +282,20 @@ def test_new_rule_version_reruns_policy_before_sending(
             {"o": co.id, "p": pid},
         ).all()
     assert [(r.outcome, r.version) for r in rows] == [("EXECUTE", 1), ("ESCALATE", 2)]
+
+
+def test_a_send_never_logs_the_wallet_private_key(
+    engine: Engine, clock: FrozenClock, co: ChainOrg, caplog: pytest.LogCaptureFixture
+) -> None:
+    """FND-08: a full send, with every logger at DEBUG, never writes the sending wallet's private key."""
+    import logging
+
+    from detent.logging import JsonFormatter
+
+    caplog.set_level(logging.DEBUG)
+    pid = co.payout(engine, clock, "12.00")
+    assert send(engine, clock, co, pid) == "CONFIRMED"
+    key = co.adapter._signer._account.key.hex().removeprefix("0x").lower()  # type: ignore[attr-defined]
+    fmt = JsonFormatter()
+    lines = [fmt.format(r).lower() for r in caplog.records]
+    assert lines and all(key not in line for line in lines)

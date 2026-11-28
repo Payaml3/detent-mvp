@@ -35,6 +35,10 @@ class NotCancellable(CancelError):
     pass
 
 
+class PaymentIsBlocked(CancelError):
+    code = "payment_blocked"  # POL-06: a block is final; nothing about the payment changes
+
+
 class PaymentMissing(CancelError):
     status = 404
     code = "not_found"
@@ -66,6 +70,8 @@ def cancel_intent(
         if row is None:
             raise PaymentMissing(f"no payment {payment_id}")
         status = Status(row.status)
+        if status is Status.BLOCKED:
+            raise PaymentIsBlocked(f"payment {payment_id} is BLOCKED; a block is final")
         if status not in CANCELLABLE:
             raise NotCancellable(
                 f"payment {payment_id} is {status.value}; only ESCALATED, HELD or READY can be cancelled"

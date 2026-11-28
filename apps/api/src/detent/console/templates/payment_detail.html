@@ -45,7 +45,17 @@
 
 <h2>Route</h2>
 {% set last = p.decisions[-1] if p.decisions else None %}
-{% if last and last.route %}<pre class="mono">{{ last.route }}</pre>{% else %}<p class="muted">Rail chosen from the destination network: {{ p.destination.network }}. Scored routing arrives with RAL-06.</p>{% endif %}
+{% if last and last.route %}
+<p>Chosen: <strong class="mono">{{ last.route.chosen or 'none' }}</strong> ({{ last.route.reason }})</p>
+<table data-section="route">
+  <thead><tr><th>Rail</th><th>Eligible</th><th>Reason</th><th>Score</th><th>Fee (minor)</th><th>Expected seconds</th><th>Success rate</th><th>Liquidity headroom</th></tr></thead>
+  <tbody>
+  {% for c in last.route.candidates %}
+    <tr><td class="mono">{{ c.rail }}</td><td>{{ 'yes' if c.eligible else 'no' }}</td><td>{{ c.reason or '' }}</td><td class="mono">{{ c.score or '' }}</td><td class="mono">{{ c.fee_minor }}</td><td class="mono">{{ c.expected_seconds }}</td><td class="mono">{{ c.success_rate }}</td><td class="mono">{{ c.liquidity_headroom }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}<p class="muted">Not routed yet. The rail is chosen just before sending; the destination network is {{ p.destination.network }}.</p>{% endif %}
 
 <h2>Attempts</h2>
 <table>

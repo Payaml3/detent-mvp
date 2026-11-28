@@ -269,6 +269,8 @@ def confirm_send(engine: Engine, clock: Clock, *, org_id: str, payment_id: str, 
         ).one_or_none()
         if p is None:
             raise ModeError(f"no payment {payment_id}", status=404, code="not_found")
+        if p.status == Status.BLOCKED.value:  # POL-06: a block is final
+            raise ModeError(f"payment {payment_id} is BLOCKED; a block is final", code="payment_blocked")
         if p.status != Status.READY.value or not p.awaiting_send_click:
             raise ModeError(f"payment {payment_id} is {p.status} and not waiting for a Send click")
         if p.initiated_by == actor.id:

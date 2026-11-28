@@ -204,6 +204,63 @@ def test_console_invoice_drop_and_submit(engine: Engine, d: DecisionOrg, client:
     assert "ESCALATED" in out and "FIRST_PAYMENT" in out
 
 
+def _pdf(text_doc: str) -> bytes:
+    """A minimal one-page PDF with the text as lines (no PDF library needed)."""
+    esc = [ln.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)") for ln in text_doc.splitlines()]
+    stream = "BT /F1 9 Tf 11 TL 40 800 Td " + " ".join(f"({ln}) Tj T*" for ln in esc) + " ET"
+    objs = [
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R "
+        "/Resources << /Font << /F1 5 0 R >> >> >>",
+        f"<< /Length {len(stream.encode('latin-1'))} >>\nstream\n{stream}\nendstream",
+        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    ]
+    out, offsets = b"%PDF-1.4\n", []
+    for i, o in enumerate(objs, 1):
+        offsets.append(len(out))
+        out += f"{i} 0 obj\n{o}\nendobj\n".encode("latin-1")
+    xref = len(out)
+    out += f"xref\n0 {len(objs) + 1}\n0000000000 65535 f \n".encode()
+    out += "".join(f"{off:010d} 00000 n \n" for off in offsets).encode()
+    out += f"trailer\n<< /Size {len(objs) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode()
+    return out
+
+
+def test_console_invoice_drop_reads_a_pdf(engine: Engine, d: DecisionOrg, client: TestClient) -> None:
+    """CON-05: a PDF invoice gives the same proposal as its text, with sources highlighted and the mandate."""
+    login(client, d.org.users[Role.REVIEWER])
+    pdf = _pdf(doc("inv-canonical-18500-usdc.txt", d))
+    r = client.post(
+        "/console/invoices", files={"file": ("invoice.pdf", pdf, "application/pdf")}, follow_redirects=False
+    )
+    assert r.status_code == 303, r.text
+    html = client.get(r.headers["location"]).text
+    assert "18500.00" in html and "<mark" in html and "No flags" in html and "%" in html
+    assert "Mandate in force" in html and "mnd_demo_ap_agent" in html
+
+
+def test_an_invoice_body_is_never_logged(
+    engine: Engine, d: DecisionOrg, client: TestClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    """FND-08: dropping and submitting an invoice, with every logger at DEBUG, never writes its text."""
+    import logging
+
+    from detent.logging import JsonFormatter
+
+    caplog.set_level(logging.DEBUG)
+    canary = "Remittance note QX7-CANARY-LOGCHECK-5521"
+    login(client, d.org.users[Role.REVIEWER])
+    body = doc("inv-canonical-18500-usdc.txt", d) + "\n" + canary + "\n"
+    r = client.post("/console/invoices", data={"text": body}, follow_redirects=False)
+    assert r.status_code == 303
+    pid = r.headers["location"].rsplit("/", 1)[1]
+    assert client.post(f"/console/invoices/{pid}/submit", follow_redirects=False).status_code == 303
+    fmt = JsonFormatter()
+    lines = [fmt.format(rec) for rec in caplog.records]
+    assert lines and all("CANARY-LOGCHECK" not in line and "INV-2026-0142" not in line for line in lines)
+
+
 def test_console_flagged_invoice_shows_flags_and_blocks_submit(
     engine: Engine, d: DecisionOrg, client: TestClient
 ) -> None:
@@ -225,3 +282,36 @@ def test_agent_payment_replays_from_stored_output_without_a_model(
     r = client.get(f"/v1/payment_intents/{pid}/replay", headers=d.auth()).json()
     assert r["match"] is True and r["model_called"] is False
     assert r["agent"]["agent_call_id"] == p.id and r["agent"]["proposal"]["amount"]["value"] == "18500.00"
+
+
+def test_an_agent_payment_audits_every_step_on_one_verified_chain(
+    agent_key: str, engine: Engine, clock: FrozenClock, d: DecisionOrg, client: TestClient
+) -> None:
+    """AUD-01: agent output, intent, decision with rule version and checks, case events, approval and
+    transitions are all audit events, and the chain verifies. Rail, posting, kill switch and policy events are
+    covered by their own tests (test-map)."""
+    from detent.audit.log import verify_chain
+    from detent.exceptions.cases import approve
+
+    p = propose(engine, clock, d, "inv-canonical-18500-usdc.txt")
+    body = submit_proposal(engine, clock, client, agent_key=agent_key, org_id=d.id, proposal_id=p.id).json()
+    approve(
+        engine,
+        clock,
+        case_id=body["exception"]["id"],
+        org_id=d.id,
+        actor=Actor(d.org.users[Role.REVIEWER], Role.REVIEWER.value),
+        reason="Invoice checked against the purchase order",
+        mandate_key=KEY,
+    )
+    with engine.connect() as c:
+        rows = c.execute(
+            text("SELECT kind, payload FROM audit_events WHERE org_id=:o ORDER BY seq"), {"o": d.id}
+        ).all()
+        assert verify_chain(c, d.id).ok
+    kinds = [r.kind for r in rows]
+    for want in ("agent.proposal_recorded", "agent.proposal_submitted", "payment.received", "decision.made",
+                 "case.opened", "case.resolved", "payment.status_changed"):  # fmt: skip
+        assert want in kinds, want
+    decided = next(r.payload for r in rows if r.kind == "decision.made")
+    assert decided["policy_version"] >= 1 and decided["checks"]

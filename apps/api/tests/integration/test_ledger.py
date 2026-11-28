@@ -167,3 +167,34 @@ def test_unknown_keeps_the_reservation(engine: Engine, clock: FrozenClock, bank:
     assert _bal(engine, bo.id)[("rail_clearing", "banksim-sepa-inst:pending")] == -10013
     assert settle(engine, clock, bo, pid) == "CONFIRMED"
     assert _kinds(engine, bo.id, pid) == ["payout.reserve", "payout.settle", "payout.fee"]
+
+
+def test_every_posting_is_audited_in_its_own_transaction(
+    engine: Engine, org: OrgFixture, clock: FrozenClock
+) -> None:
+    """AUD-01: a ledger entry writes its audit event in the same transaction; a rolled-back one leaves none."""
+
+    def entry(payment_id: str) -> str:
+        with transaction(engine) as c:
+            a = account(c, clock, org.id, "platform_operating", "platform", "EUR")
+            b = account(c, clock, org.id, "suspense", "suspense", "EUR")
+            jid = post(
+                c, clock, org_id=org.id, kind="test.entry", currency="EUR", payment_id=payment_id,
+                lines=[Line(a, "debit", 250), Line(b, "credit", 250)],
+            )  # fmt: skip
+            if payment_id == "pay_rolled_back":
+                raise RuntimeError("the change failed")
+            return jid
+
+    jid = entry("pay_audited")
+    with pytest.raises(RuntimeError):
+        entry("pay_rolled_back")
+    with engine.connect() as c:
+        rows = c.execute(
+            text("SELECT subject_id, payload FROM audit_events WHERE org_id=:o AND kind='ledger.posted'"),
+            {"o": org.id},
+        ).all()
+    assert [r.subject_id for r in rows] == ["pay_audited"]
+    p = rows[0].payload
+    assert p["journal_id"] == jid and p["kind"] == "test.entry" and p["currency"] == "EUR"
+    assert sorted(ln["side"] for ln in p["lines"]) == ["credit", "debit"]
