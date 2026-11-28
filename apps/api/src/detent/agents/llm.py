@@ -81,7 +81,8 @@ class LLMClient(Protocol):
 
 class AnthropicLLM:
     """Claude through the Anthropic SDK: structured output (a JSON schema), read-only tools (not
-    strict; inputs are checked here), and the server-side refusal fallback. No sampling parameters are sent."""
+    strict; inputs are checked here), and the server-side refusal fallback.
+    No sampling parameters are sent."""
 
     MAX_TOOL_TURNS = 6
 
