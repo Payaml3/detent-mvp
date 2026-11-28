@@ -6,6 +6,7 @@
 <div id="overview-stats" hx-get="/console/overview/stats" hx-trigger="every 5s" hx-swap="innerHTML">
   {% include "overview_stats.html" %}
 </div>
+{% include "_ai_team_map.html" %}
 <div class="layers">
   <section class="card"><h2>Decision</h2><p>Should this payment happen? Execute, escalate or block under rules you own.</p><a href="/console/policy">Rules</a> · <a href="/console/exceptions">Exceptions queue</a></section>
   <section class="card"><h2>Orchestration</h2><p>How and where does it go? Sent once, a timeout is unknown and never resent, and the kill switch stops everything.</p><a href="/console/payments">Payments</a> · <a href="/console/rails">Rails</a></section>

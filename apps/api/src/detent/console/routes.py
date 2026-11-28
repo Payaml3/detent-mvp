@@ -153,10 +153,14 @@ def overview(
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
     from detent.console.overview import overview_stats
+    from detent.views.ai_team import ai_team, team_map
 
     with rt.engine.connect() as conn:
         stats = overview_stats(conn, user.org_id, rt.clock.now())
-    return page(request, rt, "overview.html", user, s=stats)
+        team = ai_team(
+            conn, user.org_id, rt.clock.now(), daily_token_budget=rt.settings.ai_daily_token_budget
+        )
+    return page(request, rt, "overview.html", user, s=stats, tm=team_map(team))
 
 
 @router.get("/overview/stats", response_class=HTMLResponse)
@@ -784,6 +788,25 @@ def console_revoke_mandate(
     except LookupError as exc:
         raise HTTPException(status_code=404) from exc
     return RedirectResponse("/console/mandates", status_code=303)
+
+
+# ---------------------------------------------------------------------------------- CON-11 AI team
+@router.get("/agents", response_class=HTMLResponse)
+def ai_team_page(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> HTMLResponse:
+    """The client's AI team: each agent's limits, its work and what people and rules did. Read-only."""
+    from detent.views.ai_team import ai_team
+
+    with rt.engine.connect() as conn:
+        team = ai_team(
+            conn, user.org_id, rt.clock.now(), daily_token_budget=rt.settings.ai_daily_token_budget
+        )
+    s = rt.settings
+    live = s.agent_llm == "anthropic" or (s.agent_llm == "auto" and s.anthropic_api_key is not None)
+    return page(request, rt, "ai_team.html", user, team=team, live=live)
 
 
 # ---------------------------------------------------------------------------------- CON-05 invoices

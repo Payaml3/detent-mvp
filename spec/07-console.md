@@ -23,7 +23,8 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 
 | Screen | Contents | Actions | Stories |
 |---|---|---|---|
-| **Overview** | Today's decisions by outcome; share decided without a human; open and overdue cases; UNKNOWN count and oldest age; recon match rate; rail health; recent events stream | Kill switch | CON-02, EXE-08 |
+| **Overview** | The AI team map (CON-11); today's decisions by outcome; share decided without a human; open and overdue cases; UNKNOWN count and oldest age; recon match rate; rail health; recent events stream | Kill switch | CON-02, EXE-08 |
+| **AI team** | The three agents (instruction, investigation, reconciliation) as team members: job, layer, what each may and may never do, who decides, limits (mandates in force, read-only tools, the shared daily AI budget); each agent's latest work, and under each item what followed: who resolved its flags, what the policy decided, who approved or rejected the case or the fix. Says whether the agents call the Claude API or use recorded stand-in answers | — (read-only) | CON-11 |
 | **Invoice drop** | Upload area; extracted fields with confidence bars and highlighted source text; flags; mandate scope and usage | Resolve flags; "Submit as agent" | CON-05 |
 | **Payments** | Table: ID, payee, amount, rail, status, decision, created; filters | Open detail | CON-03 |
 | **Payment detail** | Header with status chip; the decision, with each check, reason and evidence; route candidates and scores; attempts (status, nonce, tx hash and explorer link); ledger postings; timeline; agent calls | Replay, Cancel, Send (assist), Export evidence | CON-03, AUD-02, AUD-03 |
@@ -117,3 +118,26 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 - **User payouts:** Payments, Payment detail, Exceptions and the case page show the user account reference and
   "user payout profile" for a payout to one of the platform's own end users. The case's raw facts show the
   platform's `user_verified` flag with who set it and when, in place of KYB and the allowlist.
+
+## As built (slice T: CON-11)
+
+- **AI team (`/console/agents`):** the client's three agents shown as their AI team, in the console navigation after
+  Overview and in the dashboard navigation (a dashboard member sees their own organisation, DSH-09). The page leads
+  with "They propose; your rules and your people decide" (invariant 5). Each agent card lists what it may do (its one
+  proposal), what it may never do (approve, send, retry, re-route, change rules, post to the ledger), who decides, and
+  its limits: the mandates in force for the instruction agent, read-only tools, and the daily AI budget the team shares.
+- **Activity and interactions:** each agent's latest 15 items from `agent_calls`, newest first, with a summary built
+  from typed fields only (amount, currency, counterparty ID, recommendation enum, fix action and target, flag codes);
+  invoice text and the model's free text stay on the detail screens (invariant 11). Under each item, what followed,
+  from the audit log: `agent.flags_resolved`, `decision.made` ("Your rules (policy vN) decided ..."),
+  `case.resolved`, `reconciliation.fix_applied`, `reconciliation.fix_rejected` and `payment.cancelled`, with the
+  person's name and role. Each item links to its case, payment or reconciliation; the invoice proposal link is hidden
+  for dashboard members (the invoice drop is demo-only).
+- **Overview team map:** the Overview opens with a map of the team in three columns, one per layer: the instruction
+  agent in decision, no AI agent in orchestration (routing, sending once and failover follow the rules only,
+  invariants 5 and 6), the investigation and reconciliation agents in operations. Each agent shows a few words on its
+  job. All connect to "Your rules", with "Your people" below. A red dashed line and dot mark an agent with work waiting for a person; beside the map,
+  "Right now" lists that work and "Latest decisions on their work" lists the last four human decisions. Each node
+  links to its agent on the AI team page. The map says "AI agents"; "agentic" stays the category word.
+- **Read-only:** the page has no form or button and writes nothing; it never calls a model (`detent/views/ai_team.py`).
+

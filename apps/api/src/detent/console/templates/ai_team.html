@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}AI team{% endblock %}
+{% block main %}
+<h1>Your AI team</h1>
+<p class="lead">Three {{ brand }} AI agents work for your team: one prepares payments, one investigates held cases, one proposes reconciliation fixes. <strong>They propose; your rules and your people decide.</strong> No agent can approve, send, retry or re-route a payment, change a rule or post to the ledger.</p>
+<p class="note" data-section="running-on">{% if live %}The agents call the Claude API.{% else %}The agents use recorded stand-in answers (prototype; not a live model call). Adding the AI key makes them call the real model; nothing else changes.{% endif %}</p>
+
+<div class="layers ai-team">
+{% for m in team %}
+<section class="card" data-agent="{{ m.profile.kind }}">
+  <div class="agent-head"><span class="avatar agent-avatar" aria-hidden="true">{{ m.profile.short }}</span>
+    <div><h2>{{ m.profile.name }}</h2><span class="muted small">{{ m.profile.layer }} layer</span></div></div>
+  <p>{{ m.profile.job }}</p>
+  <div class="stats">
+    <div class="stat"><b>{{ m.total }}</b><span>Items of work</span></div>
+    <div class="stat"><b>{{ m.needs_person }}</b><span>Handed to a person</span></div>
+  </div>
+  <p class="small muted">Last active {{ m.last_at.strftime('%Y-%m-%d %H:%M') ~ ' UTC' if m.last_at else 'never' }}</p>
+</section>
+{% endfor %}
+</div>
+
+{% for m in team %}
+<section class="card" id="{{ m.profile.kind }}" data-member="{{ m.profile.kind }}">
+  <h2>{{ m.profile.name }}</h2>
+  <div class="ai-cols">
+    <div>
+      <h3>May</h3>
+      <ul>{% for x in m.profile.may %}<li>{{ x }}</li>{% endfor %}</ul>
+      <h3>Never</h3>
+      <ul data-section="never">{% for x in m.profile.never %}<li>{{ x }}</li>{% endfor %}</ul>
+      <h3>Reads</h3>
+      <ul>{% for x in m.profile.reads %}<li>{{ x }}</li>{% endfor %}</ul>
+    </div>
+    <div>
+      <h3>Who decides</h3>
+      <p data-section="decides">{{ m.profile.decides }}</p>
+      <h3>Limits</h3>
+      <dl class="facts" data-section="limits">
+        {% for k, v in m.limits %}<dt>{{ k }}</dt><dd>{{ v }}</dd>{% endfor %}
+      </dl>
+      {% if m.accepted or m.rejected %}<p class="small">In the work below, your people accepted {{ m.accepted }} and rejected {{ m.rejected }}.</p>{% endif %}
+    </div>
+  </div>
+
+  <h3>Activity and interactions</h3>
+  {% if m.activity %}
+  <ol class="ai-feed" data-section="activity">
+    {% for a in m.activity %}
+    <li data-activity="{{ a.id }}">
+      <div class="ai-item">
+        <span class="small muted">{{ a.at.strftime('%Y-%m-%d %H:%M') }}</span>
+        <span class="st st-{{ 'submitted' if a.status == 'submitted' else 'escalated' if a.status == 'needs_human' else 'neutral' }}">{{ a.status_label }}</span>
+        <span>{{ a.summary }}</span>
+        {% if a.flags %}<span class="mono small">{{ a.flags|join(', ') }}</span>{% endif %}
+        <span class="small muted">{{ 'Claude API' if a.source == 'model' else 'recorded stand-in' if a.source == 'recording' else a.source }}</span>
+        {% if a.kind == 'instruction' and not dashboard %}<a class="small" href="/console/invoices/{{ a.id }}">Open proposal</a>{% endif %}
+        {% if a.kind == 'investigation' and a.subject_id %}<a class="small" href="/console/exceptions/{{ a.subject_id }}">Open case</a>{% endif %}
+        {% if a.kind == 'reconciliation' %}<a class="small" href="/console/reconciliation">Open reconciliation</a>{% endif %}
+        {% if a.payment_id %}<a class="small mono" href="/console/payments/{{ a.payment_id }}">{{ a.payment_id }}</a>{% endif %}
+      </div>
+      {% if a.interactions %}
+      <ul class="ai-replies">
+        {% for x in a.interactions %}
+        <li class="ai-{{ x.outcome }}"><span class="small muted">{{ x.at.strftime('%H:%M') }}</span> <strong>{{ x.who }}</strong>{% if x.role and x.role.replace('_', ' ') not in x.who %} <span class="role">{{ x.role.replace('_', ' ') }}</span>{% endif %} {{ x.what }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="small muted ai-replies">No decision yet.</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}<p class="muted">No work yet.</p>{% endif %}
+</section>
+{% endfor %}
+{% endblock %}

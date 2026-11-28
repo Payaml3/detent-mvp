@@ -25,7 +25,7 @@
       {% if dashboard %}<a class="back" href="/dashboard/">Back to the dashboard</a>{% endif %}
       <nav class="nav" aria-label="Console">
         {% for group, links in [
-             (None, [("/console/", "Overview")]),
+             (None, [("/console/", "Overview"), ("/console/agents", "AI team")]),
              ("Decision", [("/console/invoices", "Invoices"), ("/console/policy", "Policy"), ("/console/mandates", "Mandates"),
                            ("/console/counterparties", "Counterparties"), ("/console/exceptions", "Exceptions"),
                            ("/console/shadow", "Shadow")]),
