@@ -88,6 +88,32 @@ def test_an_investigation_shows_who_approved_the_case(engine: Engine, clock: Fro
     reply = member.split('class="ai-replies"', 1)[1]
     assert "Test reviewer" in reply and "approved the case" in reply
     assert "accepted 1 and rejected 0" in member
+    overview = c.get("/console/").text
+    team_map = overview.split('data-section="ai-team-map"', 1)[1].split("</section>", 1)[0]
+    assert (
+        'data-node="investigation"' in team_map
+        and "connected to your rules" in team_map
+        and "Your people" in team_map
+    )
+    assert "Test reviewer" in team_map and "approved the case" in team_map
+    assert "Nothing from the agents is waiting for a person." in team_map
+
+
+def test_the_overview_map_shows_work_waiting_for_a_person(engine: Engine, clock: FrozenClock) -> None:
+    d, c = client(engine, clock)
+    with c, engine.begin() as conn:
+        issue_mandate(conn, clock, d.id, fixture_mandate(clock, d.id), KEY, actor=Actor.system("seed"))
+    with c:
+        p = run(engine, clock, d, "inv-canonical-18500-usdc.txt")
+        with engine.begin() as conn:  # stand-in for a proposal the agent could not finish
+            conn.execute(
+                text("UPDATE agent_calls SET status='needs_human' WHERE org_id=:o AND id=:i"),
+                {"o": d.id, "i": p.id},
+            )
+        login(c, d.org.users[Role.REVIEWER])
+        team_map = c.get("/console/").text.split('data-section="ai-team-map"', 1)[1].split("</section>", 1)[0]
+    assert f'data-waiting="{p.id}"' in team_map and "ai-link-wait" in team_map
+    assert "Proposed 18500.00 USDC to cpt_bluefin" in team_map
 
 
 def test_reconciliation_fixes_show_the_payments_leads_decision(engine: Engine, clock: FrozenClock) -> None:

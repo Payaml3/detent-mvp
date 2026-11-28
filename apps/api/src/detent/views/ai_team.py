@@ -29,11 +29,13 @@ class AgentProfile:
     may: tuple[str, ...]
     never: tuple[str, ...]
     decides: str
+    short: str = ""
 
 
 ROSTER: tuple[AgentProfile, ...] = (
     AgentProfile(
         kind="instruction",
+        short="Ins",
         actor="system:instruction_agent",
         name="Instruction agent",
         layer="Decision",
@@ -45,6 +47,7 @@ ROSTER: tuple[AgentProfile, ...] = (
     ),
     AgentProfile(
         kind="investigation",
+        short="Inv",
         actor="system:investigation_agent",
         name="Investigation agent",
         layer="Operations",
@@ -56,6 +59,7 @@ ROSTER: tuple[AgentProfile, ...] = (
     ),
     AgentProfile(
         kind="reconciliation",
+        short="Rec",
         actor="system:reconciliation_agent",
         name="Reconciliation agent",
         layer="Operations",
@@ -311,3 +315,27 @@ def ai_team(
             )
         )
     return team
+
+
+@dataclass
+class TeamMap:
+    """The overview's team map: who is waiting for a person right now, and the latest hand-backs."""
+
+    members: list[TeamMember]
+    waiting: list[tuple[TeamMember, Activity]]
+    recent: list[tuple[TeamMember, Activity, Interaction]]
+
+
+def team_map(team: list[TeamMember], *, recent: int = 4) -> TeamMap:
+    waiting = [
+        (m, a)
+        for m in team
+        for a in m.activity
+        if a.status == "needs_human" and not any(x.is_person for x in a.interactions)
+    ]
+    said = sorted(
+        ((m, a, x) for m in team for a in m.activity for x in a.interactions if x.is_person),
+        key=lambda t: t[2].at,
+        reverse=True,
+    )
+    return TeamMap(team, waiting, said[:recent])

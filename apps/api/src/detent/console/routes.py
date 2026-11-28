@@ -153,10 +153,14 @@ def overview(
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
     from detent.console.overview import overview_stats
+    from detent.views.ai_team import ai_team, team_map
 
     with rt.engine.connect() as conn:
         stats = overview_stats(conn, user.org_id, rt.clock.now())
-    return page(request, rt, "overview.html", user, s=stats)
+        team = ai_team(
+            conn, user.org_id, rt.clock.now(), daily_token_budget=rt.settings.ai_daily_token_budget
+        )
+    return page(request, rt, "overview.html", user, s=stats, tm=team_map(team))
 
 
 @router.get("/overview/stats", response_class=HTMLResponse)

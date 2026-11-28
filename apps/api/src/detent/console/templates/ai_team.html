@@ -2,13 +2,13 @@
 {% block title %}AI team{% endblock %}
 {% block main %}
 <h1>Your AI team</h1>
-<p class="lead">Three {{ brand }} agents work for your team: one prepares payments, one investigates held cases, one proposes reconciliation fixes. <strong>They propose; your rules and your people decide.</strong> No agent can approve, send, retry or re-route a payment, change a rule or post to the ledger.</p>
+<p class="lead">Three {{ brand }} AI agents work for your team: one prepares payments, one investigates held cases, one proposes reconciliation fixes. <strong>They propose; your rules and your people decide.</strong> No agent can approve, send, retry or re-route a payment, change a rule or post to the ledger.</p>
 <p class="note" data-section="running-on">{% if live %}The agents call the Claude API.{% else %}The agents use recorded stand-in answers (prototype; not a live model call). Adding the AI key makes them call the real model; nothing else changes.{% endif %}</p>
 
 <div class="layers ai-team">
 {% for m in team %}
 <section class="card" data-agent="{{ m.profile.kind }}">
-  <div class="agent-head"><span class="avatar agent-avatar" aria-hidden="true">{{ m.profile.name[:1] }}</span>
+  <div class="agent-head"><span class="avatar agent-avatar" aria-hidden="true">{{ m.profile.short }}</span>
     <div><h2>{{ m.profile.name }}</h2><span class="muted small">{{ m.profile.layer }} layer</span></div></div>
   <p>{{ m.profile.job }}</p>
   <div class="stats">

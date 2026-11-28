@@ -23,7 +23,7 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 
 | Screen | Contents | Actions | Stories |
 |---|---|---|---|
-| **Overview** | Today's decisions by outcome; share decided without a human; open and overdue cases; UNKNOWN count and oldest age; recon match rate; rail health; recent events stream | Kill switch | CON-02, EXE-08 |
+| **Overview** | The AI team map (CON-11); today's decisions by outcome; share decided without a human; open and overdue cases; UNKNOWN count and oldest age; recon match rate; rail health; recent events stream | Kill switch | CON-02, EXE-08 |
 | **AI team** | The three agents (instruction, investigation, reconciliation) as team members: job, layer, what each may and may never do, who decides, limits (mandates in force, read-only tools, the shared daily AI budget); each agent's latest work, and under each item what followed: who resolved its flags, what the policy decided, who approved or rejected the case or the fix. Says whether the agents call the Claude API or use recorded stand-in answers | — (read-only) | CON-11 |
 | **Invoice drop** | Upload area; extracted fields with confidence bars and highlighted source text; flags; mandate scope and usage | Resolve flags; "Submit as agent" | CON-05 |
 | **Payments** | Table: ID, payee, amount, rail, status, decision, created; filters | Open detail | CON-03 |
@@ -133,5 +133,9 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
   `case.resolved`, `reconciliation.fix_applied`, `reconciliation.fix_rejected` and `payment.cancelled`, with the
   person's name and role. Each item links to its case, payment or reconciliation; the invoice proposal link is hidden
   for dashboard members (the invoice drop is demo-only).
+- **Overview team map:** the Overview opens with a map of the team: the three AI agents around "Your rules", with
+  "Your people" below. A red dashed line and dot mark an agent with work waiting for a person; beside the map,
+  "Right now" lists that work and "Latest decisions on their work" lists the last four human decisions. Each node
+  links to its agent on the AI team page. The map says "AI agents"; "agentic" stays the category word.
 - **Read-only:** the page has no form or button and writes nothing; it never calls a model (`detent/views/ai_team.py`).
 
