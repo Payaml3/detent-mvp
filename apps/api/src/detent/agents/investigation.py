@@ -26,7 +26,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import Connection, Engine, text
 
-from detent.agents.llm import LLMClient, LLMResult
+from detent.agents.llm import LLMClient, LLMResult, describe_error
 from detent.audit.log import Actor, append
 from detent.clock import Clock
 from detent.domain.ids import Prefix, new_id
@@ -525,7 +525,7 @@ def investigate(
                 tool_handler=tools,
             )
         except Exception as exc:  # the model is unavailable: the reviewer works from the raw facts
-            return human("MODEL_UNAVAILABLE", type(exc).__name__)
+            return human("MODEL_UNAVAILABLE", describe_error(exc))
         try:
             parsed = _Output.model_validate(json.loads(result.raw_text))
             break
