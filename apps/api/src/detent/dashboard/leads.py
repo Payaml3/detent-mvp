@@ -20,6 +20,7 @@ from sqlalchemy import Connection, text
 
 from detent.audit.log import Actor, append
 from detent.clock import Clock
+from detent.dashboard import nda
 from detent.dashboard.access import OPERATOR_ORG, AccessError, Member, _require_staff, ensure_operator_org
 from detent.dashboard.email import send_email
 from detent.domain.ids import Prefix, new_id
@@ -53,19 +54,20 @@ class AccessRequest:
         )
 
 
-def confirmation_body(settings: Settings) -> str:
-    """The fixed reply to the person who sent the form: what happens next (founder, 2026-11-28)."""
+def confirmation_body(settings: Settings, nda_link: str | None = None) -> str:
+    """The fixed reply to the person who sent the form: what happens next (founder, 2026-11-28). The NDA
+    link is their own one-time signing page (D-45), included once the NDA text is final."""
     brand = settings.brand_name
     reply_from = settings.sales_inbox or "our team"
-    nda = (
-        f"1. A short NDA to sign. You can sign it now: {settings.nda_url}\n"
-        if settings.nda_url
+    step1 = (
+        f"1. A short NDA to sign. You can sign it now: {nda_link}\n"
+        if nda_link
         else "1. A short NDA to sign.\n"
     )
     return (
         f"Thank you for your interest in {brand}.\n\n"
         f"We've received your access request. We'll reply from {reply_from} with the next steps:\n"
-        f"{nda}"
+        f"{step1}"
         "2. A commercial call about your platform, your deposits and your payouts.\n"
         f"3. If {brand} is a fit, access to the sandbox and your client dashboard.\n\n"
         f"{brand}: agentic payment controls.\n"
@@ -141,7 +143,7 @@ def submit(conn: Connection, clock: Clock, settings: Settings, req: AccessReques
         to=r.email,
         template="access_request.received",
         settings=settings,
-        body=confirmation_body(settings),
+        body=confirmation_body(settings, nda.issue_link(conn, settings, lead_id)),
     )
     append(
         conn,
@@ -160,7 +162,9 @@ def list_leads(conn: Connection, status: str | None = None, limit: int = 200) ->
         conn.execute(
             text(
                 "SELECT id, name, email, company, role, use_case, status, status_note, status_by, status_at, "
-                "outbox_id, created_at FROM leads WHERE org_id=:o "
+                "outbox_id, created_at, "
+                "(SELECT s.signed_at FROM nda_signatures s WHERE s.lead_id = leads.id) AS nda_signed_at "
+                "FROM leads WHERE org_id=:o "
                 "AND (CAST(:s AS TEXT) IS NULL OR status=:s) ORDER BY created_at DESC, id DESC LIMIT :n"
             ),
             {"o": OPERATOR_ORG, "s": status if status in STATUSES else None, "n": limit},

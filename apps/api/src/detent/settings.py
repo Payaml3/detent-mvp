@@ -86,9 +86,6 @@ class Settings(BaseSettings):
     zeptomail_token: SecretStr = SecretStr("")  # the mail agent's Send Mail token; set on the server only
     zeptomail_api_url: str = "https://cpaas.zoho.uk/v1.1/email"  # the UK console's API URL
     email_from: str = "notifications@dekernai.com"
-    # The public e-signature link for the NDA, put in the access-request confirmation (founder, 2026-11-28).
-    # Not a secret; empty leaves the NDA step to the sales reply.
-    nda_url: str = ""
     # P2: where invite links point (the dashboard's public address once deployed; spec/08 dashboard.<domain>).
     dashboard_url: str = "http://localhost:8000"
     invite_days: int = 7  # DSH-01, DSH-11: invites are single-use and expire after 7 days

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}NDA{% endblock %}
+{% block main %}
+{% if state == "unavailable" %}
+<section class="card narrow"><h1>NDA not available</h1>
+<p class="error" role="alert">This signing link isn't valid, or the NDA isn't open for signing yet.</p>
+<p>Reply to the email you received and we'll send you the NDA another way.</p></section>
+{% elif state == "signed" %}
+<section class="card narrow"><h1>{{ 'Thank you' if just_signed else 'NDA already signed' }}</h1>
+<p role="status">The NDA was signed on {{ lead.signed_at.strftime('%Y-%m-%d at %H:%M') }} UTC. A copy has gone to {{ lead.email }}.
+Next, we'll be in touch to arrange a commercial call.</p></section>
+{% else %}
+<section class="card nda">
+<h1>{{ brand }} mutual NDA</h1>
+<p class="muted">Read the agreement, then fill in your details and sign below. Version {{ doc.version }}.</p>
+<div class="nda-text" tabindex="0" aria-label="NDA text">{{ doc.text }}</div>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form method="post" action="/nda/{{ token }}" id="nda-form">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input type="hidden" name="signature" id="nda-signature">
+  {% set f = form or {"name": lead.name or "", "title": lead.role or "", "company": lead.company or ""} %}
+  <label>Full name <input name="name" value="{{ f.name }}" maxlength="120" required autocomplete="name"></label>
+  <label>Job title <input name="title" value="{{ f.title }}" maxlength="120" required autocomplete="organization-title"></label>
+  <label>Company (the Counterparty) <input name="company" value="{{ f.company }}" maxlength="160" required autocomplete="organization"></label>
+  <p id="pad-label"><strong>Signature</strong></p>
+  <canvas id="nda-pad" class="nda-pad" width="600" height="180" role="img" aria-labelledby="pad-label"></canvas>
+  <p><button type="button" class="link" id="nda-clear">Clear signature</button></p>
+  <p class="error" id="nda-pad-error" role="alert" hidden>Draw your signature in the box.</p>
+  <label class="inline"><input type="checkbox" name="agree" value="yes" required> I have read this NDA and agree to it on behalf of the company named above.</label>
+  <p class="small muted">We store your signature with the NDA version, the time, your IP address and your browser's user agent, and email a copy to {{ lead.email }}.</p>
+  <button>Sign the NDA</button>
+</form>
+<noscript><p class="error">Drawing a signature needs JavaScript. Reply to the email you received and we'll send the NDA another way.</p></noscript>
+</section>
+<script src="/static/nda.js" defer></script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+Mutual Non-Disclosure Agreement
+
+This Mutual Non-Disclosure Agreement (the Agreement) is made on the date of the signature below between:
+
+1. [DekernAI legal entity name], a company registered in England and Wales with company number [number], whose registered office is at [address] (DekernAI); and
+2. The company named in the signature block (the Counterparty),
+
+each a Party.
+
+Purpose: the Parties want to discuss whether the Counterparty will use DekernAI's agentic payment controls, including demonstrations, commercial terms and sandbox access (the Purpose). To do so they will share information that is not public.
+
+1. Confidential Information. Any information a Party (the Discloser) gives the other (the Recipient) for the Purpose, in any form, that is marked confidential or that a reasonable person would treat as confidential. This includes product plans, technical designs, pricing, commercial terms, customer and volume information, and security information.
+
+2. Exclusions. Information is not Confidential Information if the Recipient can show that it: (a) is or becomes public other than through the Recipient's breach; (b) was lawfully known to the Recipient before disclosure without a duty of confidence; (c) is lawfully received from a third party without a duty of confidence; or (d) is developed independently without use of the Discloser's information.
+
+3. Use and protection. The Recipient will use Confidential Information only for the Purpose, protect it with at least reasonable care, and not disclose it except to its employees, officers and professional advisers who need to know it for the Purpose and are bound by duties of confidence no less strict. The Recipient is responsible for their compliance.
+
+4. Required disclosure. The Recipient may disclose Confidential Information where required by law, a court or a regulator, provided that (where lawful) it gives the Discloser prompt notice and discloses only what is required.
+
+5. No personal data needed. The Parties do not intend to share personal data under this Agreement. DekernAI's sandbox uses fictional data and test networks only. If personal data is shared, each Party will comply with UK data protection law.
+
+6. No licence or obligation. All Confidential Information remains the Discloser's property. Nothing in this Agreement grants any licence or intellectual property right, or obliges either Party to enter into any further agreement.
+
+7. No warranty. Confidential Information is provided "as is", without any warranty about its accuracy or completeness.
+
+8. Return or destruction. On written request, the Recipient will promptly return or destroy the Discloser's Confidential Information, except copies kept in routine backups or required by law, which stay subject to this Agreement.
+
+9. Term. This Agreement covers information disclosed within [2] years of its date. The duties of confidence last for [3] years from the date of each disclosure, and for trade secrets for as long as they remain trade secrets.
+
+10. Remedies. Damages may not be an adequate remedy for breach, so the Discloser may seek an injunction or other equitable relief in addition to any other remedy.
+
+11. General. This Agreement is the entire agreement on its subject. It may be changed only in writing signed by both Parties, may be signed electronically and in counterparts, and gives no rights to third parties under the Contracts (Rights of Third Parties) Act 1999.
+
+12. Law and courts. This Agreement and any dispute arising from it are governed by the law of England and Wales, and the courts of England and Wales have exclusive jurisdiction.
+
+[DekernAI's acceptance: how DekernAI signs or accepts this Agreement, to be settled with the lawyer.]
