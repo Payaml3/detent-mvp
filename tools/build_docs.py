@@ -173,7 +173,7 @@ def build_postman(spec: dict[str, Any]) -> dict[str, Any]:
             "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
         },
         "variable": [
-            {"key": "baseUrl", "value": "http://localhost:8000"},
+            {"key": "baseUrl", "value": spec["servers"][0]["url"]},  # the hosted sandbox
             {"key": "apiKey", "value": "sk_test_..."},
             {"key": "apiVersion", "value": spec["info"]["version"]},
         ],
