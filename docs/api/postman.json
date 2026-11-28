@@ -152,7 +152,7 @@
           }
         },
         {
-          "name": "Cancel before sending (escalated, held or ready only)",
+          "name": "Cancel a payment before it is sent",
           "request": {
             "method": "POST",
             "header": [

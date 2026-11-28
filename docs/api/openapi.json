@@ -6526,7 +6526,7 @@
     },
     "/v1/payment_intents/{payment_id}/cancel": {
       "post": {
-        "summary": "Cancel before sending (escalated, held or ready only)",
+        "summary": "Cancel a payment before it is sent",
         "description": "Cancel before sending: ESCALATED, HELD or READY only; SUBMITTED or UNKNOWN answers 409.",
         "operationId": "postPaymentIntentsPaymentIdCancel",
         "parameters": [

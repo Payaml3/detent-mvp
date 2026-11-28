@@ -304,7 +304,7 @@ class PaymentIntents(_Resource):
         )
 
     def cancel(self, payment_id: str, params: ResolutionIn) -> PaymentIntent:
-        """Cancel before sending (escalated, held or ready only) (`POST /v1/payment_intents/{payment_id}/cancel`)."""
+        """Cancel a payment before it is sent (`POST /v1/payment_intents/{payment_id}/cancel`)."""
         return cast(
             "PaymentIntent",
             self._client._request(

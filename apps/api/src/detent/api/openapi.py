@@ -313,7 +313,7 @@ OPS: dict[tuple[str, str], tuple[str, str, tuple[int, ...]]] = {
         (404, 409),
     ),
     ("post", "/v1/payment_intents/{payment_id}/cancel"): (
-        "Cancel before sending (escalated, held or ready only)",
+        "Cancel a payment before it is sent",
         "PaymentIntent",
         (404, 409, 422),
     ),

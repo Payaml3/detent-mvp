@@ -211,7 +211,7 @@ export class PaymentIntents {
     return this.client.request<PaymentIntent>({ method: "POST", path: `/v1/payment_intents/${encodeURIComponent(String(paymentId))}/send` });
   }
 
-  /** Cancel before sending (escalated, held or ready only) (`POST /v1/payment_intents/{payment_id}/cancel`). */
+  /** Cancel a payment before it is sent (`POST /v1/payment_intents/{payment_id}/cancel`). */
   cancel(paymentId: string, params: ResolutionIn): Promise<PaymentIntent> {
     return this.client.request<PaymentIntent>({ method: "POST", path: `/v1/payment_intents/${encodeURIComponent(String(paymentId))}/cancel`, body: params });
   }
