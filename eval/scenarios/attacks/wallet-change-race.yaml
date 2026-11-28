@@ -61,3 +61,12 @@ scenarios:
             - run_worker: {}
       - run_worker: {}
     assert: {no_payment_to_alias: spare}
+
+  - id: atk-wc-08
+    description: The worker sends before the change commits. The approved address is paid once; the new one never.
+    steps:
+      - intent: {dest: local_id, amount: "61.00", save: p1, expect_status: READY}
+      - run_worker: {}
+      - change_destination: {destination: dst_local, to: spare}
+      - run_worker: {}
+    assert: {no_payment_to_alias: spare, status: {p1: CONFIRMED}, attempts: {p1: 1}}
