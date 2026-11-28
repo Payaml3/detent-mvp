@@ -33,10 +33,12 @@ from detent.domain.roles import Role
 from detent.intents.registry import update_destination
 from detent.runtime import Runtime
 from detent.sandbox.generations import visible
+from detent.views.display import install as install_display_filters
 
 log = logging.getLogger("detent.console")
 
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+install_display_filters(templates.env)
 router = APIRouter(prefix="/console")
 
 

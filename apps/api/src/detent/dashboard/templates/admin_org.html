@@ -13,7 +13,7 @@
 {% endif %}
 <dl class="facts">
   <dt>Kind</dt><dd>{{ org.kind }}</dd>
-  <dt>Status</dt><dd>{{ status }}{% if org.suspended_reason %}: {{ org.suspended_reason }}{% endif %}</dd>
+  <dt>Status</dt><dd><span class="st st-{{ {'active': 'ready', 'expired': 'held', 'suspended': 'held'}[status] }}">{{ status }}</span>{% if org.suspended_reason %}: {{ org.suspended_reason }}{% endif %}</dd>
   <dt>KYB</dt><dd>{% if org.kyb_reference %}{{ org.kyb_reference }}, approved {{ org.kyb_approved_on }}{% else %}none (evaluation){% endif %}</dd>
   <dt>Expires</dt><dd>{{ org.expires_at.strftime('%Y-%m-%d %H:%M') ~ ' UTC' if org.expires_at else 'never' }}</dd>
   <dt>Created</dt><dd>{{ org.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</dd>
@@ -53,7 +53,7 @@
 </tbody></table>
 <h2>Invites</h2>
 <table><thead><tr><th>Email</th><th>Role</th><th>State</th><th>Expires</th></tr></thead><tbody>
-{% for i in invites %}<tr><td>{{ i.email }}</td><td>{{ i.role }}</td><td>{{ i.state }}</td><td>{{ i.expires_at.strftime('%Y-%m-%d %H:%M') }} UTC</td></tr>
+{% for i in invites %}<tr><td>{{ i.email }}</td><td>{{ i.role }}</td><td><span class="st st-{{ {'open': 'ready', 'used': 'neutral', 'expired': 'rejected', 'revoked': 'rejected'}[i.state] }}">{{ i.state }}</span></td><td>{{ i.expires_at.strftime('%Y-%m-%d %H:%M') }} UTC</td></tr>
 {% else %}<tr><td colspan="4" class="muted">No invites.</td></tr>{% endfor %}
 </tbody></table>
 {% endblock %}

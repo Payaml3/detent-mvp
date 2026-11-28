@@ -8,7 +8,7 @@
   <h2>Raw facts: the inbound transfer</h2>
   <dl class="facts">
     <dt>Rail</dt><dd>{{ inb.rail_id }} ({{ inb.network }})</dd>
-    <dt>Amount</dt><dd>{{ inb.amount_minor }} minor units of {{ inb.currency }}</dd>
+    <dt>Amount</dt><dd>{{ inb.amount_minor|amount }} minor units of {{ inb.currency }}</dd>
     <dt>From</dt><dd class="mono">{{ inb.from_address }}</dd>
     <dt>To</dt><dd class="mono">{{ inb.to_address }}</dd>
     <dt>Transaction</dt><dd class="mono">{{ inb.tx_hash }}{% if inb.block_number %} · block {{ inb.block_number }}{% endif %}</dd>

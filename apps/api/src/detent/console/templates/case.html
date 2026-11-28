@@ -18,7 +18,7 @@
     <dt>Network</dt><dd>{{ f.network }}</dd>
     <dt>First seen</dt><dd>{{ f.first_seen.strftime('%Y-%m-%d %H:%M') if f.first_seen else 'unknown' }} UTC</dd>
     <dt>Last changed</dt><dd>{{ f.last_changed.strftime('%Y-%m-%d %H:%M') if f.last_changed else 'unknown' }} UTC{% if f.changed_by %} by {{ f.changed_by }}{% endif %}</dd>
-    <dt>Amount</dt><dd>{{ f.amount }}</dd>
+    <dt>Amount</dt><dd>{{ f.amount|amount }}</dd>
     <dt>Median</dt><dd>{% if f.median %}{{ f.median }} over {{ f.payment_count }} confirmed payments{% if f.ratio %} · this is {{ f.ratio }}× the median{% endif %}{% else %}no confirmed payments yet{% endif %}</dd>
     <dt>Mandate scope</dt><dd>{% if f.source == 'agent' %}<span class="mono">{{ f.mandate }}</span> (signature and scope re-checked before every send){% else %}Not applicable: platform intent{% endif %}</dd>
     <dt>Reference</dt><dd>{{ f.reference or '' }}</dd>

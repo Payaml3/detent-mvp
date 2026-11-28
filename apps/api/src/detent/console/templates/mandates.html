@@ -8,7 +8,7 @@
   <h2><span class="mono">{{ m.mandate_id }}</span> · {{ m.agent_id }} {% if m.revoked_at %}<span class="late">revoked {{ m.revoked_at[:16] }}</span>{% endif %}</h2>
   <dl class="facts">
     <dt>Payees</dt><dd class="mono">{{ m.scope.payees|join(', ') }}</dd>
-    <dt>Per payment</dt><dd>{{ m.scope.max_per_payment.amount }} {{ m.scope.max_per_payment.currency }}</dd>
+    <dt>Per payment</dt><dd>{{ m.scope.max_per_payment.amount|amount }} {{ m.scope.max_per_payment.currency }}</dd>
     <dt>Total</dt><dd>{{ m.used }} used of {{ m.max_total }}</dd>
     <dt>Networks</dt><dd>{{ m.scope.networks|join(', ') }}</dd>
     <dt>Purpose</dt><dd>{{ m.scope.purpose }}</dd>

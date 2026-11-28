@@ -16,7 +16,7 @@
   <tbody>
   {% for p in payments %}
     <tr><td class="mono"><a href="/console/payments/{{ p.id }}">{{ p.id }}</a></td><td><span class="st st-{{ p.status|lower }}">{{ p.status }}</span></td>
-        <td>{% if p.user_account_ref %}User <span class="mono">{{ p.user_account_ref }}</span> <span class="small muted">user payout profile</span>{% else %}{{ p.payee or '' }}{% endif %}</td><td class="num">{{ p.amount }}</td><td>{{ p.source }}</td><td>{{ p.reference or '' }}</td>
+        <td>{% if p.user_account_ref %}User <span class="mono">{{ p.user_account_ref }}</span> <span class="small muted">user payout profile</span>{% else %}{{ p.payee or '' }}{% endif %}</td><td class="num">{{ p.amount|amount }}</td><td>{{ p.source }}</td><td>{{ p.reference or '' }}</td>
         <td>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
   {% else %}
     <tr><td colspan="7" class="empty">{% if status %}<strong>No {{ status }} payments.</strong> <span><a href="/console/payments">Show all payments</a></span>{% else %}<strong>No payments yet.</strong> <span>Payments appear here once your rules decide an intent. Propose one from an <a href="/console/invoices">invoice</a>, or create one with the API.</span>{% endif %}</td></tr>

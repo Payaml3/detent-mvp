@@ -14,7 +14,7 @@ table{border-collapse:collapse;width:100%;margin:8px 0}td,th{border-bottom:1px s
 {% for p in pack.payments %}{% set i = p.inputs %}
 <section>
 <h2 class="mono">{{ p.id }} <span class="muted small">{{ p.status }}</span></h2>
-<p>Inputs: {{ i.amount }} to <span class="mono">{{ i.counterparty_id or i.user_account_ref }}</span>, network {{ i.network }}, reference {{ i.reference or '-' }}, source {{ i.source }}, created {{ i.created_at }}.</p>
+<p>Inputs: {{ i.amount|amount }} to <span class="mono">{{ i.counterparty_id or i.user_account_ref }}</span>, network {{ i.network }}, reference {{ i.reference or '-' }}, source {{ i.source }}, created {{ i.created_at }}.</p>
 <h3>Decisions</h3>
 <table><thead><tr><th>Outcome</th><th>Rule version</th><th>At</th><th>By</th><th>Checks not passed</th></tr></thead><tbody>
 {% for d in p.decisions %}<tr><td>{{ d.outcome }}</td><td>v{{ d.rule_version }} <span class="mono small muted">{{ d.rule_hash[:12] }}</span></td><td>{{ d.decided_at }}</td><td class="mono">{{ d.actor }}</td>

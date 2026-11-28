@@ -8,7 +8,7 @@
 <section class="card" data-section="mix">
   <h2>Decision mix</h2>
   <table><thead><tr><th>Outcome</th><th>Count</th><th>Amount</th><th>Top reason</th></tr></thead><tbody>
-  {% for m in rep.mix %}<tr><td>{{ m.label }}</td><td>{{ m.count }}</td><td>{{ m.amounts|join(', ') or '0' }}</td><td class="mono">{{ m.top_reason or '' }}</td></tr>{% endfor %}
+  {% for m in rep.mix %}<tr><td>{{ m.label }}</td><td>{{ m.count }}</td><td>{{ m.amounts|map('amount')|join(', ') or '0' }}</td><td class="mono">{{ m.top_reason or '' }}</td></tr>{% endfor %}
   </tbody></table>
 </section>
 <section class="card" data-section="agreement">
@@ -23,7 +23,7 @@
 <section class="card" data-section="unsafe">
   <h2>Unsafe approvals</h2>
   <p class="small muted">Payments {{ brand }} would have executed that you rejected. A mode gate needs zero.</p>
-  <ul>{% for r in agr.unsafe %}<li class="mono">{{ r.platform_ref }}: {{ r.amount_minor }} {{ r.currency }} (minor units)</li>{% else %}<li>None.</li>{% endfor %}</ul>
+  <ul>{% for r in agr.unsafe %}<li class="mono">{{ r.platform_ref }}: {{ r.amount_minor|amount }} {{ r.currency }} (minor units)</li>{% else %}<li>None.</li>{% endfor %}</ul>
   <h3>Your approvals the rules would stop</h3>
   <ul>{% for r in agr.stopped %}<li><span class="mono">{{ r.platform_ref }}</span>: {{ words[r.outcome] }} ({{ r.reasons|join(', ') }})</li>{% else %}<li>None.</li>{% endfor %}</ul>
 </section>

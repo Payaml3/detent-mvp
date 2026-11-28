@@ -10,7 +10,7 @@
   {% for r in rows %}
   <tr><td><a href="/admin/organisations/{{ r.org.id }}">{{ r.org.name }}</a></td><td>{{ r.org.kind }}</td>
     <td>{% if r.org.kyb_reference %}{{ r.org.kyb_reference }} ({{ r.org.kyb_approved_on }}){% else %}<span class="muted">none</span>{% endif %}</td>
-    <td>{{ r.status }}</td><td>{{ r.org.expires_at.strftime('%Y-%m-%d') if r.org.expires_at else 'never' }}</td>
+    <td><span class="st st-{{ {'active': 'ready', 'expired': 'held', 'suspended': 'held'}[r.status] }}">{{ r.status }}</span></td><td>{{ r.org.expires_at.strftime('%Y-%m-%d') if r.org.expires_at else 'never' }}</td>
     <td class="num">{{ r.org.members }}</td><td>{{ r.org.created_at.strftime('%Y-%m-%d') }}</td></tr>
   {% else %}
   <tr><td colspan="7" class="empty"><strong>No organisations yet.</strong> <span>Create the first one once its KYB is approved. <a href="/admin/organisations/new">New organisation</a></span></td></tr>

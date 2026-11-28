@@ -57,10 +57,10 @@ def test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide(
             assert f'data-agent="{prof.kind}"' in page and prof.name in page
         assert "They propose; your rules and your people decide." in page
         member = page.split('data-member="instruction"', 1)[1].split('data-member="investigation"', 1)[0]
-        assert "Mandate mnd_demo_ap_agent" in member and "20000.00 USDC per payment" in member
+        assert "Mandate mnd_demo_ap_agent" in member and "20,000.00 USDC per payment" in member
         assert "Approve, send, retry or re-route a payment" in member.split('data-section="never"', 1)[1]
         assert "your policy decides execute, escalate or block" in member
-        assert "Proposed 18500.00 USDC to cpt_bluefin" in member and "recorded stand-in" in member
+        assert "Proposed 18,500.00 USDC to cpt_bluefin" in member and "recorded stand-in" in member
         assert "AI budget" in member and "tokens used today" in member
         assert "recorded stand-in answers" in page  # no AI key in tests: the page says so
         # Read-only: no forms, no buttons, nothing written to the audit log.
@@ -116,7 +116,7 @@ def test_the_overview_map_shows_work_waiting_for_a_person(engine: Engine, clock:
         login(c, d.org.users[Role.REVIEWER])
         team_map = c.get("/console/").text.split('data-section="ai-team-map"', 1)[1].split("</section>", 1)[0]
     assert f'data-waiting="{p.id}"' in team_map and "ai-link-wait" in team_map
-    assert "Proposed 18500.00 USDC to cpt_bluefin" in team_map
+    assert "Proposed 18,500.00 USDC to cpt_bluefin" in team_map
 
 
 def test_reconciliation_fixes_show_the_payments_leads_decision(engine: Engine, clock: FrozenClock) -> None:

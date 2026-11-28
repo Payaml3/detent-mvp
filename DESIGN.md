@@ -33,7 +33,9 @@ Token names are roles, not colours (`stop`, not "red"), so a new palette swaps v
 - Shell: a 240px sidebar with the nav grouped by layer (Decision, Orchestration, Operations, then Prototype). The current page carries `aria-current="page"`. The user row and log out sit at the foot. Under 860px the sidebar folds into a top bar.
 - Title bar: demo clock, kill-switch state and the kill-switch button, on every page.
 - One primary button per screen, in the `primary` colour (safety orange). The `stop` colour (graphite) is only for block, reject and the kill switch.
-- Figures: one container split by dividers, label above value, tabular numbers.
+- Figures: one container split by dividers, label above value, tabular numbers. The last row's figures widen to fill it.
+- Amounts carry thousands separators (`|amount` filter, `views/display.py`), applied to the text, never through a float.
+- Every lifecycle state (organisation, invite, key, endpoint) is a status pill, not a plain word.
 - Tables: no zebra stripes, 12px muted headers, numbers right-aligned, a quiet hover row.
 - Notices (`.note`): a white callout with a 4px wait-coloured edge. The wait fill stays for waiting states only.
 - Errors (`p.error`): a callout with a stop-coloured edge and a cross, so an error never reads as an ordinary sentence.
@@ -55,7 +57,7 @@ A blocked state always carries an icon and its label, never colour alone.
 
 ## Type, space, motion
 
-- Fonts: Space Grotesk (headings), Inter (body), JetBrains Mono (ids, amounts, code). Self-hosted.
+- Fonts: Space Grotesk (headings), Inter (body), JetBrains Mono (ids, amounts, code). Self-hosted in the apps; the docs set the same heading and body fonts in `docs/docs.json`.
 - Console sizes: title 24, section 16, figure 24, body 14, small 12.
 - Space on a 4px unit; card padding 20, page padding 32.
 - Motion: ease-out `cubic-bezier(0.23,1,0.32,1)`; press 100ms with `scale(0.97)`; hover only on fine pointers; everything off under `prefers-reduced-motion`.

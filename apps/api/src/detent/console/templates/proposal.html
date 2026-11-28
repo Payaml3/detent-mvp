@@ -30,7 +30,7 @@
   <h2>Mandate in force</h2>
   {% if mandate %}
   <p class="mono">{{ mandate.id }}{% if mandate.revoked_at %} <span class="late">revoked</span>{% endif %}</p>
-  <p>Payees {{ mandate.payload.scope.payees|join(', ') }} · up to {{ mandate.payload.scope.max_per_payment.amount }} {{ mandate.payload.scope.max_per_payment.currency }} per payment · {{ mandate.payload.scope.max_total.amount }} {{ mandate.payload.scope.max_total.currency }} in total · networks {{ mandate.payload.scope.networks|join(', ') }}</p>
+  <p>Payees {{ mandate.payload.scope.payees|join(', ') }} · up to {{ mandate.payload.scope.max_per_payment.amount|amount }} {{ mandate.payload.scope.max_per_payment.currency }} per payment · {{ mandate.payload.scope.max_total.amount|amount }} {{ mandate.payload.scope.max_total.currency }} in total · networks {{ mandate.payload.scope.networks|join(', ') }}</p>
   {% else %}<p class="note">No mandate: an intent from this proposal would be blocked.</p>{% endif %}
 </section>
 
