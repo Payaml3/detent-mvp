@@ -36,5 +36,8 @@
       "series": "#3c9a62",
       "miss": "#FF4A1F"
     }
-  }
+  },
+  "logo": "apps/site/public/brand/logo.svg",
+  "logo_dark": "apps/site/public/brand/logo-reverse.svg",
+  "icon": "apps/site/public/favicon.svg"
 }
