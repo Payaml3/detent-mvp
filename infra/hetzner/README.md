@@ -10,7 +10,7 @@ keys only (invariant 14). This replaces the Render plan in `render.yaml`, which 
 | `worker` | Job loop: sends, confirmations, deadlines, deposits, reconciliation, webhooks | none |
 | `banksim` | Simulated instant bank rail | none (private) |
 | `faultproxy` | Fault injection in front of Base Sepolia, `FAULTPROXY_DEMO_MODE=1` | none (private) |
-| `site` | Marketing site (Astro, static, nginx) | `https://dekernai.com` (when moved from Vercel) |
+| `site` | Marketing site (Astro, static, nginx) | `https://dekernai.com`, `https://www.dekernai.com` |
 
 Files: `docker-compose.yml` (what Coolify deploys), `Dockerfile.app`, `Dockerfile.site`, `nginx-site.conf`,
 `make_secrets.py` (prints fresh secrets and test wallets on your own screen).
@@ -76,8 +76,8 @@ and your password manager. Never commit them to this repository.
    after any redeploy that changes that key, or "Submit as agent" answers `invalid_api_key`).
 11. **AI agents.** Create an Anthropic API key at console.anthropic.com (set a monthly spend limit), paste it as
     `ANTHROPIC_API_KEY`, redeploy. Until then the agents use recorded stand-ins (`AGENT_LLM=auto`).
-12. **Website (optional, last).** Set the `site` service domain to `https://dekernai.com,https://www.dekernai.com`,
-    then at GoDaddy point `@` and `www` to the server instead of Vercel. Keep Vercel until the new one loads.
+12. **Website (done 28 Nov 2026, D-42).** In Coolify, Domains, Add Domain: service `site`, `https://dekernai.com`
+    and `https://www.dekernai.com`, port 80. At GoDaddy, `@` (A) and `www` (A) point to the server instead of Vercel.
 
 ## Operating it
 

@@ -29,4 +29,4 @@ Layers: Business → Product → MVP → Architecture → Tasks → Tests → Re
 | Website built in-house in a cinematic dark-blue style | see D-19 |
 | Site look: halftone-dot detent wheel (references "Flora", "Stackside") | see D-20 (to be revisited for B-01) |
 | Hero: halftone-dot agent figure with three layer cards in the founder's wording | see D-21 |
-| Site hosted on Vercel, no-index until launch | see D-22 |
+| Site hosted on Vercel, no-index until launch | see D-22 (host superseded by D-42: Hetzner) |
