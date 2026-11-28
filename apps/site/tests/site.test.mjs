@@ -144,6 +144,7 @@ test("sub-pages carry their required content", () => {
   for (const w of [/discovery/i, /KYB/, /registration email/i]) assert.match(acc, w);
   assert.ok(!/simulated rails|\.13|\.42|What would you like to test/i.test(acc), "access is the onboarding intake, not a sandbox sign-up");
   const prod = text(read(PAGES.product));
+  assert.match(prod, /every deposit and payout/i, "the product page covers deposits and payouts, not payouts only (founder, 2026-11-28)");
   for (const w of [/decision/i, /orchestration/i, /operations/i]) assert.match(prod, w);
 });
 
