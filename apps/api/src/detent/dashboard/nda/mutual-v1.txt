@@ -2,7 +2,7 @@ Mutual Non-Disclosure Agreement
 
 This Mutual Non-Disclosure Agreement (the Agreement) is made on the date of the signature below between:
 
-1. [DekernAI legal entity name], a company registered in England and Wales with company number [number], whose registered office is at [address] (DekernAI); and
+1. Payam Rahimi, trading as DekernAI (DekernAI); and
 2. The company named in the signature block (the Counterparty),
 
 each a Party.
@@ -25,7 +25,7 @@ Purpose: the Parties want to discuss whether the Counterparty will use DekernAI'
 
 8. Return or destruction. On written request, the Recipient will promptly return or destroy the Discloser's Confidential Information, except copies kept in routine backups or required by law, which stay subject to this Agreement.
 
-9. Term. This Agreement covers information disclosed within [2] years of its date. The duties of confidence last for [3] years from the date of each disclosure, and for trade secrets for as long as they remain trade secrets.
+9. Term. This Agreement covers information disclosed within 2 years of its date. The duties of confidence last for 3 years from the date of each disclosure, and for trade secrets for as long as they remain trade secrets.
 
 10. Remedies. Damages may not be an adequate remedy for breach, so the Discloser may seek an injunction or other equitable relief in addition to any other remedy.
 
@@ -33,4 +33,4 @@ Purpose: the Parties want to discuss whether the Counterparty will use DekernAI'
 
 12. Law and courts. This Agreement and any dispute arising from it are governed by the law of England and Wales, and the courts of England and Wales have exclusive jurisdiction.
 
-[DekernAI's acceptance: how DekernAI signs or accepts this Agreement, to be settled with the lawyer.]
+DekernAI's acceptance: this Agreement is signed for DekernAI by Payam Rahimi, Founder, and takes effect when the Counterparty signs it below.
