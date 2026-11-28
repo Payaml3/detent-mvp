@@ -54,6 +54,10 @@ PERMISSIONS: dict[str, frozenset[Role]] = {
     "demo.clock.advance": frozenset(Role) - {R.AUDITOR},
     # INT-04: editing payout details. Payments lead only (G-23, Proposed: the narrowest safe choice).
     "counterparty.edit": frozenset({R.PAYMENTS_LEAD}),
+    # OPS-01: opening and working an incident (DekernAI on-call and the client's two leads).
+    "incident.manage": frozenset({R.ONCALL, R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
+    # INT-05: cancelling before sending; spec/02 "payments lead cancels".
+    "payment.cancel": frozenset({R.PAYMENTS_LEAD}),
     # EXE-06: the UNKNOWN_STUCK case goes to the payments lead (spec/04 owners).
     "unknown.cancel_by_replacement": frozenset({R.PAYMENTS_LEAD}),
     # DSH-11, spec/08 dashboard permissions. Only an account owner can grant or take away that role.

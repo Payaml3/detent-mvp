@@ -101,6 +101,11 @@
    "id": "L",
    "name": "After launch (Should and Could)",
    "status": ""
+  },
+  {
+   "id": "U",
+   "name": "User payouts",
+   "status": ""
   }
  ],
  "tasks": [
@@ -297,8 +302,8 @@
    "initiative": "Payment intents",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -691,8 +696,8 @@
    "initiative": "Exactly-once execution",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -1269,8 +1274,8 @@
    "initiative": "Back-office console",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1543,8 +1548,8 @@
    "initiative": "Operational controls",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -2205,6 +2210,62 @@
    "priority": "",
    "status": "done",
    "progress": "1/1",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "USR-01",
+   "title": "",
+   "kind": "story",
+   "role": "engineer",
+   "epic": "USR",
+   "initiative": "User payouts",
+   "slice": "U",
+   "priority": "",
+   "status": "todo",
+   "progress": "0/2",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "USR-02",
+   "title": "",
+   "kind": "story",
+   "role": "engineer",
+   "epic": "USR",
+   "initiative": "User payouts",
+   "slice": "U",
+   "priority": "",
+   "status": "todo",
+   "progress": "0/2",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "USR-03",
+   "title": "",
+   "kind": "story",
+   "role": "engineer",
+   "epic": "USR",
+   "initiative": "User payouts",
+   "slice": "U",
+   "priority": "",
+   "status": "todo",
+   "progress": "0/1",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "USR-04",
+   "title": "",
+   "kind": "story",
+   "role": "engineer",
+   "epic": "USR",
+   "initiative": "User payouts",
+   "slice": "U",
+   "priority": "",
+   "status": "todo",
+   "progress": "0/2",
    "deps": [],
    "dependents": []
   },

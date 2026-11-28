@@ -128,3 +128,12 @@ slices:
   exit: "A shadow-phase report is produced from a CSV export and the mode-gate sign-off is recorded."
   stories: [SHD-01, SHD-02, SHD-03, SHD-04, RAL-08, RAL-09, RAL-10, EXE-10, OPS-01, OPS-03, OPS-04, AUD-03,
             CON-10, DEM-06, EXC-09, INT-05, DSH-13]
+
+- id: U
+  name: "User payouts"
+  goal: "Payouts to the platform's own end users, decided under the user payout profile (spec/04, G-10, D-40)."
+  exit: >-
+    POST /v1/payment_intents with user_account_ref decides under the user payout profile (no 422
+    user_payouts_unavailable): a verified user's payout to their registered destination executes, user_verified
+    false escalates, a changed destination escalates CHANGED_DETAILS, and the console, API, docs and SDKs show it.
+  stories: [USR-01, USR-02, USR-03, USR-04]

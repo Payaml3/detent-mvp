@@ -28,6 +28,20 @@ from detent.domain.states import Status
 from detent.worker.queue import enqueue
 
 MODES = ("shadow", "assist", "auto")
+FAIL_SAFES = ("hold", "manual_queue")
+# CON-10: the settings changed with two people (column on organisations, allowed values).
+SETTINGS: dict[str, tuple[str, tuple[str, ...]]] = {
+    "mode": ("mode", MODES),
+    "fail_safe": ("fail_safe", FAIL_SAFES),
+}
+_LOCK_SQL = {
+    "mode": "SELECT mode FROM organisations WHERE org_id=:o FOR UPDATE",
+    "fail_safe": "SELECT fail_safe FROM organisations WHERE org_id=:o FOR UPDATE",
+}
+_SET_SQL = {
+    "mode": "UPDATE organisations SET mode=:m WHERE org_id=:o",
+    "fail_safe": "UPDATE organisations SET fail_safe=:m WHERE org_id=:o",
+}
 
 
 class ModeError(Exception):
@@ -59,25 +73,35 @@ def current_mode(conn: Connection, org_id: str, *, lock: bool = False) -> str:
 
 
 def propose_mode_change(
-    engine: Engine, clock: Clock, *, org_id: str, actor: Actor, to_mode: str, reason: str
+    engine: Engine,
+    clock: Clock,
+    *,
+    org_id: str,
+    actor: Actor,
+    to_mode: str,
+    reason: str,
+    setting: str = "mode",
 ) -> str:
+    """Propose a change to the mode or (CON-10) the fail-safe; the other lead approves it."""
     role = _role(actor)
     if not allowed("org.change_mode.propose", role):
-        raise ModeError(f"{role.value} may not propose a mode change", status=403, code="insufficient_role")
-    if to_mode not in MODES:
-        raise ModeError(f"unknown mode {to_mode!r}", status=422, code="invalid_mode")
+        raise ModeError(
+            f"{role.value} may not propose a {setting} change", status=403, code="insufficient_role"
+        )
+    if setting not in SETTINGS:
+        raise ModeError(f"unknown setting {setting!r}", status=422, code="invalid_mode")
+    _, values = SETTINGS[setting]
+    if to_mode not in values:
+        raise ModeError(f"unknown {setting} {to_mode!r}", status=422, code="invalid_mode")
     if not reason.strip():
         raise ModeError("a reason is required", status=422, code="reason_required")
     with transaction(engine) as conn:
-        mode = str(
-            conn.execute(
-                text("SELECT mode FROM organisations WHERE org_id=:o FOR UPDATE"), {"o": org_id}
-            ).scalar_one()
-        )
+        mode = str(conn.execute(text(_LOCK_SQL[setting]), {"o": org_id}).scalar_one())
         if mode == to_mode:
-            raise ModeError(f"the mode is already {mode}")
+            raise ModeError(f"the {setting.replace('_', '-')} is already {mode}")
         pending = conn.execute(
-            text("SELECT to_mode FROM mode_changes WHERE org_id=:o AND status='proposed'"), {"o": org_id}
+            text("SELECT to_mode FROM mode_changes WHERE org_id=:o AND setting=:s AND status='proposed'"),
+            {"o": org_id, "s": setting},
         ).scalar_one_or_none()
         if pending:
             raise ModeError(f"a change to {pending} is already waiting for approval")
@@ -85,13 +109,14 @@ def propose_mode_change(
         ch = new_id(Prefix.MCH, now)
         conn.execute(
             text(
-                "INSERT INTO mode_changes (id, org_id, from_mode, to_mode, reason, proposed_by, "
+                "INSERT INTO mode_changes (id, org_id, setting, from_mode, to_mode, reason, proposed_by, "
                 "proposed_role, "
-                "status, created_at) VALUES (:id, :o, :f, :t, :r, :p, :pr, 'proposed', :now)"
+                "status, created_at) VALUES (:id, :o, :s, :f, :t, :r, :p, :pr, 'proposed', :now)"
             ),
             {
                 "id": ch,
                 "o": org_id,
+                "s": setting,
                 "f": mode,
                 "t": to_mode,
                 "r": reason.strip(),
@@ -105,9 +130,9 @@ def propose_mode_change(
             clock,
             org_id=org_id,
             actor=actor,
-            kind="org.mode_change_proposed",
+            kind="org.mode_change_proposed" if setting == "mode" else "org.fail_safe_change_proposed",
             subject_id=ch,
-            payload={"from": mode, "to": to_mode, "reason": reason.strip()},
+            payload={"setting": setting, "from": mode, "to": to_mode, "reason": reason.strip()},
         )
     return ch
 
@@ -131,15 +156,11 @@ def approve_mode_change(engine: Engine, clock: Clock, *, org_id: str, change_id:
                 status=403,
                 code="insufficient_role",
             )
-        mode = str(
-            conn.execute(
-                text("SELECT mode FROM organisations WHERE org_id=:o FOR UPDATE"), {"o": org_id}
-            ).scalar_one()
-        )
+        mode = str(conn.execute(text(_LOCK_SQL[ch.setting]), {"o": org_id}).scalar_one())
         if mode != ch.from_mode:
-            raise ModeError(f"the mode changed to {mode} after this was proposed; propose again")
+            raise ModeError(f"the {ch.setting} changed to {mode} after this was proposed; propose again")
         now = clock.now()
-        conn.execute(text("UPDATE organisations SET mode=:m WHERE org_id=:o"), {"m": ch.to_mode, "o": org_id})
+        conn.execute(text(_SET_SQL[ch.setting]), {"m": ch.to_mode, "o": org_id})
         conn.execute(
             text(
                 "UPDATE mode_changes SET status='applied', approved_by=:a, approved_role=:r, decided_at=:t "
@@ -152,9 +173,10 @@ def approve_mode_change(engine: Engine, clock: Clock, *, org_id: str, change_id:
             clock,
             org_id=org_id,
             actor=actor,
-            kind="org.mode_changed",
+            kind="org.mode_changed" if ch.setting == "mode" else "org.fail_safe_changed",
             subject_id=org_id,
             payload={
+                "setting": ch.setting,
                 "from": ch.from_mode,
                 "to": ch.to_mode,
                 "proposed_by": ch.proposed_by,
@@ -185,9 +207,10 @@ def withdraw_mode_change(engine: Engine, clock: Clock, *, org_id: str, change_id
         )
 
 
-def pending_mode_change(conn: Connection, org_id: str) -> Any:
+def pending_mode_change(conn: Connection, org_id: str, setting: str = "mode") -> Any:
     return conn.execute(
-        text("SELECT * FROM mode_changes WHERE org_id=:o AND status='proposed'"), {"o": org_id}
+        text("SELECT * FROM mode_changes WHERE org_id=:o AND setting=:s AND status='proposed'"),
+        {"o": org_id, "s": setting},
     ).one_or_none()
 
 

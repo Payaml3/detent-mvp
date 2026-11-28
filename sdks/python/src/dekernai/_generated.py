@@ -303,6 +303,15 @@ class PaymentIntents(_Resource):
             self._client._request("POST", f"/v1/payment_intents/{quote(str(payment_id), safe='')}/send"),
         )
 
+    def cancel(self, payment_id: str, params: ResolutionIn) -> PaymentIntent:
+        """Cancel before sending (escalated, held or ready only) (`POST /v1/payment_intents/{payment_id}/cancel`)."""
+        return cast(
+            "PaymentIntent",
+            self._client._request(
+                "POST", f"/v1/payment_intents/{quote(str(payment_id), safe='')}/cancel", body=params
+            ),
+        )
+
     def replay(self, payment_id: str) -> Object:
         """Replay a payment's decisions (`GET /v1/payment_intents/{payment_id}/replay`)."""
         return cast(

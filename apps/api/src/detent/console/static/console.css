@@ -41,6 +41,8 @@ mark { background: var(--pill-wait-bg); color: var(--pill-wait-ink); padding: 0 
 /* ---------- the honesty banner and the kill switch: always visible, never decorative ---------- */
 .banner { background: var(--text); color: var(--ground); text-align: center; font-size: var(--fs-small); line-height: 28px; }
 .kill-bar { background: var(--stop); color: var(--on-stop); text-align: center; font-weight: 600; padding: 10px 16px; }
+.sev1-bar { background: var(--stop); color: var(--on-stop); text-align: center; padding: 10px 16px; border-bottom: 2px solid var(--on-stop); }
+.sev1-bar a { color: var(--on-stop); text-decoration: underline; }
 
 /* ---------- shell: open plane, a labelled sidebar on the page ground ---------- */
 .shell { display: grid; grid-template-columns: var(--control-sidebar) minmax(0, 1fr); min-height: calc(100vh - 28px); }

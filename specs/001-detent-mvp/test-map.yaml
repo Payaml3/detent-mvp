@@ -460,3 +460,13 @@ DSH-11:
   0: ["integration/test_dashboard_access.py::test_owner_invites_a_developer_who_cannot_manage_the_team", "integration/test_dashboard_access.py::test_removing_a_member_stops_their_sign_in_and_keys"]
   1: ["unit/test_dashboard_rules.py::test_member_roles_are_the_spec_02_list", "unit/test_dashboard_rules.py::test_dashboard_permissions_follow_spec_08", "integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays"]
   2: ["integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays", "integration/test_dashboard_access.py::test_two_owners_cannot_demote_each_other_at_once"]
+INT-05:
+  0: ["integration/test_cancel.py::test_cancel_a_ready_payment_and_the_send_job_then_sends_nothing", "integration/test_cancel.py::test_cancel_an_escalated_payment_resolves_its_case", "integration/test_cancel.py::test_cancel_a_held_payment", "integration/test_cancel.py::test_submitted_or_unknown_answers_409"]
+  1: ["integration/test_cancel.py::test_cancelled_is_terminal", "integration/test_cancel.py::test_cancel_a_ready_payment_and_the_send_job_then_sends_nothing", "integration/test_cancel.py::test_console_cancel_is_payments_lead_only"]
+EXE-10:
+  0: ["integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies", "integration/test_incidents.py::test_duplicate_payment_and_double_credit_are_found", "integration/test_incidents.py::test_the_worker_runs_the_monitor_every_minute_and_after_each_confirmation"]
+  1: ["integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies", "integration/test_incidents.py::test_kill_switch_engagement_is_configurable"]
+OPS-01:
+  0: ["integration/test_incidents.py::test_manual_incident_timeline_notification_root_cause_and_replay", "integration/test_incidents.py::test_console_incidents_screens", "integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies"]
+CON-10:
+  0: ["integration/test_incidents.py::test_fail_safe_changes_need_both_leads", "integration/test_incidents.py::test_settings_screen_shows_fail_safe_deadlines_and_weights"]

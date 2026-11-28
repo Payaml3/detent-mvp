@@ -99,4 +99,16 @@ notes below describe `render.yaml`, which was never deployed and is kept only as
   mints the demo token (D-33) to the sending wallet and the payer up to that many runs; gas still comes from a faucet for each chain.
 - **Kill switch:** engage from the Overview or `POST /v1/kill_switch`; release by the payments lead only.
 - **Sev 1:** triggered by the invariant monitor. Kill switch on, incident opened, notification within 1 hour (outbox), replay the affected payments, root cause within 5 days.
+- **Incidents (OPS-01, as built):** severities and notification windows: Sev 1 (an invariant broke or money may be at
+  risk; 1 hour), Sev 2 (a control misbehaved without loss, such as a replay mismatch; 4 hours), Sev 3 (degraded
+  service; 24 hours), Sev 4 (near miss or cosmetic; 5 days). The timeline is `incident_events` (append-only), and each
+  step writes an audit event. Root cause is required before a Sev 1 or 2 is resolved; replays are linked from the
+  incident page.
+- **Invariant monitor (EXE-10, as built):** `detent/incidents/monitor.py`, run by the worker every
+  `INVARIANT_MONITOR_SECONDS` (60) and by the `invariants.check` job queued when a payment becomes CONFIRMED. Findings:
+  `duplicate_payment` (two CONFIRMED attempts or two confirmed transaction hashes for one payment ID),
+  `unauthorised_execution` (a CONFIRMED attempt without an EXECUTE decision) and `double_credit` (two credits for one
+  inbound transfer). A hit opens one Sev 1 per finding, engages the kill switch unless
+  `INVARIANT_MONITOR_KILL_SWITCH=false`, posts `incident_sev1` to the outbox (logging the notification) and shows the
+  red banner.
 - **Restore (OPS-03):** use the provider's point-in-time restore to a new branch, run `detent audit verify` and switch the URL. Target under 1 hour.

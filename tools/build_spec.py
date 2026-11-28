@@ -30,6 +30,7 @@ INVARIANTS_ANCHOR = "../../AGENTS.md#non-negotiable-invariants"
 EPIC_LEVEL = {
     "FND": "integration",
     "INT": "integration",
+    "USR": "integration",
     "POL": "unit",
     "MND": "unit",
     "AGT": "unit",
@@ -62,6 +63,7 @@ KEYWORD_LEVEL = [
 EPIC_PATH = {
     "FND": "apps/api/src/detent/",
     "INT": "apps/api/src/detent/intents/",
+    "USR": "apps/api/src/detent/intents/",
     "POL": "apps/api/src/detent/policy/",
     "MND": "apps/api/src/detent/mandates/",
     "AGT": "apps/api/src/detent/agents/",

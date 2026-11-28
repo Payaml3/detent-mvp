@@ -73,6 +73,7 @@ people and may change. Quote `request_id` when you contact DekernAI; it is also 
 | `resolve_via_reconciliation` | 409 | The payment's outcome is UNKNOWN; only rail evidence through reconciliation can resolve it. | Wait for reconciliation. Never resend while the outcome is UNKNOWN. |
 | `too_many_endpoints` | 409 | The organisation already has the maximum number of enabled webhook endpoints. | Disable an endpoint you no longer use. |
 | `endpoint_disabled` | 409 | The webhook endpoint is disabled. | Create a new endpoint. |
+| `not_cancellable` | 409 | The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled. | Wait for the rail's outcome; a sent payment is settled only by rail evidence. |
 | `shadow_mode` | 409 | The organisation is in shadow mode, so nothing is sent. | Switch to assist or auto mode in the console to send. |
 
 ## `rate_limit`

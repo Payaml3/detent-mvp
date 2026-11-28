@@ -104,4 +104,16 @@ def transition(
     )
     # LED-02: the ledger entry for this change is written in the same transaction.
     on_status(conn, clock, org_id=org_id, payment_id=payment_id, new_status=to.value)
+    if to is Status.CONFIRMED:
+        # EXE-10: the invariant monitor also runs after each confirmation, in its own job.
+        from detent.worker.queue import enqueue
+
+        enqueue(
+            conn,
+            clock,
+            org_id=org_id,
+            kind="invariants.check",
+            payment_id=payment_id,
+            dedupe_key=f"{payment_id}:invariants",
+        )
     return old

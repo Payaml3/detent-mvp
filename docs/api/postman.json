@@ -152,6 +152,48 @@
           }
         },
         {
+          "name": "Cancel before sending (escalated, held or ready only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{apiKey}}"
+              },
+              {
+                "key": "DekernAI-Version",
+                "value": "{{apiVersion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payment_intents/{{payment_id}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "payment_intents",
+                "{{payment_id}}",
+                "cancel"
+              ]
+            },
+            "description": "Cancel before sending: ESCALATED, HELD or READY only; SUBMITTED or UNKNOWN answers 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "Replay a payment's decisions",
           "request": {
             "method": "GET",

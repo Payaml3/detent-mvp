@@ -189,7 +189,7 @@ def test_assist_send_button(engine: Engine, clock: FrozenClock) -> None:
         pid = harbor(c, d)["id"]
         login(c, d.org.users[Role.PAYMENTS_LEAD])  # the initiator: no Send button
         page = c.get(f"/console/payments/{pid}").text
-        assert 'data-section="send"' in page and 'action="/console/payments/' not in page
+        assert 'data-section="send"' in page and f'action="/console/payments/{pid}/send"' not in page
         login(c, d.org.users[Role.REVIEWER])
         page = c.get(f"/console/payments/{pid}").text
         assert f'action="/console/payments/{pid}/send"' in page

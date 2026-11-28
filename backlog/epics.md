@@ -24,13 +24,14 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | SBX Sandbox | All three (developer access) | portal | Developers trigger every path with test values, inside quotas | 4 | 3 | 1 | 0 | 1.5 |
 | DOC Docs portal | All three (developer access) | portal | Concepts, guides and reference with tested samples in 8 languages | 6 | 5 | 1 | 0 | 4.25 |
 | SDK SDKs | All three (developer access) | portal | Typed Python and TypeScript clients with automatic idempotency and webhook helpers | 3 | 2 | 1 | 0 | 2.25 |
+| USR User payouts | Decision | prototype | Payouts to the platform's own end users, under the user payout profile | 4 | 0 | 4 | 0 | 2.25 |
 | WEB Marketing site | Go-to-market | portal | A public face that looks real and stays honest | 8 | 6 | 2 | 0 | 3.75 |
 
 ## Totals (Estimate)
 
 | | Stories | Days |
 |---|---|---|
-| All stories | 149 | 73 |
+| All stories | 153 | 75.25 |
 | Must only | 121 | 62.5 |
 | Must, prototype track | 85 | 43.25 |
 | Must, portal track | 36 | 19.25 |
@@ -54,3 +55,4 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | P3 Docs and SDKs | 9 | 6 | 6.5 |
 | P4 Website launch | 8 | 3.25 | 3.75 |
 | L After launch (Should and Could) | 17 | 0 | 7.25 |
+| U User payouts | 4 | 0 | 2.25 |

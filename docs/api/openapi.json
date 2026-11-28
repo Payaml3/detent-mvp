@@ -322,7 +322,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -427,6 +427,19 @@
                         "type": "conflict",
                         "code": "endpoint_disabled",
                         "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -1535,7 +1548,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -1640,6 +1653,19 @@
                         "type": "conflict",
                         "code": "endpoint_disabled",
                         "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -2516,7 +2542,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -2621,6 +2647,19 @@
                         "type": "conflict",
                         "code": "endpoint_disabled",
                         "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -3160,7 +3199,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -3265,6 +3304,19 @@
                         "type": "conflict",
                         "code": "endpoint_disabled",
                         "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -6254,7 +6306,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -6365,6 +6417,19 @@
                       }
                     }
                   },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
                   "shadow_mode": {
                     "summary": "The organisation is in shadow mode, so nothing is sent.",
                     "value": {
@@ -6372,6 +6437,664 @@
                         "type": "conflict",
                         "code": "shadow_mode",
                         "message": "The organisation is in shadow mode, so nothing is sent.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests: `rate_limited`, `quota_exceeded`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "rate_limited": {
+                    "summary": "Too many requests for this key or client address in the current window.",
+                    "value": {
+                      "error": {
+                        "type": "rate_limit",
+                        "code": "rate_limited",
+                        "message": "Too many requests for this key or client address in the current window.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "quota_exceeded": {
+                    "summary": "The organisation used its daily sandbox quota for this kind of request (SBX-02).",
+                    "value": {
+                      "error": {
+                        "type": "quota",
+                        "code": "quota_exceeded",
+                        "message": "The organisation used its daily sandbox quota for this kind of request (SBX-02).",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "Seconds to wait."
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error: `internal_error`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "internal_error": {
+                    "summary": "Something went wrong on DekernAI's side. Nothing was executed because of it.",
+                    "value": {
+                      "error": {
+                        "type": "internal",
+                        "code": "internal_error",
+                        "message": "Something went wrong on DekernAI's side. Nothing was executed because of it.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "payment_intents"
+        ]
+      }
+    },
+    "/v1/payment_intents/{payment_id}/cancel": {
+      "post": {
+        "summary": "Cancel before sending (escalated, held or ready only)",
+        "description": "Cancel before sending: ESCALATED, HELD or READY only; SUBMITTED or UNKNOWN answers 409.",
+        "operationId": "postPaymentIntentsPaymentIdCancel",
+        "parameters": [
+          {
+            "name": "payment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Payment Id"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/Version"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolutionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                }
+              }
+            },
+            "headers": {
+              "Request-Id": {
+                "$ref": "#/components/headers/RequestId"
+              },
+              "RateLimit-Limit": {
+                "$ref": "#/components/headers/RateLimitLimit"
+              },
+              "RateLimit-Remaining": {
+                "$ref": "#/components/headers/RateLimitRemaining"
+              },
+              "RateLimit-Reset": {
+                "$ref": "#/components/headers/RateLimitReset"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request: `unknown_version`, `bad_request`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "unknown_version": {
+                    "summary": "The `DekernAI-Version` header names a version that does not exist.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "unknown_version",
+                        "message": "The `DekernAI-Version` header names a version that does not exist.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "The request could not be read, for example a malformed path parameter.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "bad_request",
+                        "message": "The request could not be read, for example a malformed path parameter.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated: `missing_api_key`, `invalid_api_key`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "missing_api_key": {
+                    "summary": "No `Authorization: Bearer` header was sent.",
+                    "value": {
+                      "error": {
+                        "type": "authentication",
+                        "code": "missing_api_key",
+                        "message": "No `Authorization: Bearer` header was sent.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "invalid_api_key": {
+                    "summary": "The key is unknown, revoked or expired.",
+                    "value": {
+                      "error": {
+                        "type": "authentication",
+                        "code": "invalid_api_key",
+                        "message": "The key is unknown, revoked or expired.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not allowed: `live_mode_unavailable`, `insufficient_scope`, `insufficient_role`, `self_approval_forbidden`, `mandate_mismatch`, `organisation_expired`, `organisation_suspended`, `forbidden`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "live_mode_unavailable": {
+                    "summary": "A live key was sent. DekernAI runs on test networks only.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "live_mode_unavailable",
+                        "message": "A live key was sent. DekernAI runs on test networks only.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "insufficient_scope": {
+                    "summary": "The key does not carry the scope this endpoint needs.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "insufficient_scope",
+                        "message": "The key does not carry the scope this endpoint needs.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "insufficient_role": {
+                    "summary": "The user behind the key does not hold the role this action needs.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "insufficient_role",
+                        "message": "The user behind the key does not hold the role this action needs.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "self_approval_forbidden": {
+                    "summary": "The approver is the person who started the payment.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "self_approval_forbidden",
+                        "message": "The approver is the person who started the payment.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "mandate_mismatch": {
+                    "summary": "The intent names a mandate that is not the one bound to this agent key.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "mandate_mismatch",
+                        "message": "The intent names a mandate that is not the one bound to this agent key.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_expired": {
+                    "summary": "The sandbox organisation has passed its expiry date and is locked.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_expired",
+                        "message": "The sandbox organisation has passed its expiry date and is locked.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "organisation_suspended": {
+                    "summary": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "organisation_suspended",
+                        "message": "DekernAI has suspended the organisation; it is read-only until reinstated.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "forbidden": {
+                    "summary": "The action is not allowed for this caller.",
+                    "value": {
+                      "error": {
+                        "type": "permission",
+                        "code": "forbidden",
+                        "message": "The action is not allowed for this caller.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found: `not_found`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "No such object in your organisation, or no such path.",
+                    "value": {
+                      "error": {
+                        "type": "not_found",
+                        "code": "not_found",
+                        "message": "No such object in your organisation, or no such path.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "conflict": {
+                    "summary": "The object is in a state that does not allow this action.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "conflict",
+                        "message": "The object is in a state that does not allow this action.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "idempotency_conflict": {
+                    "summary": "This `Idempotency-Key` was already used with a different request body.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "idempotency_conflict",
+                        "message": "This `Idempotency-Key` was already used with a different request body.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "idempotency_key_reused": {
+                    "summary": "This `Idempotency-Key` was already used for a different kind of request.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "idempotency_key_reused",
+                        "message": "This `Idempotency-Key` was already used for a different kind of request.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "already_resolved": {
+                    "summary": "The case was already approved or rejected.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "already_resolved",
+                        "message": "The case was already approved or rejected.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "payment_blocked": {
+                    "summary": "The payment was BLOCKED. A block is final and is never approved, retried or resent.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "payment_blocked",
+                        "message": "The payment was BLOCKED. A block is final and is never approved, retried or resent.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "resolve_via_reconciliation": {
+                    "summary": "The payment's outcome is UNKNOWN; only rail evidence through reconciliation can resolve it.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "resolve_via_reconciliation",
+                        "message": "The payment's outcome is UNKNOWN; only rail evidence through reconciliation can resolve it.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "too_many_endpoints": {
+                    "summary": "The organisation already has the maximum number of enabled webhook endpoints.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "too_many_endpoints",
+                        "message": "The organisation already has the maximum number of enabled webhook endpoints.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "endpoint_disabled": {
+                    "summary": "The webhook endpoint is disabled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "endpoint_disabled",
+                        "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "shadow_mode": {
+                    "summary": "The organisation is in shadow mode, so nothing is sent.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "shadow_mode",
+                        "message": "The organisation is in shadow mode, so nothing is sent.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid request: `validation_error`, `unsupported_network`, `network_not_allowed`, `currency_mismatch`, `currency_network_mismatch`, `invalid_amount`, `mandate_invalid`, `user_payouts_unavailable`, `invalid_mode`, `invalid_url`, `unknown_event_type`, `reason_required`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "validation_error": {
+                    "summary": "A field is missing, has the wrong type or is out of range. `param` names it.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "validation_error",
+                        "message": "A field is missing, has the wrong type or is out of range. `param` names it.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "unsupported_network": {
+                    "summary": "The destination or deposit network is not one the sandbox supports.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "unsupported_network",
+                        "message": "The destination or deposit network is not one the sandbox supports.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "network_not_allowed": {
+                    "summary": "The network is supported but not enabled for your organisation.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "network_not_allowed",
+                        "message": "The network is supported but not enabled for your organisation.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "currency_mismatch": {
+                    "summary": "The currency does not match the destination or the expected amount.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "currency_mismatch",
+                        "message": "The currency does not match the destination or the expected amount.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "currency_network_mismatch": {
+                    "summary": "The currency is not available on the chosen network.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "currency_network_mismatch",
+                        "message": "The currency is not available on the chosen network.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "invalid_amount": {
+                    "summary": "The amount is not a positive decimal string with the currency's precision.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "invalid_amount",
+                        "message": "The amount is not a positive decimal string with the currency's precision.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "mandate_invalid": {
+                    "summary": "The mandate is unknown, revoked, expired or not signed for this agent.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "mandate_invalid",
+                        "message": "The mandate is unknown, revoked, expired or not signed for this agent.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "user_payouts_unavailable": {
+                    "summary": "Payouts to end users are not available in the sandbox yet.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "user_payouts_unavailable",
+                        "message": "Payouts to end users are not available in the sandbox yet.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "invalid_mode": {
+                    "summary": "The execution mode is not one of `shadow`, `assist` or `auto`.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "invalid_mode",
+                        "message": "The execution mode is not one of `shadow`, `assist` or `auto`.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "invalid_url": {
+                    "summary": "The webhook URL is not https://, carries credentials, or points at a private address.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "invalid_url",
+                        "message": "The webhook URL is not https://, carries credentials, or points at a private address.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "unknown_event_type": {
+                    "summary": "An event type is not one of the documented types.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "unknown_event_type",
+                        "message": "An event type is not one of the documented types.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "reason_required": {
+                    "summary": "This action needs a written reason.",
+                    "value": {
+                      "error": {
+                        "type": "invalid_request",
+                        "code": "reason_required",
+                        "message": "This action needs a written reason.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -6713,7 +7436,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -6818,6 +7541,19 @@
                         "type": "conflict",
                         "code": "endpoint_disabled",
                         "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -8806,7 +9542,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -8911,6 +9647,19 @@
                         "type": "conflict",
                         "code": "endpoint_disabled",
                         "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -10463,7 +11212,7 @@
             }
           },
           "409": {
-            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `shadow_mode`",
+            "description": "Conflict: `conflict`, `idempotency_conflict`, `idempotency_key_reused`, `already_resolved`, `payment_blocked`, `resolve_via_reconciliation`, `too_many_endpoints`, `endpoint_disabled`, `not_cancellable`, `shadow_mode`",
             "content": {
               "application/json": {
                 "schema": {
@@ -10568,6 +11317,19 @@
                         "type": "conflict",
                         "code": "endpoint_disabled",
                         "message": "The webhook endpoint is disabled.",
+                        "payment_id": null,
+                        "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
+                        "param": null
+                      }
+                    }
+                  },
+                  "not_cancellable": {
+                    "summary": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
+                    "value": {
+                      "error": {
+                        "type": "conflict",
+                        "code": "not_cancellable",
+                        "message": "The payment is SUBMITTED, UNKNOWN or already final, so it can no longer be cancelled.",
                         "payment_id": null,
                         "request_id": "req_4f7c1e1a2b3c4d5e6f708192",
                         "param": null
@@ -14525,6 +15287,7 @@
                   "resolve_via_reconciliation",
                   "too_many_endpoints",
                   "endpoint_disabled",
+                  "not_cancellable",
                   "shadow_mode",
                   "rate_limited",
                   "quota_exceeded",

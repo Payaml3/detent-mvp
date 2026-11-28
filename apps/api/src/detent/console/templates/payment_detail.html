@@ -14,6 +14,16 @@
   {% else %}<p class="muted">Send needs the reviewer, backup owner or payments lead role, and never the person who started the payment.</p>{% endif %}
 </section>
 {% endif %}
+{% if can_cancel %}
+<details class="card" data-section="cancel">
+  <summary>Cancel this payment</summary>
+  <p class="small muted">A cancelled payment is never sent and cannot be reopened. Once a payment is submitted to a rail it can no longer be cancelled.</p>
+  <form method="post" action="/console/payments/{{ p.id }}/cancel" class="filters">
+    <label>Reason (required)<input name="reason" required maxlength="500"></label>
+    <button>Cancel payment</button>
+  </form>
+</details>
+{% endif %}
 
 <h2>Decisions</h2>
 {% for d in p.decisions %}

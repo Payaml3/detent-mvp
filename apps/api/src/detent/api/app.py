@@ -27,6 +27,7 @@ from detent.api.errors import error_response
 from detent.api.limits import RateLimiter
 from detent.api.middleware import request_context
 from detent.clock import Clock
+from detent.console import incidents as console_incidents
 from detent.console import routes as console_routes
 from detent.console.auth import ActingUserRequired, LoginRequired
 from detent.dashboard import mount as dashboard
@@ -96,7 +97,14 @@ def create_app(
     app.middleware("http")(request_context)
 
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-    for router in (console_routes.router, v1.router, v1_webhooks.router, public_status.router):
+    routers = (
+        console_incidents.router,  # before console_routes: its section placeholder catches unknown pages
+        console_routes.router,
+        v1.router,
+        v1_webhooks.router,
+        public_status.router,
+    )
+    for router in routers:
         app.include_router(router)
     dashboard.install(app)
     app.state.screening = MockScreening.from_fixture()
