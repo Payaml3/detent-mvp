@@ -160,10 +160,12 @@ test("404: a real not-found page with navigation, never indexed", () => {
   assert.match(html, /href="\/product\/"/);
 });
 
-test("launch: opening the site to search also removes the noindex header in vercel.json", () => {
+test("launch: opening the site to search also removes the noindex header on the host (Hetzner nginx, D-42; Vercel kept in step)", () => {
   const vercel = JSON.parse(readFileSync(new URL("../vercel.json", import.meta.url), "utf8"));
   const noindexHeader = JSON.stringify(vercel.headers ?? []).includes("noindex");
   assert.equal(noindexHeader, !config.indexable, "X-Robots-Tag noindex must be sent exactly while config.indexable is false");
+  const nginx = readFileSync(new URL("../../../infra/hetzner/nginx-site.conf", import.meta.url), "utf8");
+  assert.equal(/X-Robots-Tag\s+"noindex/.test(nginx), !config.indexable, "the Hetzner nginx config must match config.indexable too");
 });
 
 test("the name comes from one setting: no page source hard-codes it", () => {
