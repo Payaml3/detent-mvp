@@ -134,11 +134,11 @@ def test_the_requester_gets_a_confirmation_that_repeats_nothing_they_typed(
     assert "evil" not in mail.body and "<b>" not in mail.body
 
 
-def test_the_confirmation_carries_the_nda_link_when_one_is_set() -> None:
+def test_the_confirmation_carries_the_nda_link_when_one_is_given() -> None:
     from detent.dashboard.leads import confirmation_body
 
-    with_link = make_settings("org_detent", nda_url="https://sign.example.test/nda")
-    assert "sign it now: https://sign.example.test/nda" in confirmation_body(with_link)
+    link = "https://dashboard.example.test/nda/tok"
+    assert f"sign it now: {link}" in confirmation_body(NO_INBOX, link)
     assert "sign it now" not in confirmation_body(NO_INBOX) and "our team" in confirmation_body(NO_INBOX)
 
 

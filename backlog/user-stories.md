@@ -1785,6 +1785,7 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 **Acceptance criteria**
 
 - [x] One entry action, Request access (D-44; no booking page); access form posts to DSH-10 and the requester gets a confirmation email
+- [x] The requester signs the NDA on our own page from the confirmation email's one-time link (D-45); off while the NDA text has placeholders; the admin inbox shows NDA signed
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** DSH-10, WEB-01 · **Traces to:** D.ops_pages, D.sales_led
 

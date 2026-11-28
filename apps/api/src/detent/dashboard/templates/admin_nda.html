@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Signed NDA{% endblock %}
+{% block main %}
+<h1>Signed NDA</h1>
+<p class="muted">The name, title and company were typed on a public page: treat them as unverified. <a href="/admin/access-requests">Back to access requests</a></p>
+<dl>
+  <dt>Signed by</dt><dd>{{ sig.signer_name }}, {{ sig.signer_title }}</dd>
+  <dt>Company</dt><dd>{{ sig.signer_company }}</dd>
+  <dt>Email (the signing link went here)</dt><dd class="mono">{{ sig.signer_email }}</dd>
+  <dt>Signed at (UTC)</dt><dd>{{ sig.signed_at.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
+  <dt>NDA version</dt><dd>{{ sig.nda_version }} <span class="small mono">SHA-256 {{ sig.nda_sha256 }}</span></dd>
+  <dt>IP address</dt><dd class="mono">{{ sig.ip }}</dd>
+  <dt>Browser</dt><dd class="small">{{ sig.user_agent }}</dd>
+  <dt>Signature</dt><dd><img class="nda-sig" src="/admin/access-requests/{{ sig.lead_id }}/nda.png" alt="Signature drawn by {{ sig.signer_name }}"></dd>
+</dl>
+{% endblock %}

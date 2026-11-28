@@ -274,3 +274,11 @@ td.empty a { text-decoration: underline; text-decoration-thickness: 1px; text-un
 .ai-engine { fill: var(--surface); stroke: var(--muted); stroke-width: 2; stroke-dasharray: 4 3; }
 .ai-engine-text { fill: var(--muted); font: 600 13px var(--font-body); text-anchor: middle; }
 .ai-sub-wait { fill: var(--stop); }
+
+/* D-45: the NDA signing page. */
+.card.nda { max-width: 760px; }
+.nda-text { white-space: pre-wrap; max-height: 420px; overflow-y: auto; margin: 0 0 24px; padding: 16px;
+  border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--surface); font-size: var(--fs-small); }
+.nda-pad { display: block; width: 100%; max-width: 600px; aspect-ratio: 600 / 180; touch-action: none; cursor: crosshair;
+  background: #fff; border: 1px solid var(--control); border-radius: var(--radius-control); }
+.nda-sig { max-width: 300px; background: #fff; border: 1px solid var(--border); }

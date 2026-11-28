@@ -26,6 +26,8 @@ SUBJECTS = {
     "invite.member": "You're invited to join your team on {brand}",
     "access_request": "New access request from the {brand} website",
     "access_request.received": "We've received your {brand} access request",
+    "nda.signed_copy": "Your signed {brand} NDA",
+    "nda.signed_notice": "An access requester signed the {brand} NDA",
 }
 TIMEOUT_SECONDS = 15.0
 AUTH_SCHEME = "Zoho-enczapikey"
