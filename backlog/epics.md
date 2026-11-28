@@ -13,7 +13,7 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | EXC Exceptions and investigation | Operations | prototype | Every escalation has an owner and a deadline, shows raw facts first, and a timeout never becomes an approval | 9 | 8 | 0 | 1 | 4 |
 | LED Ledger, deposits and reconciliation | Operations | prototype | One ledger across rails; deposits credited once; mismatches become exceptions with proposed fixes | 8 | 7 | 0 | 1 | 4.25 |
 | AUD Audit and replay | Operations | prototype | Every step is recorded append-only and any payment can be replayed and exported | 3 | 2 | 1 | 0 | 2 |
-| CON Back-office console | All three (console) | prototype | The screens where the 10-minute demo happens | 10 | 9 | 1 | 0 | 4.75 |
+| CON Back-office console | All three (console) | prototype | The screens where the 10-minute demo happens | 11 | 9 | 2 | 0 | 5.25 |
 | EVL Evaluation harness | All three (proof) | prototype | Measured proof: attacks, faults, interpretation and agreement, gated in CI and published as a results report | 8 | 7 | 1 | 0 | 4.75 |
 | DEM Demo data and scenarios | All three (demo) | prototype | Fictional, repeatable demo data and a one-click scenario runner | 6 | 5 | 1 | 0 | 1.75 |
 | SHD Shadow mode | Decision (shadow mode) | prototype | Decide a client's payments without sending any (the shadow phase of onboarding, or an exported month to calibrate rule set v1) and report agreement | 4 | 0 | 3 | 1 | 2.25 |
@@ -31,7 +31,7 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 
 | | Stories | Days |
 |---|---|---|
-| All stories | 153 | 75.25 |
+| All stories | 154 | 75.75 |
 | Must only | 121 | 62.5 |
 | Must, prototype track | 85 | 43.25 |
 | Must, portal track | 36 | 19.25 |
@@ -56,3 +56,4 @@ Product: agentic payment controls in three layers (decision, orchestration, oper
 | P4 Website launch | 8 | 3.25 | 3.75 |
 | L After launch (Should and Could) | 17 | 0 | 7.25 |
 | U User payouts | 4 | 0 | 2.25 |
+| T AI team view | 1 | 0 | 0.5 |

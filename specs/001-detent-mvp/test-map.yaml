@@ -511,3 +511,7 @@ USR-03:
 USR-04:
   0: ["ci:.github/workflows/ci.yml release gate runs eval/scenarios/attacks/user-payouts.yaml (atk-up-01 to atk-up-09, 0 unauthorised executions)"]
   1: ["integration/test_user_payouts.py::test_new_organisations_are_seeded_with_fictional_users_as_test_values", "integration/test_dashboard_access.py::test_admin_creates_a_client_org_only_with_kyb_and_invites_the_owner"]
+CON-11:
+  0: ["integration/test_ai_team.py::test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide"]
+  1: ["integration/test_ai_team.py::test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide", "integration/test_ai_team.py::test_an_investigation_shows_who_approved_the_case", "integration/test_ai_team.py::test_reconciliation_fixes_show_the_payments_leads_decision", "integration/test_ai_team.py::test_the_overview_map_shows_work_waiting_for_a_person"]
+  2: ["integration/test_ai_team.py::test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide", "integration/test_ai_team.py::test_a_dashboard_member_reaches_the_ai_team_without_demo_links"]

@@ -17,7 +17,7 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | A2.Prove | Product model A2 | Prove module: audit log, replay, evidence export | mvp | INT-03, AGT-05, AUD-01, AUD-02, AUD-03, CON-03 |
 | A2.Connect | Product model A2 | Connect module: rail adapters, connection flow, status normalisation | mvp | RAL-01, RAL-02, RAL-03, RAL-04, RAL-08, RAL-09, CON-08 |
 | A2.Route | Product model A2 | Route module: best-rail choice and failover on technical errors only | mvp | RAL-06, RAL-07 |
-| A2.Mandate | Product model A2 | Mandate module: agent-proposed intents stay inside a signed scope | mvp | MND-01, MND-02, MND-03, CON-06 |
+| A2.Mandate | Product model A2 | Mandate module: agent-proposed intents stay inside a signed scope | mvp | MND-01, MND-02, MND-03, CON-06, CON-11 |
 | A2b.rule | Product model A2b | A failure can retry; a rejection can't; no retry can become a second payment | mvp | POL-06, EXE-02, EXE-07 |
 | A2b.states | Product model A2b | Payment states SUBMITTED, UNKNOWN, CONFIRMED, FAILED then RETRY, BLOCKED | mvp | FND-03, INT-01, EXE-01, EXE-05 |
 | A2b.unknown | Product model A2b | UNKNOWN: nothing is resent until the original's outcome is known | mvp | EXE-05, EXE-06, RAL-05 |
@@ -34,7 +34,7 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | A4.fee | Product model A4 | Software fee per payment, not a share of money moved (usage metering) | partly | LED-08 |
 | A4.plans | Product model A4 | Plans: Pilot, Growth, Scale, routing add-on (no free shadow report, B-04) | partly | SHD-02, WEB-01 |
 | A5.proposes | Product model A5 | The LLM proposes; the policy layer decides; uncertain fields flagged, never guessed | mvp | MND-02, AGT-01, AGT-02, CON-05, EVL-04 |
-| A5.tools | Product model A5 | Agent tools are read-only; nothing that moves money | mvp | AGT-03, EXC-03 |
+| A5.tools | Product model A5 | Agent tools are read-only; nothing that moves money | mvp | AGT-03, EXC-03, CON-11 |
 | A5.injection | Product model A5 | Free text is data, never instructions; tested by attack suite | mvp | AGT-04, EVL-02 |
 | A5.citations | Product model A5 | Every agent claim cites evidence or isn't shown | mvp | AGT-05, EXC-03 |
 | A5.gate | Product model A5 | Regression gate: 100+ attack scenarios before every release | mvp | FND-09, EVL-01, EVL-02, EVL-07 |

@@ -373,4 +373,8 @@ def unknown_section(
     """Unknown sections. Policy, mandates and counterparties live in the console (DSH-09)."""
     if section == "policy":
         return RedirectResponse("/console/policy", status_code=303)
+    if section in ("agents", "ai-team"):
+        return RedirectResponse(
+            "/console/agents", status_code=303
+        )  # CON-11: the AI team lives in the console
     return page(request, rt, "not_found.html", member, status_code=404)

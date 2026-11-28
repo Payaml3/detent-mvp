@@ -45,6 +45,7 @@ Source: `venture/05-developer-portal.md` (16 Nov 2026). The marketing site and d
   - toggle real testnet mode (Should)
 - **Usage:** calls, payments decided and agent investigations against daily quotas.
 - **Console and policy:** the back-office screens scoped to the organisation, including the policy screens (rule sets, counterparties, mandates). Demo-only controls are hidden.
+- **AI team (CON-11):** a navigation link to the console's AI team page: the organisation's three DekernAI agents with their limits, their work and the people who approved or rejected it. The agents propose; the client's rules and people decide.
 - **Admin (DekernAI only):** organisations (with the KYB reference), owner invites, evaluation expiry and client suspension, integration verification, and the access-requests inbox (DSH-10).
 
 ## Sandbox (SBX)
@@ -364,6 +365,11 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   `starts_in: shadow`) and the page says the switch is not available in the prototype. Nothing else changes: no mode
   change and no `sk_live_` key (invariant 14). In production the organisation starts in Shadow and moves up on
   signed mode gates (SHD-03).
+
+## As built (slice T: CON-11)
+
+- **AI team:** the dashboard navigation has "AI team", which opens the console's AI team page (`/console/agents`,
+  spec/07) for the member's own organisation; `/dashboard/ai-team` and `/dashboard/agents` redirect there.
 
 ## Needed from the founder before M8 to M11
 

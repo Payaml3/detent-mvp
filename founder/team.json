@@ -106,6 +106,11 @@
    "id": "U",
    "name": "User payouts",
    "status": ""
+  },
+  {
+   "id": "T",
+   "name": "AI team view",
+   "status": ""
   }
  ],
  "tasks": [
@@ -1276,6 +1281,20 @@
    "priority": "",
    "status": "done",
    "progress": "1/1",
+   "deps": [],
+   "dependents": []
+  },
+  {
+   "id": "CON-11",
+   "title": "",
+   "kind": "story",
+   "role": "engineer",
+   "epic": "CON",
+   "initiative": "Back-office console",
+   "slice": "T",
+   "priority": "",
+   "status": "done",
+   "progress": "3/3",
    "deps": [],
    "dependents": []
   },

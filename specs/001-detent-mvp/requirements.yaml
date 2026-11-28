@@ -263,9 +263,9 @@ requirements:
    src: ["spec/07#07--back-office-console", "spec/00#honesty-rules-product-docs-and-website"],
    text: "Every console page shows the prototype banner, the acting user and role, the kill-switch state and, in demo mode, the clock."}
 - {id: FR-091, area: Console, layer: cross-cutting, status: confirmed,
-   stories: [CON-02, CON-03, CON-04, CON-05, CON-06, CON-07, CON-08, CON-10],
+   stories: [CON-02, CON-03, CON-04, CON-05, CON-06, CON-07, CON-08, CON-10, CON-11],
    src: ["spec/07#screens", "spec/07#ux-rules"],
-   text: "Console screens: Overview, Invoice drop, Payments and detail, Exceptions and case, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings, Demo, following the UX rules (full addresses in mono, one colour per status, in-page confirmation)."}
+   text: "Console screens: Overview, AI team, Invoice drop, Payments and detail, Exceptions and case, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings, Demo, following the UX rules (full addresses in mono, one colour per status, in-page confirmation)."}
 - {id: FR-092, area: Evaluation, layer: cross-cutting, status: confirmed, stories: [EVL-01, EVL-02, EVL-03],
    src: ["spec/09#evaluation-suites-eval"],
    text: "An evaluation runner executes YAML scenarios: 100+ attacks across the eleven categories with 0 unauthorised executions, and 30+ faults with 0 duplicates, the ID preserved and no timeout turned FAILED."}

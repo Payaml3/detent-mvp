@@ -399,7 +399,7 @@ Generated from [requirements.yaml](requirements.yaml); sources and model items p
 **Console**
 
 - **FR-090**: Every console page shows the prototype banner, the acting user and role, the kill-switch state and, in demo mode, the clock.
-- **FR-091**: Console screens: Overview, Invoice drop, Payments and detail, Exceptions and case, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings, Demo, following the UX rules (full addresses in mono, one colour per status, in-page confirmation).
+- **FR-091**: Console screens: Overview, AI team, Invoice drop, Payments and detail, Exceptions and case, Reconciliation, Rails, Policy, Mandates, Counterparties, Outbox, Audit, Evaluation, Settings, Demo, following the UX rules (full addresses in mono, one colour per status, in-page confirmation).
 
 **Evaluation**
 
