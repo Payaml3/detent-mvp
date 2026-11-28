@@ -148,7 +148,9 @@ def test_admin_creates_a_client_org_only_with_kyb_and_invites_the_owner(
         ).one()
         seeded = conn.execute(
             text("SELECT (SELECT count(*) FROM counterparties WHERE org_id=:o), "
-                 "(SELECT count(*) FROM policy_versions WHERE org_id=:o AND status='active')"), {"o": org_id}
+                 "(SELECT count(*) FROM policy_versions WHERE org_id=:o AND status='active'), "
+                 "(SELECT count(*) FROM destinations WHERE org_id=:o AND user_account_ref IS NOT NULL)"),
+            {"o": org_id}
         ).one()  # fmt: skip
     assert (org.kind, org.kyb_reference, str(org.kyb_approved_on), org.expires_at) == (
         "client", "KYB-2026-0042", "2026-12-01", None,
@@ -156,6 +158,7 @@ def test_admin_creates_a_client_org_only_with_kyb_and_invites_the_owner(
     assert inv.role == "account_owner" and inv.used_at is None
     assert inv.expires_at - inv.created_at == timedelta(days=7)
     assert seeded[0] > 0 and seeded[1] == 1  # G-18: fictional counterparties and rule set v1
+    assert seeded[2] == 3  # USR-04: fictional user accounts, one destination each
     link_in_outbox(engine, org_id, owner)
     assert audit_kinds(engine, org_id)[-2:] == ["organisation.created", "invite.sent"]
 

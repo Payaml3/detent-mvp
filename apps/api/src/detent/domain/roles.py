@@ -54,6 +54,10 @@ PERMISSIONS: dict[str, frozenset[Role]] = {
     "demo.clock.advance": frozenset(Role) - {R.AUDITOR},
     # INT-04: editing payout details. Payments lead only (G-23, Proposed: the narrowest safe choice).
     "counterparty.edit": frozenset({R.PAYMENTS_LEAD}),
+    # OPS-01: opening and working an incident (DekernAI on-call and the client's two leads).
+    "incident.manage": frozenset({R.ONCALL, R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
+    # INT-05: cancelling before sending; spec/02 "payments lead cancels".
+    "payment.cancel": frozenset({R.PAYMENTS_LEAD}),
     # EXE-06: the UNKNOWN_STUCK case goes to the payments lead (spec/04 owners).
     "unknown.cancel_by_replacement": frozenset({R.PAYMENTS_LEAD}),
     # DSH-11, spec/08 dashboard permissions. Only an account owner can grant or take away that role.
@@ -61,6 +65,14 @@ PERMISSIONS: dict[str, frozenset[Role]] = {
     "team.grant_account_owner": frozenset({R.ACCOUNT_OWNER}),
     "settings.manage": _OWNERS,
     "verification.request": _OWNERS,
+    # DSH-13: only the account owner asks for production mode.
+    "production.request": frozenset({R.ACCOUNT_OWNER}),
+    # SHD-01, SHD-02: the two leads import an export; anyone in the console reads the report.
+    "shadow.import": frozenset({R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
+    # SHD-03: either lead prepares a mode-gate report; each signs it in their own role.
+    "mode_gate.create": frozenset({R.PAYMENTS_LEAD, R.COMPLIANCE_LEAD}),
+    # RAL-09: the payments lead connects and disconnects the organisation's rails.
+    "rail.connect": frozenset({R.PAYMENTS_LEAD}),
     "keys.manage": _BUILDERS,
     "webhooks.manage": _BUILDERS,
     "request_logs.read": _BUILDERS,

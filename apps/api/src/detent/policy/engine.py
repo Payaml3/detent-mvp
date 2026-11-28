@@ -15,7 +15,7 @@ from decimal import Decimal
 from typing import Any, Literal
 
 from detent.domain.money import Money
-from detent.policy.facts import Facts, Unavailable
+from detent.policy.facts import CounterpartyFacts, Facts, Unavailable
 from detent.policy.schema import RuleSet
 
 Result = Literal["PASS", "ESCALATE", "BLOCK", "NOT_EVALUATED"]
@@ -68,6 +68,12 @@ def _m(x: Money) -> str:
     return x.to_decimal_str()
 
 
+def _cp(f: Facts) -> CounterpartyFacts:
+    if f.counterparty is None:  # a counterparty check on a user payout: _run turns this into an escalation
+        raise LookupError("no counterparty")
+    return f.counterparty
+
+
 # ---------------------------------------------------------------------------------------- checks
 def mandate_scope(f: Facts, r: RuleSet) -> CheckResult:
     n = "mandate_scope"
@@ -96,7 +102,7 @@ def kyb_status(f: Facts, r: RuleSet) -> CheckResult:
     n, rule = "kyb_status", r.checks.kyb_status
     if rule is None:
         return _skip(n, "not configured")
-    st = f.counterparty.kyb_status
+    st = _cp(f).kyb_status
     ev = {"status": st}
     if st in rule.block_on:
         return CheckResult(n, "BLOCK", "KYB_FAILED", ev)
@@ -109,8 +115,9 @@ def allowlist(f: Facts, r: RuleSet) -> CheckResult:
     n, rule = "allowlist", r.checks.allowlist
     if rule is None:
         return _skip(n, "not configured")
-    if rule.escalate_if_not_listed and not f.counterparty.allowlisted:
-        return CheckResult(n, "ESCALATE", "NOT_ALLOWLISTED", {"counterparty_id": f.counterparty.id})
+    cp = _cp(f)
+    if rule.escalate_if_not_listed and not cp.allowlisted:
+        return CheckResult(n, "ESCALATE", "NOT_ALLOWLISTED", {"counterparty_id": cp.id})
     return _pass(n)
 
 
@@ -253,7 +260,7 @@ def first_payment(f: Facts, r: RuleSet) -> CheckResult:
     n, u = "first_payment", r.checks.unusual
     if u is None or u.first_payment == "off":
         return _skip(n, "not configured")
-    if f.counterparty.payment_count == 0:
+    if _cp(f).payment_count == 0:
         return CheckResult(n, "ESCALATE", "FIRST_PAYMENT", {"counterparty_payment_count": 0})
     return _pass(n)
 
@@ -262,7 +269,7 @@ def above_norm(f: Facts, r: RuleSet) -> CheckResult:
     n, u = "above_norm", r.checks.unusual
     if u is None:
         return _skip(n, "not configured")
-    cp = f.counterparty
+    cp = _cp(f)
     if cp.payment_count < u.above_norm_min_history or cp.median is None:
         return _skip(n, f"not evaluated: fewer than {u.above_norm_min_history} confirmed payments")
     if cp.median.currency != f.amount.currency:  # G-13
@@ -278,6 +285,22 @@ def above_norm(f: Facts, r: RuleSet) -> CheckResult:
     if Decimal(f.amount.amount_minor) > ratio_limit:
         return CheckResult(n, "ESCALATE", "ABOVE_NORM", ev)
     return CheckResult(n, "PASS", evidence=ev)
+
+
+def user_verified(f: Facts, r: RuleSet) -> CheckResult:
+    """User payout profile only (G-10): the platform's typed flag. The user's KYC is the platform's job."""
+    n = "user_verified"
+    if f.user is None:
+        raise LookupError("no user account")
+    ev = {
+        "user_account_ref": f.user.ref,
+        "user_verified": f.user.verified,
+        "set_by": f.user.verified_set_by,
+        "set_at": f.user.verified_set_at.isoformat(),
+    }
+    if not f.user.verified:
+        return CheckResult(n, "ESCALATE", "USER_NOT_VERIFIED", ev)
+    return _pass(n, **ev)
 
 
 def resubmission_after_block(f: Facts, r: RuleSet) -> CheckResult:
@@ -342,9 +365,30 @@ def combine(results: tuple[CheckResult, ...]) -> Outcome:
     return "EXECUTE"
 
 
+# The user payout profile (spec/04): checks about business counterparties do not apply to the platform's own
+# end users; every safety check still runs, and user_verified runs in kyb_status's place.
+USER_PROFILE_SKIPS = frozenset(
+    {"kyb_status", "allowlist", "first_payment", "above_norm", "daily_cap_counterparty"}
+)
+
+
+def _plan(facts: Facts) -> list[tuple[str, Check | None]]:
+    if facts.profile == "counterparty":
+        return list(CHECKS.items())
+    plan: list[tuple[str, Check | None]] = []
+    for name, check in CHECKS.items():
+        if name == "kyb_status":
+            plan.append(("user_verified", user_verified))
+        plan.append((name, None if name in USER_PROFILE_SKIPS else check))
+    return plan
+
+
 def evaluate(facts: Facts, rules: RuleSet) -> Evaluation:
     results: list[CheckResult] = []
-    for name, check in CHECKS.items():
+    for name, check in _plan(facts):
+        if check is None:
+            results.append(_skip(name, "user payout profile: a business counterparty check"))
+            continue
         res = _run(name, check, facts, rules)
         results.append(res)
         if name == "mandate_scope" and res.result == "BLOCK":

@@ -155,6 +155,31 @@ export interface ResolutionIn {
   reason: string;
 }
 
+/** One of your end users: one payout destination and your user_verified flag. */
+export interface UserAccount {
+  object?: "user_account";
+  user_account_ref?: string;
+  holder_name?: string | null;
+  user_verified?: boolean;
+  verified_set_by?: string;
+  verified_set_at?: string;
+  created_at?: string;
+  destination?: Record<string, unknown> | null;
+}
+
+export interface UserAccountIn {
+  user_verified: boolean;
+  holder_name?: string | null;
+  destination: UserDestinationIn;
+}
+
+export interface UserDestinationIn {
+  kind: "evm_wallet" | "bank_account";
+  network: string;
+  address?: string | null;
+  account_masked?: string | null;
+}
+
 export interface WebhookDelivery {
   id?: string;
   object?: "webhook_delivery";
@@ -209,6 +234,11 @@ export class PaymentIntents {
   /** Confirm sending (assist mode) (`POST /v1/payment_intents/{payment_id}/send`). */
   send(paymentId: string): Promise<PaymentIntent> {
     return this.client.request<PaymentIntent>({ method: "POST", path: `/v1/payment_intents/${encodeURIComponent(String(paymentId))}/send` });
+  }
+
+  /** Cancel a payment before it is sent (`POST /v1/payment_intents/{payment_id}/cancel`). */
+  cancel(paymentId: string, params: ResolutionIn): Promise<PaymentIntent> {
+    return this.client.request<PaymentIntent>({ method: "POST", path: `/v1/payment_intents/${encodeURIComponent(String(paymentId))}/cancel`, body: params });
   }
 
   /** Replay a payment's decisions (`GET /v1/payment_intents/{payment_id}/replay`). */
@@ -270,6 +300,20 @@ export class RequestLogs {
   /** List this organisation's request logs (`GET /v1/request_logs`). */
   list(options: { "status"?: number | null; "payment_id"?: string | null; "idempotency_key"?: string | null; "limit"?: number; "starting_after"?: number | null } = {}): Promise<Page<RequestLog>> {
     return this.client.request<Page<RequestLog>>({ method: "GET", path: `/v1/request_logs`, query: { "status": options["status"], "payment_id": options["payment_id"], "idempotency_key": options["idempotency_key"], "limit": options["limit"], "starting_after": options["starting_after"] } });
+  }
+}
+
+export class UserAccounts {
+  constructor(private readonly client: Requester) {}
+
+  /** Get a user account (`GET /v1/user_accounts/{user_account_ref}`). */
+  retrieve(userAccountRef: string): Promise<UserAccount> {
+    return this.client.request<UserAccount>({ method: "GET", path: `/v1/user_accounts/${encodeURIComponent(String(userAccountRef))}` });
+  }
+
+  /** Register a user account and its destination (`PUT /v1/user_accounts/{user_account_ref}`). */
+  register(userAccountRef: string, params: UserAccountIn): Promise<UserAccount> {
+    return this.client.request<UserAccount>({ method: "PUT", path: `/v1/user_accounts/${encodeURIComponent(String(userAccountRef))}`, body: params });
   }
 }
 
@@ -389,6 +433,7 @@ export function resources(client: Requester) {
     exceptions: new Exceptions(client),
     killSwitch: new KillSwitch(client),
     requestLogs: new RequestLogs(client),
+    userAccounts: new UserAccounts(client),
     mandates: new Mandates(client),
     policy: new Policy(client),
     depositIntents: new DepositIntents(client),

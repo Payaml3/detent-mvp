@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Shadow report{% endblock %}
+{% block main %}
+<h1>Shadow-phase report: {{ rep.import.label }}</h1>
+<p class="small muted mono">{{ rep.import.id }} · imported {{ rep.import.created_at.strftime('%Y-%m-%d %H:%M') }} UTC by {{ rep.import.created_by }}</p>
+<form method="get" class="filters">
+  <label>Week<select name="week"><option value="">Whole import</option>{% for w in weeks %}<option value="{{ w }}"{% if w == week %} selected{% endif %}>{{ w }}</option>{% endfor %}</select></label>
+  <button>Show</button>
+  <a class="button" href="/console/shadow/{{ rep.import.id }}/report.html{% if week %}?week={{ week }}{% endif %}">Export HTML</a>
+  <a class="button" href="/console/shadow/{{ rep.import.id }}/report.pdf{% if week %}?week={{ week }}{% endif %}">Export PDF</a>
+</form>
+{% include "_shadow_report_body.html" %}
+{% endblock %}

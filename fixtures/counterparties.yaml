@@ -75,7 +75,10 @@ counterparties:
     history: {payment_count: 40, median_amount: {amount: "300.00", currency: GBP}}
     destinations:
       - {id: dst_kestrel_acct, kind: bank_account, network: banksim-fps, sort_code_masked: "**-**-07", first_seen_days_ago: 400, last_changed_days_ago: 400}
-user_accounts:   # platform end-user balances for deposits and user payouts
-  - {account_ref: "acct_u1001", name: "User 1001 (fictional)", currency: USDC}
-  - {account_ref: "acct_u1002", name: "User 1002 (fictional)", currency: USDC}
-  - {account_ref: "acct_u1003", name: "User 1003 (fictional)", currency: GBP}
+user_accounts:   # platform end users: deposits, and user payouts (slice U, G-10; sandbox test values)
+  - {account_ref: "acct_u1001", name: "User 1001 (fictional)", currency: USDC, user_verified: true,     # EXECUTE
+     destination: {id: dst_u1001_base, kind: evm_wallet, network: base-sepolia, address: "{{WALLET_USER_1001}}", first_seen_days_ago: 60, last_changed_days_ago: 60}}
+  - {account_ref: "acct_u1002", name: "User 1002 (fictional)", currency: USDC, user_verified: false,    # USER_NOT_VERIFIED
+     destination: {id: dst_u1002_base, kind: evm_wallet, network: base-sepolia, address: "{{WALLET_USER_1002}}", first_seen_days_ago: 60, last_changed_days_ago: 60}}
+  - {account_ref: "acct_u1003", name: "User 1003 (fictional)", currency: GBP, user_verified: true,      # CHANGED_DETAILS
+     destination: {id: dst_u1003_acct, kind: bank_account, network: banksim-fps, account_masked: "**-**-13", first_seen_days_ago: 90, last_changed_days_ago: 2}}

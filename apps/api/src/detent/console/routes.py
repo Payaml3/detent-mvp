@@ -48,6 +48,16 @@ def _kill_switch_engaged(rt: Runtime, user: ActingUser | None) -> bool:
     return bool(v)
 
 
+def _sev1(rt: Runtime, user: ActingUser | None) -> list[Any]:
+    """EXE-10: a red banner on every page while a Sev 1 incident is open."""
+    from detent.incidents.records import open_sev1
+
+    if user is None:
+        return []
+    with rt.engine.connect() as conn:
+        return open_sev1(conn, user.org_id)
+
+
 def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ctx: Any) -> HTMLResponse:
     from detent.dashboard.web import csrf_token
 
@@ -56,6 +66,7 @@ def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ct
         "brand": rt.settings.brand_name,
         "user": user,
         "kill_switch_engaged": _kill_switch_engaged(rt, user),
+        "sev1_incidents": _sev1(rt, user),
         # DSH-09: a dashboard member sees their own organisation, without the demo-only controls.
         "dashboard": member_mode,
         "dashboard_csrf": csrf_token(request) if member_mode else "",
@@ -276,7 +287,6 @@ def edit_destination(
 
 # ---------------------------------------------------------------------------------- S3: review loop
 SECTIONS_NOT_BUILT = {
-    "audit": ("Audit", "Searchable audit log, replay and evidence export (AUD-02, AUD-03)."),
     "evaluation": ("Evaluation", "Release-gate suites and the results report (EVL, slice S8)."),
 }
 
@@ -300,8 +310,9 @@ def payments(
         rows = conn.execute(
             text(
                 "SELECT p.id, p.status, p.amount_minor, p.currency, p.source, p.reference, p.created_at, "
-                "c.name AS payee FROM payment_intents p LEFT JOIN counterparties c ON c.org_id = p.org_id "
-                "AND c.id = p.counterparty_id WHERE p.org_id=:o "
+                "p.user_account_ref, c.name AS payee FROM payment_intents p "
+                "LEFT JOIN counterparties c ON c.org_id = p.org_id AND c.id = p.counterparty_id "
+                "WHERE p.org_id=:o "
                 "AND p.generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
                 "AND (CAST(:s AS text) IS NULL OR p.status "
                 "= :s) "
@@ -360,8 +371,41 @@ def payment_detail(
         explorer=expl,
         mode=mode,
         can_send=can_send,
+        can_cancel=view["status"] in ("ESCALATED", "HELD", "READY") and allowed("payment.cancel", user.role),
         error=request.query_params.get("error"),
     )
+
+
+@router.post("/payments/{payment_id}/cancel")
+def console_cancel(
+    request: Request,
+    payment_id: str,
+    reason: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("payment.cancel")),  # noqa: B008
+) -> Response:
+    """INT-05: cancel an escalated, held or ready payment; it is never sent."""
+    from urllib.parse import quote
+
+    from detent.intents.cancel import CancelError, cancel_intent
+
+    with rt.engine.connect() as conn:
+        if not visible(conn, "payment_intents", user.org_id, payment_id):
+            raise HTTPException(status_code=404)
+    try:
+        cancel_intent(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            payment_id=payment_id,
+            actor=Actor(user.id, user.role.value),
+            reason=reason,
+        )
+    except CancelError as exc:
+        return RedirectResponse(
+            f"/console/payments/{payment_id}?error={quote(str(exc)[:300])}", status_code=303
+        )
+    return RedirectResponse(f"/console/payments/{payment_id}", status_code=303)
 
 
 @router.post("/payments/{payment_id}/send")
@@ -404,7 +448,10 @@ def exceptions_queue(
         rows = conn.execute(
             text(
                 "SELECT c.id, c.payment_id, c.type, c.tier, c.reasons, c.owner_id, c.deadline_at, c.status, "
-                "u.display_name AS owner_name, p.amount_minor, p.currency FROM exception_cases c "
+                "u.display_name AS owner_name, p.amount_minor, p.currency, p.user_account_ref, "
+                "cp.name AS payee FROM exception_cases c "
+                "LEFT JOIN counterparties cp ON cp.org_id = c.org_id AND cp.id = ("
+                "SELECT counterparty_id FROM payment_intents WHERE org_id = c.org_id AND id = c.payment_id) "
                 "LEFT JOIN users u ON u.org_id = c.org_id AND u.id = c.owner_id "
                 "LEFT JOIN payment_intents p ON p.org_id = c.org_id AND p.id = c.payment_id "
                 "WHERE c.org_id=:o AND c.status IN ('OPEN','HELD_OVERDUE') "
@@ -638,8 +685,12 @@ def rails_screen(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
-    """CON-08: per rail, the network or currency, balance, pre-funded limit usage and the last 20 attempts."""
+    """CON-08: per rail, the network or currency, balance, pre-funded limit usage and the last 20 attempts.
+
+    RAL-08 adds the rolling success rate, p95 latency and the circuit breaker's state."""
     from detent.domain.money import Currency, Money
+    from detent.rails.health import is_open as rail_is_open
+    from detent.rails.health import stats as rail_stats
     from detent.rails.registry import build_adapters
 
     day = rt.clock.now().date().isoformat()
@@ -689,7 +740,15 @@ def rails_screen(
                 else None
             )
             rails.append(
-                {"row": r, "usage": usage, "attempts": attempts, "balance": balance, "per_payment": ppl}
+                {
+                    "row": r,
+                    "usage": usage,
+                    "attempts": attempts,
+                    "balance": balance,
+                    "per_payment": ppl,
+                    "health": rail_stats(conn, user.org_id, r.id),
+                    "circuit_open": rail_is_open(conn, user.org_id, r),
+                }
             )
     return page(request, rt, "rails.html", user, rails=rails)
 
@@ -1094,9 +1153,37 @@ def settings_page(
             text("SELECT * FROM mode_changes WHERE org_id=:o ORDER BY created_at DESC, id DESC LIMIT 10"),
             {"o": user.org_id},
         ).all()
-    can_approve = pending is not None and mode_change_approved(
-        proposer=(pending.proposed_by, Role(pending.proposed_role)), approver=(user.id, user.role)
-    )
+        # CON-10: the fail-safe changes like the mode; deadlines and weights are shown read-only.
+        fs_pending = pending_mode_change(conn, user.org_id, "fail_safe")
+        from detent.policy.store import NoActivePolicy, active_policy
+        from detent.routing.engine import DEFAULT_WEIGHTS
+
+        try:
+            pol = active_policy(conn, user.org_id)
+            deadlines, policy_version = dict(pol.rules.deadlines), pol.version
+        except NoActivePolicy:
+            deadlines, policy_version = {}, None
+        ready_gates = conn.execute(
+            text(
+                "SELECT id, to_mode FROM mode_gates WHERE org_id=:o AND from_mode=:m AND passed "
+                "AND payments_lead_id IS NOT NULL AND compliance_lead_id IS NOT NULL AND "
+                "mode_change_id IS NULL "
+                "ORDER BY created_at DESC"
+            ),
+            {"o": user.org_id, "m": mode},
+        ).all()
+        rail_weights = conn.execute(
+            text("SELECT id, weights FROM rails WHERE org_id=:o AND weights IS NOT NULL ORDER BY id"),
+            {"o": user.org_id},
+        ).all()
+
+    def approvable(p: Any) -> bool:
+        return p is not None and mode_change_approved(
+            proposer=(p.proposed_by, Role(p.proposed_role)), approver=(user.id, user.role)
+        )
+
+    can_approve = approvable(pending)
+    lead = allowed("org.change_mode.propose", user.role)
     return page(
         request,
         rt,
@@ -1107,9 +1194,18 @@ def settings_page(
         orch=orch,
         fail_safe=fail_safe,
         history=history,
-        can_propose=allowed("org.change_mode.propose", user.role) and pending is None,
+        can_propose=lead and pending is None,
         can_approve=can_approve,
-        can_withdraw=pending is not None and allowed("org.change_mode.propose", user.role),
+        can_withdraw=pending is not None and lead,
+        fs_pending=fs_pending,
+        fs_can_propose=lead and fs_pending is None,
+        fs_can_approve=approvable(fs_pending),
+        fs_can_withdraw=fs_pending is not None and lead,
+        deadlines=deadlines,
+        policy_version=policy_version,
+        default_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
+        rail_weights=rail_weights,
+        ready_gates=ready_gates,
         error=request.query_params.get("error"),
     )
 
@@ -1127,6 +1223,8 @@ def console_propose_mode(
     request: Request,
     to_mode: str = Form(""),
     reason: str = Form(""),
+    setting: str = Form("mode"),
+    gate_id: str = Form(""),
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(require_permission("org.change_mode.propose")),  # noqa: B008
 ) -> RedirectResponse:
@@ -1140,6 +1238,8 @@ def console_propose_mode(
             actor=Actor(user.id, user.role.value),
             to_mode=to_mode,
             reason=reason,
+            setting=setting,
+            gate_id=gate_id or None,
         )
     except ModeError as exc:
         return _settings_redirect(exc)
@@ -1300,11 +1400,13 @@ def demo_page(
 ) -> HTMLResponse:
     demo_only(user)
     from detent.demo.generations import current_generation
+    from detent.demo.packs import current_pack, packs
     from detent.demo.scenarios import SCENARIOS, recorded
 
     _demo_enabled(rt)
     with rt.engine.connect() as conn:
         gen = current_generation(conn, rt.settings.demo_org_id)
+        pack = current_pack(conn, user.org_id)
     results = {sid: recorded(rt, user.org_id, sid) for sid in SCENARIOS if sid != "reset"}
     return page(
         request,
@@ -1314,6 +1416,8 @@ def demo_page(
         scenarios=list(SCENARIOS.values()),
         results=results,
         generation=gen,
+        packs=packs(),
+        pack=pack,
         flash=request.query_params.get("result"),
         error=request.query_params.get("error"),
     )
@@ -1361,6 +1465,47 @@ def demo_run(
         return RedirectResponse("/console/act-as", status_code=303)
     note = " ".join(result.lines)[:600]
     return RedirectResponse(f"/console/demo?result={quote(note)}#{scenario_id}", status_code=303)
+
+
+@router.post("/demo/reset")
+def demo_reset_pack(
+    request: Request,
+    pack: str = Form("default"),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    """DEM-06: reset into a chosen scenario pack (payments lead only, like every reset)."""
+    demo_only(user)
+    from urllib.parse import quote
+
+    from detent.demo.generations import ResetRefused, reset_demo
+
+    _demo_enabled(rt)
+    try:
+        reset_demo(rt, actor=Actor(user.id, user.role.value), pack=pack)
+    except ResetRefused as exc:
+        return RedirectResponse(f"/console/demo?error={quote(str(exc)[:400])}", status_code=303)
+    request.session.pop("user_id", None)  # the new generation has its own users
+    return RedirectResponse("/console/act-as", status_code=303)
+
+
+@router.post("/demo/pack-batch")
+def demo_pack_batch(
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    """DEM-06: run the current pack's short batch through the rules."""
+    demo_only(user)
+    from urllib.parse import quote
+
+    from detent.demo.packs import current_pack, run_pack_batch
+
+    _demo_enabled(rt)
+    with rt.engine.connect() as conn:
+        pack = current_pack(conn, user.org_id)
+    rows = run_pack_batch(rt, user.org_id, Actor(user.id, user.role.value), pack)
+    note = "; ".join(f"{r['ref']} {r['outcome']} (expected {r['expected']})" for r in rows)
+    return RedirectResponse(f"/console/demo?result={quote(note[:600])}", status_code=303)
 
 
 # ------------------------------------------------------------------------------------- AUD-02 replay

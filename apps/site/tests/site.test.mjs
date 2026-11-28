@@ -15,6 +15,7 @@ const PAGES = {
   privacy: "privacy/index.html",
   terms: "terms/index.html",
   cookies: "cookies/index.html",
+  status: "status/index.html",
 };
 const read = (p) => readFileSync(join(DIST, p), "utf8");
 const text = (html) => html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
@@ -118,6 +119,9 @@ test("sub-pages carry their required content", () => {
   const dp = text(read(PAGES.partners));
   assert.match(dp, /seven phases/i);
   assert.match(dp, /data processing agreement/i);
+  // WEB-02 criterion 1: data handling across the phases, the G-19 retention and the non-custodial line.
+  for (const w of [/sandbox request logs are kept for 30 days/i, /append-only/i, /never hold/i]) assert.match(dp, w);
+  for (const n of ["Discovery", "Contract and due diligence", "Sandbox integration", "Policy setup", "Shadow on live traffic", "Go-live", "Scale"]) assert.ok(dp.includes(n), `onboarding phase ${n}`);
   const acc = text(read(PAGES.access));
   for (const w of [/discovery/i, /KYB/, /registration email/i]) assert.match(acc, w);
   assert.ok(!/simulated rails|\.13|\.42|What would you like to test/i.test(acc), "access is the onboarding intake, not a sandbox sign-up");
@@ -197,4 +201,33 @@ test("home: a quotable definition of the product, and no test or prototype wordi
   assert.match(t, new RegExp(`What is ${config.brandName}\\?`));
   assert.match(t, new RegExp(`${config.brandName} is agentic payment controls software for UK and EU platforms`));
   for (const [p, html] of allHtml()) assert.ok(!/test.networks?|prototype/i.test(text(html)), `${p} says test network or prototype`);
+});
+
+test("access form posts to the dashboard's DSH-10 endpoint (WEB-06)", () => {
+  const html = read(PAGES.access);
+  assert.match(config.accessFormAction, /^https:\/\/[^/]+\/access-requests$/);
+  assert.ok(html.includes(`action="${config.accessFormAction}"`), "the form's action is the endpoint");
+  assert.ok(!/isn.t connected yet/i.test(text(html)), "no 'not connected' notice once connected");
+  // The endpoint's field names (detent/dashboard/public.py): name, email, company, title, message, country, platform, rails.
+  for (const f of ["name", "email", "company", "title", "message", "country", "platform", "rails"]) assert.match(html, new RegExp(`name="${f}"`));
+});
+
+test("status page: sandbox API, dashboard and docs, fed by the deploy's health checks (WEB-07)", () => {
+  const html = read(PAGES.status);
+  for (const n of ["Sandbox API", "Dashboard", "Docs"]) assert.ok(text(html).includes(n), n);
+  assert.match(config.statusUrl, /^https:\/\/[^/]+\/status\.json$/);
+  assert.ok(html.includes(`data-url="${config.statusUrl}"`));
+  assert.match(read("index.html"), /href="\/status\/"/, "the footer links the status page");
+});
+
+test("legal review 2026-11-28: no regulated-function claims; the access form says how its data is used", () => {
+  for (const [p, html] of allHtml()) {
+    const t = text(html);
+    for (const rx of [/safeguarded funds/i, /client money/i, /ready for your regulator/i, /never paid twice/i])
+      assert.ok(!rx.test(t), `${p} contains ${rx}`);
+  }
+  const access = read(PAGES.access);
+  assert.match(access, /href="\/privacy\/"/, "the access form links the privacy notice at the point of collection");
+  assert.match(text(access), /don.t add you to a mailing list/i);
+  assert.match(text(read(PAGES.home)), /Pre-launch\./, "the footer says the product is pre-launch");
 });

@@ -41,6 +41,7 @@ ATTACK_MINIMUMS = {
     "rule_tampering": 6,
     "api_authorisation": 8,
     "kill_switch": 4,
+    "user_payouts": 4,
 }
 SAFETY_KEYS = (
     "unauthorised_executions",

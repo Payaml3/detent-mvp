@@ -27,6 +27,7 @@ from detent.domain.money import Currency, Money, MoneyError
 from detent.domain.states import Status
 from detent.intents.registry import counterparty_stats
 from detent.intents.transition import transition
+from detent.intents.users import destination_row, holder_name, user_facts
 from detent.mandates.store import add_usage, release_usage
 from detent.mandates.store import verify as verify_mandate
 from detent.policy.engine import CheckResult, Evaluation, evaluate
@@ -37,6 +38,7 @@ from detent.policy.facts import (
     MandateFacts,
     TravelRuleFacts,
     Unavailable,
+    UserFacts,
 )
 from detent.policy.screening import Screening
 from detent.policy.store import ActivePolicy, active_policy
@@ -89,7 +91,7 @@ class IntentRequest(BaseModel):
     source: Literal["platform", "agent"]
     mandate_id: str | None = Field(default=None, pattern=r"^mnd_")
     counterparty_id: str | None = Field(default=None, pattern=r"^cpt_")
-    user_account_ref: str | None = None
+    user_account_ref: str | None = Field(default=None, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:\-]{0,127}$")
     destination: DestinationIn
     amount: AmountIn
     allow_network_switch: bool = False
@@ -244,13 +246,47 @@ def load_destination(
     )
 
 
-def _scopes(cpt: str, currency: Currency) -> list[str]:
-    # Fixed order: platform row first, then counterparty, so concurrent decisions never deadlock.
-    return [f"platform:{currency.value}", f"counterparty:{cpt}:{currency.value}"]
+def load_user_destination(conn: Connection, org_id: str, ref: str, dest: DestinationIn) -> DestinationFacts:
+    """A user payout goes only to the user's one registered destination (USR-01, G-10)."""
+    r = destination_row(conn, org_id, ref)
+    if r is None:
+        raise RequestProblem(
+            "validation_error",
+            "this user account has no registered destination; register it with PUT /v1/user_accounts/{ref}",
+            "user_account_ref",
+        )
+    if (
+        (dest.destination_id and dest.destination_id != r.id)
+        or r.network != dest.network
+        or r.kind != dest.kind
+        or (dest.address and (r.address or "").lower() != dest.address.lower())
+    ):
+        raise RequestProblem(
+            "validation_error", "destination is not the user's registered destination", "destination"
+        )
+    return DestinationFacts(
+        r.id,
+        True,
+        r.address,
+        r.account_masked,
+        r.first_seen_at,
+        r.last_changed_at,
+        r.last_changed_by,
+        previous_details(conn, org_id, r.id),
+    )
+
+
+def _scopes(cpt: str | None, currency: Currency) -> list[str]:
+    # Fixed order: platform row first, then counterparty, so concurrent decisions never deadlock. A user
+    # payout counts against the platform cap only (spec/04 User payouts).
+    out = [f"platform:{currency.value}"]
+    if cpt is not None:
+        out.append(f"counterparty:{cpt}:{currency.value}")
+    return out
 
 
 def read_counters(
-    conn: Connection, org_id: str, cpt: str, currency: Currency, day: str
+    conn: Connection, org_id: str, cpt: str | None, currency: Currency, day: str
 ) -> tuple[Money, Money]:
     """Lock and read today's cap counters (confirmed plus in-flight). Concurrent decisions queue here."""
     used = []
@@ -267,11 +303,11 @@ def read_counters(
             {"o": org_id, "s": scope, "p": day},
         ).scalar_one()
         used.append(Money(int(v), currency))
-    return used[0], used[1]
+    return used[0], used[1] if len(used) > 1 else Money(0, currency)
 
 
 def add_to_counters(
-    conn: Connection, org_id: str, cpt: str, amount: Money, day: str, payment_id: str
+    conn: Connection, org_id: str, cpt: str | None, amount: Money, day: str, payment_id: str
 ) -> None:
     """The payment becomes in flight: its amount counts against today's caps until it is released."""
     for scope in _scopes(cpt, amount.currency):
@@ -321,28 +357,37 @@ def release_counters(conn: Connection, org_id: str, payment_id: str) -> None:
 
 
 def find_recent_block(
-    conn: Connection, org_id: str, cpt: str, address: str | None, since: datetime
+    conn: Connection,
+    org_id: str,
+    cpt: str | None,
+    address: str | None,
+    since: datetime,
+    user_ref: str | None = None,
 ) -> str | None:
-    """D-10: a block on the same counterparty or the same destination address, whatever the amount."""
+    """D-10: a block on the same counterparty, user account or destination address, whatever the amount."""
     return conn.execute(
         text(
             "SELECT p.id FROM payment_intents p LEFT JOIN destinations d "
             "ON d.org_id = p.org_id AND d.id = p.destination_id "
             "WHERE p.org_id=:o AND p.status='BLOCKED' AND p.updated_at >= :since "
-            "AND (p.counterparty_id=:c OR (CAST(:a AS text) IS NOT NULL AND lower(d.address)=lower(CAST(:a "
-            "AS text)))) "
+            "AND (p.counterparty_id=:c OR p.user_account_ref=:u "
+            "OR (CAST(:a AS text) IS NOT NULL AND lower(d.address)=lower(CAST(:a AS text)))) "
             "ORDER BY p.updated_at DESC LIMIT 1"
         ),
-        {"o": org_id, "since": since, "c": cpt, "a": address},
+        {"o": org_id, "since": since, "c": cpt, "u": user_ref, "a": address},
     ).scalar_one_or_none()
 
 
 def load_travel_rule(
-    org: OrgRow, cp: CounterpartyFacts, dest: DestinationFacts, supplied: dict[str, Any] | None, source: str
+    org: OrgRow,
+    beneficiary_name: str | None,
+    dest: DestinationFacts,
+    supplied: dict[str, Any] | None,
+    source: str,
 ) -> TravelRuleFacts:
     return TravelRuleFacts(
         originator={"name": org.registered_name, "account": org.registered_account},
-        beneficiary={"name": cp.name, "account": dest.address or dest.account_masked},
+        beneficiary={"name": beneficiary_name, "account": dest.address or dest.account_masked},
         supplied=supplied if source == "platform" else None,
     )
 
@@ -428,14 +473,23 @@ def _claim_idempotency(conn: Connection, clock: Clock, c: _Ctx) -> tuple[int, di
     return int(rec.response["status_code"]), rec.response["body"]
 
 
-def _validate_refs(conn: Connection, c: _Ctx) -> str:
+def _validate_refs(conn: Connection, c: _Ctx) -> str | None:
+    """The counterparty ID, or None for a user payout (whose account must be registered)."""
     req = c.req
     if req.user_account_ref is not None:
-        raise RequestProblem(
-            "user_payouts_unavailable",
-            "Payouts to end users are not available yet (D-26). Use counterparty_id.",
-            "user_account_ref",
-        )
+        if req.source == "agent":
+            raise RequestProblem(
+                "validation_error",
+                "an agent intent pays a counterparty, not a user account",
+                "user_account_ref",
+            )
+        if user_facts(conn, c.org_id, req.user_account_ref) is None:
+            raise RequestProblem(
+                "validation_error",
+                "unknown user account; register it with PUT /v1/user_accounts/{ref}",
+                "user_account_ref",
+            )
+        return None
     assert req.counterparty_id is not None
     if not counterparty_exists(conn, c.org_id, req.counterparty_id):
         raise RequestProblem("validation_error", "unknown counterparty", "counterparty_id")
@@ -444,18 +498,19 @@ def _validate_refs(conn: Connection, c: _Ctx) -> str:
     return req.counterparty_id
 
 
-def _insert_intent(conn: Connection, clock: Clock, c: _Ctx, cpt: str, dest_id: str | None) -> str:
+def _insert_intent(conn: Connection, clock: Clock, c: _Ctx, cpt: str | None, dest_id: str | None) -> str:
     now = clock.now()
     pid = new_id(Prefix.PAY, now)
     amount = c.req.amount.money()
     conn.execute(
         text(
-            "INSERT INTO payment_intents (id, org_id, source, mandate_id, counterparty_id, destination_id, "
+            "INSERT INTO payment_intents (id, org_id, source, mandate_id, counterparty_id, user_account_ref, "
+            "destination_id, "
             "amount_minor, currency, network_constraint, allow_network_switch, reference, notes, "
             "travel_rule, "
             "status, idempotency_key, request_hash, initiated_by, created_at, updated_at) VALUES (:id, :o, "
             ":src, "
-            ":m, :c, :d, :a, :cur, :net, :sw, :ref, :notes, CAST(:tr AS jsonb), 'RECEIVED', :k, :h, :by, "
+            ":m, :c, :u, :d, :a, :cur, :net, :sw, :ref, :notes, CAST(:tr AS jsonb), 'RECEIVED', :k, :h, :by, "
             ":t, :t)"
         ),
         {
@@ -464,6 +519,7 @@ def _insert_intent(conn: Connection, clock: Clock, c: _Ctx, cpt: str, dest_id: s
             "src": c.req.source,
             "m": c.req.mandate_id,
             "c": cpt,
+            "u": c.req.user_account_ref,
             "d": dest_id,
             "a": amount.amount_minor,
             "cur": amount.currency.value,
@@ -489,6 +545,7 @@ def _insert_intent(conn: Connection, clock: Clock, c: _Ctx, cpt: str, dest_id: s
             "amount": amount.to_api(),
             "source": c.req.source,
             "counterparty_id": cpt,
+            "user_account_ref": c.req.user_account_ref,
             "destination_id": dest_id,
             "network": c.req.destination.network,
             "decision_only": c.decision_only,
@@ -597,19 +654,24 @@ def build_facts(
     source: str,
     amount: Money,
     network: str,
-    cp: CounterpartyFacts,
+    cp: CounterpartyFacts | None,
     dest: DestinationFacts,
     supplied_travel_rule: dict[str, Any] | None,
     screening: Screening,
     already_counted: Money | None,
     mandate_id: str | None = None,
     mandate_key: SecretStr | None = None,
+    user: UserFacts | None = None,
+    user_name: str | None = None,
 ) -> Facts:
     """Gather the typed facts for one evaluation. ``already_counted`` is this payment's own amount when a
-    re-run happens while it is in flight, so it is not counted against the cap twice."""
+    re-run happens while it is in flight, so it is not counted against the cap twice. A user payout passes
+    ``user`` (and the platform's ``user_name`` for screening and the travel rule) instead of ``cp``."""
     now = clock.now()
     day = now.date().isoformat()  # UTC calendar day (G-14)
-    counters = _try("counters", read_counters, conn, org_id, cp.id, amount.currency, day)
+    cpt = cp.id if cp is not None else None
+    payee_name = cp.name if cp is not None else user_name
+    counters = _try("counters", read_counters, conn, org_id, cpt, amount.currency, day)
     if isinstance(counters, tuple):
         used_p, used_c = counters
         if already_counted is not None:
@@ -619,9 +681,11 @@ def build_facts(
     recent_block = None
     if rules.checks.resubmission_after_block is not None:
         since = now - timedelta(hours=rules.checks.resubmission_after_block.window_hours)
-        recent_block = find_recent_block(conn, org_id, cp.id, dest.address, since)
+        recent_block = find_recent_block(
+            conn, org_id, cpt, dest.address, since, user_ref=user.ref if user is not None else None
+        )
     mandate: MandateFacts | Unavailable | None = None
-    if source == "agent":
+    if source == "agent" and cpt is not None:
         mandate = (
             _try(
                 "mandate",
@@ -631,7 +695,7 @@ def build_facts(
                     mandate_id=mandate_id,
                     key=mandate_key,
                     now=now,
-                    payee=cp.id,
+                    payee=cpt,
                     amount=amount,
                     network=network,
                     already_counted=already_counted is not None,
@@ -647,12 +711,13 @@ def build_facts(
         network=network,
         counterparty=cp,
         destination=dest,
-        screening=_try("screening", lambda: screening.check(address=dest.address, name=cp.name)),
-        travel_rule=load_travel_rule(org, cp, dest, supplied_travel_rule, source),
+        screening=_try("screening", lambda: screening.check(address=dest.address, name=payee_name)),
+        travel_rule=load_travel_rule(org, payee_name, dest, supplied_travel_rule, source),
         used_today_platform=used_p,
         used_today_counterparty=used_c,
         recent_block_id=recent_block,
         mandate=mandate,
+        user=user,
     )
 
 
@@ -702,6 +767,8 @@ _APPROVAL_BASIS = (
     ("counterparty", "id"),
     ("counterparty", "kyb_status"),
     ("counterparty", "allowlisted"),
+    ("user", "ref"),
+    ("user", "verified"),
 )
 # A system failure is never something a person can approve away (fail closed).
 _NEVER_APPROVABLE = {"SYSTEM_UNAVAILABLE"}
@@ -760,15 +827,19 @@ def reevaluate(
     ).scalar_one_or_none()
     p = conn.execute(
         text(
-            "SELECT source, counterparty_id, destination_id, amount_minor, currency, network_constraint, "
-            "travel_rule, status, counted_on, mandate_id FROM payment_intents WHERE org_id=:o AND id=:p"
+            "SELECT source, counterparty_id, user_account_ref, destination_id, amount_minor, currency, "
+            "network_constraint, travel_rule, status, counted_on, mandate_id FROM payment_intents "
+            "WHERE org_id=:o AND id=:p"
         ),
         {"o": org_id, "p": payment_id},
     ).one()
     org = load_org(conn, org_id)
     policy = active_policy(conn, org_id)
     amount = Money(int(p.amount_minor), Currency(p.currency))
-    cp = load_counterparty(conn, org_id, p.counterparty_id)
+    cp = load_counterparty(conn, org_id, p.counterparty_id) if p.counterparty_id else None
+    user = user_facts(conn, org_id, p.user_account_ref) if p.user_account_ref else None
+    if p.user_account_ref and user is None:
+        raise LookupError(f"user account {p.user_account_ref} is missing")  # fail closed: the caller holds
     dest = load_destination_by_id(conn, org_id, p.destination_id)
     in_flight = p.counted_on is not None  # its own amount is already in today's counters
     facts = build_facts(
@@ -787,6 +858,8 @@ def reevaluate(
         already_counted=amount if in_flight else None,
         mandate_id=p.mandate_id,
         mandate_key=mandate_key,
+        user=user,
+        user_name=holder_name(conn, org_id, p.user_account_ref) if p.user_account_ref else None,
     )
     result = evaluate(facts, policy.rules)
     facts_json = _jsonable(facts)
@@ -817,6 +890,7 @@ def reevaluate(
                 {
                     "facts": facts_json,
                     "rule_version": policy.version,
+                    "profile": facts.profile,
                     "rerun_reason": reason,
                     "changed": changed,
                 }
@@ -856,9 +930,14 @@ def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tu
     org = load_org(conn, c.org_id)
     policy = active_policy(conn, c.org_id)
     rules = policy.rules
-    dest = load_destination(conn, clock, c.org_id, cpt, c.req.destination)
+    ref = c.req.user_account_ref
+    if cpt is None:
+        assert ref is not None
+        dest = load_user_destination(conn, c.org_id, ref, c.req.destination)
+    else:
+        dest = load_destination(conn, clock, c.org_id, cpt, c.req.destination)
     pid = _insert_intent(conn, clock, c, cpt, dest.id)
-    cp = load_counterparty(conn, c.org_id, cpt)
+    cp = load_counterparty(conn, c.org_id, cpt) if cpt is not None else None
     now = clock.now()
     amount = c.req.amount.money()
     day = now.date().isoformat()  # UTC calendar day (G-14)
@@ -878,6 +957,8 @@ def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tu
         already_counted=None,
         mandate_id=c.req.mandate_id,
         mandate_key=c.mandate_key,
+        user=user_facts(conn, c.org_id, ref) if ref else None,
+        user_name=holder_name(conn, c.org_id, ref) if ref else None,
     )
     result: Evaluation = evaluate(facts, rules)
     status = _status_for(
@@ -897,7 +978,7 @@ def _decide(conn: Connection, clock: Clock, c: _Ctx, screening: Screening) -> tu
         policy,
         result.outcome,
         [ch.to_json() for ch in result.checks],
-        {"facts": _jsonable(facts), "rule_version": policy.version},
+        {"facts": _jsonable(facts), "rule_version": policy.version, "profile": facts.profile},
         status,
         status is Status.READY and org.mode == "assist",
     )

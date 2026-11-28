@@ -1,0 +1,52 @@
+# DEM-06 scenario pack: a crypto service provider paying out test USDC withdrawals to wallets.
+# Every name is invented and fictional. Wallets are generated placeholders on test networks only.
+id: crypto-service
+label: "Crypto service provider"
+description: "USDC withdrawals to customer and partner wallets on Base Sepolia and Ethereum Sepolia."
+platform: {name: "Orbital Exchange Ltd (fictional)", mode: auto, fail_safe: manual_queue,
+           registered_account: "GB00 ORBX 0000 0000 0000 00 (fictional)"}
+policy_overrides:
+  checks:
+    limits:
+      auto_limit: {USDC: "25000.00", GBP: "5000.00", EUR: "5000.00"}
+users:
+  - {id: usr_pl, name: "Priya (payments lead)", role: payments_lead}
+  - {id: usr_cl, name: "Marco (compliance lead)", role: compliance_lead}
+  - {id: usr_rv, name: "Sam (reviewer)", role: reviewer}
+  - {id: usr_bo, name: "Lea (backup owner)", role: backup_owner}
+  - {id: usr_oc, name: "DekernAI on-call", role: oncall}
+counterparties:
+  - id: cpt_orbit
+    contact_email: "treasury@orbit.example.invalid"
+    name: "Orbit Market Makers BV (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: NL
+    history: {payment_count: 50, median_amount: {amount: "200.00", currency: USDC}}
+    destinations:
+      - {id: dst_orbit_base, kind: evm_wallet, network: base-sepolia, address: "{{WALLET_ORBIT_BASE}}", first_seen_days_ago: 200, last_changed_days_ago: 200}
+  - id: cpt_nebula
+    contact_email: "ops@nebula.example.invalid"
+    name: "Nebula Labs Ltd (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: GB
+    history: {payment_count: 0}
+    destinations:
+      - {id: dst_nebula_eth, kind: evm_wallet, network: eth-sepolia, address: "{{WALLET_NEBULA_ETH}}", first_seen_days_ago: 1, last_changed_days_ago: 1}   # NEW_WALLET
+  - id: cpt_quasar
+    contact_email: "ops@quasar.example.invalid"
+    name: "Quasar Trading SA (fictional)"
+    kyb_status: failed
+    allowlisted: false
+    jurisdiction: XX
+    history: {payment_count: 0}
+    destinations:
+      - {id: dst_quasar_base, kind: evm_wallet, network: base-sepolia, address: "{{WALLET_QUASAR_BASE}}", first_seen_days_ago: 30, last_changed_days_ago: 30}
+user_accounts:
+  - {account_ref: "acct_c2001", name: "Customer 2001 (fictional)", currency: USDC}
+batch:
+  - {ref: cs1, counterparty: cpt_orbit, amount: "250.00", currency: USDC, network: base-sepolia, expect: EXECUTE}
+  - {ref: cs2, counterparty: cpt_orbit, amount: "180.00", currency: USDC, network: base-sepolia, expect: EXECUTE}
+  - {ref: cs3, counterparty: cpt_nebula, amount: "75.00", currency: USDC, network: eth-sepolia, expect: ESCALATE, reason: [NEW_WALLET, FIRST_PAYMENT]}
+  - {ref: cs4, counterparty: cpt_quasar, amount: "90.00", currency: USDC, network: base-sepolia, expect: BLOCK, reason: KYB_FAILED}

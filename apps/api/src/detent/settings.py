@@ -37,6 +37,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
+        env_ignore_empty=True,  # an empty variable (e.g. an unset Coolify value) means "not set", not ""
     )
 
     app_env: AppEnv = "dev"
@@ -99,6 +100,9 @@ class Settings(BaseSettings):
     sales_inbox: str | None = None
 
     # FND-07: where this instance and its database run, as stated in the console footer and /healthz.
+    # WEB-07: the public status page also checks the docs site; empty means "not monitored".
+    status_docs_url: str = ""
+    status_cache_seconds: int = 60  # how long one round of status checks is reused
     hosting_region: str = "local machine (not deployed)"
     database_region: str = "local machine (not deployed)"
 
@@ -115,6 +119,12 @@ class Settings(BaseSettings):
     # LED-06: how often the worker runs reconciliation for every organisation with a ledger.
     reconciliation_seconds: float = 3600.0
     worker_max_attempts: int = 8
+    # EXE-10: the invariant monitor's cadence, and whether a hit engages the kill switch (on by default).
+    invariant_monitor_seconds: float = 60.0
+    invariant_monitor_kill_switch: bool = True
+    # RAL-08: how often the worker checks rail circuits, and the least time between probes of an open one.
+    rail_health_seconds: float = 30.0
+    rail_probe_seconds: float = 60.0
     # API-04: requests per key per minute (the per-address ceiling is 10 times this).
     api_rate_limit_per_minute: int = 120
     # WHK-03: webhook delivery. Plain http:// and private or loopback addresses are refused unless this is

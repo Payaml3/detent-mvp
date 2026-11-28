@@ -339,6 +339,32 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   `create_payout` regions, the quickstart's `payout.json` and its response) and `--check` fails when it is stale;
   the home page's engineering panel renders it, so the site shows the same tested code as the docs.
 
+## As built (P4)
+
+- **Onboarding page (WEB-02):** `/design-partners/` ("Onboarding" in the menus) lists the seven phases from
+  `apps/site/src/data/onboarding.mjs` and a "Your data" section: what data each phase uses, the append-only audit
+  trail, the G-19 sandbox retention (request logs 30 days; other sandbox data until the organisation expires plus
+  30 days) and that DekernAI never holds client funds or keys. G-19 still needs the founder's legal review.
+- **Access form (WEB-06):** `accessFormAction` in `apps/site/site.config.mjs` is the live deploy's
+  `https://app.dekernai.com/access-requests` (DSH-10); a plain form post, so the visitor lands on the dashboard's
+  thank-you page. "Book a demo" stays an email to the sales inbox until the founder's booking URL replaces
+  `bookingUrl`; WEB-06 is done when it does.
+- **Status page (WEB-07):** `GET /status.json` (`detent/api/status.py`) reports `sandbox_api`, `dashboard` and
+  `docs` as `operational`, `down` or `not_monitored`, with `checked_at`. API and dashboard share the database check
+  (one process); docs is an HTTP GET of `STATUS_DOCS_URL` (empty: not monitored). Results are reused for
+  `STATUS_CACHE_SECONDS` (60) and served to any origin, with nothing private in them. The site's `/status/` page
+  fetches it in the browser every minute (`apps/site/src/lib/status.mjs`); because the site is hosted apart from
+  the deploy, a failed fetch shows the API and dashboard as "can't be reached".
+
+## As built (L group 2: DSH-13)
+
+- **Production mode (DSH-13):** the verification page ends with "Production mode". The request button is offered to
+  the account owner only when the integration is verified (DSH-12) and the active rule version was attested by the
+  client's compliance lead. A request is recorded (`production_requests`, audit `production.requested` with
+  `starts_in: shadow`) and the page says the switch is not available in the prototype. Nothing else changes: no mode
+  change and no `sk_live_` key (invariant 14). In production the organisation starts in Shadow and moves up on
+  signed mode gates (SHD-03).
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Header, Query, Request
+from fastapi import APIRouter, Depends, Header, Path, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import text
@@ -16,6 +16,9 @@ from detent.audit.log import Actor
 from detent.db.retention import REQUEST_LOG_DAYS
 from detent.exceptions.cases import CaseError, approve, reject
 from detent.intents.service import IntentRequest, submit_intent
+from detent.intents.users import REF_PATTERN as USER_REF_PATTERN
+from detent.intents.users import UserAccountIn, register_user
+from detent.intents.users import view as user_view
 from detent.ledger.deposits import DepositRequest
 from detent.logging import request_id_var
 from detent.sandbox.generations import visible
@@ -342,6 +345,57 @@ def list_request_logs(
     return JSONResponse({"data": data, "has_more": more, "next_cursor": str(page[-1].id) if more else None})
 
 
+# ------------------------------------------------------------------------------ user accounts (USR-01)
+@router.put("/user_accounts/{user_account_ref}")
+def put_user_account(
+    request: Request,
+    user_account_ref: Annotated[str, Path(pattern=USER_REF_PATTERN)],
+    body: UserAccountIn,
+    principal: Annotated[Principal, Depends(authenticate)],
+) -> JSONResponse:
+    """Register an end user's one payout destination and the platform's typed user_verified flag."""
+    require(principal, "intents:create")
+    if principal.mandate_id is not None:  # invariant 5: an agent never registers where money goes
+        return error_response(
+            403,
+            "permission",
+            "insufficient_role",
+            "An agent key cannot register user accounts.",
+            request_id=_rid(),
+        )
+    rt = request.app.state.runtime
+    out = register_user(
+        rt.engine,
+        rt.clock,
+        org_id=principal.org_id,
+        ref=user_account_ref,
+        body=body,
+        actor=Actor(principal.user_id, principal.role),
+    )
+    return JSONResponse(out)
+
+
+@router.get("/user_accounts/{user_account_ref}")
+def get_user_account(
+    request: Request,
+    user_account_ref: Annotated[str, Path(pattern=USER_REF_PATTERN)],
+    principal: Annotated[Principal, Depends(authenticate)],
+) -> JSONResponse:
+    require(principal, "read")
+    with request.app.state.runtime.engine.connect() as conn:
+        out = user_view(conn, principal.org_id, user_account_ref)
+    if out is None:
+        return error_response(
+            404,
+            "not_found",
+            "not_found",
+            "No such user account.",
+            request_id=_rid(),
+            param="user_account_ref",
+        )
+    return JSONResponse(out)
+
+
 @router.get("/mandates")
 def list_mandates_api(
     request: Request, principal: Annotated[Principal, Depends(authenticate)]
@@ -438,6 +492,49 @@ def send_payment_intent(
         if exc.status == 404:
             return error_response(404, "not_found", exc.code, str(exc), request_id=_rid())
         return error_response(exc.status, "conflict", exc.code, str(exc), request_id=_rid())
+    with rt.engine.connect() as conn:
+        return JSONResponse(payment_view(conn, principal.org_id, payment_id))
+
+
+# ----------------------------------------------------------------------------------- cancel (INT-05)
+@router.post("/payment_intents/{payment_id}/cancel")
+def cancel_payment_intent(
+    request: Request,
+    payment_id: str,
+    body: ResolutionIn,
+    principal: Annotated[Principal, Depends(authenticate)],
+) -> JSONResponse:
+    """Cancel before sending: ESCALATED, HELD or READY only; SUBMITTED or UNKNOWN answers 409."""
+    from detent.intents.cancel import CancelError, cancel_intent
+
+    require(principal, "intents:create")
+    if principal.mandate_id is not None:  # invariant 5: an agent proposes; it never changes a payment's fate
+        return error_response(
+            403, "permission", "insufficient_role", "An agent key cannot cancel a payment.", request_id=_rid()
+        )
+    rt = request.app.state.runtime
+    with rt.engine.connect() as conn:
+        if not visible(conn, "payment_intents", principal.org_id, payment_id):
+            return error_response(404, "not_found", "not_found", "No such payment intent.", request_id=_rid())
+    try:
+        cancel_intent(
+            rt.engine,
+            rt.clock,
+            org_id=principal.org_id,
+            payment_id=payment_id,
+            actor=Actor(principal.user_id, principal.role),
+            reason=body.reason,
+        )
+    except CancelError as exc:
+        kinds: dict[int, ErrorType] = {404: "not_found", 409: "conflict", 422: "invalid_request"}
+        return error_response(
+            exc.status,
+            kinds[exc.status],
+            exc.code,
+            str(exc),
+            request_id=_rid(),
+            param="reason" if exc.status == 422 else None,
+        )
     with rt.engine.connect() as conn:
         return JSONResponse(payment_view(conn, principal.org_id, payment_id))
 

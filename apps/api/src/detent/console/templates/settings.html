@@ -23,16 +23,55 @@
     <label>Change to
       <select name="to_mode">{% for m in ['shadow', 'assist', 'auto'] if m != mode %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select>
     </label>
+    <label>Mode gate (for a move up)
+      <select name="gate_id"><option value="">(none)</option>{% for g in ready_gates %}<option value="{{ g.id }}">{{ g.id }} → {{ g.to_mode }}</option>{% endfor %}</select>
+    </label>
     <label>Reason (required)<input name="reason" required maxlength="500"></label>
     <button class="primary">Propose</button>
   </form>
+  <p class="small muted">A move up (shadow to assist or auto, assist to auto) names a mode gate signed by both leads on the <a href="/console/shadow">Shadow</a> screen; a production organisation must have one.</p>
   {% else %}<p class="muted small">Only the payments lead and the compliance lead change the mode.</p>{% endif %}
 </section>
-<section class="card"><h2>Fail-safe</h2><p>If any part of a decision fails, the payment goes to <strong>{{ fail_safe.replace('_', ' ') }}</strong>; it is never sent.</p></section>
-<h2>Mode changes</h2>
+<section class="card" data-section="fail-safe">
+  <h2>Fail-safe: {{ fail_safe.replace('_', ' ') }}</h2>
+  <p>If any part of a decision fails, the payment goes to <strong>{{ fail_safe.replace('_', ' ') }}</strong>; it is never sent.</p>
+  <dl class="facts">
+    <dt>hold</dt><dd>The payment is held (HELD); it goes back to READY only when the condition clears and the rules re-run with EXECUTE.</dd>
+    <dt>manual queue</dt><dd>The payment goes to the exceptions queue for a person to decide.</dd>
+  </dl>
+  {% if fs_pending %}
+  <p class="note">Change to <strong>{{ fs_pending.to_mode.replace('_', ' ') }}</strong> proposed by {{ fs_pending.proposed_by }} ({{ fs_pending.proposed_role }}): {{ fs_pending.reason }}</p>
+  {% if fs_can_approve %}
+  <form method="post" action="/console/settings/mode/{{ fs_pending.id }}/approve"><button class="primary">Approve the fail-safe change</button></form>
+  {% else %}<p class="muted small">Approval needs the other lead: the payments lead and the compliance lead, as two different people.</p>{% endif %}
+  {% if fs_can_withdraw %}<form method="post" action="/console/settings/mode/{{ fs_pending.id }}/withdraw"><button>Withdraw</button></form>{% endif %}
+  {% elif fs_can_propose %}
+  <form method="post" action="/console/settings/mode/propose" class="filters">
+    <input type="hidden" name="setting" value="fail_safe">
+    <label>Change to
+      <select name="to_mode">{% for m in ['hold', 'manual_queue'] if m != fail_safe %}<option value="{{ m }}">{{ m.replace('_', ' ') }}</option>{% endfor %}</select>
+    </label>
+    <label>Reason (required)<input name="reason" required maxlength="500"></label>
+    <button class="primary">Propose</button>
+  </form>
+  {% else %}<p class="muted small">Only the payments lead and the compliance lead change the fail-safe.</p>{% endif %}
+</section>
+<section class="card" data-section="deadlines">
+  <h2>Deadlines (read-only in the prototype)</h2>
+  {% if deadlines %}<dl class="facts">{% for k, v in deadlines.items() %}<dt class="mono">{{ k }}</dt><dd class="mono">{{ v }}</dd>{% endfor %}</dl>
+  <p class="small muted">From rule version {{ policy_version }}. They change through a rule change on the Policy screen.</p>
+  {% else %}<p class="muted">No active rule set.</p>{% endif %}
+</section>
+<section class="card" data-section="weights">
+  <h2>Routing weights (read-only in the prototype)</h2>
+  <dl class="facts">{% for k, v in default_weights.items() %}<dt>{{ k }}</dt><dd class="mono">{{ v }}</dd>{% endfor %}</dl>
+  {% for r in rail_weights %}<p class="small">Rail <span class="mono">{{ r.id }}</span> overrides: <span class="mono">{% for k, v in r.weights.items() %}{{ k }} {{ v }}{% if not loop.last %}, {% endif %}{% endfor %}</span></p>{% endfor %}
+  <p class="small muted">A lower score wins: cost, speed, success and liquidity are each scaled 0 to 1 and weighted.</p>
+</section>
+<h2>Setting changes</h2>
 <table>
-  <thead><tr><th>When (UTC)</th><th>Change</th><th>Status</th><th>Proposed by</th><th>Approved by</th><th>Reason</th></tr></thead>
-  <tbody>{% for h in history %}<tr><td>{{ h.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ h.from_mode }} → {{ h.to_mode }}</td><td>{{ h.status }}</td><td class="mono">{{ h.proposed_by }}</td><td class="mono">{{ h.approved_by or '' }}</td><td>{{ h.reason }}</td></tr>
-  {% else %}<tr><td colspan="6" class="muted">No mode changes yet.</td></tr>{% endfor %}</tbody>
+  <thead><tr><th>When (UTC)</th><th>Setting</th><th>Change</th><th>Status</th><th>Proposed by</th><th>Approved by</th><th>Reason</th></tr></thead>
+  <tbody>{% for h in history %}<tr><td>{{ h.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ h.setting.replace('_', '-') }}</td><td>{{ h.from_mode }} → {{ h.to_mode }}</td><td>{{ h.status }}</td><td class="mono">{{ h.proposed_by }}</td><td class="mono">{{ h.approved_by or '' }}</td><td>{{ h.reason }}</td></tr>
+  {% else %}<tr><td colspan="7" class="muted">No setting changes yet.</td></tr>{% endfor %}</tbody>
 </table>
 {% endblock %}

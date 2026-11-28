@@ -62,7 +62,9 @@ WEB-04:
 WEB-05:
   0: ["ci:apps/site/tests/site.test.mjs legal pages are marked draft for legal review", "ci:apps/site/tests/site.test.mjs no third-party requests: scripts, styles and fonts are served locally", "manual:apps/site sets no cookies and has no analytics configured"]
 WEB-06:
-  0: ["ci:apps/site/tests/site.test.mjs placeholders are reported, never silently shipped (booking link and access form are placeholders until DSH-10 and the founder's booking URL)"]
+  0: ["ci:apps/site/tests/site.test.mjs access form posts to the dashboard's DSH-10 endpoint (WEB-06)", "ci:apps/site/tests/site.test.mjs placeholders are reported, never silently shipped"]
+WEB-07:
+  0: ["integration/test_status_page.py::test_status_lists_the_three_components_for_any_origin", "integration/test_status_page.py::test_docs_are_checked_over_http", "integration/test_status_page.py::test_database_down_marks_api_and_dashboard_down", "ci:apps/site/tests/logic.test.mjs status: rows follow the deploy's answer, and a failed fetch means unreachable (WEB-07)", "ci:apps/site/tests/site.test.mjs status page: sandbox API, dashboard and docs, fed by the deploy's health checks (WEB-07)"]
 WEB-08:
   0: ["ci:apps/site/tests/site.test.mjs SEO: titles pair the name with 'payment controls'; sitemap, robots, OG image, schema.org"]
 INT-01:
@@ -458,3 +460,54 @@ DSH-11:
   0: ["integration/test_dashboard_access.py::test_owner_invites_a_developer_who_cannot_manage_the_team", "integration/test_dashboard_access.py::test_removing_a_member_stops_their_sign_in_and_keys"]
   1: ["unit/test_dashboard_rules.py::test_member_roles_are_the_spec_02_list", "unit/test_dashboard_rules.py::test_dashboard_permissions_follow_spec_08", "integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays"]
   2: ["integration/test_dashboard_access.py::test_roles_follow_spec_08_and_the_last_owner_stays", "integration/test_dashboard_access.py::test_two_owners_cannot_demote_each_other_at_once"]
+INT-05:
+  0: ["integration/test_cancel.py::test_cancel_a_ready_payment_and_the_send_job_then_sends_nothing", "integration/test_cancel.py::test_cancel_an_escalated_payment_resolves_its_case", "integration/test_cancel.py::test_cancel_a_held_payment", "integration/test_cancel.py::test_submitted_or_unknown_answers_409"]
+  1: ["integration/test_cancel.py::test_cancelled_is_terminal", "integration/test_cancel.py::test_cancel_a_ready_payment_and_the_send_job_then_sends_nothing", "integration/test_cancel.py::test_console_cancel_is_payments_lead_only"]
+EXE-10:
+  0: ["integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies", "integration/test_incidents.py::test_duplicate_payment_and_double_credit_are_found", "integration/test_incidents.py::test_the_worker_runs_the_monitor_every_minute_and_after_each_confirmation"]
+  1: ["integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies", "integration/test_incidents.py::test_kill_switch_engagement_is_configurable"]
+OPS-01:
+  0: ["integration/test_incidents.py::test_manual_incident_timeline_notification_root_cause_and_replay", "integration/test_incidents.py::test_console_incidents_screens", "integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies"]
+CON-10:
+  0: ["integration/test_incidents.py::test_fail_safe_changes_need_both_leads", "integration/test_incidents.py::test_settings_screen_shows_fail_safe_deadlines_and_weights"]
+SHD-01:
+  0: ["integration/test_shadow.py::test_mapping_guess_and_validation_report_store_nothing", "integration/test_shadow.py::test_decisions_run_and_nothing_is_executed", "integration/test_shadow.py::test_daily_caps_count_inside_the_import", "integration/test_shadow.py::test_console_upload_map_validate_and_decide"]
+SHD-02:
+  0: ["integration/test_shadow.py::test_report_sections_and_exports"]
+SHD-03:
+  0: ["integration/test_shadow.py::test_gate_fails_on_an_unsafe_approval_and_cannot_be_signed", "integration/test_shadow.py::test_passed_gate_signed_by_both_leads_is_linked_to_the_mode_change", "integration/test_shadow.py::test_the_gate_window_is_30_days"]
+SHD-04:
+  0: ["integration/test_shadow.py::test_raw_names_and_account_identifiers_are_never_stored"]
+EXC-09:
+  0: ["integration/test_shadow.py::test_agent_versus_human_agreement"]
+DSH-13:
+  0: ["integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing"]
+  1: ["integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing", "integration/test_shadow.py::test_passed_gate_signed_by_both_leads_is_linked_to_the_mode_change"]
+  2: ["integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing"]
+RAL-08:
+  0: ["integration/test_rail_health.py::test_success_rate_and_p95_latency", "integration/test_rail_health.py::test_rails_screen_shows_health_and_circuit", "integration/test_console_rails.py::test_rails_screen"]
+  1: ["integration/test_rail_health.py::test_circuit_opens_after_the_failure_count_and_leaves_routing", "integration/test_rail_health.py::test_circuit_closes_after_a_successful_probe", "integration/test_rail_health.py::test_the_worker_checks_every_organisations_rails"]
+RAL-09:
+  0: ["integration/test_rail_connect.py::test_consent_screen_connects_and_disconnect_takes_the_rail_out_of_routing", "integration/test_rail_connect.py::test_api_key_is_encrypted_never_shown_and_audited", "integration/test_rail_connect.py::test_bad_keys_and_scopes_are_refused", "integration/test_rail_connect.py::test_no_encryption_key_means_no_connection", "integration/test_rail_connect.py::test_catalogue_has_test_rails_only"]
+  1: ["integration/test_rail_connect.py::test_consent_screen_connects_and_disconnect_takes_the_rail_out_of_routing", "integration/test_rail_connect.py::test_only_the_payments_lead_connects"]
+RAL-10:
+  0: ["unit/test_contract_report.py::test_the_workflow_runs_daily_and_opens_an_issue_on_failure", "unit/test_contract_report.py::test_failures_name_the_adapter_and_test", "unit/test_contract_report.py::test_a_clean_run_reports_nothing"]
+AUD-03:
+  0: ["integration/test_evidence.py::test_pack_for_one_payment", "integration/test_evidence.py::test_pack_for_a_range_and_bad_scopes", "integration/test_evidence.py::test_a_broken_chain_is_reported", "integration/test_evidence.py::test_console_exports_json_html_and_pdf"]
+OPS-03:
+  0: ["manual:spec/10 Runbooks 'Restore' and 'Restore drill log' (local drill 2026-11-28, 0.5 s)", "integration/test_restore_drill.py::test_the_drill_restores_and_verifies_every_chain", "integration/test_restore_drill.py::test_a_drill_never_targets_the_live_database"]
+OPS-04:
+  0: ["unit/test_security_pack.py::test_security_pack_is_current", "unit/test_security_pack.py::test_controls_have_tests_and_roadmap_is_labelled"]
+DEM-06:
+  0: ["integration/test_scenario_packs.py::test_three_packs_each_with_platform_counterparties_rules_and_a_batch", "integration/test_scenario_packs.py::test_reset_into_a_pack_and_its_batch_decides_as_expected", "integration/test_scenario_packs.py::test_unknown_pack_is_refused", "integration/test_scenario_packs.py::test_console_reset_with_a_pack"]
+USR-01:
+  0: ["integration/test_user_payouts.py::test_a_user_account_has_one_destination_and_a_typed_verified_flag", "integration/test_user_payouts.py::test_a_replaced_destination_escalates_changed_details", "integration/test_user_payouts.py::test_a_user_payout_goes_only_to_the_registered_destination"]
+  1: ["integration/test_user_payouts.py::test_a_user_account_has_one_destination_and_a_typed_verified_flag", "integration/test_user_payouts.py::test_bad_registrations_are_refused"]
+USR-02:
+  0: ["integration/test_user_payouts.py::test_the_user_payout_profile_skips_counterparty_checks_and_keeps_the_safety_checks", "integration/test_user_payouts.py::test_screening_networks_and_resubmission_still_apply", "integration/test_user_payouts.py::test_user_payouts_count_against_the_platform_cap_only", "integration/test_user_payouts.py::test_the_travel_rule_needs_the_users_name_above_the_threshold"]
+  1: ["integration/test_user_payouts.py::test_an_unverified_user_escalates_and_approval_reruns_policy", "integration/test_user_payouts.py::test_an_approval_does_not_cover_a_changed_verification", "integration/test_intents_api.py::test_a_payout_to_an_unregistered_user_is_refused"]
+USR-03:
+  0: ["integration/test_user_payouts.py::test_the_console_shows_the_user_account_and_the_profile", "unit/test_openapi.py::test_every_v1_route_is_described", "sdks/python/tests/test_client.py::test_user_accounts_register_with_put_and_no_idempotency_key"]
+USR-04:
+  0: ["ci:.github/workflows/ci.yml release gate runs eval/scenarios/attacks/user-payouts.yaml (atk-up-01 to atk-up-09, 0 unauthorised executions)"]
+  1: ["integration/test_user_payouts.py::test_new_organisations_are_seeded_with_fictional_users_as_test_values", "integration/test_dashboard_access.py::test_admin_creates_a_client_org_only_with_kyb_and_invites_the_owner"]

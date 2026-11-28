@@ -27,6 +27,7 @@ NAV = [
     "Mandates",
     "Counterparties",
     "Outbox",
+    "Incidents",
     "Audit",
     "Evaluation",
     "Settings",
@@ -78,8 +79,8 @@ def test_every_page_has_the_banner_nav_and_honest_wording(setup) -> None:  # typ
 
 def test_unbuilt_sections_say_so(setup) -> None:  # type: ignore[no-untyped-def]
     c, *_ = setup
-    html = c.get("/console/audit").text
-    assert c.get("/console/audit").status_code == 200 and "not built yet" in html.lower()
+    html = c.get("/console/evaluation").text
+    assert c.get("/console/evaluation").status_code == 200 and "not built yet" in html.lower()
 
 
 def test_payments_list_and_detail(setup) -> None:  # type: ignore[no-untyped-def]

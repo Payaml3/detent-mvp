@@ -106,6 +106,9 @@ def case_detail(conn: Connection, org_id: str, case_id: str) -> dict[str, Any] |
         f = raw_facts(conn, org_id, r.payment_id)
         out["raw_facts"] = {
             "payee": f["payee"],
+            "profile": f["profile"],
+            "user_account_ref": f["user_account_ref"],
+            "user_verified": f["user_verified"],
             "kyb_status": f["kyb"],
             "allowlisted": f["allowlisted"],
             "destination": {
@@ -157,8 +160,10 @@ def raw_facts(conn: Connection, org_id: str, payment_id: str) -> dict[str, Any]:
             "SELECT p.*, c.name AS payee, c.kyb_status, c.allowlisted, c.payment_count, "
             "c.median_amount_minor, "
             "c.median_currency, d.address, d.account_masked, d.network AS d_network, d.first_seen_at, "
-            "d.last_changed_at, d.last_changed_by, d.verified FROM payment_intents p "
+            "d.last_changed_at, d.last_changed_by, d.verified, ua.holder_name, ua.user_verified, "
+            "ua.verified_set_by, ua.verified_set_at FROM payment_intents p "
             "LEFT JOIN counterparties c ON c.org_id = p.org_id AND c.id = p.counterparty_id "
+            "LEFT JOIN user_accounts ua ON ua.org_id = p.org_id AND ua.ref = p.user_account_ref "
             "LEFT JOIN destinations d ON d.org_id = p.org_id AND d.id = p.destination_id "
             "WHERE p.org_id=:o AND p.id=:p"
         ),
@@ -185,6 +190,12 @@ def raw_facts(conn: Connection, org_id: str, payment_id: str) -> dict[str, Any]:
     hits = [c for c in dec if c.get("result") in ("ESCALATE", "BLOCK")]
     return {
         "payee": p.payee,
+        "profile": "user" if p.user_account_ref else "counterparty",
+        "user_account_ref": p.user_account_ref,
+        "holder_name": p.holder_name,
+        "user_verified": p.user_verified,
+        "user_verified_by": p.verified_set_by,
+        "user_verified_at": p.verified_set_at,
         "kyb": p.kyb_status,
         "allowlisted": p.allowlisted,
         "address": Web3.to_checksum_address(p.address) if p.address else None,

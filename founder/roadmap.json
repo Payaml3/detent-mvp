@@ -472,7 +472,7 @@
    "exit": "The site is live with dated results, booking and the access form; the honesty checklist is signed off by the founder.",
    "stories": 8,
    "criteria": 11,
-   "criteria_done": 8
+   "criteria_done": 10
   },
   {
    "id": "L",
@@ -482,7 +482,17 @@
    "exit": "A shadow-phase report is produced from a CSV export and the mode-gate sign-off is recorded.",
    "stories": 17,
    "criteria": 23,
-   "criteria_done": 0
+   "criteria_done": 23
+  },
+  {
+   "id": "U",
+   "name": "User payouts",
+   "status": "",
+   "goal": "Payouts to the platform's own end users, decided under the user payout profile (spec/04, G-10, D-40).",
+   "exit": "POST /v1/payment_intents with user_account_ref decides under the user payout profile (no 422 user_payouts_unavailable): a verified user's payout to their registered destination executes, user_verified false escalates, a changed destination escalates CHANGED_DETAILS, and the console, API, docs and SDKs show it.",
+   "stories": 4,
+   "criteria": 7,
+   "criteria_done": 7
   }
  ],
  "blockers": [

@@ -37,7 +37,8 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 | **Outbox** | Every mock email or notification: recipient, template, body, time | — | EXC-07 |
 | **Audit** | Event stream with filters; hash-chain status | Verify chain | AUD-01 |
 | **Evaluation** | Latest results.json summary; link to the report | Run suite (demo) | EVL-06 |
-| **Settings** | Mode, fail-safe, deadlines, routing weights | Change mode (needs two roles) | CON-10, EXE-09 |
+| **Incidents** | Incidents by severity, trigger, status, notification time and root cause; one incident's timeline and linked replays; a red Sev 1 banner on every page while one is open | Open (manual), log notification, link a replay, note, root cause, resolve | OPS-01, EXE-10 |
+| **Settings** | Mode, fail-safe, deadlines, routing weights | Change mode or fail-safe (needs two roles); deadlines and weights read-only | CON-10, EXE-09 |
 | **Demo** | Scenario runner: $18,500 invoice; forced timeout; 20-payment batch; close the day; attack sample; reset. Each scenario runs once per demo generation and then shows what it did. Not in the public sandbox | Run; reset (payments lead) | CON-09 |
 
 ## UX rules
@@ -59,3 +60,60 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
   outside world (fictional payers sending deposits, a fault armed on the proxy for the next matching send).
   Idempotent: a second run in the same generation returns the recorded result (`demo.scenario_run`).
 - **Footer:** the hosting and database regions (FND-07).
+
+## As built (L group 1: INT-05, EXE-10, OPS-01, CON-10)
+
+- **Cancel (INT-05, G-17):** payment detail has "Cancel this payment" for the payments lead while the payment is
+  ESCALATED, HELD or READY, with a required reason; the API is `POST /v1/payment_intents/{id}/cancel` (`intents:create`;
+  agent keys are refused). Any other status answers 409 `not_cancellable`. An open case is resolved `cancelled`.
+- **Incidents (OPS-01):** `/console/incidents` and `/console/incidents/{id}` (`detent/console/incidents.py`,
+  `detent/incidents/records.py`). Sev 1 to 4 with notification windows of 1 h, 4 h, 24 h and 5 days; overdue shows in
+  red. A Sev 1 or Sev 2 needs a root cause before it is resolved. On-call and the two leads work incidents.
+- **Sev 1 banner (EXE-10):** every console page shows a red bar linking each open Sev 1.
+- **Settings (CON-10):** the fail-safe is proposed by one lead and approved by the other, like the mode (`mode_changes`
+  now has a `setting` column, migration 0016). Deadlines come from the active rule version and routing weights from
+  the routing defaults and any per-rail overrides; both are read-only.
+
+## As built (L group 2: SHD-01 to SHD-04, EXC-09)
+
+- **Shadow import (SHD-01):** `/console/shadow` (payments lead and compliance lead; `detent/console/shadow.py`,
+  `detent/shadow/imports.py`). Upload a CSV, map its columns (the mapping is guessed from the header), see the
+  validation report (rows read, valid, invalid with reasons, duplicates), then decide. Decisions run in memory with
+  the active rule version; no payment, decision row, destination, attempt or job is created (`shadow.imported`
+  records `executed: false`). Daily caps are counted per UTC day inside the import.
+- **Anonymise (SHD-04):** names, destinations and free text are hashed with a per-import salt that is never stored,
+  so hashes match inside one import and differ across imports. A counterparty reference that is a registry ID
+  (`cpt_...`) is kept; anything else is treated as unregistered.
+- **Report (SHD-02):** `/console/shadow/{id}` with a weekly view (`?week=2026-W48`), and HTML and PDF exports
+  (`report.html`, `report.pdf`). Sections: summary, decision mix, agreement, unsafe approvals (DekernAI would execute,
+  the platform rejected), the platform's approvals the rules would stop, unreconciled rows, simulated routing saving
+  (fee paid minus the lowest estimated fee among connected rails in the same currency), method and limits. The report
+  reads stored rows only, so it is replayable.
+- **Mode gate (SHD-03, D-41):** `/console/shadow` lists gates. A gate measures the last 30 days of shadow rows (the
+  newest import wins for a repeated reference) against the organisation's `gate_agreement_bp` (9500) and zero unsafe
+  approvals, and is frozen when created. The payments lead and the compliance lead each sign a passed gate, as two
+  different people. Settings offers signed gates when a lead proposes a move up; a production organisation can't move up
+  without one. The applied mode change is linked to the gate (`mode_gates.mode_change_id`, migration 0017).
+- **Agreement sample (EXC-09):** `/console/agreement?days=30` compares the newest recorded investigation's
+  recommendation with the final decision for cases approved or rejected in the period, and lists disagreements with
+  the agent's cited claims and the person's reason. `needs_information` and cases with no investigation are counted
+  but not compared.
+
+## As built (L group 4: AUD-03, DEM-06)
+
+- **Audit (AUD-03):** `/console/audit` replaces the placeholder: the hash-chain check, the last 100 events (filter
+  by kind) and an evidence export for one payment or the payments created in a date range, as JSON, HTML or PDF
+  (`detent/audit/evidence.py`). A pack holds the inputs, every decision with its rule version and checks, the
+  people who approved or rejected, the state changes from the audit log, the attempts with transaction hashes and
+  explorer links, and the chain check result at build time. A broken chain is stated on the first page.
+- **Scenario packs (DEM-06):** the Demo screen shows which pack seeded the current generation and resets into
+  another (`POST /console/demo/reset`, payments lead only; `detent demo reset --pack <id>`). Packs live in
+  `fixtures/packs/`: payout platform, crypto service provider and marketplace, each with a fictional platform,
+  counterparties, rule overrides on the default rule set and a short batch. "Run this pack's batch" sends it through
+  the rules. The scripted spec/11 scenarios use the default pack.
+
+## As built (slice U: USR-03)
+
+- **User payouts:** Payments, Payment detail, Exceptions and the case page show the user account reference and
+  "user payout profile" for a payout to one of the platform's own end users. The case's raw facts show the
+  platform's `user_verified` flag with who set it and when, in place of KYB and the allowlist.

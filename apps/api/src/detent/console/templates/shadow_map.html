@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Map columns{% endblock %}
+{% block main %}
+<h1>Map the columns</h1>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<p class="note">Choose the same file again below ({{ filename }}): nothing from it is kept until you decide it, and then only in anonymised form.</p>
+<form method="post" action="/console/shadow/import" enctype="multipart/form-data">
+  <table>
+    <thead><tr><th>Field</th><th>Column in your file</th></tr></thead>
+    <tbody>{% for key, f in fields.items() %}<tr><td>{{ f[1] }}{% if f[0] %} <strong>(required)</strong>{% endif %}</td>
+      <td><select name="map_{{ key }}"><option value="">(not in the file)</option>{% for c in columns %}<option value="{{ c }}"{% if guess.get(key) == c %} selected{% endif %}>{{ c }}</option>{% endfor %}</select></td></tr>{% endfor %}</tbody>
+  </table>
+  <p class="filters">
+    <label>File<input type="file" name="file" accept=".csv,text/csv" required></label>
+    <label>Label<input name="label" maxlength="200" value="{{ filename }}"></label>
+    <button name="action" value="validate">Validate only</button>
+    <button name="action" value="decide" class="primary">Validate and decide</button>
+  </p>
+</form>
+{% if report %}
+{% set s = report.summary() %}
+<section class="card" data-section="validation">
+  <h2>Validation report</h2>
+  <p>{{ s.rows_read }} rows read: {{ s.rows_valid }} valid, {{ s.rows_invalid }} with problems. Rows with problems are listed in the report and not decided; none are dropped silently.</p>
+  {% if s.problems %}<ul>{% for p, n in s.problems.items() %}<li>{{ p }}: {{ n }}</li>{% endfor %}</ul>{% endif %}
+  <table><thead><tr><th>Row</th><th>Problems</th></tr></thead><tbody>
+  {% for r in report.invalid[:100] %}<tr><td>{{ r.row_no }}</td><td>{{ r.problems|join(', ') }}</td></tr>{% else %}<tr><td colspan="2" class="muted">No problems.</td></tr>{% endfor %}
+  </tbody></table>
+</section>
+{% endif %}
+{% endblock %}

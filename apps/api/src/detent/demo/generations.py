@@ -95,11 +95,18 @@ def _in_flight(conn: Connection, org_id: str) -> int:
     )
 
 
-def reset_demo(rt: Runtime, *, actor: Actor) -> ResetResult:
+def reset_demo(rt: Runtime, *, actor: Actor, pack: str = "default") -> ResetResult:
     """Start a new demo generation. Only the payments lead may reset (they alone can release a kill switch,
-    and a reset engages the old generation's switch for good)."""
+    and a reset engages the old generation's switch for good). ``pack`` picks the scenario pack (DEM-06) the
+    new generation is seeded from."""
+    from detent.demo.packs import PackError, load, policy_text
     from detent.execution.kill_switch import engage_in
     from detent.seed import seed_demo
+
+    try:
+        chosen = load(pack)
+    except PackError as exc:
+        raise ResetRefused(str(exc)) from exc
 
     if actor.role != Role.PAYMENTS_LEAD.value:
         raise ResetRefused("only the payments lead can reset the demo data")
@@ -123,7 +130,7 @@ def reset_demo(rt: Runtime, *, actor: Actor) -> ResetResult:
         engage_in(conn, rt.clock, org_id=old, actor=actor)
     new_gen = gen + 1
     new_org = generation_org_id(base, new_gen)
-    seed_demo(rt, org_id=new_org)
+    seed_demo(rt, chosen.fixture, org_id=new_org, policy=policy_text(chosen))
     with transaction(rt.engine) as conn:
         # The demo clock never runs backwards across a reset: the new generation starts at the old offset.
         conn.execute(
@@ -141,7 +148,7 @@ def reset_demo(rt: Runtime, *, actor: Actor) -> ResetResult:
                 actor=actor,
                 kind=kind,
                 subject_id=new_org,
-                payload={"previous_org_id": old, "org_id": new_org, "generation": new_gen},
+                payload={"previous_org_id": old, "org_id": new_org, "generation": new_gen, "pack": chosen.id},
             )
     return ResetResult(old, new_org, new_gen)
 

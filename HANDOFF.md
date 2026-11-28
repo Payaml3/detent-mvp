@@ -3,7 +3,7 @@
 One repository, one session per slice. A new session reads `CLAUDE.md`, then this file, and then only
 the specs and code the slice needs. At the end of the slice, update this file and push it with the slice.
 
-Last updated: 2026-11-25. The founder passed playbook stage 8 (specify): every C- and G- item is Confirmed (D-38); the G-19 legal review is still due before P4.
+Last updated: 2026-11-28: P4 built except the booking URL and go-live (founder). Earlier, 2026-11-25: The founder passed playbook stage 8 (specify): every C- and G- item is Confirmed (D-38); the G-19 legal review is still due before P4.
 
 Earlier, 2026-11-24: the founder confirmed DekernAI is in MVP development (TRL 4) and passed playbook stages 7 (MVP scope), 9 (screen specs: every criterion linked to a story in `traceability.md`) and 12 (tasks and story groups); stages 1 to 6, 10 and 11 wait on the founder's Passed or Deferred call. The founder chose the full MVP scope on 2026-11-23 (D-37). The dashboard runs on Vercel behind its login, on solo-to-scale 2.7.0.
 
@@ -19,8 +19,9 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | P1 Sandbox API and webhooks | done | `main` |
 | P2 Dashboard and sandbox | done | `main` |
 | P3 Docs and SDKs | done (Mintlify connection and SDK publishing wait on the founder) | `main` |
-| P4 Website launch | in progress: WEB-04 built; WEB-06 needs the booking URL, WEB-07 waits on the S9 deploy | branch from `main` |
-| L After launch (Should and Could) | todo | |
+| P4 Website launch | built: WEB-02, WEB-07 done; the access form posts to the live deploy. Open: the booking URL (WEB-06), the legal review and the founder's go-live call | `main` |
+| L After launch (Should and Could) | done: groups 1 to 4 built (17 stories); exit check met | `main` |
+| U User payouts (D-40, 28 Nov) | done: USR-01 to USR-04 built | `main` |
 
 Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
 
@@ -119,7 +120,7 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 
 ## Next: P1 now, the S9 live run when the founder items are in
 
-- **S9 live run** (needs the founder items below): deploy `render.yaml`, set the secrets, `detent demo check`,
+- **S9 live run** (needs the founder items below): deploy on Hetzner + Neon (`infra/hetzner/README.md`; replaces `render.yaml`), set the secrets, `detent demo check`,
   then run spec/11 on Base Sepolia and Ethereum Sepolia and fix any mismatch in spec/11; then mark S9 done
   (FND-07 criterion 0 and the slice exit). · Model: mid-tier
 - **P1 group 1: built (PR from `claude/project-thread-babje1`, 2026-11-26):** API-01 to API-04 and API-06. The
@@ -172,14 +173,42 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   spec/08 "As built (P3 group 4)". P3 is complete.
 - **P4 WEB-04: built (PR from `claude/project-thread-babje1`, 2026-11-27):** the site's code tabs come from the
   docs' tested samples (`apps/site/src/data/snippets.json`, written by `tools/build_docs.py`).
-- **Next:** the rest of P4: WEB-06 needs the founder's booking URL, WEB-07 waits on the FND-07 deploy; then L.
-  · Model: mid-tier
+- **P4 rest: built (PR from `claude/project-thread-ci5zmu`, 2026-11-28):** WEB-02 criterion 1 (data handling on the
+  onboarding page), WEB-06 access form to `https://app.dekernai.com/access-requests`, WEB-07 status page (`/status/` on
+  the site, fed by `GET /status.json` in `detent/api/status.py`). See spec/08 "As built (P4)". To finish P4: the
+  booking URL into `bookingUrl` (WEB-06), the G-19 and legal-pages review, `indexable: true` at go-live (founder), and
+  `STATUS_DOCS_URL` on the deploy once the docs are published (an infra change: founder-approved label).
+- **L group 1: built (PR from `claude/project-thread-zzhxlz`, 2026-11-28):** INT-05 cancel (`detent/intents/cancel.py`,
+  `POST /v1/payment_intents/{id}/cancel`, 409 `not_cancellable`), EXE-10 invariant monitor and OPS-01 incidents
+  (`detent/incidents/`, console Incidents screens, Sev 1 banner, migration 0016), CON-10 fail-safe changes with two
+  leads plus read-only deadlines and weights. See spec/07 "As built (L group 1)" and spec/10 Runbooks.
+- **L group 2: built (2026-11-28):** shadow mode. SHD-01 import with column mapping and a validation report, decided
+  in memory with nothing executed (`detent/shadow/imports.py`); SHD-04 per-import salted hashes; SHD-02 report with a
+  weekly view and HTML and PDF exports (`detent/shadow/report.py`, `pdf.py`); SHD-03 mode gates at 95% and zero
+  unsafe approvals (D-41, `detent/shadow/gates.py`), signed by both leads and required for a production organisation to
+  move up; EXC-09 agreement sample (`/console/agreement`); DSH-13 production request, recorded only. Migration
+  0017. See spec/07 and spec/08 "As built (L group 2)".
+- **L group 3: built (2026-11-28):** RAL-08 rail health and a per-rail circuit breaker (`detent/rails/health.py`;
+  routing skips an open circuit; the worker probes and closes it), RAL-09 mock rail connection with encrypted
+  credentials (`detent/rails/connections.py`, `/console/rails/connect`), RAL-10 daily contract run that opens an
+  issue on failure (`.github/workflows/rail-contracts.yml`, `tools/contract_report.py`). Migration 0018. See spec/06.
+- **L group 4: built (2026-11-28):** AUD-03 evidence export (`/console/audit`, JSON, HTML and PDF), OPS-03 restore
+  drill (`detent ops restore-drill`, runbook and drill log in spec/10; the Neon point-in-time drill waits for the
+  hosted database), OPS-04 security pack (`docs/security.md` from `tools/build_security.py`, internal only), DEM-06
+  scenario packs (`fixtures/packs/`, selectable on reset). Slice L is complete.
+- **Slice U: built (2026-11-28):** USR-01 user accounts with one destination each and the typed `user_verified`
+  flag (`PUT /v1/user_accounts/{ref}`, `detent/intents/users.py`, migration 0019); USR-02 the user payout profile
+  in the engine (counterparty checks NOT_EVALUATED, `user_verified` escalates USER_NOT_VERIFIED, platform cap only);
+  USR-03 console, OpenAPI, docs guide (`docs/guides/user-payouts.mdx`) and SDKs; USR-04 nine eval attacks
+  (`eval/scenarios/attacks/user-payouts.yaml`) and three seeded fictional users as sandbox test values. The demo
+  batch stays counterparty-only (D-32). See spec/04 "As built (slice U)".
+- **Next:** the backlog is built. Open founder items below (deploy, live testnet run, publishing). · Model: mid-tier
 
 ## Open founder items
 
-- **S9 live run:** a Render account (Frankfurt) and a Neon project in an EU region; the plans (Render's free plan
-  covers the web service only; the worker and the two private services need a paid instance type: Proposed);
-  the secrets in `render.yaml`; funded test wallets (four: sender and payer on each chain).
+- **S9 live run (host chosen 27 Nov: Hetzner + Neon):** a Hetzner Cloud server (CAX11, Helsinki) with Coolify and a
+  Neon project in AWS Frankfurt, set up step by step in `infra/hetzner/README.md`; the secrets typed into
+  Coolify; funded test wallets (four: sender and payer on each chain); `ANTHROPIC_API_KEY`.
 - **G-27 Confirmed (D-33):** the live demo pays in its own labelled test token (tUSDC). Before the live run, per
   network: `detent demo token deploy --network <n>`, set `USDC_ADDRESS_*` to the printed address, then
   `detent demo token fund --network <n>`; gas comes from a faucet.

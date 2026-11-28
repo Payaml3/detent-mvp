@@ -2,7 +2,7 @@
 
 The startup dashboard: one page with tabs (Overview, Needs you, Goals, Documents, Progress trace, Roadmap, Scope and
 journey, Team and board, Agent activity, Decisions, Approvals inbox, Costs), built from the repo and GitHub.
-The dashboard workflow rebuilds it on every merge to main and every three hours, and serves it at the host in
+The dashboard workflow rebuilds it on every merge to main and every six hours, and serves it at the host in
 founder/dashboard.json behind a login: Cloudflare Pages behind Cloudflare Access (the default), or a Vercel
 project behind Vercel Authentication on all deployments. The Claude page from publish-views is the backup.
 
@@ -552,6 +552,8 @@ def github_data(root: Path, cfg_dash: dict[str, Any], month: str, now: dt.dateti
             ctl = control.read(hub, root)
         except (subprocess.CalledProcessError, ValueError, KeyError, TypeError):
             ctl = {"all": None, "roles": {}, "url": "", "unknown": True}
+        at = now or dt.datetime.now(dt.timezone.utc)  # a /wake the next run hasn't spent yet shows on its agent
+        ctl["woken"] = {r: w for r in tickets.ROLES if (w := control.woken(ctl, r, c["entries"], at))}
         return {"ok": True, "control": ctl, "repo": repo, "activity": activity[-limit:], "tickets": open_tickets,
                 "approvals": approvals(hub, root), "costs": c, "merged": merged,
                 "trends": trends(recent_runs + c["entries"], activity, merged, now),

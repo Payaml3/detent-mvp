@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Incidents{% endblock %}
+{% block main %}
+<h1>Incidents</h1>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<p class="note">A Sev 1 opens automatically when the invariant monitor finds a duplicate payment, an unauthorised execution or a double credit; it engages the kill switch and posts a notice to the outbox. Incidents can also be opened by hand.</p>
+<dl class="facts">
+  {% for level, s in severities.items() %}<dt>{{ s.name }}</dt><dd>{{ s.meaning }} Notify within {{ (s.notify_within.total_seconds() // 3600)|int }} h.</dd>{% endfor %}
+</dl>
+<table>
+  <thead><tr><th>Opened (UTC)</th><th>Severity</th><th>Title</th><th>Trigger</th><th>Status</th><th>Notified</th><th>Root cause</th></tr></thead>
+  <tbody>
+  {% for i in incidents %}<tr{% if i.severity == 1 and i.status == 'open' %} class="r-fail"{% endif %}>
+    <td>{{ i.opened_at.strftime('%Y-%m-%d %H:%M') }}</td><td>Sev {{ i.severity }}</td>
+    <td><a href="/console/incidents/{{ i.id }}">{{ i.title or i.trigger }}</a></td><td class="mono">{{ i.trigger }}</td><td>{{ i.status }}</td>
+    <td>{% if i.notified_at %}{{ i.notified_at.strftime('%Y-%m-%d %H:%M') }}{% elif i.id in overdue %}<strong class="error">overdue</strong>{% else %}not yet{% endif %}</td>
+    <td>{{ 'recorded' if i.root_cause else '' }}</td></tr>
+  {% else %}<tr><td colspan="7" class="muted">No incidents.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% if can_manage %}
+<section class="card">
+  <h2>Open an incident</h2>
+  <form method="post" action="/console/incidents" class="filters">
+    <label>Severity<select name="severity">{% for level, s in severities.items() %}<option value="{{ level }}">{{ s.name }}</option>{% endfor %}</select></label>
+    <label>Title (required)<input name="title" required maxlength="200"></label>
+    <button class="primary">Open</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

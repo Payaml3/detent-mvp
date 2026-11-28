@@ -152,6 +152,48 @@
           }
         },
         {
+          "name": "Cancel a payment before it is sent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{apiKey}}"
+              },
+              {
+                "key": "DekernAI-Version",
+                "value": "{{apiVersion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payment_intents/{{payment_id}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "payment_intents",
+                "{{payment_id}}",
+                "cancel"
+              ]
+            },
+            "description": "Cancel before sending: ESCALATED, HELD or READY only; SUBMITTED or UNKNOWN answers 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "Replay a payment's decisions",
           "request": {
             "method": "GET",
@@ -462,6 +504,80 @@
               ]
             },
             "description": "API-06: this organisation's own calls of the last 30 days, newest first."
+          }
+        }
+      ]
+    },
+    {
+      "name": "user_accounts",
+      "item": [
+        {
+          "name": "Get a user account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{apiKey}}"
+              },
+              {
+                "key": "DekernAI-Version",
+                "value": "{{apiVersion}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/user_accounts/{{user_account_ref}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "user_accounts",
+                "{{user_account_ref}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Register a user account and its destination",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{apiKey}}"
+              },
+              {
+                "key": "DekernAI-Version",
+                "value": "{{apiVersion}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/user_accounts/{{user_account_ref}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "user_accounts",
+                "{{user_account_ref}}"
+              ]
+            },
+            "description": "Register an end user's one payout destination and the platform's typed user_verified flag.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           }
         }
       ]

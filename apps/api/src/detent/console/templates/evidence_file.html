@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence pack</title>
+<style>/* a standalone file: system colours, so it reads in light and dark */ body{font:15px/1.5 system-ui,sans-serif;max-width:960px;margin:24px auto;padding:0 16px;color:CanvasText;background:Canvas}
+table{border-collapse:collapse;width:100%;margin:8px 0}td,th{border-bottom:1px solid GrayText;padding:4px 6px;text-align:left;vertical-align:top}.mono{font-family:ui-monospace,monospace}.muted{color:GrayText}.small{font-size:13px}section{margin:28px 0}</style>
+</head><body>
+<p class="small muted">{{ brand }} agentic payment controls · prototype · test networks only</p>
+<h1>Evidence pack</h1>
+{% set sc = pack.scope %}
+<p>Organisation <span class="mono">{{ pack.org_id }}</span>. Scope: {% if sc.payment_id %}payment <span class="mono">{{ sc.payment_id }}</span>{% else %}payments created {{ sc['from'] }} to {{ sc['to'] }}{% endif %}. Built {{ pack.generated_at }}.</p>
+{% set ch = pack.hash_chain %}
+<p><strong>Hash chain:</strong> {% if ch.ok %}verified, {{ ch.events }} events.{% else %}BROKEN at event {{ ch.first_bad_seq }} ({{ ch.problem }}).{% endif %}</p>
+<p>{{ pack.payments | length }} payments{% if pack.truncated %} (truncated){% endif %}.</p>
+{% for p in pack.payments %}{% set i = p.inputs %}
+<section>
+<h2 class="mono">{{ p.id }} <span class="muted small">{{ p.status }}</span></h2>
+<p>Inputs: {{ i.amount }} to <span class="mono">{{ i.counterparty_id or i.user_account_ref }}</span>, network {{ i.network }}, reference {{ i.reference or '-' }}, source {{ i.source }}, created {{ i.created_at }}.</p>
+<h3>Decisions</h3>
+<table><thead><tr><th>Outcome</th><th>Rule version</th><th>At</th><th>By</th><th>Checks not passed</th></tr></thead><tbody>
+{% for d in p.decisions %}<tr><td>{{ d.outcome }}</td><td>v{{ d.rule_version }} <span class="mono small muted">{{ d.rule_hash[:12] }}</span></td><td>{{ d.decided_at }}</td><td class="mono">{{ d.actor }}</td>
+<td>{% for c in d.checks if c.result != 'pass' %}{{ c.reason or c.check }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>{% else %}<tr><td colspan="5" class="muted">None.</td></tr>{% endfor %}
+</tbody></table>
+<h3>Approvers</h3>
+<table><tbody>{% for a in p.approvals %}<tr><td>{{ a.resolution }}</td><td class="mono">{{ a.by }}</td><td>{{ a.at }}</td><td>{{ a.reason or '' }}</td></tr>{% else %}<tr><td class="muted">No human decision was needed.</td></tr>{% endfor %}</tbody></table>
+<h3>State changes</h3>
+<table><tbody>{% for s in p.state_changes %}<tr><td>{{ s.at }}</td><td>{{ s['from'] }} to {{ s.to }}</td><td class="mono">{{ s.actor }}</td><td>{{ s.reason or '' }}</td></tr>{% else %}<tr><td class="muted">None.</td></tr>{% endfor %}</tbody></table>
+<h3>Attempts</h3>
+<table><tbody>{% for a in p.attempts %}<tr><td>{{ a.attempt_no }}</td><td>{{ a.rail }}</td><td>{{ a.status }}{% if a.failure_class %} ({{ a.failure_class }}){% endif %}</td>
+<td class="mono">{% if a.explorer_url %}<a href="{{ a.explorer_url }}" rel="noopener">{{ a.tx_hash }}</a>{% else %}{{ a.tx_hash or a.rail_reference or '' }}{% endif %}</td></tr>{% else %}<tr><td class="muted">None.</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endfor %}
+<p class="small muted">{{ pack.note }}</p>
+</body></html>

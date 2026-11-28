@@ -34,6 +34,7 @@ Base URL (placeholder): `https://sandbox.api.<domain>/v1`. Every request uses TL
 | POST `/exceptions/{id}/reject` | exceptions:approve | EXC-04, EXC-08 | Reject with `reason` |
 | POST `/deposit_intents` | intents:create | LED-03 | Create deposit instructions |
 | GET `/deposit_intents/{id}` | read | LED-03 | Status and credits |
+| PUT `/user_accounts/{ref}`, GET `/user_accounts/{ref}` | intents:create (read for GET) | USR-01 | Register an end user's one payout destination and the platform's typed `user_verified` flag; agent keys are refused |
 | GET `/mandates`, POST `/mandates`, POST `/mandates/{id}/revoke` | admin | MND-01, MND-03 | Manage agent mandates |
 | GET `/policy/versions`, GET `/policy/versions/{v}` | read | POL-01 | Read rule versions (changes happen in the console) |
 | POST `/kill_switch` and DELETE `/kill_switch` | admin | EXE-08 | Engage, and release (payments lead only) |

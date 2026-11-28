@@ -18,6 +18,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
 
 from detent import logging as dlog
+from detent.api import status as public_status
 from detent.api import v1
 from detent.api import webhooks as v1_webhooks
 from detent.api.auth import AuthError
@@ -26,7 +27,11 @@ from detent.api.errors import error_response
 from detent.api.limits import RateLimiter
 from detent.api.middleware import request_context
 from detent.clock import Clock
+from detent.console import audit as console_audit
+from detent.console import incidents as console_incidents
+from detent.console import rail_connect as console_rail_connect
 from detent.console import routes as console_routes
+from detent.console import shadow as console_shadow
 from detent.console.auth import ActingUserRequired, LoginRequired
 from detent.dashboard import mount as dashboard
 from detent.intents.service import IdempotencyConflict, RequestProblem
@@ -95,9 +100,18 @@ def create_app(
     app.middleware("http")(request_context)
 
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-    app.include_router(console_routes.router)
-    app.include_router(v1.router)
-    app.include_router(v1_webhooks.router)
+    routers = (
+        console_shadow.router,
+        console_audit.router,
+        console_rail_connect.router,
+        console_incidents.router,  # before console_routes: its section placeholder catches unknown pages
+        console_routes.router,
+        v1.router,
+        v1_webhooks.router,
+        public_status.router,
+    )
+    for router in routers:
+        app.include_router(router)
     dashboard.install(app)
     app.state.screening = MockScreening.from_fixture()
 

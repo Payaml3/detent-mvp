@@ -41,6 +41,7 @@ class Prefix(StrEnum):
     AGC = "agc"  # agent call
     EVT = "evt"
     INC = "inc"
+    INE = "ine"  # incident event
     JOB = "job"
     CEV = "cev"  # case event
     OBX = "obx"  # outbox message
@@ -51,6 +52,11 @@ class Prefix(StrEnum):
     LED = "lead"  # website access request
     MCH = "mch"  # mode change
     VER = "ver"  # integration verification request
+    SHI = "shi"  # shadow import
+    SHR = "shr"  # shadow row
+    MGT = "mgt"  # mode gate
+    PRQ = "prq"  # production request
+    RCN = "rcn"  # rail connection
 
 
 _CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"

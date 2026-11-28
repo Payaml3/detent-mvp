@@ -51,7 +51,7 @@ extend-exclude = [
   "tools/tests/test_approval.py", "tools/tests/test_control.py", "tools/tests/test_dashboard.py",
   "tools/tests/test_doctor.py", "tools/tests/test_finance.py", "tools/tests/test_goals.py",
   "tools/tests/test_heartbeat.py", "tools/tests/test_portfolio.py", "tools/tests/test_tickets.py",
-  "tools/tests/test_tools.py", "tools/tests/test_autopilot.py",
+  "tools/tests/test_tools.py", "tools/tests/test_autopilot.py", "tools/release.py", "tools/tests/test_release.py",
 ]
 
 [tool.ruff.lint]
