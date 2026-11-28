@@ -15,7 +15,7 @@
     <td><a href="/console/incidents/{{ i.id }}">{{ i.title or i.trigger }}</a></td><td class="mono">{{ i.trigger }}</td><td>{{ i.status }}</td>
     <td>{% if i.notified_at %}{{ i.notified_at.strftime('%Y-%m-%d %H:%M') }}{% elif i.id in overdue %}<strong class="error">overdue</strong>{% else %}not yet{% endif %}</td>
     <td>{{ 'recorded' if i.root_cause else '' }}</td></tr>
-  {% else %}<tr><td colspan="7" class="muted">No incidents.</td></tr>{% endfor %}
+  {% else %}<tr><td colspan="7" class="empty"><strong>No incidents.</strong> <span>Open one below when a rail or the platform misbehaves.</span></td></tr>{% endfor %}
   </tbody>
 </table>
 {% if can_manage %}

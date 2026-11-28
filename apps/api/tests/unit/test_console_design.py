@@ -29,3 +29,12 @@ def test_templates_have_no_inline_colours() -> None:
         text = re.sub(r"\{#.*?#\}", "", t.read_text(), flags=re.S)
         hits = [m for m in RAW.findall(text)]
         assert not hits, f"{t.name}: raw colour {hits[0]}"
+
+
+def test_notices_are_quiet_and_errors_are_callouts() -> None:
+    """A notice uses the wait colour as an edge, not a fill, so the fill keeps meaning "waiting"; an error is a
+    bordered callout with a cross, so it never reads as an ordinary sentence."""
+    css = re.sub(r"/\*.*?\*/", "", (STATIC / "console.css").read_text(), flags=re.S)
+    note = re.search(r"\.note \{([^}]*)\}", css)
+    assert note and "--pill-wait-bg" not in note.group(1) and "--pill-wait-border" in note.group(1)
+    assert re.search(r"p\.error::before[^{]*\{[^}]*mask", css)

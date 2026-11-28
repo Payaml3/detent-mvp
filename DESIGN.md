@@ -35,6 +35,12 @@ Token names are roles, not colours (`stop`, not "red"), so a new palette swaps v
 - One primary button per screen, in the `primary` colour (safety orange). The `stop` colour (graphite) is only for block, reject and the kill switch.
 - Figures: one container split by dividers, label above value, tabular numbers.
 - Tables: no zebra stripes, 12px muted headers, numbers right-aligned, a quiet hover row.
+- Notices (`.note`): a white callout with a 4px wait-coloured edge. The wait fill stays for waiting states only.
+- Errors (`p.error`): a callout with a stop-coloured edge and a cross, so an error never reads as an ordinary sentence.
+- Empty tables say what is missing in bold, then the next step in one muted sentence, with a link when there is one (`td.empty`).
+- Links inside running text are underlined; navigation and table links are not.
+- Every page has a skip link to `main`, and a pressed form button shows a pending spinner (`static/forms.js`).
+- An unknown console or dashboard address shows a "Page not found" page with a way back, never the API's JSON.
 
 ## Status vocabulary
 
