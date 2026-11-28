@@ -58,7 +58,9 @@ def _sev1(rt: Runtime, user: ActingUser | None) -> list[Any]:
         return open_sev1(conn, user.org_id)
 
 
-def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ctx: Any) -> HTMLResponse:
+def page(
+    request: Request, rt: Runtime, name: str, user: ActingUser | None, status_code: int = 200, **ctx: Any
+) -> HTMLResponse:
     from detent.dashboard.web import csrf_token
 
     member_mode = bool(user and user.via_dashboard)
@@ -76,7 +78,7 @@ def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ct
         "hosting_region": rt.settings.hosting_region,
         "database_region": rt.settings.database_region,
     }
-    return templates.TemplateResponse(request, name, {**base, **ctx})
+    return templates.TemplateResponse(request, name, {**base, **ctx}, status_code=status_code)
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -1533,6 +1535,6 @@ def not_built(
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
     if section not in SECTIONS_NOT_BUILT:
-        raise HTTPException(status_code=404)
+        return page(request, rt, "not_found.html", user, status_code=404)
     title, what = SECTIONS_NOT_BUILT[section]
     return page(request, rt, "not_built.html", user, title=title, what=what)

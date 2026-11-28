@@ -145,3 +145,18 @@ def test_require_permission_on_plain_app() -> None:
 
     with pytest.raises(Exception):  # noqa: B017, PT011 - no session middleware: refuses
         TestClient(app).get("/x")
+
+
+def test_unknown_console_page_is_an_html_not_found_page(client: TestClient, org: OrgFixture) -> None:
+    """A mistyped console address shows a page with a way back, not the API's JSON error."""
+    login(client, org.users[Role.REVIEWER])
+    r = client.get("/console/no-such-page")
+    assert r.status_code == 404 and r.headers["content-type"].startswith("text/html")
+    assert "Page not found" in r.text and 'href="/console/"' in r.text
+
+
+def test_every_page_has_a_skip_link_and_the_pending_script(client: TestClient, org: OrgFixture) -> None:
+    login(client, org.users[Role.REVIEWER])
+    page = client.get("/console/").text
+    assert 'href="#main"' in page and 'id="main"' in page and "/static/forms.js" in page
+    assert client.get("/static/forms.js").status_code == 200

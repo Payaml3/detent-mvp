@@ -6,9 +6,11 @@
   <title>{% block title %}Console{% endblock %} · {{ brand }} payment controls</title>
   <link rel="stylesheet" href="/static/console.css">
   <script src="/static/htmx-2.0.4.min.js" defer></script>
+  <script src="/static/forms.js" defer></script>
 </head>
 <body>
-  <div class="banner" role="note">{{ 'Sandbox · test networks · simulated bank rail' if dashboard else 'Prototype · test networks · simulated bank rail' }}</div>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="banner">{{ 'Sandbox · test networks · simulated bank rail' if dashboard else 'Prototype · test networks · simulated bank rail' }}</header>
   {% if sev1_incidents %}
   <div class="sev1-bar" role="alert"><strong>Sev 1 incident open:</strong> {% for i in sev1_incidents %}<a href="/console/incidents/{{ i.id }}">{{ i.title }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div>
   {% endif %}
@@ -62,14 +64,14 @@
           <button class="{{ '' if kill_switch_engaged else 'danger' }}" title="{{ 'Payments lead only' if kill_switch_engaged else 'Stops all sending; holds pending payments' }}">{{ 'Release' if kill_switch_engaged else 'Engage kill switch' }}</button>
         </form>
       </div>
-      <main>{% block main %}{% endblock %}</main>
+      <main id="main" tabindex="-1">{% block main %}{% endblock %}</main>
       <footer>{{ 'Your sandbox organisation, on test networks.' if dashboard else 'Fictional demo data.' }} {{ brand }} agentic payment controls (prototype): decision, orchestration and operations.
         <span class="regions">Hosted in {{ hosting_region }} · database in {{ database_region }}.</span></footer>
     </div>
   </div>
   {% else %}
   <div class="gate">
-    <main>
+    <main id="main" tabindex="-1">
       <a class="brand" href="/console/" aria-label="{{ brand }} console home">{{ mark }}</a>
       {% if demo_mode %}<p class="mono" title="Demo clock">{{ now.strftime('%Y-%m-%d %H:%M') }} UTC</p>{% endif %}
       {% block gate %}{{ self.main() }}{% endblock %}
