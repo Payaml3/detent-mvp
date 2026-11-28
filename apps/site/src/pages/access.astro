@@ -5,7 +5,7 @@ import config from "../../site.config.mjs";
 const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
 ---
 <Base title="Request access" description={`Request access to ${config.brandName}: tell us about your platform and start onboarding.`}>
-  <PageHead compact title="Request access." lead="Tell us about your platform and how you pay out today. You get an email straight away, and we reply with the next steps.">
+  <PageHead compact title="Request access." lead="Tell us about your platform and how you handle deposits and payouts today. You get an email straight away, and we reply with the next steps.">
   </PageHead>
   <section class="section formsection"><div class="wrap grid">
     <form class="form" data-reveal method="post" action={connected ? config.accessFormAction : undefined} data-access-form>
@@ -20,7 +20,7 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
           <option>Payout platform</option><option>Crypto service provider</option><option>Broker or prop firm</option><option>Marketplace</option><option>Other</option>
         </select>
       </label>
-      <label>Rails you pay out on
+      <label>Rails you use for deposits and payouts
         <select name="rails">
           <option>Stablecoins</option><option>Instant bank payouts</option><option>Both</option><option>Other</option>
         </select>
@@ -39,7 +39,7 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
       </ol>
       <h2>What happens next</h2>
       <ul>
-        <li>We reply to book a discovery call and a demo.</li>
+        <li>We send the NDA, then book the commercial call: phase 1, discovery.</li>
         <li>If we both want to go ahead, we run due diligence (KYB) on your business and sign the contract and data processing agreement.</li>
         <li>Once KYB is approved, your account owner gets a registration email, signs up and invites the team.</li>
         <li>Your rules are signed off by your compliance lead before any live payment is decided. You sign every step that moves money closer to being sent.</li>

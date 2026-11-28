@@ -6,7 +6,7 @@
 
 | Layer | Question it answers | What it does |
 |---|---|---|
-| **1. Decision** | Should this payment happen? | Execute, escalate or block every pay-in and pay-out, under rules the client owns |
+| **1. Decision** | Should this payment happen? | Execute, escalate or block every deposit and payout, under rules the client owns |
 | **2. Orchestration** | How and where does it go? | Picks the best rail by policy, sends it exactly once, fails over only on technical errors, kill switch |
 | **3. Operations** | What happens around it? | Exceptions queue, reconciliation across rails, audit with replay |
 
@@ -35,7 +35,7 @@ On stablecoins and instant bank payouts a wrong decision can't be reversed. Toda
 | **On-call engineer** (DekernAI) | Can engage the kill switch; handles Sev 1 incidents |
 | **Account owner** (client) | Receives the registration email after KYB; invites the team, assigns roles, requests verification and production |
 | **DekernAI admin** (founder or sales) | Approves KYB, creates the client organisation and invites its account owner; verifies integrations |
-| **Prospect** | Reads the website, books a demo, requests sandbox access |
+| **Prospect** | Reads the website, requests access (NDA, commercial call, approval), then gets sandbox access |
 
 ## MVP definition
 

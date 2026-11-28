@@ -97,7 +97,7 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 4. **Built for irreversible payments:** "A failure can retry. A rejection can't. No retry ever becomes a second payment.", with the payment states shown and the kill switch.
 5. **Measured results:** shown only once `results.json` exists, each figure labelled "evaluation on synthetic data, [date]. Not production results.". Left out of the page until then.
 6. **Roles:** tabs for Payments, Compliance and Engineering. Engineering holds the 8-language code tab creating a payment intent (pre-launch label) and the sandbox access link; Compliance links to the Security page, which holds non-custodial, audit and replay, kill switch, EU hosting and the roadmap list.
-7. **Onboarding:** the six phases shown on the site (docs/product/client-journey.md, B-04; the shadow phase is not shown, founder 2026-11-28): discovery, contract and due diligence, sandbox integration, policy setup, go-live, scale. Each shows both owners and its exit check; phases 4 to 6 are signed by the client, and the Pilot covers phases 3 to 6 on one rail. Paid plans (Pilot, Growth, Scale) are "Talk to us", with no prices. There is no free shadow report: shadow is a phase after the contract.
+7. **Onboarding:** the six phases shown on the site (docs/product/client-journey.md, B-04; the shadow phase is not shown, founder 2026-11-28): discovery, contract and due diligence, sandbox integration, policy setup, go-live, scale. Each shows both owners and its exit check; phases 4 and 5 are signed by the client, and the Pilot covers phases 3 to 5 on one rail. Paid plans (Pilot, Growth, Scale) are "Talk to us", with no prices. There is no free shadow report: shadow is a phase after the contract.
 8. **Use cases and FAQ:** payout platforms, crypto service providers, brokers and prop firms, marketplaces; then 8 questions (money and custody, does the AI approve, changing rails, who approves, timeouts, rails, how onboarding works, cost).
 9. **Close:** "Held until it's right. Sent exactly once." with both CTAs.
 10. **Footer:** docs, status, privacy, terms, contact.
@@ -289,7 +289,7 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   request bodies and shown responses are read from the page and run against a sandbox organisation
   (`tests/integration/test_docs_guides.py`).
 - **Try it (DOC-05):** Mintlify's interactive playground with bearer auth (`tools/try-it.mdx`). The OpenAPI file
-  names only local and sandbox servers, with no server variables, and the navbar has "Request sandbox access";
+  names only local and sandbox servers, with no server variables, and the navbar has "Request access";
   a test holds all three. The sandbox server is added when its address is known (founder item).
 - **Sandbox seed (G-18, as found):** a new sandbox organisation now also gets the fictional accounts-payable
   agent's mandate (`mnd_demo_ap_agent`, valid for 365 days) when the mandate signing key is set, so the agent

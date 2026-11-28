@@ -56,7 +56,7 @@
     ]
   },
   "navbar": {
-    "primary": {"type": "button", "label": "Request sandbox access", "href": "https://dekernai.com/access/"}
+    "primary": {"type": "button", "label": "Request access", "href": "https://dekernai.com/access/"}
   },
   "footer": {"socials": {}}
 }

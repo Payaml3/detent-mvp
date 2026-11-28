@@ -273,6 +273,6 @@ def test_try_it_reaches_only_the_sandbox() -> None:
                                                                 "type": "http", "scheme": "bearer"}  # fmt: skip
     config = json.loads((DOCS / "docs.json").read_text())
     assert config["api"]["playground"]["display"] == "interactive"
-    assert config["navbar"]["primary"]["label"] == "Request sandbox access"
+    assert config["navbar"]["primary"]["label"] == "Request access"
     page = (DOCS / "tools" / "try-it.mdx").read_text()
-    assert "Request sandbox access" in page and "sk_live_" in page
+    assert "Request access" in page and "sk_live_" in page
