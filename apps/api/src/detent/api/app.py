@@ -18,6 +18,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.sessions import SessionMiddleware
 
 from detent import logging as dlog
+from detent.api import status as public_status
 from detent.api import v1
 from detent.api import webhooks as v1_webhooks
 from detent.api.auth import AuthError
@@ -95,9 +96,8 @@ def create_app(
     app.middleware("http")(request_context)
 
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-    app.include_router(console_routes.router)
-    app.include_router(v1.router)
-    app.include_router(v1_webhooks.router)
+    for router in (console_routes.router, v1.router, v1_webhooks.router, public_status.router):
+        app.include_router(router)
     dashboard.install(app)
     app.state.screening = MockScreening.from_fixture()
 

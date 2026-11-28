@@ -1192,7 +1192,7 @@
    "epic": "WEB",
    "slice": "P4",
    "criteria": 2,
-   "done": 1
+   "done": 2
   },
   {
    "id": "WEB-03",
@@ -1227,7 +1227,7 @@
    "epic": "WEB",
    "slice": "P4",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "WEB-08",

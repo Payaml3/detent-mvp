@@ -2220,7 +2220,7 @@ stories:
     - "Onboarding page explains the seven onboarding phases and data handling (B-04)"
   pri: Must
   est: 0.75
-  done: [0]
+  done: [0, 1]
   deps: [WEB-01]
   trace: [D.site, D.honesty, B3.lead_shadow, B5.hosting]
   ms: P4
@@ -2289,6 +2289,7 @@ stories:
     - "Fed by health checks; shows sandbox API, dashboard and docs"
   pri: Should
   est: 0.25
+  done: [0]
   deps: [FND-07]
   trace: [D.ops_pages, B7.reliability]
   ms: P4

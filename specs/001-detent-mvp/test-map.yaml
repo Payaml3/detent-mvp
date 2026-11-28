@@ -62,7 +62,9 @@ WEB-04:
 WEB-05:
   0: ["ci:apps/site/tests/site.test.mjs legal pages are marked draft for legal review", "ci:apps/site/tests/site.test.mjs no third-party requests: scripts, styles and fonts are served locally", "manual:apps/site sets no cookies and has no analytics configured"]
 WEB-06:
-  0: ["ci:apps/site/tests/site.test.mjs placeholders are reported, never silently shipped (booking link and access form are placeholders until DSH-10 and the founder's booking URL)"]
+  0: ["ci:apps/site/tests/site.test.mjs access form posts to the dashboard's DSH-10 endpoint (WEB-06)", "ci:apps/site/tests/site.test.mjs placeholders are reported, never silently shipped"]
+WEB-07:
+  0: ["integration/test_status_page.py::test_status_lists_the_three_components_for_any_origin", "integration/test_status_page.py::test_docs_are_checked_over_http", "integration/test_status_page.py::test_database_down_marks_api_and_dashboard_down", "ci:apps/site/tests/logic.test.mjs status: rows follow the deploy's answer, and a failed fetch means unreachable (WEB-07)", "ci:apps/site/tests/site.test.mjs status page: sandbox API, dashboard and docs, fed by the deploy's health checks (WEB-07)"]
 WEB-08:
   0: ["ci:apps/site/tests/site.test.mjs SEO: titles pair the name with 'payment controls'; sitemap, robots, OG image, schema.org"]
 INT-01:

@@ -3,6 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { SCENARIOS, runScenario } from "../src/scripts/scenarios.mjs";
 import { readResults } from "../src/lib/results.mjs";
+import { statusRows } from "../src/lib/status.mjs";
 
 // The states a payment may move between (spec/02, detent/domain/states.py ALLOWED), mirrored for the demo.
 const ALLOWED = {
@@ -77,4 +78,18 @@ test("results: every figure carries the dated synthetic-data label", () => {
 
 test("results: a file without a date is rejected", () => {
   assert.throws(() => readResults({ figures: [{ value: "0", caption: "x" }] }), /date/);
+});
+
+test("status: rows follow the deploy's answer, and a failed fetch means unreachable (WEB-07)", () => {
+  const ok = statusRows({ checked_at: "2026-11-28T00:00:00Z", components: [
+    { id: "sandbox_api", status: "operational" }, { id: "dashboard", status: "operational" }, { id: "docs", status: "not_monitored" }] });
+  assert.deepEqual(ok.rows.map((r) => r.label), ["Operational", "Operational", "Not monitored yet"]);
+  assert.match(ok.summary, /operational/);
+  assert.equal(ok.checkedAt, "2026-11-28T00:00:00Z");
+  const down = statusRows({ components: [{ id: "sandbox_api", status: "down" }, { id: "dashboard", status: "down" }, { id: "docs", status: "weird" }] });
+  assert.deepEqual(down.rows.map((r) => r.state), ["down", "down", "unknown"]);
+  assert.equal(down.summary, "Sandbox API and Dashboard are having problems.");
+  const gone = statusRows(null);
+  assert.deepEqual(gone.rows.map((r) => r.state), ["unreachable", "unreachable", "unknown"]);
+  assert.match(gone.summary, /can't reach/);
 });

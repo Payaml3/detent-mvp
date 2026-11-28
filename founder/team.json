@@ -2119,8 +2119,8 @@
    "initiative": "Marketing site",
    "slice": "P4",
    "priority": "",
-   "status": "in_progress",
-   "progress": "1/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -2189,8 +2189,8 @@
    "initiative": "Marketing site",
    "slice": "P4",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
