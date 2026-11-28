@@ -37,6 +37,7 @@ TAG_TEXT: dict[str, str] = {
     "policy": "The client-owned rule set and its versions.",
     "reconciliation": "Reconciliation runs and the breaks they find.",
     "request_logs": "Your recent API requests, for debugging.",
+    "user_accounts": "Your own end users: one payout destination each and your typed user_verified flag.",
     "webhook_endpoints": "Where events are sent, signed, with retries and resends.",
 }
 
@@ -145,7 +146,10 @@ SCHEMAS: dict[str, Any] = {
             "source": {"type": "string", "enum": ["platform", "agent"]},
             "amount": _ref("Money"),
             "counterparty_id": {"type": ["string", "null"]},
-            "user_account_ref": {"type": ["string", "null"]},
+            "user_account_ref": {
+                "type": ["string", "null"],
+                "description": "A payout to one of your own end users (the user payout profile).",
+            },
             "destination": {"type": "object"},
             "reference": {"type": ["string", "null"]},
             "decision": {"oneOf": [_ref("Decision"), {"type": "null"}]},
@@ -293,6 +297,20 @@ SCHEMAS: dict[str, Any] = {
             "at": {"type": "string", "format": "date-time"},
         },
     },
+    "UserAccount": {
+        "type": "object",
+        "description": "One of your end users: one payout destination and your user_verified flag.",
+        "properties": {
+            "object": {"type": "string", "enum": ["user_account"]},
+            "user_account_ref": {"type": "string", "example": "u-1001"},
+            "holder_name": {"type": ["string", "null"]},
+            "user_verified": {"type": "boolean"},
+            "verified_set_by": {"type": "string"},
+            "verified_set_at": {"type": "string", "format": "date-time"},
+            "created_at": {"type": "string", "format": "date-time"},
+            "destination": {"type": ["object", "null"]},
+        },
+    },
     "Accepted": {"type": "object", "description": "The work is queued."},
     "Object": {"type": "object"},
 }
@@ -329,6 +347,12 @@ OPS: dict[tuple[str, str], tuple[str, str, tuple[int, ...]]] = {
     ("post", "/v1/kill_switch"): ("Engage the kill switch", "Object", ()),
     ("delete", "/v1/kill_switch"): ("Release the kill switch (payments lead only)", "Object", ()),
     ("get", "/v1/request_logs"): ("List this organisation's request logs", "list:RequestLog", (422,)),
+    ("put", "/v1/user_accounts/{user_account_ref}"): (
+        "Register a user account and its destination",
+        "UserAccount",
+        (403, 422),
+    ),
+    ("get", "/v1/user_accounts/{user_account_ref}"): ("Get a user account", "UserAccount", (404, 422)),
     ("get", "/v1/mandates"): ("List agent mandates", "Object", ()),
     ("post", "/v1/mandates/{mandate_id}/revoke"): ("Revoke an agent mandate", "Object", (404,)),
     ("get", "/v1/policy/versions"): ("List rule versions", "Object", ()),

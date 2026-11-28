@@ -2222,8 +2222,8 @@
    "initiative": "User payouts",
    "slice": "U",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -2236,8 +2236,8 @@
    "initiative": "User payouts",
    "slice": "U",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },
@@ -2250,8 +2250,8 @@
    "initiative": "User payouts",
    "slice": "U",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -2264,8 +2264,8 @@
    "initiative": "User payouts",
    "slice": "U",
    "priority": "",
-   "status": "todo",
-   "progress": "0/2",
+   "status": "done",
+   "progress": "2/2",
    "deps": [],
    "dependents": []
   },

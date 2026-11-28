@@ -41,6 +41,8 @@ NAMES: dict[str, tuple[str, str]] = {
     "postKillSwitch": ("kill_switch", "engage"),
     "deleteKillSwitch": ("kill_switch", "release"),
     "getRequestLogs": ("request_logs", "list"),
+    "putUserAccountsUserAccountRef": ("user_accounts", "register"),
+    "getUserAccountsUserAccountRef": ("user_accounts", "retrieve"),
     "getMandates": ("mandates", "list"),
     "postMandatesMandateIdRevoke": ("mandates", "revoke"),
     "getPolicyVersions": ("policy", "list_versions"),

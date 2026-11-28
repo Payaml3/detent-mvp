@@ -155,6 +155,31 @@ export interface ResolutionIn {
   reason: string;
 }
 
+/** One of your end users: one payout destination and your user_verified flag. */
+export interface UserAccount {
+  object?: "user_account";
+  user_account_ref?: string;
+  holder_name?: string | null;
+  user_verified?: boolean;
+  verified_set_by?: string;
+  verified_set_at?: string;
+  created_at?: string;
+  destination?: Record<string, unknown> | null;
+}
+
+export interface UserAccountIn {
+  user_verified: boolean;
+  holder_name?: string | null;
+  destination: UserDestinationIn;
+}
+
+export interface UserDestinationIn {
+  kind: "evm_wallet" | "bank_account";
+  network: string;
+  address?: string | null;
+  account_masked?: string | null;
+}
+
 export interface WebhookDelivery {
   id?: string;
   object?: "webhook_delivery";
@@ -278,6 +303,20 @@ export class RequestLogs {
   }
 }
 
+export class UserAccounts {
+  constructor(private readonly client: Requester) {}
+
+  /** Get a user account (`GET /v1/user_accounts/{user_account_ref}`). */
+  retrieve(userAccountRef: string): Promise<UserAccount> {
+    return this.client.request<UserAccount>({ method: "GET", path: `/v1/user_accounts/${encodeURIComponent(String(userAccountRef))}` });
+  }
+
+  /** Register a user account and its destination (`PUT /v1/user_accounts/{user_account_ref}`). */
+  register(userAccountRef: string, params: UserAccountIn): Promise<UserAccount> {
+    return this.client.request<UserAccount>({ method: "PUT", path: `/v1/user_accounts/${encodeURIComponent(String(userAccountRef))}`, body: params });
+  }
+}
+
 export class Mandates {
   constructor(private readonly client: Requester) {}
 
@@ -394,6 +433,7 @@ export function resources(client: Requester) {
     exceptions: new Exceptions(client),
     killSwitch: new KillSwitch(client),
     requestLogs: new RequestLogs(client),
+    userAccounts: new UserAccounts(client),
     mandates: new Mandates(client),
     policy: new Policy(client),
     depositIntents: new DepositIntents(client),

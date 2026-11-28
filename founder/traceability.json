@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 153,
-   "done": 126,
-   "pct": 82
+   "done": 130,
+   "pct": 85
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 327,
-   "done": 297,
-   "pct": 91
+   "done": 304,
+   "pct": 93
   },
   {
    "order": 3,
@@ -40,9 +40,9 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 228,
+   "done": 235,
    "total": 251,
-   "pct_done": 91
+   "pct_done": 94
   },
   {
    "function": "05 QA",
@@ -237,8 +237,8 @@
    "role": "engineer",
    "stories": 4,
    "criteria": 7,
-   "criteria_done": 0,
-   "pct_done": 0
+   "criteria_done": 7,
+   "pct_done": 100
   },
   {
    "code": "WEB",
@@ -1756,9 +1756,9 @@
    "function": "04 Engineering",
    "slice": "U",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "USR-02",
@@ -1766,9 +1766,9 @@
    "function": "04 Engineering",
    "slice": "U",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "USR-03",
@@ -1776,9 +1776,9 @@
    "function": "04 Engineering",
    "slice": "U",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "USR-04",
@@ -1786,9 +1786,9 @@
    "function": "04 Engineering",
    "slice": "U",
    "criteria": 2,
-   "criteria_done": 0,
+   "criteria_done": 2,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   }
  ],
  "decision_counts": {

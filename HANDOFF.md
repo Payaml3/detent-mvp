@@ -21,7 +21,7 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | P3 Docs and SDKs | done (Mintlify connection and SDK publishing wait on the founder) | `main` |
 | P4 Website launch | built: WEB-02, WEB-07 done; the access form posts to the live deploy. Open: the booking URL (WEB-06), the legal review and the founder's go-live call | `main` |
 | L After launch (Should and Could) | done: groups 1 to 4 built (17 stories); exit check met | `main` |
-| U User payouts (D-40, 28 Nov) | todo: USR-01 to USR-04, after L | |
+| U User payouts (D-40, 28 Nov) | done: USR-01 to USR-04 built | `main` |
 
 Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
 
@@ -196,7 +196,13 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   drill (`detent ops restore-drill`, runbook and drill log in spec/10; the Neon point-in-time drill waits for the
   hosted database), OPS-04 security pack (`docs/security.md` from `tools/build_security.py`, internal only), DEM-06
   scenario packs (`fixtures/packs/`, selectable on reset). Slice L is complete.
-- **Next:** slice U (user payouts, D-40). · Model: strongest for EXE/RAL/money paths, mid-tier otherwise
+- **Slice U: built (2026-11-28):** USR-01 user accounts with one destination each and the typed `user_verified`
+  flag (`PUT /v1/user_accounts/{ref}`, `detent/intents/users.py`, migration 0019); USR-02 the user payout profile
+  in the engine (counterparty checks NOT_EVALUATED, `user_verified` escalates USER_NOT_VERIFIED, platform cap only);
+  USR-03 console, OpenAPI, docs guide (`docs/guides/user-payouts.mdx`) and SDKs; USR-04 nine eval attacks
+  (`eval/scenarios/attacks/user-payouts.yaml`) and three seeded fictional users as sandbox test values. The demo
+  batch stays counterparty-only (D-32). See spec/04 "As built (slice U)".
+- **Next:** the backlog is built. Open founder items below (deploy, live testnet run, publishing). · Model: mid-tier
 
 ## Open founder items
 

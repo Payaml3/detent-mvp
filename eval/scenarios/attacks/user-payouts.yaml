@@ -1,0 +1,81 @@
+# User payouts (slice U, USR-04). Payouts to the platform's own end users are decided under the user payout
+# profile: counterparty checks are skipped, every safety check still runs, and the platform's typed
+# user_verified flag escalates when false. Zero unauthorised executions, as for every attack.
+category: user_payouts
+scenarios:
+  - id: atk-up-01
+    description: A payout to an unverified user escalates USER_NOT_VERIFIED and is never sent.
+    steps:
+      - register_user: {ref: u-eval-1, verified: false, age_days: 30}
+      - intent: {user: u-eval-1, amount: "60.00", save: p1, expect_status: ESCALATED, expect_reasons: [USER_NOT_VERIFIED]}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-up-02
+    description: The user's destination is replaced just before a payout (CHANGED_DETAILS escalates).
+    steps:
+      - register_user: {ref: u-eval-2, dest: local, age_days: 30}
+      - register_user: {ref: u-eval-2, dest: spare}
+      - intent: {user: u-eval-2, dest: spare, amount: "60.00", save: p1, expect_status: ESCALATED, expect_reasons: [CHANGED_DETAILS]}
+      - run_worker: {}
+    assert: {no_payment_to_alias: spare, attempts: {p1: 0}}
+
+  - id: atk-up-03
+    description: An intent names a wallet that is not the user's registered destination; nothing is created.
+    steps:
+      - register_user: {ref: u-eval-3, dest: local, age_days: 30}
+      - intent: {user: u-eval-3, dest: spare, amount: "60.00", expect_http: 422, expect_code: validation_error}
+      - run_worker: {}
+    assert: {no_payment_to_alias: spare, confirmed_count: 0}
+
+  - id: atk-up-04
+    description: 8 parallel user payouts of 900 against a 5,000 platform cap.
+    setup: {policy_changes: {checks.daily_caps.platform.USDC: "5000.00"}}
+    steps:
+      - register_user: {ref: u-eval-4, age_days: 30}
+      - parallel_intents: {n: 8, user: u-eval-4, amount: "900.00", save: ids}
+      - run_worker: {}
+    assert: {max_confirmed_total: "5000.00", confirmed_count: 5}
+
+  - id: atk-up-05
+    description: The same user payout sent twice under one idempotency key keeps one payment ID and pays once.
+    steps:
+      - register_user: {ref: u-eval-5, age_days: 30}
+      - intent: {user: u-eval-5, amount: "70.00", idem: dup-user-1, save: p1, expect_status: READY}
+      - intent: {user: u-eval-5, amount: "70.00", idem: dup-user-1, save: p2}
+      - run_worker: {}
+    assert: {status: {p1: CONFIRMED}, rail_transfers: {p1: 1}, confirmed_count: 1}
+
+  - id: atk-up-06
+    description: The platform withdraws user_verified after escalation; the approval re-runs policy and holds.
+    steps:
+      - register_user: {ref: u-eval-6, holder_name: "Eval User Six (fictional)", age_days: 30}
+      - intent: {user: u-eval-6, amount: "15000.00", save: p1, expect_status: ESCALATED}
+      - register_user: {ref: u-eval-6, verified: false, holder_name: "Eval User Six (fictional)"}
+      - approve: {payment: p1, as: reviewer, expect_status: ESCALATED}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-up-07
+    description: An agent intent tries to pay a user account; it is refused and nothing is created.
+    steps:
+      - register_user: {ref: u-eval-7, age_days: 30}
+      - intent: {user: u-eval-7, source: agent, amount: "60.00", expect_http: 422, expect_code: validation_error}
+    assert: {confirmed_count: 0}
+
+  - id: atk-up-08
+    description: A newly registered user destination escalates NEW_WALLET.
+    steps:
+      - register_user: {ref: u-eval-8}
+      - intent: {user: u-eval-8, amount: "60.00", save: p1, expect_status: ESCALATED, expect_reasons: [NEW_WALLET]}
+      - run_worker: {}
+    assert: {status: {p1: ESCALATED}, attempts: {p1: 0}}
+
+  - id: atk-up-09
+    description: A user payout to a screened address is blocked, and the block is never retried.
+    steps:
+      - register_user: {ref: u-eval-9, dest: dead, age_days: 30}
+      - intent: {user: u-eval-9, dest: dead, amount: "60.00", save: p1, expect_status: BLOCKED, expect_reasons: [SCREENING_HIT]}
+      - approve: {payment: p1, as: reviewer, expect_http: [404, 409]}
+      - run_worker: {}
+    assert: {status: {p1: BLOCKED}, attempts: {p1: 0}}

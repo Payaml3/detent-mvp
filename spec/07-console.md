@@ -111,3 +111,9 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
   `fixtures/packs/`: payout platform, crypto service provider and marketplace, each with a fictional platform,
   counterparties, rule overrides on the default rule set and a short batch. "Run this pack's batch" sends it through
   the rules. The scripted spec/11 scenarios use the default pack.
+
+## As built (slice U: USR-03)
+
+- **User payouts:** Payments, Payment detail, Exceptions and the case page show the user account reference and
+  "user payout profile" for a payout to one of the platform's own end users. The case's raw facts show the
+  platform's `user_verified` flag with who set it and when, in place of KYB and the allowlist.

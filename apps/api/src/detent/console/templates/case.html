@@ -8,7 +8,12 @@
 <section class="card" data-section="raw-facts">
   <h2>Raw facts</h2>
   <dl class="facts">
+    {% if f.user_account_ref %}
+    <dt>Payee as registered</dt><dd>User account <span class="mono">{{ f.user_account_ref }}</span>{% if f.holder_name %} ({{ f.holder_name }}){% endif %} · <strong>user payout profile</strong></dd>
+    <dt>User verified</dt><dd>{{ 'yes' if f.user_verified else 'no' }} (the platform's own KYC; set by {{ f.user_verified_by }} at {{ f.user_verified_at.strftime('%Y-%m-%d %H:%M') if f.user_verified_at else 'unknown' }} UTC)</dd>
+    {% else %}
     <dt>Payee as registered</dt><dd>{{ f.payee }} · KYB {{ f.kyb }} · {{ 'allowlisted' if f.allowlisted else 'not allowlisted' }}</dd>
+    {% endif %}
     <dt>Destination</dt><dd class="mono">{{ f.address or f.account_masked }}{% if f.verified == false %} (unverified){% endif %}</dd>
     <dt>Network</dt><dd>{{ f.network }}</dd>
     <dt>First seen</dt><dd>{{ f.first_seen.strftime('%Y-%m-%d %H:%M') if f.first_seen else 'unknown' }} UTC</dd>

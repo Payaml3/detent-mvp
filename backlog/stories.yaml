@@ -2340,6 +2340,7 @@ stories:
   est: 0.5
   deps: [INT-04]
   trace: [A2.Intent]
+  done: [0, 1]
   ms: U
 
 - id: USR-02
@@ -2355,6 +2356,7 @@ stories:
   est: 0.75
   deps: [USR-01, POL-08]
   trace: [A2.Decide, A2.Policy]
+  done: [0, 1]
   ms: U
 
 - id: USR-03
@@ -2369,6 +2371,7 @@ stories:
   est: 0.5
   deps: [USR-02]
   trace: [A2.Intent]
+  done: [0]
   ms: U
 
 - id: USR-04
@@ -2384,4 +2387,5 @@ stories:
   est: 0.5
   deps: [USR-02]
   trace: [A2.Decide]
+  done: [0, 1]
   ms: U

@@ -106,6 +106,14 @@ A payout with `user_account_ref` instead of `counterparty_id` uses a **user payo
 - **Kept:** screening of the destination, allowed_networks, limits, daily caps (platform scope), unusual.new_wallet and unusual.changed_details on the user's destination, and resubmission_after_block.
 - **Platform's job:** the end user's own KYC stays with the platform, which is accountable for it. The policy only reads the platform's typed `user_verified` flag, and it escalates if the flag is false.
 
+**As built (slice U, USR-01 and USR-02):**
+- `PUT /v1/user_accounts/{ref}` registers the account (`user_accounts`) and its one destination (`destinations.user_account_ref`, unique per account, migration 0019). A different destination replaces it in place under the same `dst_` ID and writes `destination.changed`, so the next payout escalates CHANGED_DETAILS. A changed `user_verified` is stored with who set it and when (`user_account.verification_changed`).
+- A user payout must name the registered destination, or the request is refused (422 `validation_error`) and nothing is created. A user payout comes from the platform only: an agent intent always pays a counterparty, because a mandate's payee is a counterparty.
+- The decision lists every check. Under the user payout profile, kyb_status, allowlist, first_payment, above_norm and daily_cap_counterparty are `NOT_EVALUATED` with the note "user payout profile", and a `user_verified` check runs in kyb_status's place (ESCALATE `USER_NOT_VERIFIED`). The counters use the platform scope only.
+- Screening and the travel rule use the platform's optional `holder_name` for the user. Above the travel-rule threshold, a missing name escalates TRAVEL_RULE_MISSING. This is fail closed: the travel rule was not on the skip list.
+- An approval covers its reasons only while `user.ref` and `user.verified` are unchanged (D-01), so withdrawing `user_verified` after an escalation keeps the payment held.
+- The 422 `user_payouts_unavailable` is gone (D-26 ends, D-40).
+
 ## Counters and concurrency
 
 Daily caps and mandate totals use one row per (org, scope, day) in `counters`, updated with `UPDATE ... RETURNING` inside the decision transaction. Concurrent decisions serialise on that row. The amount counted is confirmed plus in-flight (READY, SUBMITTED or UNKNOWN). It is released on FAILED_FINAL, CANCELLED, BLOCKED or REJECTED.

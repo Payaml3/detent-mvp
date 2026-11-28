@@ -37,6 +37,7 @@ deadlines:
 |---|---|---|
 | Mandate (agent payouts) | BLOCK | `MANDATE_MISSING`, `MANDATE_EXPIRED`, `MANDATE_REVOKED`, `MANDATE_AMOUNT_EXCEEDED`, ... |
 | KYB status | BLOCK or ESCALATE | `KYB_FAILED`, `KYB_PENDING` |
+| User verified (user payouts) | ESCALATE | `USER_NOT_VERIFIED` |
 | Allowlist | ESCALATE | `NOT_ALLOWLISTED` |
 | Screening | BLOCK | `SCREENING_HIT` |
 | Travel rule | ESCALATE | `TRAVEL_RULE_MISSING` |
@@ -45,6 +46,10 @@ deadlines:
 | Daily caps | ESCALATE | `DAILY_CAP_PLATFORM`, `DAILY_CAP_COUNTERPARTY` |
 | Unusual activity | ESCALATE | `NEW_WALLET`, `CHANGED_DETAILS`, `FIRST_PAYMENT`, `ABOVE_NORM` |
 | Resubmission after a block | ESCALATE | `RESUBMISSION_AFTER_BLOCK` |
+
+A payout to one of your own end users is decided under the user payout profile: KYB status, allowlist, first
+payment, above norm and the per-counterparty daily cap are skipped, and `user_verified` runs instead. See
+[Pay your own users](/guides/user-payouts).
 
 ## Changing the rules
 

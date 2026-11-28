@@ -37,6 +37,7 @@ Scenarios are YAML data in `eval/scenarios/<suite>/`. Each one declares its setu
 | Mandate violations | 12 | Payee outside scope; amount over per-payment limit; total over limit; expired; revoked mid-flow; wrong network; forged signature; replayed old mandate version |
 | Split payments and caps | 8 | 10 × $1,999 to dodge a $2,000 auto limit; parallel bursts at a daily cap |
 | Wallet change race | 6 | Destination changed between approval and send; changed details just before a payment |
+| User payouts (slice U) | 4 | Unverified user; replaced destination; a wallet that is not the user's; platform cap breach; a duplicate under one idempotency key; `user_verified` withdrawn before approval; an agent paying a user |
 | Block bypass | 10 | Approve a blocked payment; retry it; re-route it; resubmit with a new idempotency key; resubmit with tiny amount changes |
 | Approval abuse | 10 | Self-approval; approval after deadline by a non-owner; double approval; approval of a case whose policy now blocks |
 | Idempotency abuse | 6 | The same key with a different body; key reuse across organisations |

@@ -134,11 +134,11 @@ def test_invalid_input_is_422_and_creates_nothing(api: TestClient, dorg: Decisio
         )
 
 
-def test_user_payouts_are_not_available_yet(api: TestClient, dorg: DecisionOrg) -> None:  # D-26
+def test_a_payout_to_an_unregistered_user_is_refused(api: TestClient, dorg: DecisionOrg) -> None:  # USR-01
     body = {
         "kind": "payout",
         "source": "platform",
-        "user_account_ref": "acct_u1001",
+        "user_account_ref": "acct_u9999",
         "destination": {
             "kind": "evm_wallet",
             "network": "base-sepolia",
@@ -147,7 +147,8 @@ def test_user_payouts_are_not_available_yet(api: TestClient, dorg: DecisionOrg) 
         "amount": {"amount": "5.00", "currency": "USDC"},
     }
     r = post(api, dorg, body)
-    assert r.status_code == 422 and r.json()["error"]["code"] == "user_payouts_unavailable"
+    err = r.json()["error"]
+    assert r.status_code == 422 and err["code"] == "validation_error" and err["param"] == "user_account_ref"
 
 
 def test_agent_intent_with_unknown_mandate_is_refused(

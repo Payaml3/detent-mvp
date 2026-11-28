@@ -5,6 +5,7 @@
 <p><span class="st st-{{ p.status|lower }}">{{ p.status }}</span> · {{ p.amount.amount }} {{ p.amount.currency }} · {{ p.source }}{% if p.reference %} · {{ p.reference }}{% endif %}
   {% if p.exception %} · <a href="/console/exceptions/{{ p.exception.id }}">Open case</a>{% endif %}
   <a class="button" href="/console/payments/{{ p.id }}/replay" title="Re-evaluate every recorded decision from its stored inputs; no model is called">Replay</a></p>
+<p data-section="payee">{% if p.user_account_ref %}Payee: user account <span class="mono">{{ p.user_account_ref }}</span> · decided under the <strong>user payout profile</strong> (counterparty checks do not apply; the platform's user_verified flag does){% elif p.counterparty_id %}Payee: counterparty <span class="mono">{{ p.counterparty_id }}</span>{% endif %}</p>
 {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
 {% if p.status == 'READY' and p.awaiting_send_click %}
 <section class="card" data-section="send">

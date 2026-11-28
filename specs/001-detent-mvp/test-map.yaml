@@ -500,3 +500,14 @@ OPS-04:
   0: ["unit/test_security_pack.py::test_security_pack_is_current", "unit/test_security_pack.py::test_controls_have_tests_and_roadmap_is_labelled"]
 DEM-06:
   0: ["integration/test_scenario_packs.py::test_three_packs_each_with_platform_counterparties_rules_and_a_batch", "integration/test_scenario_packs.py::test_reset_into_a_pack_and_its_batch_decides_as_expected", "integration/test_scenario_packs.py::test_unknown_pack_is_refused", "integration/test_scenario_packs.py::test_console_reset_with_a_pack"]
+USR-01:
+  0: ["integration/test_user_payouts.py::test_a_user_account_has_one_destination_and_a_typed_verified_flag", "integration/test_user_payouts.py::test_a_replaced_destination_escalates_changed_details", "integration/test_user_payouts.py::test_a_user_payout_goes_only_to_the_registered_destination"]
+  1: ["integration/test_user_payouts.py::test_a_user_account_has_one_destination_and_a_typed_verified_flag", "integration/test_user_payouts.py::test_bad_registrations_are_refused"]
+USR-02:
+  0: ["integration/test_user_payouts.py::test_the_user_payout_profile_skips_counterparty_checks_and_keeps_the_safety_checks", "integration/test_user_payouts.py::test_screening_networks_and_resubmission_still_apply", "integration/test_user_payouts.py::test_user_payouts_count_against_the_platform_cap_only", "integration/test_user_payouts.py::test_the_travel_rule_needs_the_users_name_above_the_threshold"]
+  1: ["integration/test_user_payouts.py::test_an_unverified_user_escalates_and_approval_reruns_policy", "integration/test_user_payouts.py::test_an_approval_does_not_cover_a_changed_verification", "integration/test_intents_api.py::test_a_payout_to_an_unregistered_user_is_refused"]
+USR-03:
+  0: ["integration/test_user_payouts.py::test_the_console_shows_the_user_account_and_the_profile", "unit/test_openapi.py::test_every_v1_route_is_described", "sdks/python/tests/test_client.py::test_user_accounts_register_with_put_and_no_idempotency_key"]
+USR-04:
+  0: ["ci:.github/workflows/ci.yml release gate runs eval/scenarios/attacks/user-payouts.yaml (atk-up-01 to atk-up-09, 0 unauthorised executions)"]
+  1: ["integration/test_user_payouts.py::test_new_organisations_are_seeded_with_fictional_users_as_test_values", "integration/test_dashboard_access.py::test_admin_creates_a_client_org_only_with_kyb_and_invites_the_owner"]

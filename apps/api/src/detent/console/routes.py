@@ -310,8 +310,9 @@ def payments(
         rows = conn.execute(
             text(
                 "SELECT p.id, p.status, p.amount_minor, p.currency, p.source, p.reference, p.created_at, "
-                "c.name AS payee FROM payment_intents p LEFT JOIN counterparties c ON c.org_id = p.org_id "
-                "AND c.id = p.counterparty_id WHERE p.org_id=:o "
+                "p.user_account_ref, c.name AS payee FROM payment_intents p "
+                "LEFT JOIN counterparties c ON c.org_id = p.org_id AND c.id = p.counterparty_id "
+                "WHERE p.org_id=:o "
                 "AND p.generation = (SELECT data_generation FROM organisations WHERE org_id = :o) "
                 "AND (CAST(:s AS text) IS NULL OR p.status "
                 "= :s) "
@@ -447,7 +448,10 @@ def exceptions_queue(
         rows = conn.execute(
             text(
                 "SELECT c.id, c.payment_id, c.type, c.tier, c.reasons, c.owner_id, c.deadline_at, c.status, "
-                "u.display_name AS owner_name, p.amount_minor, p.currency FROM exception_cases c "
+                "u.display_name AS owner_name, p.amount_minor, p.currency, p.user_account_ref, "
+                "cp.name AS payee FROM exception_cases c "
+                "LEFT JOIN counterparties cp ON cp.org_id = c.org_id AND cp.id = ("
+                "SELECT counterparty_id FROM payment_intents WHERE org_id = c.org_id AND id = c.payment_id) "
                 "LEFT JOIN users u ON u.org_id = c.org_id AND u.id = c.owner_id "
                 "LEFT JOIN payment_intents p ON p.org_id = c.org_id AND p.id = c.payment_id "
                 "WHERE c.org_id=:o AND c.status IN ('OPEN','HELD_OVERDUE') "

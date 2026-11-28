@@ -204,6 +204,32 @@ class ResolutionIn(TypedDict):
     reason: str
 
 
+class UserAccount(TypedDict):
+    """One of your end users: one payout destination and your user_verified flag."""
+
+    object: NotRequired[Literal["user_account"]]
+    user_account_ref: NotRequired[str]
+    holder_name: NotRequired[str | None]
+    user_verified: NotRequired[bool]
+    verified_set_by: NotRequired[str]
+    verified_set_at: NotRequired[str]
+    created_at: NotRequired[str]
+    destination: NotRequired[dict[str, Any] | None]
+
+
+class UserAccountIn(TypedDict):
+    user_verified: bool
+    holder_name: NotRequired[str | None]
+    destination: UserDestinationIn
+
+
+class UserDestinationIn(TypedDict):
+    kind: Literal["evm_wallet", "bank_account"]
+    network: str
+    address: NotRequired[str | None]
+    account_masked: NotRequired[str | None]
+
+
 class WebhookDelivery(TypedDict):
     id: NotRequired[str]
     object: NotRequired[Literal["webhook_delivery"]]
@@ -421,6 +447,24 @@ class RequestLogs(_Resource):
         )
 
 
+class UserAccounts(_Resource):
+    def retrieve(self, user_account_ref: str) -> UserAccount:
+        """Get a user account (`GET /v1/user_accounts/{user_account_ref}`)."""
+        return cast(
+            "UserAccount",
+            self._client._request("GET", f"/v1/user_accounts/{quote(str(user_account_ref), safe='')}"),
+        )
+
+    def register(self, user_account_ref: str, params: UserAccountIn) -> UserAccount:
+        """Register a user account and its destination (`PUT /v1/user_accounts/{user_account_ref}`)."""
+        return cast(
+            "UserAccount",
+            self._client._request(
+                "PUT", f"/v1/user_accounts/{quote(str(user_account_ref), safe='')}", body=params
+            ),
+        )
+
+
 class Mandates(_Resource):
     def list(self) -> Object:
         """List agent mandates (`GET /v1/mandates`)."""
@@ -575,6 +619,7 @@ class Resources:
     exceptions: Exceptions
     kill_switch: KillSwitch
     request_logs: RequestLogs
+    user_accounts: UserAccounts
     mandates: Mandates
     policy: Policy
     deposit_intents: DepositIntents
@@ -588,6 +633,7 @@ class Resources:
         self.exceptions = Exceptions(client)
         self.kill_switch = KillSwitch(client)
         self.request_logs = RequestLogs(client)
+        self.user_accounts = UserAccounts(client)
         self.mandates = Mandates(client)
         self.policy = Policy(client)
         self.deposit_intents = DepositIntents(client)
