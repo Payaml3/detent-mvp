@@ -141,7 +141,7 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   at once. Members are never deleted.
 - **Email (DSH-02 criterion 2, D-43):** `dashboard/email.send_email` writes every dashboard email to the outbox in
   the caller's transaction. With `EMAIL_PROVIDER=zeptomail` the row's channel is `email` and an `email.send` job
-  (`dashboard/email_delivery.py`) posts it to ZeptoMail's UK API (`ZEPTOMAIL_API_URL`) from `EMAIL_FROM`: 2xx stores `sent_at` and the
+  (`dashboard/email_delivery.py`) posts it to ZeptoMail's UK API (`ZEPTOMAIL_API_URL`, default `https://cpaas.zoho.uk/v1.1/email`; the token may be pasted with or without its `Zoho-enczapikey` prefix) from `EMAIL_FROM`: 2xx stores `sent_at` and the
   provider's request ID; 429, 5xx and network errors retry with the worker's backoff; other 4xx are stored in
   `last_error` and not retried. Console notices to counterparties stay `email_mock` whatever the provider.
 - **Not yet (at the time):** the sandbox and verification pages (later P2 groups; the checklist links to them). Keys, logs, webhooks and usage: P2 group 2 below.

@@ -27,6 +27,7 @@ SUBJECTS = {
     "access_request": "New access request from the {brand} website",
 }
 TIMEOUT_SECONDS = 15.0
+AUTH_SCHEME = "Zoho-enczapikey"
 
 
 class RetryableSendError(RuntimeError):
@@ -35,6 +36,12 @@ class RetryableSendError(RuntimeError):
 
 def subject_for(template: str, brand: str) -> str:
     return SUBJECTS.get(template, "A message from {brand}").format(brand=brand)
+
+
+def api_key(settings: Settings) -> str:
+    """The Send Mail token, whether or not it was pasted with its "Zoho-enczapikey" prefix."""
+    token = settings.zeptomail_token.get_secret_value().strip()
+    return token.removeprefix(AUTH_SCHEME).strip()
 
 
 def request_body(settings: Settings, to: str, subject: str, body: str) -> dict[str, object]:
@@ -63,7 +70,7 @@ def send_job(ctx: JobContext) -> None:
         return  # gone or already sent: never send twice
     payload = request_body(settings, row.recipient, subject_for(row.template, settings.brand_name), row.body)
     headers = {
-        "Authorization": f"Zoho-enczapikey {settings.zeptomail_token.get_secret_value()}",
+        "Authorization": f"{AUTH_SCHEME} {api_key(settings)}",
         "Accept": "application/json",
         "Content-Type": "application/json",
     }

@@ -84,7 +84,7 @@ class Settings(BaseSettings):
     # the sales inbox notice) are also sent through Zoho ZeptoMail by the worker (founder, 2026-11-28).
     email_provider: str = "outbox"
     zeptomail_token: SecretStr = SecretStr("")  # the mail agent's Send Mail token; set on the server only
-    zeptomail_api_url: str = "https://api.zeptomail.uk/v1.1/email"  # the account is on Zoho's UK data centre
+    zeptomail_api_url: str = "https://cpaas.zoho.uk/v1.1/email"  # the UK console's API URL
     email_from: str = "notifications@dekernai.com"
     # P2: where invite links point (the dashboard's public address once deployed; spec/08 dashboard.<domain>).
     dashboard_url: str = "http://localhost:8000"
