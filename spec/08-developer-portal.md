@@ -356,6 +356,15 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   fetches it in the browser every minute (`apps/site/src/lib/status.mjs`); because the site is hosted apart from
   the deploy, a failed fetch shows the API and dashboard as "can't be reached".
 
+## As built (L group 2: DSH-13)
+
+- **Production mode (DSH-13):** the verification page ends with "Production mode". The request button is offered to
+  the account owner only when the integration is verified (DSH-12) and the active rule version was attested by the
+  client's compliance lead. A request is recorded (`production_requests`, audit `production.requested` with
+  `starts_in: shadow`) and the page says the switch is not available in the prototype. Nothing else changes: no mode
+  change and no `sk_live_` key (invariant 14). In production the organisation starts in Shadow and moves up on
+  signed mode gates (SHD-03).
+
 ## Needed from the founder before M8 to M11
 
 - the name and domain

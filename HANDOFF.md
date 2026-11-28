@@ -20,7 +20,7 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | P2 Dashboard and sandbox | done | `main` |
 | P3 Docs and SDKs | done (Mintlify connection and SDK publishing wait on the founder) | `main` |
 | P4 Website launch | built: WEB-02, WEB-07 done; the access form posts to the live deploy. Open: the booking URL (WEB-06), the legal review and the founder's go-live call | `main` |
-| L After launch (Should and Could) | in progress: group 1 (INT-05, EXE-10, OPS-01, CON-10) built | `main` |
+| L After launch (Should and Could) | done: groups 1 to 4 built (17 stories); exit check met | `main` |
 | U User payouts (D-40, 28 Nov) | todo: USR-01 to USR-04, after L | |
 
 Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
@@ -182,9 +182,21 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   `POST /v1/payment_intents/{id}/cancel`, 409 `not_cancellable`), EXE-10 invariant monitor and OPS-01 incidents
   (`detent/incidents/`, console Incidents screens, Sev 1 banner, migration 0016), CON-10 fail-safe changes with two
   leads plus read-only deadlines and weights. See spec/07 "As built (L group 1)" and spec/10 Runbooks.
-- **Next:** L group 2 (shadow: SHD-01, SHD-04, SHD-02, SHD-03, EXC-09, DSH-13), then group 3 (RAL-08 to RAL-10), group 4
-  (AUD-03, OPS-03, OPS-04, DEM-06), then slice U (user payouts, D-40). SHD-03's agreement threshold is not
-  defined anywhere yet: ask the founder. · Model: strongest for EXE/RAL/money paths, mid-tier otherwise
+- **L group 2: built (2026-11-28):** shadow mode. SHD-01 import with column mapping and a validation report, decided
+  in memory with nothing executed (`detent/shadow/imports.py`); SHD-04 per-import salted hashes; SHD-02 report with a
+  weekly view and HTML and PDF exports (`detent/shadow/report.py`, `pdf.py`); SHD-03 mode gates at 95% and zero
+  unsafe approvals (D-41, `detent/shadow/gates.py`), signed by both leads and required for a production organisation to
+  move up; EXC-09 agreement sample (`/console/agreement`); DSH-13 production request, recorded only. Migration
+  0017. See spec/07 and spec/08 "As built (L group 2)".
+- **L group 3: built (2026-11-28):** RAL-08 rail health and a per-rail circuit breaker (`detent/rails/health.py`;
+  routing skips an open circuit; the worker probes and closes it), RAL-09 mock rail connection with encrypted
+  credentials (`detent/rails/connections.py`, `/console/rails/connect`), RAL-10 daily contract run that opens an
+  issue on failure (`.github/workflows/rail-contracts.yml`, `tools/contract_report.py`). Migration 0018. See spec/06.
+- **L group 4: built (2026-11-28):** AUD-03 evidence export (`/console/audit`, JSON, HTML and PDF), OPS-03 restore
+  drill (`detent ops restore-drill`, runbook and drill log in spec/10; the Neon point-in-time drill waits for the
+  hosted database), OPS-04 security pack (`docs/security.md` from `tools/build_security.py`, internal only), DEM-06
+  scenario packs (`fixtures/packs/`, selectable on reset). Slice L is complete.
+- **Next:** slice U (user payouts, D-40). · Model: strongest for EXE/RAL/money paths, mid-tier otherwise
 
 ## Open founder items
 

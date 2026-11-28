@@ -2,7 +2,8 @@
 {% block title %}Rails{% endblock %}
 {% block main %}
 <h1>Rails</h1>
-<p class="muted">Test networks and the simulated bank rail only. Routing scores each eligible rail by cost, speed, success rate and liquidity.</p>
+<p><a class="button" href="/console/rails/connect">Connect a rail</a></p>
+<p class="muted">Test networks and the simulated bank rail only. Routing scores each eligible rail by cost, speed, success rate and liquidity, and skips a rail whose circuit is open.</p>
 {% for x in rails %}{% set r = x.row %}
 <section class="card">
   <h2>{{ r.id }} <span class="muted small">{{ r.kind }}{% if r.chain_id %} · chain {{ r.chain_id }}{% endif %}</span></h2>
@@ -13,6 +14,9 @@
     <dt>Balance</dt><dd>{{ x.balance or 'Balance unavailable: no adapter or the rail did not answer' }}</dd>
     <dt>Pre-funded limit today</dt><dd>{{ x.usage or 'no pre-funded limit' }}</dd>
     {% if x.per_payment %}<dt>Per-payment limit</dt><dd>{{ x.per_payment }}</dd>{% endif %}
+    <dt>Success rate (last 50)</dt><dd>{{ x.health.success_rate }}{% if x.health.attempts %} over {{ x.health.attempts }} finished attempts{% endif %}</dd>
+    <dt>p95 latency</dt><dd>{{ (x.health.p95_seconds ~ ' s') if x.health.p95_seconds is not none else 'no confirmations yet' }}</dd>
+    <dt>Circuit</dt><dd>{% if x.circuit_open %}<strong class="late">Circuit open</strong>: out of routing until a health probe succeeds{% if r.circuit_probe_at %} (last probe {{ r.circuit_probe_at.strftime('%H:%M:%S') }} UTC, {{ 'ok' if r.circuit_probe_ok else 'failed' }}){% endif %}{% else %}Closed: opens after {{ r.circuit_failures }} technical failures in a row{% endif %}</dd>
   </dl>
   <h3>Last 20 attempts</h3>
   <table>

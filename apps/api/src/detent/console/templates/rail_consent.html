@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Connect {{ c.rail_id }}{% endblock %}
+{% block main %}
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+{% if c.method == 'consent' %}
+<section class="card narrow" data-section="consent">
+  <p class="small muted">Mock consent screen (prototype). A real provider would show this page on its own site.</p>
+  <h1>{{ c.provider }}</h1>
+  <p><strong>DekernAI</strong> is asking to access your {{ c.rail_id }} account. It will be able to:</p>
+  <form method="post" action="/console/rails/connect/{{ c.rail_id }}">
+    <ul class="checklist">{% for s in c.scopes %}<li><label><input type="checkbox" name="scopes" value="{{ s }}" checked{% if s in needed %} required{% endif %}> <span class="mono">{{ s }}</span>{% if s in needed %} (needed to send){% endif %}</label></li>{% endfor %}</ul>
+    <p class="small">DekernAI never holds your funds or keys: the token it receives is stored encrypted and is never shown again. You can disconnect at any time.</p>
+    <button name="decision" value="allow" class="primary">Allow</button>
+    <button name="decision" value="deny">Deny</button>
+  </form>
+</section>
+{% else %}
+<section class="card narrow" data-section="api-key">
+  <h1>Connect {{ c.rail_id }} with an API key</h1>
+  <p>Create a key in the {{ c.provider | lower }}'s dashboard with only these scopes, then paste it here. Test keys only.</p>
+  <form method="post" action="/console/rails/connect/{{ c.rail_id }}">
+    <label>API key <input name="api_key" type="password" autocomplete="off" required minlength="16" maxlength="200"></label>
+    <fieldset><legend>Scopes on the key</legend>
+      {% for s in c.scopes %}<label><input type="checkbox" name="scopes" value="{{ s }}" checked{% if s in needed %} required{% endif %}> <span class="mono">{{ s }}</span></label>{% endfor %}
+    </fieldset>
+    <p class="small">The key is stored encrypted and is never shown again; only its last four characters are kept for reference.</p>
+    <button class="primary">Connect</button>
+  </form>
+</section>
+{% endif %}
+<p><a href="/console/rails/connect">Back</a></p>
+{% endblock %}

@@ -3,7 +3,8 @@
 1. Candidates: the organisation's enabled rails in the payment's currency.
 2. Eligibility: the network is the intent's own, or the intent allows a network switch and the payee has
    a verified destination on that network; the rail has not definitively failed this payment; an
-   adapter exists; the adapter says yes (balance, gas, limits); the pre-funded limit has room.
+   adapter exists; the rail's circuit is closed (RAL-08); the adapter says yes (balance, gas, limits); the
+   pre-funded limit has room.
 3. Score (lower wins): w_cost * norm(fee) + w_speed * norm(expected seconds)
    + w_success * (1 - success rate) + w_liquidity * (1 - liquidity headroom). Ties go to the rail ID.
 4. Every candidate, its score and the reason for the winner are stored on the decision.
@@ -21,6 +22,7 @@ from sqlalchemy import Connection, text
 
 from detent.domain.money import Currency, Money
 from detent.rails.base import IntentView, RailAdapter
+from detent.rails.health import is_open
 
 DEFAULT_WEIGHTS = {
     "cost": Decimal("0.4"),
@@ -166,6 +168,9 @@ def route(
         adapter = adapters.get(r.id)
         if adapter is None:
             c.reason = "no adapter configured"
+            continue
+        if is_open(conn, org_id, r):
+            c.reason = "CIRCUIT_OPEN"
             continue
         el = adapter.eligible(IntentView(payment.id, amount, r.id, c.destination_address))
         if not el.eligible:

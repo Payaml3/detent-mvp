@@ -770,11 +770,11 @@ Sources: [spec/06 §routing-ral-06](../../spec/06-rails-and-faults.md#routing-ra
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [RAL-08](../../backlog/user-stories.md#ral-08) | L | 0 | Rolling success rate and p95 latency per rail; balance and pre-funded limit usage | planned | contract: `apps/api/tests/integration/test_ral_08.py` |
-| [RAL-08](../../backlog/user-stories.md#ral-08) | L | 1 | Circuit opens after the configured failure count and closes after a successful probe | planned | contract: `apps/api/tests/integration/test_ral_08.py` |
-| [RAL-09](../../backlog/user-stories.md#ral-09) | L | 0 | Mock OAuth-style consent screen and a scoped-key form; credentials encrypted at rest and never shown again | planned | contract: `apps/api/tests/integration/test_ral_09.py` |
-| [RAL-09](../../backlog/user-stories.md#ral-09) | L | 1 | Scopes listed; disconnect removes credentials and takes the rail out of routing | planned | contract: `apps/api/tests/integration/test_ral_09.py` |
-| [RAL-10](../../backlog/user-stories.md#ral-10) | L | 0 | Scheduled GitHub Actions job; failure opens an issue with the failing adapter and test | planned | contract: `apps/api/tests/integration/test_ral_10.py` |
+| [RAL-08](../../backlog/user-stories.md#ral-08) | L | 0 | Rolling success rate and p95 latency per rail; balance and pre-funded limit usage | done | `integration/test_rail_health.py::test_success_rate_and_p95_latency`<br>`integration/test_rail_health.py::test_rails_screen_shows_health_and_circuit`<br>`integration/test_console_rails.py::test_rails_screen` |
+| [RAL-08](../../backlog/user-stories.md#ral-08) | L | 1 | Circuit opens after the configured failure count and closes after a successful probe | done | `integration/test_rail_health.py::test_circuit_opens_after_the_failure_count_and_leaves_routing`<br>`integration/test_rail_health.py::test_circuit_closes_after_a_successful_probe`<br>`integration/test_rail_health.py::test_the_worker_checks_every_organisations_rails` |
+| [RAL-09](../../backlog/user-stories.md#ral-09) | L | 0 | Mock OAuth-style consent screen and a scoped-key form; credentials encrypted at rest and never shown again | done | `integration/test_rail_connect.py::test_consent_screen_connects_and_disconnect_takes_the_rail_out_of_routing`<br>`integration/test_rail_connect.py::test_api_key_is_encrypted_never_shown_and_audited`<br>`integration/test_rail_connect.py::test_bad_keys_and_scopes_are_refused`<br>`integration/test_rail_connect.py::test_no_encryption_key_means_no_connection`<br>`integration/test_rail_connect.py::test_catalogue_has_test_rails_only` |
+| [RAL-09](../../backlog/user-stories.md#ral-09) | L | 1 | Scopes listed; disconnect removes credentials and takes the rail out of routing | done | `integration/test_rail_connect.py::test_consent_screen_connects_and_disconnect_takes_the_rail_out_of_routing`<br>`integration/test_rail_connect.py::test_only_the_payments_lead_connects` |
+| [RAL-10](../../backlog/user-stories.md#ral-10) | L | 0 | Scheduled GitHub Actions job; failure opens an issue with the failing adapter and test | done | `unit/test_contract_report.py::test_the_workflow_runs_daily_and_opens_an_issue_on_failure`<br>`unit/test_contract_report.py::test_failures_name_the_adapter_and_test`<br>`unit/test_contract_report.py::test_a_clean_run_reports_nothing` |
 
 ## FR-069 · Rails (confirmed)
 
@@ -906,7 +906,7 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints); [EXC-09 criteria
 |---|---|---|---|---|---|
 | [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 0 | GET /v1/exceptions with filters; POST /v1/exceptions/{id}/approve and /reject need scope `exceptions:approve` | done | `integration/test_exceptions_api.py::test_filters_and_paging`<br>`integration/test_exceptions_api.py::test_approving_needs_the_approve_scope` |
 | [EXC-08](../../backlog/user-stories.md#exc-08) | P1 | 1 | Same rules as the console: re-run, separation of duties, 409 on double approval | done | `integration/test_cases.py::test_api_approval_errors`<br>`integration/test_cases.py::test_parallel_approvals_through_api_and_console`<br>`integration/test_cases.py::test_initiator_cannot_approve` |
-| [EXC-09](../../backlog/user-stories.md#exc-09) | L | 0 | Per period: cases, agreement rate, disagreements listed with both rationales | planned | integration: `apps/api/tests/integration/test_exc_09.py` |
+| [EXC-09](../../backlog/user-stories.md#exc-09) | L | 0 | Per period: cases, agreement rate, disagreements listed with both rationales | done | `integration/test_shadow.py::test_agent_versus_human_agreement` |
 
 ## FR-080 · Ledger (confirmed)
 
@@ -1000,7 +1000,7 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints); [AUD-02 criteria
 | [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 0 | Console button and GET /v1/payment_intents/{id}/replay | done | `integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision`<br>`integration/test_console_ledger.py::test_payment_detail_has_replay_and_postings` |
 | [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 1 | Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert | done | `integration/test_replay.py::test_a_mismatch_raises_an_alert`<br>`integration/test_replay.py::test_decisions_cannot_be_edited`<br>`integration/test_agent_submit.py::test_agent_payment_replays_from_stored_output_without_a_model` |
 | [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 2 | Every payment in the demo data replays successfully (test) | done | `integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision` |
-| [AUD-03](../../backlog/user-stories.md#aud-03) | L | 0 | JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result | planned | integration: `apps/api/tests/integration/test_aud_03.py` |
+| [AUD-03](../../backlog/user-stories.md#aud-03) | L | 0 | JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result | done | `integration/test_evidence.py::test_pack_for_one_payment`<br>`integration/test_evidence.py::test_pack_for_a_range_and_bad_scopes`<br>`integration/test_evidence.py::test_a_broken_chain_is_reported`<br>`integration/test_evidence.py::test_console_exports_json_html_and_pdf` |
 
 ## FR-090 · Console (confirmed)
 
@@ -1125,7 +1125,7 @@ Sources: [DEM-06 criteria](../../backlog/user-stories.md#dem-06)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [DEM-06](../../backlog/user-stories.md#dem-06) | L | 0 | Each pack: platform, counterparties, rules and a short batch; selectable on reset | planned | scenario: `detent demo run (DEM-06)` |
+| [DEM-06](../../backlog/user-stories.md#dem-06) | L | 0 | Each pack: platform, counterparties, rules and a short batch; selectable on reset | done | `integration/test_scenario_packs.py::test_three_packs_each_with_platform_counterparties_rules_and_a_batch`<br>`integration/test_scenario_packs.py::test_reset_into_a_pack_and_its_batch_decides_as_expected`<br>`integration/test_scenario_packs.py::test_unknown_pack_is_refused`<br>`integration/test_scenario_packs.py::test_console_reset_with_a_pack` |
 
 ## FR-098 · Shadow (confirmed)
 
@@ -1135,13 +1135,13 @@ Sources: [spec/00 §product-principles](../../spec/00-product-context.md#product
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [SHD-01](../../backlog/user-stories.md#shd-01) | L | 0 | Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed | planned | integration: `apps/api/tests/integration/test_shd_01.py` |
-| [SHD-02](../../backlog/user-stories.md#shd-02) | L | 0 | Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF | planned | integration: `apps/api/tests/integration/test_shd_02.py` |
-| [SHD-03](../../backlog/user-stories.md#shd-03) | L | 0 | Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change | planned | integration: `apps/api/tests/integration/test_shd_03.py` |
-| [SHD-04](../../backlog/user-stories.md#shd-04) | L | 0 | Raw names and account identifiers never stored; hashes are consistent within one import | planned | integration: `apps/api/tests/integration/test_shd_04.py` |
-| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 0 | Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1 | planned | manual: `manual check, recorded in the PR description` |
-| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 1 | Production starts in Shadow mode (founder, 2026-11-26); moves to Assist and Auto follow SHD-03 | planned | manual: `manual check, recorded in the PR description` |
-| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 2 | In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14) | planned | console: `apps/api/tests/integration/test_dsh_13.py` |
+| [SHD-01](../../backlog/user-stories.md#shd-01) | L | 0 | Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed | done | `integration/test_shadow.py::test_mapping_guess_and_validation_report_store_nothing`<br>`integration/test_shadow.py::test_decisions_run_and_nothing_is_executed`<br>`integration/test_shadow.py::test_daily_caps_count_inside_the_import`<br>`integration/test_shadow.py::test_console_upload_map_validate_and_decide` |
+| [SHD-02](../../backlog/user-stories.md#shd-02) | L | 0 | Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF | done | `integration/test_shadow.py::test_report_sections_and_exports` |
+| [SHD-03](../../backlog/user-stories.md#shd-03) | L | 0 | Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change | done | `integration/test_shadow.py::test_gate_fails_on_an_unsafe_approval_and_cannot_be_signed`<br>`integration/test_shadow.py::test_passed_gate_signed_by_both_leads_is_linked_to_the_mode_change`<br>`integration/test_shadow.py::test_the_gate_window_is_30_days` |
+| [SHD-04](../../backlog/user-stories.md#shd-04) | L | 0 | Raw names and account identifiers never stored; hashes are consistent within one import | done | `integration/test_shadow.py::test_raw_names_and_account_identifiers_are_never_stored` |
+| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 0 | Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1 | done | `integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing` |
+| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 1 | Production starts in Shadow mode (founder, 2026-11-26); moves to Assist and Auto follow SHD-03 | done | `integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing`<br>`integration/test_shadow.py::test_passed_gate_signed_by_both_leads_is_linked_to_the_mode_change` |
+| [DSH-13](../../backlog/user-stories.md#dsh-13) | L | 2 | In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14) | done | `integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing` |
 
 ## FR-099 · Operations (confirmed)
 
@@ -1152,8 +1152,8 @@ Sources: [spec/10 §runbooks-write-as-the-features-land](../../spec/10-security-
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [OPS-01](../../backlog/user-stories.md#ops-01) | L | 0 | Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays | done | `integration/test_incidents.py::test_manual_incident_timeline_notification_root_cause_and_replay`<br>`integration/test_incidents.py::test_console_incidents_screens`<br>`integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies` |
-| [OPS-03](../../backlog/user-stories.md#ops-03) | L | 0 | Runbook in spec/10; one drill done and timed; audit hash chain verified after restore | planned | manual: `manual check, recorded in the PR description` |
-| [OPS-04](../../backlog/user-stories.md#ops-04) | L | 0 | docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap | planned | manual: `manual check, recorded in the PR description` |
+| [OPS-03](../../backlog/user-stories.md#ops-03) | L | 0 | Runbook in spec/10; one drill done and timed; audit hash chain verified after restore | done | `manual:spec/10 Runbooks 'Restore' and 'Restore drill log' (local drill 2026-11-28, 0.5 s)`<br>`integration/test_restore_drill.py::test_the_drill_restores_and_verifies_every_chain`<br>`integration/test_restore_drill.py::test_a_drill_never_targets_the_live_database` |
+| [OPS-04](../../backlog/user-stories.md#ops-04) | L | 0 | docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap | done | `unit/test_security_pack.py::test_security_pack_is_current`<br>`unit/test_security_pack.py::test_controls_have_tests_and_roadmap_is_labelled` |
 
 ## FR-100 · API (confirmed)
 

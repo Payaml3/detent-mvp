@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Shadow{% endblock %}
+{% block main %}
+<h1>Shadow</h1>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<p class="note">Decide an exported month of your payouts and deposits with your rules, without sending anything. Names, addresses and account numbers are hashed with a per-import salt on import and never stored.</p>
+{% if can_import %}
+<section class="card" data-section="upload">
+  <h2>Import an export</h2>
+  <form method="post" action="/console/shadow/map" enctype="multipart/form-data" class="filters">
+    <label>CSV file (UTF-8, header row, up to 20,000 rows)<input type="file" name="file" accept=".csv,text/csv" required></label>
+    <button class="primary">Next: map the columns</button>
+  </form>
+  <p class="small muted">Columns: {% for k, v in fields.items() %}{{ v[1] }}{% if v[0] %} (required){% endif %}{% if not loop.last %} · {% endif %}{% endfor %}.</p>
+</section>
+{% endif %}
+<h2>Imports</h2>
+<table>
+  <thead><tr><th>Imported (UTC)</th><th>Label</th><th>Rows</th><th>Decided</th><th>Not decided</th><th>Rule version</th></tr></thead>
+  <tbody>{% for i in imports %}<tr><td>{{ i.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td><a href="/console/shadow/{{ i.id }}">{{ i.label }}</a></td><td>{{ i.rows_read }}</td><td>{{ i.rows_decided }}</td><td>{{ i.rows_invalid }}</td><td>{{ i.policy_version }}</td></tr>
+  {% else %}<tr><td colspan="6" class="muted">No imports yet.</td></tr>{% endfor %}</tbody>
+</table>
+
+<h2>Mode gate</h2>
+<section class="card" data-section="gate">
+  <p>Mode: <strong>{{ mode }}</strong>. Last 30 days: agreement <strong>{{ live.rate }}</strong> ({{ live.agreed }} of {{ live.compared }}), unsafe approvals <strong>{{ live.unsafe|length }}</strong>. The gate needs {{ '%.2f'|format(live.threshold_bp / 100) }}% or more and zero unsafe approvals: <strong>{{ 'passes' if live.passed else 'does not pass' }}</strong>.</p>
+  {% if can_gate and next_modes %}
+  <form method="post" action="/console/shadow/gates" class="filters">
+    <label>Prepare a gate report for the move to<select name="to_mode">{% for m in next_modes %}<option value="{{ m }}">{{ m }}</option>{% endfor %}</select></label>
+    <button>Prepare</button>
+  </form>
+  {% endif %}
+  <table>
+    <thead><tr><th>Created (UTC)</th><th>Move</th><th>Agreement</th><th>Unsafe</th><th>Result</th><th>Payments lead</th><th>Compliance lead</th><th>Mode change</th><th></th></tr></thead>
+    <tbody>{% for g in gates %}<tr>
+      <td>{{ g.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ g.from_mode }} → {{ g.to_mode }}</td>
+      <td>{% if g.compared %}{{ '%.2f'|format(g.agreed * 100 / g.compared) }}% ({{ g.agreed }}/{{ g.compared }}){% else %}n/a{% endif %}</td>
+      <td>{{ g.unsafe_approvals }}</td><td>{{ 'passed' if g.passed else 'not passed' }}</td>
+      <td class="mono">{{ g.payments_lead_id or '' }}</td><td class="mono">{{ g.compliance_lead_id or '' }}</td><td class="mono">{{ g.mode_change_id or '' }}</td>
+      <td>{% if g.passed and can_gate and ((my_role == 'payments_lead' and not g.payments_lead_id) or (my_role == 'compliance_lead' and not g.compliance_lead_id)) %}<form method="post" action="/console/shadow/gates/{{ g.id }}/sign"><button>Sign as {{ my_role.replace('_', ' ') }}</button></form>{% endif %}</td>
+    </tr>{% else %}<tr><td colspan="9" class="muted">No gate reports yet.</td></tr>{% endfor %}</tbody>
+  </table>
+  <p class="small muted">Once both leads have signed a passed gate, propose the mode change on <a href="/console/settings">Settings</a> and name the gate; the applied change is linked to it.</p>
+</section>
+<p><a href="/console/agreement">Agent-versus-human agreement sample</a></p>
+{% endblock %}

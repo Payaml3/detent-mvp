@@ -27,7 +27,8 @@
         {% for group, links in [
              (None, [("/console/", "Overview")]),
              ("Decision", [("/console/invoices", "Invoices"), ("/console/policy", "Policy"), ("/console/mandates", "Mandates"),
-                           ("/console/counterparties", "Counterparties"), ("/console/exceptions", "Exceptions")]),
+                           ("/console/counterparties", "Counterparties"), ("/console/exceptions", "Exceptions"),
+                           ("/console/shadow", "Shadow")]),
              ("Orchestration", [("/console/payments", "Payments"), ("/console/rails", "Rails")]),
              ("Operations", [("/console/reconciliation", "Reconciliation"), ("/console/outbox", "Outbox"), ("/console/incidents", "Incidents"), ("/console/audit", "Audit")]),
              ("Prototype", [("/console/evaluation", "Evaluation"), ("/console/settings", "Settings"), ("/console/demo", "Demo")])] %}

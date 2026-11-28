@@ -552,21 +552,21 @@
    "epic": "RAL",
    "slice": "L",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "RAL-09",
    "epic": "RAL",
    "slice": "L",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "RAL-10",
    "epic": "RAL",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "RAL-11",
@@ -636,7 +636,7 @@
    "epic": "EXC",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "LED-01",
@@ -713,7 +713,7 @@
    "epic": "AUD",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "CON-01",
@@ -881,35 +881,35 @@
    "epic": "DEM",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SHD-01",
    "epic": "SHD",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SHD-02",
    "epic": "SHD",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SHD-03",
    "epic": "SHD",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SHD-04",
    "epic": "SHD",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "OPS-01",
@@ -930,14 +930,14 @@
    "epic": "OPS",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "OPS-04",
    "epic": "OPS",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "API-01",
@@ -1098,7 +1098,7 @@
    "epic": "DSH",
    "slice": "L",
    "criteria": 3,
-   "done": 0
+   "done": 3
   },
   {
    "id": "SBX-01",

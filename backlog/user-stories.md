@@ -630,8 +630,8 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Rolling success rate and p95 latency per rail; balance and pre-funded limit usage
-- [ ] Circuit opens after the configured failure count and closes after a successful probe
+- [x] Rolling success rate and p95 latency per rail; balance and pre-funded limit usage
+- [x] Circuit opens after the configured failure count and closes after a successful probe
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** RAL-06 · **Traces to:** A2.Connect, B3.adapters
 
@@ -641,8 +641,8 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Mock OAuth-style consent screen and a scoped-key form; credentials encrypted at rest and never shown again
-- [ ] Scopes listed; disconnect removes credentials and takes the rail out of routing
+- [x] Mock OAuth-style consent screen and a scoped-key form; credentials encrypted at rest and never shown again
+- [x] Scopes listed; disconnect removes credentials and takes the rail out of routing
 
 **Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** RAL-01 · **Traces to:** A2.Connect, B3.onboarding, B5.security
 
@@ -652,7 +652,7 @@ _Three rails behind one adapter contract, best-rail routing, failover on technic
 
 **Acceptance criteria**
 
-- [ ] Scheduled GitHub Actions job; failure opens an issue with the failing adapter and test
+- [x] Scheduled GitHub Actions job; failure opens an issue with the failing adapter and test
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** RAL-03, RAL-04 · **Traces to:** B3.adapters
 
@@ -769,7 +769,7 @@ _Every escalation has an owner and a deadline, shows raw facts first, and a time
 
 **Acceptance criteria**
 
-- [ ] Per period: cases, agreement rate, disagreements listed with both rationales
+- [x] Per period: cases, agreement rate, disagreements listed with both rationales
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXC-03 · **Traces to:** B3.agent_eval, B7.quality
 
@@ -903,7 +903,7 @@ _Every step is recorded append-only and any payment can be replayed and exported
 
 **Acceptance criteria**
 
-- [ ] JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result
+- [x] JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** AUD-02 · **Traces to:** A2.Prove, A1.evidence
 
@@ -1167,7 +1167,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [ ] Each pack: platform, counterparties, rules and a short batch; selectable on reset
+- [x] Each pack: platform, counterparties, rules and a short batch; selectable on reset
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** DEM-01 · **Traces to:** MVP.scenarios
 
@@ -1181,7 +1181,7 @@ _Decide a client's payments without sending any (the shadow phase of onboarding,
 
 **Acceptance criteria**
 
-- [ ] Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed
+- [x] Column-mapping screen; validation report; decisions run with POL-08 and nothing is executed
 
 **Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** POL-08 · **Traces to:** MVP.shadow_csv, A3.shadow, A6.shadow_first, A7.beta, B3.lead_shadow
 
@@ -1191,7 +1191,7 @@ _Decide a client's payments without sending any (the shadow phase of onboarding,
 
 **Acceptance criteria**
 
-- [ ] Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF
+- [x] Sections: decision mix, agreement, unsafe approvals (approved by DekernAI but blocked or lossy for the client), unreconciled items, simulated routing saving; export as HTML and PDF
 
 **Priority:** Should · **Estimate:** 0.75 d · **Milestone:** L After launch (Should and Could) · **Depends on:** SHD-01, RAL-06 · **Traces to:** A3.shadow, B3.lead_shadow, A4.plans
 
@@ -1201,7 +1201,7 @@ _Decide a client's payments without sending any (the shadow phase of onboarding,
 
 **Acceptance criteria**
 
-- [ ] Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change
+- [x] Shows 30-day agreement and unsafe approvals against the gate thresholds; sign-off by payments lead and compliance lead recorded and linked to the mode change
 
 **Priority:** Could · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** SHD-02, EXE-09 · **Traces to:** A3.gates, B3.mode_gates
 
@@ -1211,7 +1211,7 @@ _Decide a client's payments without sending any (the shadow phase of onboarding,
 
 **Acceptance criteria**
 
-- [ ] Raw names and account identifiers never stored; hashes are consistent within one import
+- [x] Raw names and account identifiers never stored; hashes are consistent within one import
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** SHD-01 · **Traces to:** B1.contracts, A5.data
 
@@ -1245,7 +1245,7 @@ _The operating-model processes that need software: incidents, independence check
 
 **Acceptance criteria**
 
-- [ ] Runbook in spec/10; one drill done and timed; audit hash chain verified after restore
+- [x] Runbook in spec/10; one drill done and timed; audit hash chain verified after restore
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** FND-07 · **Traces to:** B5.resilience
 
@@ -1255,7 +1255,7 @@ _The operating-model processes that need software: incidents, independence check
 
 **Acceptance criteria**
 
-- [ ] docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap
+- [x] docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EVL-07 · **Traces to:** B5.assurance, B5.security
 
@@ -1510,9 +1510,9 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 **Acceptance criteria**
 
-- [ ] Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1
-- [ ] Production starts in Shadow mode (founder, 2026-11-26); moves to Assist and Auto follow SHD-03
-- [ ] In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14)
+- [x] Available only when the integration is verified (DSH-12) and the client's compliance lead has signed off rule set v1
+- [x] Production starts in Shadow mode (founder, 2026-11-26); moves to Assist and Auto follow SHD-03
+- [x] In the prototype the switch is shown as not available and the request is recorded; no `sk_live_` key is ever issued (invariant 14)
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** DSH-12 · **Traces to:** B3.onboarding, A3.gates
 

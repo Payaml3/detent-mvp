@@ -1,0 +1,74 @@
+name: Daily adapter contract tests
+
+# RAL-10: the shared adapter contract suite (RAL-01, RAL-02), run every day against the local chain (anvil and
+# MockUSDC) and the simulated bank, so a rail API or simulator change is caught before a demo. A failure opens an
+# issue that names the failing adapter and test (tools/contract_report.py). Public testnets need funded test
+# wallets and RPC URLs as secrets: a founder item in HANDOFF.md. Nothing here deploys anything.
+
+on:
+  schedule:
+    - cron: "41 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  contracts:
+    name: adapter contract tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: detent
+          POSTGRES_PASSWORD: detent
+          POSTGRES_DB: detent
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U detent" --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql+psycopg://detent:detent@localhost:5432/detent
+      TEST_DATABASE_URL: postgresql+psycopg://detent:detent@localhost:5432/detent_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install Python and dependencies
+        run: |
+          uv python install 3.12
+          uv sync --all-packages --frozen
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Build MockUSDC
+        run: cd chain && forge build
+      - name: Run the adapter contract suites
+        run: >-
+          uv run pytest -p no:cacheprovider --junitxml=contract-report.xml
+          apps/api/tests/chain/test_rail_contract.py apps/api/tests/integration/test_banksim.py
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rail-contracts-${{ github.run_id }}
+          path: contract-report.xml
+      - name: Open an issue for the failing adapter and test
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ ! -s contract-report.xml ]; then
+            echo '{"title": "Daily adapter contract tests could not run", "body": "The run failed before any test reported. See '"$RUN_URL"'"}' > issue.json
+          else
+            uv run python tools/contract_report.py contract-report.xml "$RUN_URL" > issue.json
+          fi
+          title=$(python3 -c 'import json; print(json.load(open("issue.json"))["title"] or "Daily adapter contract tests failed")')
+          python3 -c 'import json; print(json.load(open("issue.json"))["body"] or "See the run.")' > issue.md
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file issue.md --label "rail-contracts" \
+            || gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file issue.md

@@ -844,6 +844,7 @@ stories:
   deps: [RAL-06]
   trace: [A2.Connect, B3.adapters]
   ms: L
+  done: [0, 1]
 - id: RAL-09
   epic: RAL
   title: Rail connection flow (mock)
@@ -858,6 +859,7 @@ stories:
   deps: [RAL-01]
   trace: [A2.Connect, B3.onboarding, B5.security]
   ms: L
+  done: [0, 1]
 - id: RAL-10
   epic: RAL
   title: Daily adapter contract tests
@@ -871,6 +873,7 @@ stories:
   deps: [RAL-03, RAL-04]
   trace: [B3.adapters]
   ms: L
+  done: [0]
 - id: RAL-11
   epic: RAL
   title: Simulated chain rail for the sandbox
@@ -1025,6 +1028,7 @@ stories:
   deps: [EXC-03]
   trace: [B3.agent_eval, B7.quality]
   ms: L
+  done: [0]
 
 # ---------------- LED Ledger, deposits, reconciliation ----------------
 - id: LED-01
@@ -1198,6 +1202,7 @@ stories:
   deps: [AUD-02]
   trace: [A2.Prove, A1.evidence]
   ms: L
+  done: [0]
 
 # ---------------- CON Console ----------------
 - id: CON-01
@@ -1550,6 +1555,7 @@ stories:
   deps: [DEM-01]
   trace: [MVP.scenarios]
   ms: L
+  done: [0]
 
 # ---------------- SHD Shadow mode ----------------
 - id: SHD-01
@@ -1565,6 +1571,7 @@ stories:
   deps: [POL-08]
   trace: [MVP.shadow_csv, A3.shadow, A6.shadow_first, A7.beta, B3.lead_shadow]
   ms: L
+  done: [0]
 - id: SHD-02
   epic: SHD
   title: Shadow-phase report
@@ -1578,6 +1585,7 @@ stories:
   deps: [SHD-01, RAL-06]
   trace: [A3.shadow, B3.lead_shadow, A4.plans]
   ms: L
+  done: [0]
 - id: SHD-03
   epic: SHD
   title: Mode-gate report and sign-off
@@ -1591,6 +1599,7 @@ stories:
   deps: [SHD-02, EXE-09]
   trace: [A3.gates, B3.mode_gates]
   ms: L
+  done: [0]
 - id: SHD-04
   epic: SHD
   title: Anonymise on import
@@ -1604,6 +1613,7 @@ stories:
   deps: [SHD-01]
   trace: [B1.contracts, A5.data]
   ms: L
+  done: [0]
 
 # ---------------- OPS Operational controls ----------------
 - id: OPS-01
@@ -1647,6 +1657,7 @@ stories:
   deps: [FND-07]
   trace: [B5.resilience]
   ms: L
+  done: [0]
 - id: OPS-04
   epic: OPS
   title: Security pack draft
@@ -1660,6 +1671,7 @@ stories:
   deps: [EVL-07]
   trace: [B5.assurance, B5.security]
   ms: L
+  done: [0]
 
 # ---------------- API Public sandbox API ----------------
 - id: API-01
@@ -2004,6 +2016,7 @@ stories:
   deps: [DSH-12]
   trace: [B3.onboarding, A3.gates]
   ms: L
+  done: [0, 1, 2]
 
 # ---------------- SBX Sandbox ----------------
 - id: SBX-01

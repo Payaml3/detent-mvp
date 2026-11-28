@@ -5,12 +5,15 @@ detent api [--port N]    run the API and console
 detent worker            run the job worker
 detent seed              seed the fictional demo organisation, users, counterparties and rule set
 detent audit verify      verify an organisation's hash-chained audit log (AUD-01)
+detent ops restore-drill --target-url URL   back up and restore into a drill database, timed, then verify
+                         every hash chain, chain head and row count (OPS-03)
 detent keys create       issue an sk_test_ API key to a named user (G-08)
 detent agent record      run the instruction agent on an invoice with the Claude API and save the response
                          as a recording (replaces the hand-written stand-ins; EVL-04)
 detent demo check        test-wallet balances per wallet and chain, and what to top up (DEM-04)
 detent demo run <id>     run one demo scenario in the current generation (CON-09); --list shows them
-detent demo reset        start a new demo data generation; nothing is deleted (CON-09)
+detent demo reset        start a new demo data generation; nothing is deleted (CON-09); --pack picks a
+                         scenario pack (DEM-06)
 detent demo token deploy|fund --network <n>   the demo's own labelled test token (D-33)
 detent eval run ...      evaluation suites and the release gate (eval/, S8)
 """
@@ -117,6 +120,20 @@ def cmd_audit_verify(args: argparse.Namespace) -> int:
     where = f"seq {st.first_bad_seq}" if st.first_bad_seq is not None else "chain head"
     print(f"audit chain BROKEN: {org}: {where}: {st.problem}")
     return 1
+
+
+def cmd_restore_drill(args: argparse.Namespace) -> int:
+    settings = _load_settings()
+    from detent.ops.restore_drill import DrillRefused, run_drill
+
+    source = args.source_url or settings.database_url
+    try:
+        res = run_drill(source, args.target_url)
+    except DrillRefused as exc:
+        print(f"detent: restore drill refused: {exc}", file=sys.stderr)
+        return 2
+    print("\n".join(res.summary()))
+    return 0 if res.ok else 1
 
 
 def cmd_keys_create(args: argparse.Namespace) -> int:
@@ -272,6 +289,51 @@ def cmd_demo_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_demo_reset(args: argparse.Namespace) -> int:
+    """DEM-06: reset the demo into a scenario pack."""
+    from detent.audit.log import Actor
+    from detent.demo.generations import ResetRefused, active_demo_org, demo_user_id, reset_demo
+    from detent.runtime import build_runtime
+
+    settings = _load_settings()
+    rt = build_runtime(settings)
+    org = active_demo_org(rt.engine, settings)
+    try:
+        r = reset_demo(rt, actor=Actor(demo_user_id("usr_pl", org), "payments_lead"), pack=args.pack)
+    except ResetRefused as exc:
+        print(f"detent demo: {exc}", file=sys.stderr)
+        return 1
+    print(f"new demo generation {r.generation}: {r.org_id} (pack {args.pack}); {r.previous_org_id} is kept")
+    return 0
+
+
+def _demo_parsers(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    dm = sub.add_parser("demo").add_subparsers(dest="demo_cmd", required=True)
+    dm.add_parser("check").set_defaults(fn=cmd_demo_check)
+    dr = dm.add_parser("run")
+    dr.add_argument("scenario", nargs="?")
+    dr.add_argument("--list", action="store_true")
+    dr.set_defaults(fn=cmd_demo_run)
+    tk = dm.add_parser("token").add_subparsers(dest="step", required=True)
+    for name in ("deploy", "fund"):
+        tp = tk.add_parser(name)
+        tp.add_argument("--network", required=True, choices=["base-sepolia", "eth-sepolia"])
+        if name == "fund":
+            tp.add_argument("--runs", type=int, default=3)
+        tp.set_defaults(fn=cmd_demo_token)
+    dres = dm.add_parser("reset")
+    dres.add_argument(
+        "--pack", default="default", help="scenario pack (DEM-06): default, payout-platform, ..."
+    )
+    dres.set_defaults(
+        fn=lambda a: (
+            cmd_demo_reset(a)
+            if a.pack != "default"
+            else cmd_demo_run(argparse.Namespace(list=False, scenario="reset"))
+        )
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="detent", description="DekernAI agentic payment controls (prototype)")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -285,6 +347,12 @@ def main(argv: list[str] | None = None) -> int:
     au = sub.add_parser("audit").add_subparsers(dest="audit_cmd", required=True).add_parser("verify")
     au.add_argument("--org", default=None)
     au.set_defaults(fn=cmd_audit_verify)
+    rd = sub.add_parser("ops").add_subparsers(dest="ops_cmd", required=True).add_parser("restore-drill")
+    rd.add_argument(
+        "--target-url", required=True, help="a separate database whose name contains restore or drill"
+    )
+    rd.add_argument("--source-url", default=None, help="defaults to DATABASE_URL")
+    rd.set_defaults(fn=cmd_restore_drill)
     k = sub.add_parser("keys").add_subparsers(dest="keys_cmd", required=True).add_parser("create")
     k.add_argument("--org", default=None)
     k.add_argument("--user", required=True)
@@ -301,22 +369,7 @@ def main(argv: list[str] | None = None) -> int:
     ag.add_argument("--org", default=None)
     ag.add_argument("--mandate", default="mnd_demo_ap_agent")
     ag.set_defaults(fn=cmd_agent_record)
-    dm = sub.add_parser("demo").add_subparsers(dest="demo_cmd", required=True)
-    dm.add_parser("check").set_defaults(fn=cmd_demo_check)
-    dr = dm.add_parser("run")
-    dr.add_argument("scenario", nargs="?")
-    dr.add_argument("--list", action="store_true")
-    dr.set_defaults(fn=cmd_demo_run)
-    tk = dm.add_parser("token").add_subparsers(dest="step", required=True)
-    for name in ("deploy", "fund"):
-        tp = tk.add_parser(name)
-        tp.add_argument("--network", required=True, choices=["base-sepolia", "eth-sepolia"])
-        if name == "fund":
-            tp.add_argument("--runs", type=int, default=3)
-        tp.set_defaults(fn=cmd_demo_token)
-    dm.add_parser("reset").set_defaults(
-        fn=lambda a: cmd_demo_run(argparse.Namespace(list=False, scenario="reset"))
-    )
+    _demo_parsers(sub)
     sub.add_parser("eval", help="evaluation suites: detent eval run --suite all (see eval/)", add_help=False)
     argv = sys.argv[1:] if argv is None else argv
     if argv and argv[0] == "eval":

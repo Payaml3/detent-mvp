@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Audit{% endblock %}
+{% block main %}
+<h1>Audit</h1>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<section class="card" data-section="chain">
+  <h2>Hash chain</h2>
+  {% if chain.ok %}<p class="ok">Verified: {{ chain.events }} events, each linked to the one before.</p>
+  {% else %}<p class="error" role="alert">Broken at event {{ chain.first_bad_seq }}: {{ chain.problem }}.</p>{% endif %}
+</section>
+<section class="card" data-section="evidence">
+  <h2>Evidence export</h2>
+  <p>An evidence pack for one payment or for the payments created in a date range: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check.</p>
+  <form method="get" action="/console/audit/evidence.html" class="filters">
+    <label>Payment ID <input name="payment_id" class="mono" placeholder="pay_... (or leave empty for a range)"></label>
+    <label>From <input type="date" name="start" value="{{ default_from }}"></label>
+    <label>To (inclusive) <input type="date" name="end" value="{{ default_to }}"></label>
+    <button formaction="/console/audit/evidence.json">JSON</button>
+    <button formaction="/console/audit/evidence.html">HTML</button>
+    <button formaction="/console/audit/evidence.pdf">PDF</button>
+  </form>
+</section>
+<h2>Recent events</h2>
+<form method="get" class="filters"><label>Kind starts with <input name="kind" value="{{ kind }}" placeholder="payment."></label><button>Filter</button></form>
+<table>
+  <thead><tr><th>Seq</th><th>At (UTC)</th><th>Actor</th><th>Kind</th><th>Subject</th></tr></thead>
+  <tbody>{% for e in events %}<tr><td class="num">{{ e.seq }}</td><td>{{ e.at.strftime('%Y-%m-%d %H:%M:%S') }}</td><td class="mono">{{ e.actor }}{% if e.actor_role %} ({{ e.actor_role }}){% endif %}</td><td class="mono">{{ e.kind }}</td>
+    <td class="mono">{% if e.subject_id and e.subject_id.startswith('pay_') %}<a href="/console/payments/{{ e.subject_id }}">{{ e.subject_id }}</a>{% else %}{{ e.subject_id or '' }}{% endif %}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">No events.</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

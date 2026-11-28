@@ -27,8 +27,11 @@ from detent.api.errors import error_response
 from detent.api.limits import RateLimiter
 from detent.api.middleware import request_context
 from detent.clock import Clock
+from detent.console import audit as console_audit
 from detent.console import incidents as console_incidents
+from detent.console import rail_connect as console_rail_connect
 from detent.console import routes as console_routes
+from detent.console import shadow as console_shadow
 from detent.console.auth import ActingUserRequired, LoginRequired
 from detent.dashboard import mount as dashboard
 from detent.intents.service import IdempotencyConflict, RequestProblem
@@ -98,6 +101,9 @@ def create_app(
 
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
     routers = (
+        console_shadow.router,
+        console_audit.router,
+        console_rail_connect.router,
         console_incidents.router,  # before console_routes: its section placeholder catches unknown pages
         console_routes.router,
         v1.router,

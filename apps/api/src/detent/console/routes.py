@@ -287,7 +287,6 @@ def edit_destination(
 
 # ---------------------------------------------------------------------------------- S3: review loop
 SECTIONS_NOT_BUILT = {
-    "audit": ("Audit", "Searchable audit log, replay and evidence export (AUD-02, AUD-03)."),
     "evaluation": ("Evaluation", "Release-gate suites and the results report (EVL, slice S8)."),
 }
 
@@ -682,8 +681,12 @@ def rails_screen(
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(acting_user),  # noqa: B008
 ) -> HTMLResponse:
-    """CON-08: per rail, the network or currency, balance, pre-funded limit usage and the last 20 attempts."""
+    """CON-08: per rail, the network or currency, balance, pre-funded limit usage and the last 20 attempts.
+
+    RAL-08 adds the rolling success rate, p95 latency and the circuit breaker's state."""
     from detent.domain.money import Currency, Money
+    from detent.rails.health import is_open as rail_is_open
+    from detent.rails.health import stats as rail_stats
     from detent.rails.registry import build_adapters
 
     day = rt.clock.now().date().isoformat()
@@ -733,7 +736,15 @@ def rails_screen(
                 else None
             )
             rails.append(
-                {"row": r, "usage": usage, "attempts": attempts, "balance": balance, "per_payment": ppl}
+                {
+                    "row": r,
+                    "usage": usage,
+                    "attempts": attempts,
+                    "balance": balance,
+                    "per_payment": ppl,
+                    "health": rail_stats(conn, user.org_id, r.id),
+                    "circuit_open": rail_is_open(conn, user.org_id, r),
+                }
             )
     return page(request, rt, "rails.html", user, rails=rails)
 
@@ -1148,6 +1159,15 @@ def settings_page(
             deadlines, policy_version = dict(pol.rules.deadlines), pol.version
         except NoActivePolicy:
             deadlines, policy_version = {}, None
+        ready_gates = conn.execute(
+            text(
+                "SELECT id, to_mode FROM mode_gates WHERE org_id=:o AND from_mode=:m AND passed "
+                "AND payments_lead_id IS NOT NULL AND compliance_lead_id IS NOT NULL AND "
+                "mode_change_id IS NULL "
+                "ORDER BY created_at DESC"
+            ),
+            {"o": user.org_id, "m": mode},
+        ).all()
         rail_weights = conn.execute(
             text("SELECT id, weights FROM rails WHERE org_id=:o AND weights IS NOT NULL ORDER BY id"),
             {"o": user.org_id},
@@ -1181,6 +1201,7 @@ def settings_page(
         policy_version=policy_version,
         default_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
         rail_weights=rail_weights,
+        ready_gates=ready_gates,
         error=request.query_params.get("error"),
     )
 
@@ -1199,6 +1220,7 @@ def console_propose_mode(
     to_mode: str = Form(""),
     reason: str = Form(""),
     setting: str = Form("mode"),
+    gate_id: str = Form(""),
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(require_permission("org.change_mode.propose")),  # noqa: B008
 ) -> RedirectResponse:
@@ -1213,6 +1235,7 @@ def console_propose_mode(
             to_mode=to_mode,
             reason=reason,
             setting=setting,
+            gate_id=gate_id or None,
         )
     except ModeError as exc:
         return _settings_redirect(exc)
@@ -1373,11 +1396,13 @@ def demo_page(
 ) -> HTMLResponse:
     demo_only(user)
     from detent.demo.generations import current_generation
+    from detent.demo.packs import current_pack, packs
     from detent.demo.scenarios import SCENARIOS, recorded
 
     _demo_enabled(rt)
     with rt.engine.connect() as conn:
         gen = current_generation(conn, rt.settings.demo_org_id)
+        pack = current_pack(conn, user.org_id)
     results = {sid: recorded(rt, user.org_id, sid) for sid in SCENARIOS if sid != "reset"}
     return page(
         request,
@@ -1387,6 +1412,8 @@ def demo_page(
         scenarios=list(SCENARIOS.values()),
         results=results,
         generation=gen,
+        packs=packs(),
+        pack=pack,
         flash=request.query_params.get("result"),
         error=request.query_params.get("error"),
     )
@@ -1434,6 +1461,47 @@ def demo_run(
         return RedirectResponse("/console/act-as", status_code=303)
     note = " ".join(result.lines)[:600]
     return RedirectResponse(f"/console/demo?result={quote(note)}#{scenario_id}", status_code=303)
+
+
+@router.post("/demo/reset")
+def demo_reset_pack(
+    request: Request,
+    pack: str = Form("default"),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    """DEM-06: reset into a chosen scenario pack (payments lead only, like every reset)."""
+    demo_only(user)
+    from urllib.parse import quote
+
+    from detent.demo.generations import ResetRefused, reset_demo
+
+    _demo_enabled(rt)
+    try:
+        reset_demo(rt, actor=Actor(user.id, user.role.value), pack=pack)
+    except ResetRefused as exc:
+        return RedirectResponse(f"/console/demo?error={quote(str(exc)[:400])}", status_code=303)
+    request.session.pop("user_id", None)  # the new generation has its own users
+    return RedirectResponse("/console/act-as", status_code=303)
+
+
+@router.post("/demo/pack-batch")
+def demo_pack_batch(
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    """DEM-06: run the current pack's short batch through the rules."""
+    demo_only(user)
+    from urllib.parse import quote
+
+    from detent.demo.packs import current_pack, run_pack_batch
+
+    _demo_enabled(rt)
+    with rt.engine.connect() as conn:
+        pack = current_pack(conn, user.org_id)
+    rows = run_pack_batch(rt, user.org_id, Actor(user.id, user.role.value), pack)
+    note = "; ".join(f"{r['ref']} {r['outcome']} (expected {r['expected']})" for r in rows)
+    return RedirectResponse(f"/console/demo?result={quote(note[:600])}", status_code=303)
 
 
 # ------------------------------------------------------------------------------------- AUD-02 replay

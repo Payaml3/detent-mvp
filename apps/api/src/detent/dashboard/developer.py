@@ -16,7 +16,7 @@ from sqlalchemy import text
 
 from detent.audit.log import append
 from detent.dashboard import keys as key_service
-from detent.dashboard import sandbox, verification
+from detent.dashboard import production, sandbox, verification
 from detent.dashboard.access import AccessError, Member
 from detent.dashboard.web import check_csrf, client_member, page, redirect, runtime, writable_member
 from detent.db.engine import transaction
@@ -558,6 +558,7 @@ def _verification(
     with rt.engine.connect() as conn:
         items = verification.checklist(conn, member.org_id)
         last = verification.latest(conn, member.org_id)
+        prod = production.readiness(conn, member.org_id)
     return page(
         request,
         rt,
@@ -566,6 +567,8 @@ def _verification(
         items=items,
         last=last,
         can_request=allowed("verification.request", member.role),
+        prod=prod,
+        can_request_production=allowed("production.request", member.role),
         error=error,
         status_code=status,
     )
@@ -592,3 +595,18 @@ def verification_request(
     except AccessError as exc:
         return _verification(request, rt, member, error=str(exc), status=exc.status)
     return redirect("/dashboard/verification?notice=requested")
+
+
+@router.post("/production/request", response_model=None)
+def production_request(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    member: Member = Depends(writable_member),  # noqa: B008
+) -> Response:
+    """DSH-13: record the account owner's request; production is not available in the prototype."""
+    try:
+        with transaction(rt.engine) as conn:
+            production.request_production(conn, rt.clock, by=member)
+    except AccessError as exc:
+        return _verification(request, rt, member, error=str(exc), status=exc.status)
+    return redirect("/dashboard/verification?notice=production")

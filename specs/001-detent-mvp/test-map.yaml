@@ -470,3 +470,33 @@ OPS-01:
   0: ["integration/test_incidents.py::test_manual_incident_timeline_notification_root_cause_and_replay", "integration/test_incidents.py::test_console_incidents_screens", "integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies"]
 CON-10:
   0: ["integration/test_incidents.py::test_fail_safe_changes_need_both_leads", "integration/test_incidents.py::test_settings_screen_shows_fail_safe_deadlines_and_weights"]
+SHD-01:
+  0: ["integration/test_shadow.py::test_mapping_guess_and_validation_report_store_nothing", "integration/test_shadow.py::test_decisions_run_and_nothing_is_executed", "integration/test_shadow.py::test_daily_caps_count_inside_the_import", "integration/test_shadow.py::test_console_upload_map_validate_and_decide"]
+SHD-02:
+  0: ["integration/test_shadow.py::test_report_sections_and_exports"]
+SHD-03:
+  0: ["integration/test_shadow.py::test_gate_fails_on_an_unsafe_approval_and_cannot_be_signed", "integration/test_shadow.py::test_passed_gate_signed_by_both_leads_is_linked_to_the_mode_change", "integration/test_shadow.py::test_the_gate_window_is_30_days"]
+SHD-04:
+  0: ["integration/test_shadow.py::test_raw_names_and_account_identifiers_are_never_stored"]
+EXC-09:
+  0: ["integration/test_shadow.py::test_agent_versus_human_agreement"]
+DSH-13:
+  0: ["integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing"]
+  1: ["integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing", "integration/test_shadow.py::test_passed_gate_signed_by_both_leads_is_linked_to_the_mode_change"]
+  2: ["integration/test_shadow.py::test_production_request_needs_verification_and_signed_rules_and_changes_nothing"]
+RAL-08:
+  0: ["integration/test_rail_health.py::test_success_rate_and_p95_latency", "integration/test_rail_health.py::test_rails_screen_shows_health_and_circuit", "integration/test_console_rails.py::test_rails_screen"]
+  1: ["integration/test_rail_health.py::test_circuit_opens_after_the_failure_count_and_leaves_routing", "integration/test_rail_health.py::test_circuit_closes_after_a_successful_probe", "integration/test_rail_health.py::test_the_worker_checks_every_organisations_rails"]
+RAL-09:
+  0: ["integration/test_rail_connect.py::test_consent_screen_connects_and_disconnect_takes_the_rail_out_of_routing", "integration/test_rail_connect.py::test_api_key_is_encrypted_never_shown_and_audited", "integration/test_rail_connect.py::test_bad_keys_and_scopes_are_refused", "integration/test_rail_connect.py::test_no_encryption_key_means_no_connection", "integration/test_rail_connect.py::test_catalogue_has_test_rails_only"]
+  1: ["integration/test_rail_connect.py::test_consent_screen_connects_and_disconnect_takes_the_rail_out_of_routing", "integration/test_rail_connect.py::test_only_the_payments_lead_connects"]
+RAL-10:
+  0: ["unit/test_contract_report.py::test_the_workflow_runs_daily_and_opens_an_issue_on_failure", "unit/test_contract_report.py::test_failures_name_the_adapter_and_test", "unit/test_contract_report.py::test_a_clean_run_reports_nothing"]
+AUD-03:
+  0: ["integration/test_evidence.py::test_pack_for_one_payment", "integration/test_evidence.py::test_pack_for_a_range_and_bad_scopes", "integration/test_evidence.py::test_a_broken_chain_is_reported", "integration/test_evidence.py::test_console_exports_json_html_and_pdf"]
+OPS-03:
+  0: ["manual:spec/10 Runbooks 'Restore' and 'Restore drill log' (local drill 2026-11-28, 0.5 s)", "integration/test_restore_drill.py::test_the_drill_restores_and_verifies_every_chain", "integration/test_restore_drill.py::test_a_drill_never_targets_the_live_database"]
+OPS-04:
+  0: ["unit/test_security_pack.py::test_security_pack_is_current", "unit/test_security_pack.py::test_controls_have_tests_and_roadmap_is_labelled"]
+DEM-06:
+  0: ["integration/test_scenario_packs.py::test_three_packs_each_with_platform_counterparties_rules_and_a_batch", "integration/test_scenario_packs.py::test_reset_into_a_pack_and_its_batch_decides_as_expected", "integration/test_scenario_packs.py::test_unknown_pack_is_refused", "integration/test_scenario_packs.py::test_console_reset_with_a_pack"]

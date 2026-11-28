@@ -79,6 +79,36 @@ When a destination is a specific wallet on one network, routing is effectively f
 - Failover keeps the payment ID. `attempt_no` increments.
 - Failover never happens from UNKNOWN, after a BLOCK, or after `REJECTED_BY_RAIL`.
 
+## Rail health and the circuit breaker (RAL-08)
+
+- The Rails screen shows each rail's rolling success rate and p95 latency over its last 50 finished attempts
+  (latency is creation to confirmation), with the balance and pre-funded limit usage (CON-08).
+- Each rail has a circuit (`rails.circuit_state`, migration 0018). It opens after `circuit_failures` (default 3,
+  per rail) technical failures in a row: `TECHNICAL_RETRYABLE`, `TECHNICAL_FINAL` or `TIMEOUT`. `REJECTED_BY_RAIL`
+  is a business answer and breaks the run. Routing applies the same rule, so the rail is skipped at once
+  (`CIRCUIT_OPEN`); with no other eligible rail the payment is held (`NO_RAIL_AVAILABLE`), never sent elsewhere.
+- The worker checks circuits every `RAIL_HEALTH_SECONDS` and probes an open one with the adapter's `health()` at most
+  every `RAIL_PROBE_SECONDS`. A successful probe closes it and the count restarts from the close. Opening and
+  closing are audited (`rail.circuit_opened`, `rail.circuit_closed`). A circuit never sends, retries or re-routes.
+
+## Connecting a rail (RAL-09, prototype)
+
+- `/console/rails/connect` lists the rails a client can connect: the testnet USDC rails through a mock consent
+  screen (Allow or Deny, scopes listed) and the simulated bank rails with a scoped API key. Only the payments lead
+  connects or disconnects.
+- The credential (the key, or a stand-in consent token) is Fernet-encrypted with `CREDENTIALS_ENCRYPTION_KEY` in
+  `rail_connections` and never shown again; the screen keeps the last four characters. A key starting `sk_live_` or
+  another live prefix is refused. No provider is called.
+- Disconnecting removes the credential (the row keeps the history) and disables the rail, so routing no longer
+  offers it. Both are audited (`rail.connected`, `rail.disconnected`).
+
+## Daily adapter contract tests (RAL-10)
+
+- `.github/workflows/rail-contracts.yml` runs the shared contract suite (local chain) and the simulated bank suite
+  every day at 05:41 UTC and on demand. A failure opens an issue naming each failing adapter and test
+  (`tools/contract_report.py` reads the JUnit report). Running it against the public testnets needs funded test
+  wallets and RPC URLs as secrets (a founder item).
+
 ## UNKNOWN resolution (EXE-06)
 
 ```

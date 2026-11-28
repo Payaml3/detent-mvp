@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shadow-phase report {{ rep.import.id }}</title>
+<style>/* a standalone file: system colours, so it reads in light and dark */ body{font:15px/1.5 system-ui,sans-serif;max-width:900px;margin:24px auto;padding:0 16px;color:CanvasText;background:Canvas}
+table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid GrayText;padding:4px 6px;text-align:left}.mono{font-family:ui-monospace,monospace}.muted{color:GrayText}.small{font-size:13px}.card{margin:20px 0}</style>
+</head><body>
+<p class="small muted">{{ brand }} agentic payment controls · prototype · test networks only</p>
+<h1>Shadow-phase report: {{ rep.import.label }}</h1>
+<p class="small muted mono">{{ rep.import.id }}</p>
+{% include "_shadow_report_body.html" %}
+</body></html>

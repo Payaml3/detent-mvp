@@ -81,6 +81,7 @@ def propose_mode_change(
     to_mode: str,
     reason: str,
     setting: str = "mode",
+    gate_id: str | None = None,
 ) -> str:
     """Propose a change to the mode or (CON-10) the fail-safe; the other lead approves it."""
     role = _role(actor)
@@ -105,13 +106,21 @@ def propose_mode_change(
         ).scalar_one_or_none()
         if pending:
             raise ModeError(f"a change to {pending} is already waiting for approval")
+        gate = None
+        if setting == "mode":  # SHD-03: a move up names its signed mode gate (required for clients)
+            from detent.shadow.gates import GateError, check_gate_for_change
+
+            try:
+                gate = check_gate_for_change(conn, org_id, from_mode=mode, to_mode=to_mode, gate_id=gate_id)
+            except GateError as exc:
+                raise ModeError(str(exc), status=exc.status, code="mode_gate_required") from None
         now = clock.now()
         ch = new_id(Prefix.MCH, now)
         conn.execute(
             text(
                 "INSERT INTO mode_changes (id, org_id, setting, from_mode, to_mode, reason, proposed_by, "
-                "proposed_role, "
-                "status, created_at) VALUES (:id, :o, :s, :f, :t, :r, :p, :pr, 'proposed', :now)"
+                "proposed_role, gate_id, "
+                "status, created_at) VALUES (:id, :o, :s, :f, :t, :r, :p, :pr, :g, 'proposed', :now)"
             ),
             {
                 "id": ch,
@@ -122,6 +131,7 @@ def propose_mode_change(
                 "r": reason.strip(),
                 "p": actor.id,
                 "pr": role.value,
+                "g": gate,
                 "now": now,
             },
         )
@@ -132,7 +142,13 @@ def propose_mode_change(
             actor=actor,
             kind="org.mode_change_proposed" if setting == "mode" else "org.fail_safe_change_proposed",
             subject_id=ch,
-            payload={"setting": setting, "from": mode, "to": to_mode, "reason": reason.strip()},
+            payload={
+                "setting": setting,
+                "from": mode,
+                "to": to_mode,
+                "reason": reason.strip(),
+                **({"gate_id": gate} if gate else {}),
+            },
         )
     return ch
 
@@ -161,6 +177,10 @@ def approve_mode_change(engine: Engine, clock: Clock, *, org_id: str, change_id:
             raise ModeError(f"the {ch.setting} changed to {mode} after this was proposed; propose again")
         now = clock.now()
         conn.execute(text(_SET_SQL[ch.setting]), {"m": ch.to_mode, "o": org_id})
+        if ch.gate_id:
+            from detent.shadow.gates import link_gate
+
+            link_gate(conn, org_id, ch.gate_id, change_id)
         conn.execute(
             text(
                 "UPDATE mode_changes SET status='applied', approved_by=:a, approved_role=:r, decided_at=:t "
