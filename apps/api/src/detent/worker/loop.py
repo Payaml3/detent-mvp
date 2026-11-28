@@ -35,9 +35,11 @@ class Worker:
         self._last_watch: float | None = time.monotonic()
         self._last_recon: float | None = time.monotonic()
         self._last_log_purge: float | None = None
+        self._last_invariants: float | None = None
         importlib.import_module("detent.execution.jobs")  # payment.send, payment.confirm
         importlib.import_module("detent.exceptions.investigation_job")  # case.investigate (EXC-03)
         importlib.import_module("detent.webhooks.delivery")  # webhook.deliver (WHK-03)
+        importlib.import_module("detent.incidents.jobs")  # invariants.check (EXE-10)
         for mod in rt.settings.worker_extra_handler_modules:
             importlib.import_module(mod)
 
@@ -88,6 +90,10 @@ class Worker:
             self.purge_request_logs(force=force)
         except Exception:
             log.exception("deposit watching or reconciliation failed")  # never stops the sweeper or job loop
+        try:
+            self.check_invariants(force=force)
+        except Exception:
+            log.exception("invariant monitor failed")  # never stops the sweeper or job loop
         mono = time.monotonic()  # scheduling cadence only; the sweep itself reads the Clock
         recent = (
             self._last_sweep is not None and mono - self._last_sweep < self.rt.settings.deadline_sweep_seconds
@@ -134,6 +140,22 @@ class Worker:
             return 0
         self._last_log_purge = mono
         return purge_request_logs(self.rt.engine, self.rt.clock)
+
+    def check_invariants(self, *, force: bool = False) -> dict[str, list[str]]:
+        """EXE-10: the Sev 1 invariant monitor, every minute by default."""
+        from detent.incidents.monitor import check_all
+
+        mono = time.monotonic()
+        last = self._last_invariants
+        if not force and last is not None and mono - last < self.rt.settings.invariant_monitor_seconds:
+            return {}
+        self._last_invariants = mono
+        opened = check_all(
+            self.rt.engine, self.rt.clock, kill_switch=self.rt.settings.invariant_monitor_kill_switch
+        )
+        if opened:
+            log.error("Sev 1: an invariant broke", extra={"incidents": sum(len(v) for v in opened.values())})
+        return opened
 
     def run(self) -> None:
         log.info("worker started", extra={"worker_id": self.worker_id, "handlers": registry.kinds()})

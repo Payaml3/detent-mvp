@@ -9,6 +9,9 @@
 </head>
 <body>
   <div class="banner" role="note">{{ 'Sandbox · test networks · simulated bank rail' if dashboard else 'Prototype · test networks · simulated bank rail' }}</div>
+  {% if sev1_incidents %}
+  <div class="sev1-bar" role="alert"><strong>Sev 1 incident open:</strong> {% for i in sev1_incidents %}<a href="/console/incidents/{{ i.id }}">{{ i.title }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</div>
+  {% endif %}
   {% if kill_switch_engaged %}
   <div class="kill-bar" role="alert">Kill switch engaged: all sending is stopped and pending payments are held.</div>
   {% endif %}
@@ -26,7 +29,7 @@
              ("Decision", [("/console/invoices", "Invoices"), ("/console/policy", "Policy"), ("/console/mandates", "Mandates"),
                            ("/console/counterparties", "Counterparties"), ("/console/exceptions", "Exceptions")]),
              ("Orchestration", [("/console/payments", "Payments"), ("/console/rails", "Rails")]),
-             ("Operations", [("/console/reconciliation", "Reconciliation"), ("/console/outbox", "Outbox"), ("/console/audit", "Audit")]),
+             ("Operations", [("/console/reconciliation", "Reconciliation"), ("/console/outbox", "Outbox"), ("/console/incidents", "Incidents"), ("/console/audit", "Audit")]),
              ("Prototype", [("/console/evaluation", "Evaluation"), ("/console/settings", "Settings"), ("/console/demo", "Demo")])] %}
         {% if group %}<div class="nav-group">{{ group }}</div>{% endif %}
         {% for href, label in links if not (dashboard and href in ("/console/invoices", "/console/evaluation", "/console/demo")) %}

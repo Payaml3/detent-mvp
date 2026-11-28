@@ -48,6 +48,16 @@ def _kill_switch_engaged(rt: Runtime, user: ActingUser | None) -> bool:
     return bool(v)
 
 
+def _sev1(rt: Runtime, user: ActingUser | None) -> list[Any]:
+    """EXE-10: a red banner on every page while a Sev 1 incident is open."""
+    from detent.incidents.records import open_sev1
+
+    if user is None:
+        return []
+    with rt.engine.connect() as conn:
+        return open_sev1(conn, user.org_id)
+
+
 def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ctx: Any) -> HTMLResponse:
     from detent.dashboard.web import csrf_token
 
@@ -56,6 +66,7 @@ def page(request: Request, rt: Runtime, name: str, user: ActingUser | None, **ct
         "brand": rt.settings.brand_name,
         "user": user,
         "kill_switch_engaged": _kill_switch_engaged(rt, user),
+        "sev1_incidents": _sev1(rt, user),
         # DSH-09: a dashboard member sees their own organisation, without the demo-only controls.
         "dashboard": member_mode,
         "dashboard_csrf": csrf_token(request) if member_mode else "",
@@ -360,8 +371,41 @@ def payment_detail(
         explorer=expl,
         mode=mode,
         can_send=can_send,
+        can_cancel=view["status"] in ("ESCALATED", "HELD", "READY") and allowed("payment.cancel", user.role),
         error=request.query_params.get("error"),
     )
+
+
+@router.post("/payments/{payment_id}/cancel")
+def console_cancel(
+    request: Request,
+    payment_id: str,
+    reason: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(require_permission("payment.cancel")),  # noqa: B008
+) -> Response:
+    """INT-05: cancel an escalated, held or ready payment; it is never sent."""
+    from urllib.parse import quote
+
+    from detent.intents.cancel import CancelError, cancel_intent
+
+    with rt.engine.connect() as conn:
+        if not visible(conn, "payment_intents", user.org_id, payment_id):
+            raise HTTPException(status_code=404)
+    try:
+        cancel_intent(
+            rt.engine,
+            rt.clock,
+            org_id=user.org_id,
+            payment_id=payment_id,
+            actor=Actor(user.id, user.role.value),
+            reason=reason,
+        )
+    except CancelError as exc:
+        return RedirectResponse(
+            f"/console/payments/{payment_id}?error={quote(str(exc)[:300])}", status_code=303
+        )
+    return RedirectResponse(f"/console/payments/{payment_id}", status_code=303)
 
 
 @router.post("/payments/{payment_id}/send")
@@ -1094,9 +1138,28 @@ def settings_page(
             text("SELECT * FROM mode_changes WHERE org_id=:o ORDER BY created_at DESC, id DESC LIMIT 10"),
             {"o": user.org_id},
         ).all()
-    can_approve = pending is not None and mode_change_approved(
-        proposer=(pending.proposed_by, Role(pending.proposed_role)), approver=(user.id, user.role)
-    )
+        # CON-10: the fail-safe changes like the mode; deadlines and weights are shown read-only.
+        fs_pending = pending_mode_change(conn, user.org_id, "fail_safe")
+        from detent.policy.store import NoActivePolicy, active_policy
+        from detent.routing.engine import DEFAULT_WEIGHTS
+
+        try:
+            pol = active_policy(conn, user.org_id)
+            deadlines, policy_version = dict(pol.rules.deadlines), pol.version
+        except NoActivePolicy:
+            deadlines, policy_version = {}, None
+        rail_weights = conn.execute(
+            text("SELECT id, weights FROM rails WHERE org_id=:o AND weights IS NOT NULL ORDER BY id"),
+            {"o": user.org_id},
+        ).all()
+
+    def approvable(p: Any) -> bool:
+        return p is not None and mode_change_approved(
+            proposer=(p.proposed_by, Role(p.proposed_role)), approver=(user.id, user.role)
+        )
+
+    can_approve = approvable(pending)
+    lead = allowed("org.change_mode.propose", user.role)
     return page(
         request,
         rt,
@@ -1107,9 +1170,17 @@ def settings_page(
         orch=orch,
         fail_safe=fail_safe,
         history=history,
-        can_propose=allowed("org.change_mode.propose", user.role) and pending is None,
+        can_propose=lead and pending is None,
         can_approve=can_approve,
-        can_withdraw=pending is not None and allowed("org.change_mode.propose", user.role),
+        can_withdraw=pending is not None and lead,
+        fs_pending=fs_pending,
+        fs_can_propose=lead and fs_pending is None,
+        fs_can_approve=approvable(fs_pending),
+        fs_can_withdraw=fs_pending is not None and lead,
+        deadlines=deadlines,
+        policy_version=policy_version,
+        default_weights={k: str(v) for k, v in DEFAULT_WEIGHTS.items()},
+        rail_weights=rail_weights,
         error=request.query_params.get("error"),
     )
 
@@ -1127,6 +1198,7 @@ def console_propose_mode(
     request: Request,
     to_mode: str = Form(""),
     reason: str = Form(""),
+    setting: str = Form("mode"),
     rt: Runtime = Depends(runtime),  # noqa: B008
     user: ActingUser = Depends(require_permission("org.change_mode.propose")),  # noqa: B008
 ) -> RedirectResponse:
@@ -1140,6 +1212,7 @@ def console_propose_mode(
             actor=Actor(user.id, user.role.value),
             to_mode=to_mode,
             reason=reason,
+            setting=setting,
         )
     except ModeError as exc:
         return _settings_redirect(exc)

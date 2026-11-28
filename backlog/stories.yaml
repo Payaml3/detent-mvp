@@ -23,6 +23,7 @@ epics:
   SBX: {name: "Sandbox", goal: "Developers trigger every path with test values, inside quotas", track: portal, layer: "All three (developer access)"}
   DOC: {name: "Docs portal", goal: "Concepts, guides and reference with tested samples in 8 languages", track: portal, layer: "All three (developer access)"}
   SDK: {name: "SDKs", goal: "Typed Python and TypeScript clients with automatic idempotency and webhook helpers", track: portal, layer: "All three (developer access)"}
+  USR: {name: "User payouts", goal: "Payouts to the platform's own end users, under the user payout profile", track: prototype, layer: "Decision"}
   WEB: {name: "Marketing site", goal: "A public face that looks real and stays honest", track: portal, layer: "Go-to-market"}
 
 stories:
@@ -254,6 +255,7 @@ stories:
   deps: [EXE-01]
   trace: [A2.Intent]
   ms: L
+  done: [0, 1]
 
 # ---------------- POL Policy ----------------
 - id: POL-01
@@ -713,6 +715,7 @@ stories:
   deps: [EXE-08, LED-05]
   trace: [B3.incident, B7.safety]
   ms: L
+  done: [0, 1]
 
 # ---------------- RAL Rails, routing and faults ----------------
 - id: RAL-01
@@ -1341,6 +1344,7 @@ stories:
   deps: [EXE-09]
   trace: [B5.failsafe, A3.gates]
   ms: L
+  done: [0]
 
 # ---------------- EVL Evaluation ----------------
 - id: EVL-01
@@ -1615,6 +1619,7 @@ stories:
   deps: [EXE-10, AUD-02]
   trace: [B3.incident]
   ms: L
+  done: [0]
 - id: OPS-02
   epic: OPS
   title: Independence check in CI
@@ -2307,3 +2312,63 @@ stories:
   deps: [WEB-01]
   trace: [BR.category, D.site]
   ms: P4
+
+# ---------------- USR User payouts (slice U, founder D-40) ----------------
+- id: USR-01
+  epic: USR
+  title: User destinations
+  as: platform developer
+  want: to register one payout destination per end-user account, with the platform's typed user_verified flag
+  so: payouts to our own users go only to a destination we registered
+  ac:
+    - "One destination per user_account_ref (G-10); registering a different one replaces it, is audited and the next payout escalates CHANGED_DETAILS"
+    - "user_verified is a typed boolean the platform supplies; it is stored with who set it and when"
+  pri: Should
+  est: 0.5
+  deps: [INT-04]
+  trace: [A2.Intent]
+  ms: U
+
+- id: USR-02
+  epic: USR
+  title: Decide a user payout under the user payout profile
+  as: payments lead
+  want: payouts with user_account_ref decided with the user payout profile
+  so: business-counterparty checks don't apply to our end users but every safety check still does
+  ac:
+    - "kyb_status, allowlist, unusual.first_payment and unusual.above_norm are skipped; screening, allowed_networks, limits, daily caps (platform scope), new_wallet, changed_details and resubmission_after_block run"
+    - "user_verified false escalates USER_NOT_VERIFIED; the 422 user_payouts_unavailable is gone"
+  pri: Should
+  est: 0.75
+  deps: [USR-01, POL-08]
+  trace: [A2.Decide, A2.Policy]
+  ms: U
+
+- id: USR-03
+  epic: USR
+  title: User payouts in the console and the API reference
+  as: reviewer
+  want: user payouts shown with the user account reference and the profile that decided them
+  so: I can tell a user payout from a counterparty payout in the queue
+  ac:
+    - "Payments, payment detail and exceptions show the user account reference and \"user payout profile\"; the OpenAPI file, docs guide and SDKs carry user_account_ref"
+  pri: Should
+  est: 0.5
+  deps: [USR-02]
+  trace: [A2.Intent]
+  ms: U
+
+- id: USR-04
+  epic: USR
+  title: User payouts in evaluation and the sandbox
+  as: founder
+  want: attack and fault scenarios for user payouts, and sandbox test values for them
+  so: the release gate covers user payouts like counterparty payouts
+  ac:
+    - "Eval scenarios: unverified user, changed destination, cap breach, duplicate payout under one payment ID; 0 unauthorised executions"
+    - "Sandbox organisations are seeded with fictional user accounts and their destinations"
+  pri: Should
+  est: 0.5
+  deps: [USR-02]
+  trace: [A2.Decide]
+  ms: U

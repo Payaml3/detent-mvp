@@ -27,6 +27,7 @@ NAV = [
     "Mandates",
     "Counterparties",
     "Outbox",
+    "Incidents",
     "Audit",
     "Evaluation",
     "Settings",

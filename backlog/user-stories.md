@@ -177,8 +177,8 @@ _Every payment starts as an intent with one payment ID for life_ · layer: Decis
 
 **Acceptance criteria**
 
-- [ ] Cancel is allowed from ESCALATED, HELD or READY only; from SUBMITTED or UNKNOWN it returns 409
-- [ ] CANCELLED is terminal and audited with the actor and reason
+- [x] Cancel is allowed from ESCALATED, HELD or READY only; from SUBMITTED or UNKNOWN it returns 409
+- [x] CANCELLED is terminal and audited with the actor and reason
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-01 · **Traces to:** A2.Intent
 
@@ -531,8 +531,8 @@ _A payment is sent once: timeouts become UNKNOWN, retries keep the payment ID, t
 
 **Acceptance criteria**
 
-- [ ] Every minute and after each confirmation: two confirmed transfers for one payment ID, a confirmed attempt without an EXECUTE or approved decision, or two credits for one inbound transfer
-- [ ] A hit opens a Sev 1 incident, engages the kill switch (configurable, on by default), posts to the mock outbox and shows a red banner
+- [x] Every minute and after each confirmation: two confirmed transfers for one payment ID, a confirmed attempt without an EXECUTE or approved decision, or two credits for one inbound transfer
+- [x] A hit opens a Sev 1 incident, engages the kill switch (configurable, on by default), posts to the mock outbox and shows a red banner
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-08, LED-05 · **Traces to:** B3.incident, B7.safety
 
@@ -1013,7 +1013,7 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 
 **Acceptance criteria**
 
-- [ ] Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype
+- [x] Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-09 · **Traces to:** B5.failsafe, A3.gates
 
@@ -1225,7 +1225,7 @@ _The operating-model processes that need software: incidents, independence check
 
 **Acceptance criteria**
 
-- [ ] Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays
+- [x] Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-10, AUD-02 · **Traces to:** B3.incident
 
@@ -1661,6 +1661,53 @@ _Typed Python and TypeScript clients with automatic idempotency and webhook help
 - [x] Generated in CI from openapi.yaml and linked from the docs
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P3 Docs and SDKs · **Depends on:** API-05 · **Traces to:** D.sdks
+
+## USR · User payouts
+
+_Payouts to the platform's own end users, under the user payout profile_ · layer: Decision · track: prototype · 4 stories · 2.25 days
+
+### USR-01 · User destinations
+
+**As a** platform developer, **I want** to register one payout destination per end-user account, with the platform's typed user_verified flag, **so that** payouts to our own users go only to a destination we registered.
+
+**Acceptance criteria**
+
+- [ ] One destination per user_account_ref (G-10); registering a different one replaces it, is audited and the next payout escalates CHANGED_DETAILS
+- [ ] user_verified is a typed boolean the platform supplies; it is stored with who set it and when
+
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** U User payouts · **Depends on:** INT-04 · **Traces to:** A2.Intent
+
+### USR-02 · Decide a user payout under the user payout profile
+
+**As a** payments lead, **I want** payouts with user_account_ref decided with the user payout profile, **so that** business-counterparty checks don't apply to our end users but every safety check still does.
+
+**Acceptance criteria**
+
+- [ ] kyb_status, allowlist, unusual.first_payment and unusual.above_norm are skipped; screening, allowed_networks, limits, daily caps (platform scope), new_wallet, changed_details and resubmission_after_block run
+- [ ] user_verified false escalates USER_NOT_VERIFIED; the 422 user_payouts_unavailable is gone
+
+**Priority:** Should · **Estimate:** 0.75 d · **Milestone:** U User payouts · **Depends on:** USR-01, POL-08 · **Traces to:** A2.Decide, A2.Policy
+
+### USR-03 · User payouts in the console and the API reference
+
+**As a** reviewer, **I want** user payouts shown with the user account reference and the profile that decided them, **so that** I can tell a user payout from a counterparty payout in the queue.
+
+**Acceptance criteria**
+
+- [ ] Payments, payment detail and exceptions show the user account reference and "user payout profile"; the OpenAPI file, docs guide and SDKs carry user_account_ref
+
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** U User payouts · **Depends on:** USR-02 · **Traces to:** A2.Intent
+
+### USR-04 · User payouts in evaluation and the sandbox
+
+**As a** founder, **I want** attack and fault scenarios for user payouts, and sandbox test values for them, **so that** the release gate covers user payouts like counterparty payouts.
+
+**Acceptance criteria**
+
+- [ ] Eval scenarios: unverified user, changed destination, cap breach, duplicate payout under one payment ID; 0 unauthorised executions
+- [ ] Sandbox organisations are seeded with fictional user accounts and their destinations
+
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** U User payouts · **Depends on:** USR-02 · **Traces to:** A2.Decide
 
 ## WEB · Marketing site
 

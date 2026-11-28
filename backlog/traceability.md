@@ -8,9 +8,9 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | A1.deposits | Product model A1 | Outcome: deposits credited once, to the right account | mvp | LED-03, LED-04, LED-05 |
 | A1.cost | Product model A1 | Outcome: lower cost and failure rate per payout | mvp | RAL-06, RAL-07 |
 | A1.evidence | Product model A1 | Outcome: evidence an auditor accepts | mvp | LED-01, AUD-01, AUD-03 |
-| A2.Intent | Product model A2 | Intent module: payment intent with one payment ID for life; agents can only propose | mvp | FND-03, INT-01, INT-05, AGT-01 |
-| A2.Decide | Product model A2 | Decide module: decision API, execute / escalate / block with a reason per check | mvp | POL-02, POL-08, CON-03 |
-| A2.Policy | Product model A2 | Policy module: versioned client-approved rules (KYB, allowlist, limits, KYT, Travel Rule, unusual rules, daily caps) | mvp | INT-04, POL-01, POL-03, POL-04 |
+| A2.Intent | Product model A2 | Intent module: payment intent with one payment ID for life; agents can only propose | mvp | FND-03, INT-01, INT-05, AGT-01, USR-01, USR-03 |
+| A2.Decide | Product model A2 | Decide module: decision API, execute / escalate / block with a reason per check | mvp | POL-02, POL-08, CON-03, USR-02, USR-04 |
+| A2.Policy | Product model A2 | Policy module: versioned client-approved rules (KYB, allowlist, limits, KYT, Travel Rule, unusual rules, daily caps) | mvp | INT-04, POL-01, POL-03, POL-04, USR-02 |
 | A2.Execute | Product model A2 | Execute module: idempotency, state lock, nonce, balance check, pre-funded limits, kill switch | mvp | INT-02, EXE-01, EXE-02, EXE-03, EXE-04, EXE-08 |
 | A2.Exceptions | Product model A2 | Exceptions module: owner, deadline, held on timeout, raw facts first, approval re-runs policy | mvp | FND-04, EXC-01, EXC-03, EXC-04, EXC-08, CON-04 |
 | A2.Reconcile | Product model A2 | Reconcile module: one ledger, deposit intents, matching, exceptions with proposed fixes | mvp | LED-01, LED-02, LED-03, LED-05, LED-06, LED-07, CON-07 |

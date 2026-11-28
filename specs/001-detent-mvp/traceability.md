@@ -193,8 +193,8 @@ Sources: [spec/02 §payment-state-machine](../../spec/02-domain-model.md#payment
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [INT-05](../../backlog/user-stories.md#int-05) | L | 0 | Cancel is allowed from ESCALATED, HELD or READY only; from SUBMITTED or UNKNOWN it returns 409 | planned | integration: `apps/api/tests/integration/test_int_05.py` |
-| [INT-05](../../backlog/user-stories.md#int-05) | L | 1 | CANCELLED is terminal and audited with the actor and reason | planned | integration: `apps/api/tests/integration/test_int_05.py` |
+| [INT-05](../../backlog/user-stories.md#int-05) | L | 0 | Cancel is allowed from ESCALATED, HELD or READY only; from SUBMITTED or UNKNOWN it returns 409 | done | `integration/test_cancel.py::test_cancel_a_ready_payment_and_the_send_job_then_sends_nothing`<br>`integration/test_cancel.py::test_cancel_an_escalated_payment_resolves_its_case`<br>`integration/test_cancel.py::test_cancel_a_held_payment`<br>`integration/test_cancel.py::test_submitted_or_unknown_answers_409` |
+| [INT-05](../../backlog/user-stories.md#int-05) | L | 1 | CANCELLED is terminal and audited with the actor and reason | done | `integration/test_cancel.py::test_cancelled_is_terminal`<br>`integration/test_cancel.py::test_cancel_a_ready_payment_and_the_send_job_then_sends_nothing`<br>`integration/test_cancel.py::test_console_cancel_is_payments_lead_only` |
 
 ## FR-016 · Intents (confirmed)
 
@@ -214,6 +214,13 @@ Sources: [spec/04 §user-payouts-payouts-to-the-platforms-own-end-users](../../s
 | [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 3 | Travel Rule originator and beneficiary fields missing above the configured threshold -> ESCALATE | done | `unit/test_policy_engine.py::test_travel_rule_missing_fields_escalate_above_threshold`<br>`unit/test_policy_engine.py::test_travel_rule_below_threshold_passes`<br>`unit/test_policy_engine.py::test_travel_rule_supplied_values_must_match_the_registry`<br>`unit/test_policy_engine.py::test_travel_rule_threshold_is_per_currency` |
 | [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 4 | Network or currency not allowed for the platform -> BLOCK | done | `unit/test_policy_engine.py::test_network_not_allowed_blocks` |
 | [POL-03](../../backlog/user-stories.md#pol-03) | S1 | 5 | Screening sits behind a `Screening` interface so a real vendor can replace the mock | done | `integration/test_fail_closed.py::test_screening_down` |
+| [USR-01](../../backlog/user-stories.md#usr-01) | U | 0 | One destination per user_account_ref (G-10); registering a different one replaces it, is audited and the next payout escalates CHANGED_DETAILS | planned | integration: `apps/api/tests/integration/test_usr_01.py` |
+| [USR-01](../../backlog/user-stories.md#usr-01) | U | 1 | user_verified is a typed boolean the platform supplies; it is stored with who set it and when | planned | integration: `apps/api/tests/integration/test_usr_01.py` |
+| [USR-02](../../backlog/user-stories.md#usr-02) | U | 0 | kyb_status, allowlist, unusual.first_payment and unusual.above_norm are skipped; screening, allowed_networks, limits, daily caps (platform scope), new_wallet, changed_details and resubmission_after_block run | planned | integration: `apps/api/tests/integration/test_usr_02.py` |
+| [USR-02](../../backlog/user-stories.md#usr-02) | U | 1 | user_verified false escalates USER_NOT_VERIFIED; the 422 user_payouts_unavailable is gone | planned | integration: `apps/api/tests/integration/test_usr_02.py` |
+| [USR-03](../../backlog/user-stories.md#usr-03) | U | 0 | Payments, payment detail and exceptions show the user account reference and "user payout profile"; the OpenAPI file, docs guide and SDKs carry user_account_ref | planned | integration: `apps/api/tests/integration/test_usr_03.py` |
+| [USR-04](../../backlog/user-stories.md#usr-04) | U | 0 | Eval scenarios: unverified user, changed destination, cap breach, duplicate payout under one payment ID; 0 unauthorised executions | planned | integration: `apps/api/tests/integration/test_usr_04.py` |
+| [USR-04](../../backlog/user-stories.md#usr-04) | U | 1 | Sandbox organisations are seeded with fictional user accounts and their destinations | planned | integration: `apps/api/tests/integration/test_usr_04.py` |
 
 ## FR-020 · Policy (confirmed)
 
@@ -677,8 +684,8 @@ Sources: [spec/10 §runbooks-write-as-the-features-land](../../spec/10-security-
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [EXE-10](../../backlog/user-stories.md#exe-10) | L | 0 | Every minute and after each confirmation: two confirmed transfers for one payment ID, a confirmed attempt without an EXECUTE or approved decision, or two credits for one inbound transfer | planned | integration: `apps/api/tests/integration/test_exe_10.py` |
-| [EXE-10](../../backlog/user-stories.md#exe-10) | L | 1 | A hit opens a Sev 1 incident, engages the kill switch (configurable, on by default), posts to the mock outbox and shows a red banner | planned | integration: `apps/api/tests/integration/test_exe_10.py` |
+| [EXE-10](../../backlog/user-stories.md#exe-10) | L | 0 | Every minute and after each confirmation: two confirmed transfers for one payment ID, a confirmed attempt without an EXECUTE or approved decision, or two credits for one inbound transfer | done | `integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies`<br>`integration/test_incidents.py::test_duplicate_payment_and_double_credit_are_found`<br>`integration/test_incidents.py::test_the_worker_runs_the_monitor_every_minute_and_after_each_confirmation` |
+| [EXE-10](../../backlog/user-stories.md#exe-10) | L | 1 | A hit opens a Sev 1 incident, engages the kill switch (configurable, on by default), posts to the mock outbox and shows a red banner | done | `integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies`<br>`integration/test_incidents.py::test_kill_switch_engagement_is_configurable` |
 
 ## FR-062 · Rails (confirmed)
 
@@ -1025,7 +1032,7 @@ Sources: [spec/07 §screens](../../spec/07-console.md#screens); [spec/07 §ux-ru
 | [CON-06](../../backlog/user-stories.md#con-06) | S6 | 1 | Mandates list with scope, usage against limits, expiry and revoke | done | `integration/test_console_operations.py::test_mandates_screen_shows_scope_usage_expiry_and_revoke`<br>`integration/test_mandates.py::test_revoke_by_api_and_console` |
 | [CON-07](../../backlog/user-stories.md#con-07) | S7 | 0 | Run history, match rate, breaks with proposed fix and approve button | done | `integration/test_console_ledger.py::test_reconciliation_screen_runs_shows_breaks_and_applies_an_approved_fix` |
 | [CON-08](../../backlog/user-stories.md#con-08) | S4 | 0 | Per rail: network or currency, balance, pre-funded limit usage, last 20 attempts | done | `integration/test_console_rails.py::test_rails_screen` |
-| [CON-10](../../backlog/user-stories.md#con-10) | L | 0 | Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype | planned | console: `apps/api/tests/integration/test_con_10.py` |
+| [CON-10](../../backlog/user-stories.md#con-10) | L | 0 | Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype | done | `integration/test_incidents.py::test_fail_safe_changes_need_both_leads`<br>`integration/test_incidents.py::test_settings_screen_shows_fail_safe_deadlines_and_weights` |
 
 ## FR-092 · Evaluation (confirmed)
 
@@ -1144,7 +1151,7 @@ Sources: [spec/10 §runbooks-write-as-the-features-land](../../spec/10-security-
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [OPS-01](../../backlog/user-stories.md#ops-01) | L | 0 | Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays | planned | manual: `manual check, recorded in the PR description` |
+| [OPS-01](../../backlog/user-stories.md#ops-01) | L | 0 | Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays | done | `integration/test_incidents.py::test_manual_incident_timeline_notification_root_cause_and_replay`<br>`integration/test_incidents.py::test_console_incidents_screens`<br>`integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies` |
 | [OPS-03](../../backlog/user-stories.md#ops-03) | L | 0 | Runbook in spec/10; one drill done and timed; audit hash chain verified after restore | planned | manual: `manual check, recorded in the PR description` |
 | [OPS-04](../../backlog/user-stories.md#ops-04) | L | 0 | docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap | planned | manual: `manual check, recorded in the PR description` |
 

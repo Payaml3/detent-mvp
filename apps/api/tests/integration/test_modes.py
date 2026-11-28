@@ -215,6 +215,7 @@ def test_mode_change_needs_both_leads_as_two_people(engine: Engine, clock: Froze
             text("SELECT payload FROM audit_events WHERE org_id=:o AND kind='org.mode_changed'"), {"o": d.id}
         ).scalar_one()
     assert ev == {
+        "setting": "mode",
         "from": "shadow",
         "to": "assist",
         "proposed_by": pl.id,

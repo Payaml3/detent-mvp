@@ -41,6 +41,7 @@ class Prefix(StrEnum):
     AGC = "agc"  # agent call
     EVT = "evt"
     INC = "inc"
+    INE = "ine"  # incident event
     JOB = "job"
     CEV = "cev"  # case event
     OBX = "obx"  # outbox message

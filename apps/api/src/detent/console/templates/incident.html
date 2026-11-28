@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Incident {{ inc.id }}{% endblock %}
+{% block main %}
+<h1>{{ sev.name }}: {{ inc.title or inc.trigger }}</h1>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<dl class="facts">
+  <dt>Incident</dt><dd class="mono">{{ inc.id }}</dd>
+  <dt>Status</dt><dd>{{ inc.status }}{% if inc.resolved_at %} ({{ inc.resolved_at.strftime('%Y-%m-%d %H:%M') }} by <span class="mono">{{ inc.resolved_by }}</span>){% endif %}</dd>
+  <dt>Trigger</dt><dd class="mono">{{ inc.trigger }}{% if inc.subject_id %} · {{ inc.subject_id }}{% endif %}</dd>
+  <dt>Opened</dt><dd>{{ inc.opened_at.strftime('%Y-%m-%d %H:%M') }} UTC by <span class="mono">{{ inc.opened_by }}</span></dd>
+  <dt>Notification</dt><dd>{% if inc.notified_at %}logged {{ inc.notified_at.strftime('%Y-%m-%d %H:%M') }} UTC{% elif overdue %}<strong class="error">overdue</strong> (due by {{ notify_by.strftime('%Y-%m-%d %H:%M') }} UTC){% else %}due by {{ notify_by.strftime('%Y-%m-%d %H:%M') }} UTC{% endif %}</dd>
+  <dt>Root cause</dt><dd>{{ inc.root_cause or 'not recorded yet' }}</dd>
+  {% if inc.detail %}<dt>Detail</dt><dd class="mono small">{% for k, v in inc.detail.items() %}{{ k }}: {{ v }}{% if not loop.last %}; {% endif %}{% endfor %}</dd>{% endif %}
+</dl>
+<h2>Linked replays</h2>
+<table>
+  <thead><tr><th>Payment</th><th>Result</th><th>When (UTC)</th></tr></thead>
+  <tbody>{% for r in replays %}<tr><td><a class="mono" href="/console/payments/{{ r.payload.payment_id }}/replay">{{ r.payload.payment_id }}</a></td><td>{{ 'matches' if r.payload.match else 'MISMATCH' }}</td><td>{{ r.at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
+  {% else %}<tr><td colspan="3" class="muted">No replays linked.</td></tr>{% endfor %}</tbody>
+</table>
+<h2>Timeline</h2>
+<table>
+  <thead><tr><th>When (UTC)</th><th>What</th><th>Who</th><th>Detail</th></tr></thead>
+  <tbody>{% for e in events %}<tr><td>{{ e.at.strftime('%Y-%m-%d %H:%M:%S') }}</td><td>{{ e.kind.replace('_', ' ') }}</td><td class="mono">{{ e.actor }}</td>
+    <td class="small">{% for k, v in e.payload.items() %}{{ k }}: {{ v }}{% if not loop.last %}; {% endif %}{% endfor %}</td></tr>{% endfor %}</tbody>
+</table>
+{% if can_manage %}
+<section class="card">
+  <h2>Work the incident</h2>
+  <form method="post" action="/console/incidents/{{ inc.id }}/notify" class="filters">
+    <label>Notified via<input name="channel" required maxlength="100" placeholder="phone, email"></label>
+    <label>Who<input name="recipient" required maxlength="200"></label>
+    <button>Log notification</button>
+  </form>
+  <form method="post" action="/console/incidents/{{ inc.id }}/replay" class="filters">
+    <label>Payment ID<input name="payment_id" required maxlength="80" class="mono"></label>
+    <button>Replay and link</button>
+  </form>
+  <form method="post" action="/console/incidents/{{ inc.id }}/note" class="filters">
+    <label>Note<input name="note" required maxlength="2000"></label>
+    <button>Add to timeline</button>
+  </form>
+  <form method="post" action="/console/incidents/{{ inc.id }}/root_cause" class="filters">
+    <label>Root cause<input name="root_cause" required maxlength="4000" value="{{ inc.root_cause or '' }}"></label>
+    <button>Record root cause</button>
+  </form>
+  <form method="post" action="/console/incidents/{{ inc.id }}/resolve"><button class="primary">Resolve</button></form>
+  {% if inc.severity <= 2 %}<p class="small muted">A {{ sev.name }} needs a root cause before it is resolved.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

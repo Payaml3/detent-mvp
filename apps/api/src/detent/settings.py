@@ -119,6 +119,9 @@ class Settings(BaseSettings):
     # LED-06: how often the worker runs reconciliation for every organisation with a ledger.
     reconciliation_seconds: float = 3600.0
     worker_max_attempts: int = 8
+    # EXE-10: the invariant monitor's cadence, and whether a hit engages the kill switch (on by default).
+    invariant_monitor_seconds: float = 60.0
+    invariant_monitor_kill_switch: bool = True
     # API-04: requests per key per minute (the per-address ceiling is 10 times this).
     api_rate_limit_per_minute: int = 120
     # WHK-03: webhook delivery. Plain http:// and private or loopback addresses are refused unless this is

@@ -60,7 +60,7 @@ requirements:
 - {id: FR-015, area: Intents, layer: decision, status: confirmed, decision: [G-17], stories: [INT-05],
    src: ["spec/02#payment-state-machine", "spec/03#endpoints"],
    text: "An intent can be cancelled by the platform or the payments lead until it is submitted, never after."}
-- {id: FR-016, area: Intents, layer: decision, status: confirmed, decision: [D-04, G-10], stories: [INT-01, POL-03],
+- {id: FR-016, area: Intents, layer: decision, status: confirmed, decision: [D-04, G-10, D-40], stories: [INT-01, POL-03, USR-01, USR-02, USR-03, USR-04],
    src: ["spec/04#user-payouts-payouts-to-the-platforms-own-end-users"],
    text: "A payout to the platform's own end user (account reference instead of counterparty) uses the user payout profile: counterparty KYB, allowlist, first-payment and above-norm checks are skipped; screening, networks, limits, caps and wallet checks apply."}
 

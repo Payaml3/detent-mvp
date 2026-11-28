@@ -312,6 +312,11 @@ OPS: dict[tuple[str, str], tuple[str, str, tuple[int, ...]]] = {
         "PaymentIntent",
         (404, 409),
     ),
+    ("post", "/v1/payment_intents/{payment_id}/cancel"): (
+        "Cancel a payment before it is sent",
+        "PaymentIntent",
+        (404, 409, 422),
+    ),
     ("get", "/v1/payment_intents/{payment_id}/replay"): ("Replay a payment's decisions", "Object", (404,)),
     ("get", "/v1/exceptions"): ("List exceptions", "list:Exception", (422,)),
     ("get", "/v1/exceptions/{case_id}"): ("Get an exception with its raw facts", "ExceptionDetail", (404,)),

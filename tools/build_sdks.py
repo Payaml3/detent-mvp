@@ -31,6 +31,7 @@ NAMES: dict[str, tuple[str, str]] = {
     "getPaymentIntents": ("payment_intents", "list"),
     "getPaymentIntentsPaymentId": ("payment_intents", "retrieve"),
     "postPaymentIntentsPaymentIdSend": ("payment_intents", "send"),
+    "postPaymentIntentsPaymentIdCancel": ("payment_intents", "cancel"),
     "getPaymentIntentsPaymentIdReplay": ("payment_intents", "replay"),
     "postDecisions": ("decisions", "create"),
     "getExceptions": ("exceptions", "list"),

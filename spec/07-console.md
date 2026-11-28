@@ -37,7 +37,8 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
 | **Outbox** | Every mock email or notification: recipient, template, body, time | — | EXC-07 |
 | **Audit** | Event stream with filters; hash-chain status | Verify chain | AUD-01 |
 | **Evaluation** | Latest results.json summary; link to the report | Run suite (demo) | EVL-06 |
-| **Settings** | Mode, fail-safe, deadlines, routing weights | Change mode (needs two roles) | CON-10, EXE-09 |
+| **Incidents** | Incidents by severity, trigger, status, notification time and root cause; one incident's timeline and linked replays; a red Sev 1 banner on every page while one is open | Open (manual), log notification, link a replay, note, root cause, resolve | OPS-01, EXE-10 |
+| **Settings** | Mode, fail-safe, deadlines, routing weights | Change mode or fail-safe (needs two roles); deadlines and weights read-only | CON-10, EXE-09 |
 | **Demo** | Scenario runner: $18,500 invoice; forced timeout; 20-payment batch; close the day; attack sample; reset. Each scenario runs once per demo generation and then shows what it did. Not in the public sandbox | Run; reset (payments lead) | CON-09 |
 
 ## UX rules
@@ -59,3 +60,16 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
   outside world (fictional payers sending deposits, a fault armed on the proxy for the next matching send).
   Idempotent: a second run in the same generation returns the recorded result (`demo.scenario_run`).
 - **Footer:** the hosting and database regions (FND-07).
+
+## As built (L group 1: INT-05, EXE-10, OPS-01, CON-10)
+
+- **Cancel (INT-05, G-17):** payment detail has "Cancel this payment" for the payments lead while the payment is
+  ESCALATED, HELD or READY, with a required reason; the API is `POST /v1/payment_intents/{id}/cancel` (`intents:create`;
+  agent keys are refused). Any other status answers 409 `not_cancellable`. An open case is resolved `cancelled`.
+- **Incidents (OPS-01):** `/console/incidents` and `/console/incidents/{id}` (`detent/console/incidents.py`,
+  `detent/incidents/records.py`). Sev 1 to 4 with notification windows of 1 h, 4 h, 24 h and 5 days; overdue shows in
+  red. A Sev 1 or Sev 2 needs a root cause before it is resolved. On-call and the two leads work incidents.
+- **Sev 1 banner (EXE-10):** every console page shows a red bar linking each open Sev 1.
+- **Settings (CON-10):** the fail-safe is proposed by one lead and approved by the other, like the mode (`mode_changes`
+  now has a `setting` column, migration 0016). Deadlines come from the active rule version and routing weights from
+  the routing defaults and any per-rail overrides; both are read-only.

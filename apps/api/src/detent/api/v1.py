@@ -442,6 +442,49 @@ def send_payment_intent(
         return JSONResponse(payment_view(conn, principal.org_id, payment_id))
 
 
+# ----------------------------------------------------------------------------------- cancel (INT-05)
+@router.post("/payment_intents/{payment_id}/cancel")
+def cancel_payment_intent(
+    request: Request,
+    payment_id: str,
+    body: ResolutionIn,
+    principal: Annotated[Principal, Depends(authenticate)],
+) -> JSONResponse:
+    """Cancel before sending: ESCALATED, HELD or READY only; SUBMITTED or UNKNOWN answers 409."""
+    from detent.intents.cancel import CancelError, cancel_intent
+
+    require(principal, "intents:create")
+    if principal.mandate_id is not None:  # invariant 5: an agent proposes; it never changes a payment's fate
+        return error_response(
+            403, "permission", "insufficient_role", "An agent key cannot cancel a payment.", request_id=_rid()
+        )
+    rt = request.app.state.runtime
+    with rt.engine.connect() as conn:
+        if not visible(conn, "payment_intents", principal.org_id, payment_id):
+            return error_response(404, "not_found", "not_found", "No such payment intent.", request_id=_rid())
+    try:
+        cancel_intent(
+            rt.engine,
+            rt.clock,
+            org_id=principal.org_id,
+            payment_id=payment_id,
+            actor=Actor(principal.user_id, principal.role),
+            reason=body.reason,
+        )
+    except CancelError as exc:
+        kinds: dict[int, ErrorType] = {404: "not_found", 409: "conflict", 422: "invalid_request"}
+        return error_response(
+            exc.status,
+            kinds[exc.status],
+            exc.code,
+            str(exc),
+            request_id=_rid(),
+            param="reason" if exc.status == 422 else None,
+        )
+    with rt.engine.connect() as conn:
+        return JSONResponse(payment_view(conn, principal.org_id, payment_id))
+
+
 # ------------------------------------------------------------------------------- deposits (LED-03)
 @router.post("/deposit_intents", status_code=201)
 def create_deposit_intent_api(

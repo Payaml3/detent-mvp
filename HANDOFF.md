@@ -20,7 +20,8 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | P2 Dashboard and sandbox | done | `main` |
 | P3 Docs and SDKs | done (Mintlify connection and SDK publishing wait on the founder) | `main` |
 | P4 Website launch | built: WEB-02, WEB-07 done; the access form posts to the live deploy. Open: the booking URL (WEB-06), the legal review and the founder's go-live call | `main` |
-| L After launch (Should and Could) | todo | |
+| L After launch (Should and Could) | in progress: group 1 (INT-05, EXE-10, OPS-01, CON-10) built | `main` |
+| U User payouts (D-40, 28 Nov) | todo: USR-01 to USR-04, after L | |
 
 Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
 
@@ -177,7 +178,13 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   the site, fed by `GET /status.json` in `detent/api/status.py`). See spec/08 "As built (P4)". To finish P4: the
   booking URL into `bookingUrl` (WEB-06), the G-19 and legal-pages review, `indexable: true` at go-live (founder), and
   `STATUS_DOCS_URL` on the deploy once the docs are published (an infra change: founder-approved label).
-- **Next:** slice L (after launch, Should and Could). · Model: mid-tier
+- **L group 1: built (PR from `claude/project-thread-zzhxlz`, 2026-11-28):** INT-05 cancel (`detent/intents/cancel.py`,
+  `POST /v1/payment_intents/{id}/cancel`, 409 `not_cancellable`), EXE-10 invariant monitor and OPS-01 incidents
+  (`detent/incidents/`, console Incidents screens, Sev 1 banner, migration 0016), CON-10 fail-safe changes with two
+  leads plus read-only deadlines and weights. See spec/07 "As built (L group 1)" and spec/10 Runbooks.
+- **Next:** L group 2 (shadow: SHD-01, SHD-04, SHD-02, SHD-03, EXC-09, DSH-13), then group 3 (RAL-08 to RAL-10), group 4
+  (AUD-03, OPS-03, OPS-04, DEM-06), then slice U (user payouts, D-40). SHD-03's agreement threshold is not
+  defined anywhere yet: ask the founder. · Model: strongest for EXE/RAL/money paths, mid-tier otherwise
 
 ## Open founder items
 
