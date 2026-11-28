@@ -1407,7 +1407,7 @@ _KYB-gated access: owner invite, team and roles, keys, logs, webhooks, sandbox c
 
 - [x] Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role
 - [x] First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification
-- [ ] Emails go through a transactional email provider in production and the outbox in development
+- [x] Emails go through a transactional email provider in production and the outbox in development
 
 **Priority:** Must · **Estimate:** 0.5 d · **Milestone:** P2 Dashboard and sandbox · **Depends on:** DSH-01 · **Traces to:** D.sales_led
 

@@ -1866,7 +1866,7 @@ stories:
     - "Email verification link; password hashed with argon2; the first user of a client organisation gets the account owner role"
     - "First login shows the onboarding checklist: invite team, create sandbox keys, set up policy, integrate, request verification"
     - "Emails go through a transactional email provider in production and the outbox in development"
-  done: [0, 1]
+  done: [0, 1, 2]
   pri: Must
   est: 0.5
   deps: [DSH-01]

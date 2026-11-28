@@ -4,14 +4,14 @@
    "order": 1,
    "level": "User stories",
    "total": 155,
-   "done": 132,
-   "pct": 85
+   "done": 133,
+   "pct": 86
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 331,
-   "done": 308,
+   "done": 309,
    "pct": 93
   },
   {
@@ -27,7 +27,7 @@
    "function": "00 Founder HQ",
    "measure": "Decisions resolved",
    "done": 49,
-   "total": 99,
+   "total": 100,
    "pct_done": 49
   },
   {
@@ -40,7 +40,7 @@
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 238,
+   "done": 239,
    "total": 254,
    "pct_done": 94
   },
@@ -120,8 +120,8 @@
    "role": "engineer",
    "stories": 13,
    "criteria": 24,
-   "criteria_done": 23,
-   "pct_done": 96
+   "criteria_done": 24,
+   "pct_done": 100
   },
   {
    "code": "EVL",
@@ -1436,9 +1436,9 @@
    "function": "04 Engineering",
    "slice": "P2",
    "criteria": 3,
-   "criteria_done": 2,
+   "criteria_done": 3,
    "criteria_tested": 0,
-   "status": "In progress"
+   "status": "Done"
   },
   {
    "story": "DSH-03",

@@ -399,6 +399,7 @@ def invite(
         to=email,
         template="invite.account_owner" if role == Role.ACCOUNT_OWNER else "invite.member",
         body=body,
+        settings=settings,
     )
     append(
         conn,
