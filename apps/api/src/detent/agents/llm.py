@@ -51,6 +51,23 @@ def _string_args(raw: Any) -> dict[str, str]:
     return {k: v for k, v in dict(raw or {}).items() if isinstance(k, str) and isinstance(v, str)}
 
 
+def schema_key(schema: dict[str, Any]) -> str:
+    return json.dumps(schema, sort_keys=True)
+
+
+def _schema_note(schema: dict[str, Any]) -> str:
+    return (
+        "\n\nAnswer with one JSON object only, no other text, that matches this JSON schema:\n"
+        + json.dumps(schema, separators=(",", ":"))
+    )
+
+
+def _json_text(text: str) -> str:
+    """The JSON object in an unconstrained answer: code fences and any text around it are dropped."""
+    start, end = text.find("{"), text.rfind("}")
+    return text[start : end + 1] if start != -1 and end > start else text
+
+
 # Read-only tools the model may call while extracting; the handler runs them and returns JSON text.
 ToolHandler = Callable[[str, dict[str, Any]], str]
 
@@ -80,9 +97,9 @@ class LLMClient(Protocol):
 
 
 class AnthropicLLM:
-    """Claude through the Anthropic SDK: structured output (a JSON schema), read-only tools (not
-    strict; inputs are checked here), and the server-side refusal fallback.
-    No sampling parameters are sent."""
+    """Claude through the Anthropic SDK: structured output (a JSON schema; plain JSON checked by the
+    caller when the API finds the schema's grammar too large), read-only tools (not strict; inputs
+    are checked here), and the server-side refusal fallback. No sampling parameters are sent."""
 
     MAX_TOOL_TURNS = 6
 
@@ -95,6 +112,7 @@ class AnthropicLLM:
             if api_key
             else anthropic.Anthropic(timeout=timeout_seconds)
         )
+        self._too_large: set[str] = set()  # schemas the API refused to compile; asked for as plain JSON
 
     def complete(
         self,
@@ -110,20 +128,33 @@ class AnthropicLLM:
         messages: list[dict[str, Any]] = [{"role": "user", "content": user}]
         tokens_in = tokens_out = 0
         served = model
+        constrained = schema_key(schema) not in self._too_large
         for _ in range(self.MAX_TOOL_TURNS + 1):
             kwargs: dict[str, Any] = {
                 "model": model,
                 "max_tokens": 16000,
-                "system": system,
+                "system": system if constrained else system + _schema_note(schema),
                 "messages": messages,
-                "output_config": {"format": {"type": "json_schema", "schema": schema}},
                 # On a safety decline, the API re-runs the request on a fallback model in the same call.
                 "betas": ["server-side-fallback-2026-07-01"],
                 "fallbacks": "default",
             }
+            if constrained:
+                kwargs["output_config"] = {"format": {"type": "json_schema", "schema": schema}}
             if tools:
                 kwargs["tools"] = tools
-            resp = self._client.beta.messages.create(**kwargs)
+            try:
+                resp = self._client.beta.messages.create(**kwargs)
+            except self._anthropic.BadRequestError as exc:
+                # The API compiles the schema into a grammar and refuses one it finds too large. The
+                # answer is then requested as plain JSON and checked by the caller's own validation.
+                if not constrained or "grammar" not in describe_error(exc).lower():
+                    raise
+                self._too_large.add(schema_key(schema))
+                constrained = False
+                kwargs.pop("output_config")
+                kwargs["system"] = system + _schema_note(schema)
+                resp = self._client.beta.messages.create(**kwargs)
             tokens_in += int(resp.usage.input_tokens)
             tokens_out += int(resp.usage.output_tokens)
             served = str(resp.model)
@@ -144,6 +175,8 @@ class AnthropicLLM:
                 messages.append({"role": "user", "content": results})
                 continue
             text = next((b.text for b in resp.content if b.type == "text"), "")
+            if not constrained:
+                text = _json_text(text)
             return LLMResult(
                 text, model, served, tokens_in, tokens_out, int((time.perf_counter() - started) * 1000)
             )
