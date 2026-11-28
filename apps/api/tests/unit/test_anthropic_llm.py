@@ -68,3 +68,22 @@ def test_a_refusal_is_an_error_never_a_proposal() -> None:
     a, _ = llm_with([reply("refusal", [])])
     with pytest.raises(RuntimeError, match="declined"):
         a.complete(model="claude-sonnet-5-5", system="s", user="u", schema=SCHEMA)
+
+
+def test_describe_error_gives_the_api_reason_without_secrets() -> None:
+    from detent.agents.llm import describe_error
+
+    class BadRequestError(Exception):
+        status_code = 400
+
+        def __init__(self, msg: str) -> None:
+            super().__init__(msg)
+            self.body = {
+                "type": "error",
+                "error": {"type": "invalid_request_error", "message": "tools.0: bad field"},
+            }
+
+    assert describe_error(BadRequestError("x")) == "BadRequestError (400): tools.0: bad field"
+    leaked = RuntimeError("key sk-ant-api03-abcdefghijk rejected")
+    assert "abcdefghijk" not in describe_error(leaked)
+    assert describe_error(RuntimeError()) == "RuntimeError"

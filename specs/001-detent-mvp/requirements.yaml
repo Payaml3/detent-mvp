@@ -332,7 +332,7 @@ requirements:
 - {id: FR-110, area: SDKs, layer: portal, status: confirmed, stories: [SDK-01, SDK-02, SDK-03],
    src: ["spec/08#sdks-sdk"],
    text: "Python and TypeScript SDKs from the OpenAPI file add idempotency keys automatically, retry only safe cases with the same key, and verify webhooks; (Should) Postman collection."}
-- {id: FR-111, area: Website, layer: portal, status: confirmed, stories: [WEB-01, WEB-02, WEB-03, WEB-04, WEB-05, WEB-06, WEB-07, WEB-08],
+- {id: FR-111, area: Website, layer: portal, status: confirmed, stories: [WEB-01, WEB-02, WEB-03, WEB-04, WEB-05, WEB-06, WEB-07, WEB-08, WEB-09],
    src: ["spec/08#website-web", "spec/00#honesty-rules-product-docs-and-website", "spec/product-definition.md#rules-for-wording"],
    text: "The marketing site has the eleven home sections and three sub-pages, dated results, booking and access form, legal pages, status page and SEO basics, and passes the honesty checklist."}
 - {id: FR-112, area: Website, layer: portal, status: confirmed, decision: [C-18], stories: [WEB-01, OPS-02],

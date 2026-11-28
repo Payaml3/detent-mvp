@@ -28,7 +28,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import Connection, Engine, text
 
-from detent.agents.llm import LLMClient, LLMResult
+from detent.agents.llm import LLMClient, LLMResult, describe_error
 from detent.agents.tools import TOOLS, run_tool
 from detent.audit.log import Actor, append
 from detent.clock import Clock
@@ -536,7 +536,7 @@ def propose_from_invoice(
                 pid,
                 "needs_human",
                 _empty(),
-                [{"code": "MODEL_UNAVAILABLE", "detail": type(exc).__name__, "fields": []}],
+                [{"code": "MODEL_UNAVAILABLE", "detail": describe_error(exc), "fields": []}],
                 True,
                 mandate_id,
             )

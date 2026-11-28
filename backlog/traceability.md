@@ -34,7 +34,7 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | A4.fee | Product model A4 | Software fee per payment, not a share of money moved (usage metering) | partly | LED-08 |
 | A4.plans | Product model A4 | Plans: Pilot, Growth, Scale, routing add-on (no free shadow report, B-04) | partly | SHD-02, WEB-01 |
 | A5.proposes | Product model A5 | The LLM proposes; the policy layer decides; uncertain fields flagged, never guessed | mvp | MND-02, AGT-01, AGT-02, CON-05, EVL-04 |
-| A5.tools | Product model A5 | Agent tools are read-only; nothing that moves money | mvp | AGT-03, EXC-03, CON-11 |
+| A5.tools | Product model A5 | Agent tools are read-only; nothing that moves money | mvp | AGT-03, EXC-03, CON-11, WEB-09 |
 | A5.injection | Product model A5 | Free text is data, never instructions; tested by attack suite | mvp | AGT-04, EVL-02 |
 | A5.citations | Product model A5 | Every agent claim cites evidence or isn't shown | mvp | AGT-05, EXC-03 |
 | A5.gate | Product model A5 | Regression gate: 100+ attack scenarios before every release | mvp | FND-09, EVL-01, EVL-02, EVL-07 |
@@ -120,6 +120,6 @@ Status: **mvp** built in this MVP · **partly** software part built now, rest la
 | D.abuse | Developer portal 5 | Abuse limits: rate limits, daily caps, wallet limits, expiring keys | mvp | AGT-06, API-04, DSH-03, SBX-02 |
 | D.standards | Developer portal 6 | API standards: auth, idempotency, errors, pagination, versioning, rate limits | mvp | INT-02, INT-03, EXC-08, API-01, API-02, API-03, API-04, API-05, API-07, DOC-06 |
 | D.ops_pages | Developer portal 1/7 | Status page, legal pages, analytics, booking and access form | mvp | DSH-10, WEB-05, WEB-06, WEB-07 |
-| BR.category | facts.md 16 and 17 Nov | Category wording: 'agentic payment controls' in three layers (decision, orchestration, operations); never 'payments company' | mvp | CON-01, DOC-02, WEB-01, WEB-08 |
+| BR.category | facts.md 16 and 17 Nov | Category wording: 'agentic payment controls' in three layers (decision, orchestration, operations); never 'payments company' | mvp | CON-01, DOC-02, WEB-01, WEB-08, WEB-09 |
 
 Coverage check: every **mvp** and **partly** item has at least one story (enforced by the build script). mvp: 79, partly: 22, later: 7, non-software: 9

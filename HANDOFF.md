@@ -210,7 +210,7 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 
 ## Open founder items
 
-- **Email (D-42, 2026-11-28):** Zoho Mail Lite for sales@ (steps in the project file `domain/zoho-mail-setup.md`)
+- **Email (D-43, 2026-11-28):** Zoho Mail Lite for sales@ (steps in the project file `domain/zoho-mail-setup.md`)
   and ZeptoMail for platform email (built: `dashboard/email_delivery.py`). To switch it on, in Coolify's `app`
   service: `EMAIL_PROVIDER=zeptomail`, `ZEPTOMAIL_TOKEN=<send token>`, `SALES_INBOX=sales@dekernai.com`; the
   worker sends. ZeptoMail must verify dekernai.com and approve the account first.

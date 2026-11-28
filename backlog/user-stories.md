@@ -1723,7 +1723,7 @@ _Payouts to the platform's own end users, under the user payout profile_ · laye
 
 ## WEB · Marketing site
 
-_A public face that looks real and stays honest_ · layer: Go-to-market · track: portal · 8 stories · 3.75 days
+_A public face that looks real and stays honest_ · layer: Go-to-market · track: portal · 9 stories · 4 days
 
 ### WEB-01 · Home page
 
@@ -1807,3 +1807,13 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 - [x] Titles pair the name with 'payment controls'; sitemap.xml; OG images; schema.org Organization and SoftwareApplication
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** WEB-01 · **Traces to:** BR.category, D.site
+
+### WEB-09 · AI team section
+
+**As a** founder, **I want** a home-page section that explains the three AI agents clients get with the service, how they work and what each adds, **so that** buyers see the AI team as part of what they receive, and that the agents only propose while their rules decide.
+
+**Acceptance criteria**
+
+- [x] The home page has an AI team section after the rules demo: the instruction, investigation and reconciliation agents with what each does, what the client gets and what it can't do; orchestration has no agent; the built-in limits; the same names as the console
+
+**Priority:** Should · **Estimate:** 0.25 d · **Milestone:** T AI team view · **Depends on:** WEB-01, CON-11 · **Traces to:** A5.tools, BR.category

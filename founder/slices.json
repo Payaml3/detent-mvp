@@ -207,7 +207,7 @@
    "name": "AI team view",
    "status": "",
    "goal": "Clients see their DekernAI agents as an AI team: limits, work and the people who decided on it (founder ask, 28 Nov).",
-   "exit": "The console and dashboard show the three agents with their limits and their latest work, each item with who resolved, approved or rejected it and what the policy decided; the page is read-only."
+   "exit": "The console and dashboard show the three agents with their limits and their latest work, each item with who resolved, approved or rejected it and what the policy decided; the page is read-only. The home page explains the AI team as part of the service."
   }
  ],
  "stories": [
@@ -1258,6 +1258,13 @@
    "id": "WEB-08",
    "epic": "WEB",
    "slice": "P4",
+   "criteria": 1,
+   "done": 1
+  },
+  {
+   "id": "WEB-09",
+   "epic": "WEB",
+   "slice": "T",
    "criteria": 1,
    "done": 1
   },

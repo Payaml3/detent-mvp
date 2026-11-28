@@ -1,0 +1,79 @@
+---
+import config from "../../site.config.mjs";
+// The client's AI team (CON-11, spec/08 "AI team"): the three AI agents that come with the service, what each one
+// does for the client, and what it can never do. Agents work in decision and operations; orchestration has none
+// (invariants 5 and 6). Same names as the console's AI team page.
+const agents = [
+  { short: "Ins", name: "Instruction agent", layer: "Decision",
+    does: "Reads a supplier invoice or payout request and prepares the payment: payee, amount, currency, network and wallet, each field quoted from the source.",
+    value: "Nobody retypes invoices. Anything unclear is flagged for a person, never guessed.",
+    limit: "Works only inside a signed mandate: named payees, a limit per payment and a total." },
+  { short: "Inv", name: "Investigation agent", layer: "Operations",
+    does: "When your rules hold a payout, it gathers the evidence: the payee’s history, recent destination changes and earlier decisions. Every claim cites its source; uncited claims are removed.",
+    value: "Your reviewer opens the case with the notes already written and decides faster.",
+    limit: "It recommends; your reviewer approves or rejects, and approving runs your rules again." },
+  { short: "Rec", name: "Reconciliation agent", layer: "Operations",
+    does: "When the ledger and a rail disagree, it proposes the fix: which payment a stray deposit belongs to, or which account to credit, with its reasoning.",
+    value: "Every break arrives with a proposed answer, not a blank row in a spreadsheet.",
+    limit: "Only your payments lead applies a fix, and it is written as a new ledger entry." },
+];
+const limits = [
+  "Read-only tools, apart from each agent’s one proposal",
+  "Invoice text, names and notes are treated as data, never as instructions",
+  "A daily AI budget you can see",
+  "Every agent call is recorded and replays without calling the model",
+];
+---
+<section class="section ai-team" id="ai-team" data-section="ai-team" aria-labelledby="ai-team-title">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <h2 id="ai-team-title">Your AI team comes with the service.</h2>
+      <p class="lead">{config.brandName} includes three AI agents that do the groundwork your payments team does by hand today. They read, check and draft. Your rules make every decision, and your people answer what the rules escalate.</p>
+    </div>
+    <ol class="team">
+      {agents.map((a, i) => (
+        <li class="member" data-agent={a.short.toLowerCase()} data-reveal style={`--d:${i * 90}ms`}>
+          <p class="who"><span class="hex" aria-hidden="true">{a.short}</span><span><strong>{a.name}</strong><span class="layer">{a.layer} layer</span></span></p>
+          <p>{a.does}</p>
+          <dl>
+            <div><dt>What you get</dt><dd>{a.value}</dd></div>
+            <div><dt>What it can’t do</dt><dd>{a.limit}</dd></div>
+          </dl>
+        </li>
+      ))}
+    </ol>
+    <div class="foot" data-reveal>
+      <p class="none" data-layer="orchestration"><strong>Orchestration has no agent.</strong> Routing, sending exactly once and failover follow your rules only, so no AI ever moves money.</p>
+      <div class="limits">
+        <p class="small soft">Built-in limits for every agent</p>
+        <ul>{limits.map((l) => <li>{l}</li>)}</ul>
+      </div>
+      <p class="small soft see">In your console, the AI team page shows each agent’s limits, its recent work, and who on your team accepted or rejected it.</p>
+    </div>
+  </div>
+</section>
+<style>
+  .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
+  .head h2 { grid-column: 1 / span 6; }
+  .head .lead { grid-column: 7 / span 6; color: var(--text-soft); }
+  .team { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .member { padding: 32px; display: grid; gap: 18px; align-content: start; background: var(--surface); border-radius: var(--radius); }
+  .who { display: flex; gap: 14px; align-items: center; }
+  .who strong { display: block; font: 600 clamp(20px, 1.7vw, 24px)/1.2 var(--font-head); letter-spacing: -0.01em; }
+  .layer { display: block; color: var(--text-soft); font-size: var(--t-small); }
+  .hex { flex: none; display: grid; place-items: center; width: 46px; height: 52px; font: 600 15px var(--font-head);
+    color: var(--on-signal); background: var(--signal);
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+  dl { margin: 0; display: grid; gap: 14px; }
+  dt { font-size: var(--t-small); font-weight: 600; color: var(--text-soft); margin-bottom: 2px; }
+  dd { margin: 0; }
+  .foot { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-top: 32px; align-items: start; }
+  .none { grid-column: 1 / span 5; padding: 24px; border: 1px dashed var(--text-soft); border-radius: var(--radius); }
+  .limits { grid-column: 6 / span 4; }
+  .limits ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+  .see { grid-column: 10 / span 3; }
+  @media (max-width: 960px) {
+    .head h2, .head .lead, .none, .limits, .see { grid-column: 1 / -1; }
+    .team { grid-template-columns: 1fr; }
+  }
+</style>

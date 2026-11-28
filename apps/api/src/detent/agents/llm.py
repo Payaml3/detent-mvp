@@ -10,11 +10,39 @@ Model IDs always come from settings (``model_agent``, ``model_light``, ``model_e
 from __future__ import annotations
 
 import json
+import logging
+import re
 import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
+
+_log = logging.getLogger("detent.agents")
+_KEYISH = re.compile(r"\bsk[-_][A-Za-z0-9_-]{6,}")
+
+
+def describe_error(exc: BaseException) -> str:
+    """A short, secret-free reason for a failed model call, for the MODEL_UNAVAILABLE flag and the log.
+
+    An API error carries the API's own message (for example which request field it rejected or that the
+    credit balance is too low); without it a person cannot tell why the agent handed over.
+    """
+    name = type(exc).__name__
+    message = ""
+    body = getattr(exc, "body", None)
+    if isinstance(body, dict):
+        err = body.get("error")
+        if isinstance(err, dict) and isinstance(err.get("message"), str):
+            message = err["message"]
+    if not message:
+        message = str(exc)
+    message = _KEYISH.sub("[REDACTED]", " ".join(message.split()))[:300]
+    status = getattr(exc, "status_code", None)
+    reason = f"{name} ({status}): {message}" if status else (f"{name}: {message}" if message else name)
+    _log.warning("model call failed: %s", reason)
+    return reason
+
 
 # Read-only tools the model may call while extracting; the handler runs them and returns JSON text.
 ToolHandler = Callable[[str, dict[str, Any]], str]
