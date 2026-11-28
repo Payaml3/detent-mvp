@@ -370,6 +370,10 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 
 - **AI team:** the dashboard navigation has "AI team", which opens the console's AI team page (`/console/agents`,
   spec/07) for the member's own organisation; `/dashboard/ai-team` and `/dashboard/agents` redirect there.
+- **Website AI team section (WEB-09):** the home page has "Your AI team comes with the service." after the rules
+  demo (`apps/site/src/components/AiTeam.astro`): the three AI agents, each with what it does, what the client gets
+  and what it can't do, a note that orchestration has no agent, and the built-in limits. The spine's orchestration
+  column now says no agent works there, matching the product (the investigation agent runs on held payout cases).
 
 ## Needed from the founder before M8 to M11
 

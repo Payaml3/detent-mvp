@@ -3,21 +3,21 @@
   {
    "order": 1,
    "level": "User stories",
-   "total": 154,
-   "done": 131,
+   "total": 155,
+   "done": 132,
    "pct": 85
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
-   "total": 330,
-   "done": 307,
+   "total": 331,
+   "done": 308,
    "pct": 93
   },
   {
    "order": 3,
    "level": "Criteria with test evidence",
-   "total": 330,
+   "total": 331,
    "done": 0,
    "pct": 0
   }
@@ -54,8 +54,8 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 22,
-   "total": 23,
+   "done": 23,
+   "total": 24,
    "pct_done": 96
   }
  ],
@@ -244,10 +244,10 @@
    "code": "WEB",
    "initiative": "Marketing site",
    "role": "growth",
-   "stories": 8,
-   "criteria": 11,
-   "criteria_done": 10,
-   "pct_done": 91
+   "stories": 9,
+   "criteria": 12,
+   "criteria_done": 11,
+   "pct_done": 92
   },
   {
    "code": "WHK",
@@ -1755,6 +1755,16 @@
    "epic": "WEB",
    "function": "06 GTM",
    "slice": "P4",
+   "criteria": 1,
+   "criteria_done": 1,
+   "criteria_tested": 0,
+   "status": "Done"
+  },
+  {
+   "story": "WEB-09",
+   "epic": "WEB",
+   "function": "06 GTM",
+   "slice": "T",
    "criteria": 1,
    "criteria_done": 1,
    "criteria_tested": 0,

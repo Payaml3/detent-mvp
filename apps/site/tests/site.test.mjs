@@ -55,7 +55,7 @@ test("home: category wording, Book a demo as the main action, Request access bes
 });
 
 test("home: the sections of docs/design/landing-page-ux.md, in order", () => {
-  const order = ["hero", "problem", "spine", "use-cases", "rules", "irreversible", "roles", "onboarding", "faq", "close", "footer"];
+  const order = ["hero", "problem", "spine", "use-cases", "rules", "ai-team", "irreversible", "roles", "onboarding", "faq", "close", "footer"];
   const found = [...read(PAGES.home).matchAll(/data-section="([a-z-]+)"/g)].map((m) => m[1]);
   assert.deepEqual(found.filter((s) => order.includes(s)), order);
 });
@@ -64,6 +64,15 @@ test("home: the rules decide, said once, and never the AI", () => {
   const t = text(read(PAGES.home));
   assert.match(t, /Agents prepare\. Your rules decide\./);
   assert.ok(!/\b(AI|agent)s? (decides?|approves?)\b/i.test(t.replace(/Does the AI approve payments\?/, "")), "no copy says the AI decides or approves");
+});
+
+test("home: the AI team, the three agents with what each does and can't do; orchestration has none (CON-11)", () => {
+  const section = text(read(PAGES.home).split('data-section="ai-team"')[1].split("data-section=")[0]);
+  for (const name of ["Instruction agent", "Investigation agent", "Reconciliation agent"]) assert.match(section, new RegExp(name));
+  assert.match(section, /comes with the service/);
+  assert.match(section, /Orchestration has no agent/);
+  assert.equal((section.match(/What you get/g) || []).length, 3);
+  assert.equal((section.match(/What it can’t do/g) || []).length, 3);
 });
 
 test("home: the demonstration's scenarios are readable without JavaScript", () => {

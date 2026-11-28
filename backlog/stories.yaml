@@ -2343,6 +2343,21 @@ stories:
   trace: [BR.category, D.site]
   ms: P4
 
+- id: WEB-09
+  epic: WEB
+  title: AI team section
+  as: founder
+  want: a home-page section that explains the three AI agents clients get with the service, how they work and what each adds
+  so: buyers see the AI team as part of what they receive, and that the agents only propose while their rules decide
+  ac:
+    - "The home page has an AI team section after the rules demo: the instruction, investigation and reconciliation agents with what each does, what the client gets and what it can't do; orchestration has no agent; the built-in limits; the same names as the console"
+  pri: Should
+  est: 0.25
+  done: [0]
+  deps: [WEB-01, CON-11]
+  trace: [A5.tools, BR.category]
+  ms: T
+
 # ---------------- USR User payouts (slice U, founder D-40) ----------------
 - id: USR-01
   epic: USR
