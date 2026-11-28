@@ -1,4 +1,4 @@
-"""The ``email.send`` job: sends one outbox email through Zoho ZeptoMail (EU), then records the outcome.
+"""The ``email.send`` job: sends one outbox email through Zoho ZeptoMail (UK), then records the outcome.
 
 - 2xx: ``sent_at`` and the provider's request ID are stored.
 - 429, 5xx, a timeout or a connection error: the job raises, so the worker retries it with backoff.

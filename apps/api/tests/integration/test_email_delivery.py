@@ -89,7 +89,7 @@ def test_zeptomail_sends_once_from_the_job(
     row = _row(engine, org, mid)
     assert row.sent_at is not None and row.provider_message_id == "zm_123" and row.last_error is None
     (call,) = fake.calls
-    assert call["url"] == "https://api.zeptomail.eu/v1.1/email"
+    assert call["url"] == "https://api.zeptomail.uk/v1.1/email"
     assert call["headers"]["Authorization"] == f"Zoho-enczapikey {TOKEN}"
     body = call["json"]
     assert body["from"] == {"address": "notifications@dekernai.com", "name": "DekernAI"}
