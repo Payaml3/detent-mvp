@@ -9,7 +9,7 @@ const layers = [
     agent: "Prepares the payment intent from the invoice or request.", status: "ESCALATED" },
   { word: "Settle", name: "Orchestration", question: "How and where does it go?",
     rules: "Best rail by your policy, sent exactly once. A timeout is UNKNOWN, never resent.",
-    agent: "Investigates an UNKNOWN result against the rail’s own record.", status: "SUBMITTED" },
+    agent: "None here: routing, sending and failover follow your rules only.", status: "SUBMITTED" },
   { word: "Prove", name: "Operations", question: "Can you show what happened?",
     rules: "Every outcome reconciled across rails and written to an append-only audit log.",
     agent: "Drafts the reconciliation fix for a person to accept.", status: "CONFIRMED" },

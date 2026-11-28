@@ -54,6 +54,7 @@ NAV       DekernAI · Product · Solutions · Security · Developers · Onboardi
 1 HERO    Headline + category line · CTA pair · live example payment (kept) · honesty strip
 2 PROBLEM On rails you can't reverse, every mistake is permanent (4 pains)
 3 SPINE   Sift. Settle. Prove.  the three layers, one payment ID, "agents prepare, your rules decide"
+  AI TEAM Your AI team comes with the service: three agents, what each does and can't do (CON-11)
 4 PROOF   Built for payments you can't take back  (irreversible demo, kept)
 5 ROLES   Tabs: Payments · Compliance · Engineering  (absorbs Developers + Security)
 6 ONBOARD Seven onboarding phases, owners and exit checks; plans "Talk to us" (B-04)
@@ -90,10 +91,17 @@ Three columns that read left to right as one payment's life, with the same `pay_
 |---|---|---|---|
 | Question | Should this payment happen? | How and where does it go? | Can you show what happened? |
 | Your rules | Execute, escalate or block | Best rail by policy; sent exactly once | Every outcome reconciled and audited |
-| Agents do the groundwork | Prepare the intent from the invoice | Investigate an UNKNOWN result | Draft the reconciliation fix |
+| Agents do the groundwork | Prepare the intent from the invoice | None: routing and sending follow the rules only | Draft the reconciliation fix |
 
 One statement across the section, said only here: **"Agents prepare. Your rules decide."** This replaces both
 "How it works" and "Three layers".
+
+### 3b. AI team: "Your AI team comes with the service." (CON-11, added 28 Nov)
+
+After the rules demo. The three AI agents a client gets, with the same names as the console's AI team page:
+the instruction agent (decision), the investigation and reconciliation agents (operations). Each card says what the
+agent does, what the client gets and what it can't do. A note says orchestration has no agent, then the built-in
+limits (read-only tools, untrusted text as data, a daily AI budget, recorded calls that replay without the model).
 
 ### 4. Proof: "Built for payments you can't take back."
 

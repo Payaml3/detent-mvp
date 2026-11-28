@@ -515,3 +515,5 @@ CON-11:
   0: ["integration/test_ai_team.py::test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide"]
   1: ["integration/test_ai_team.py::test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide", "integration/test_ai_team.py::test_an_investigation_shows_who_approved_the_case", "integration/test_ai_team.py::test_reconciliation_fixes_show_the_payments_leads_decision", "integration/test_ai_team.py::test_the_overview_map_shows_work_waiting_for_a_person"]
   2: ["integration/test_ai_team.py::test_the_page_shows_three_agents_their_limits_and_that_the_rules_decide", "integration/test_ai_team.py::test_a_dashboard_member_reaches_the_ai_team_without_demo_links"]
+WEB-09:
+  0: ["ci:apps/site/tests/site.test.mjs home: the AI team, the three agents with what each does and can't do; orchestration has none (CON-11)", "ci:apps/site/tests/site.test.mjs home: the sections of docs/design/landing-page-ux.md, in order"]
