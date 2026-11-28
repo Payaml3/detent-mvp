@@ -54,14 +54,18 @@ def ensure_org(conn: Connection, rt: Runtime, org_id: str, name: str, **kw: Any)
     return created is not None
 
 
-def seed_demo(rt: Runtime, fixture: Path = FIXTURE, *, org_id: str | None = None) -> dict[str, int]:
+def seed_demo(
+    rt: Runtime, fixture: Path = FIXTURE, *, org_id: str | None = None, policy: str | None = None
+) -> dict[str, int]:
     """Seed the fictional demo platform. ``org_id`` seeds another organisation from the same fixtures (a
-    later demo generation, CON-09 reset); its user IDs carry the organisation's suffix (DEM-01)."""
+    later demo generation, CON-09 reset); its user IDs carry the organisation's suffix (DEM-01). A scenario
+    pack (DEM-06) passes its own fixture and rule-set text."""
     from detent.demo.generations import demo_user_id
 
     data = yaml.safe_load(fixture.read_text())
     plat = data["platform"]
     org_id = org_id or plat["org_id"]
+    plat = {"mode": "auto", "fail_safe": "manual_queue", **plat}
     users_added = 0
     with transaction(rt.engine) as conn:
         orgs_added = int(
@@ -101,7 +105,7 @@ def seed_demo(rt: Runtime, fixture: Path = FIXTURE, *, org_id: str | None = None
         ).first()
         if has_policy is None:
             install_ruleset(
-                conn, rt.clock, org_id, load_ruleset(POLICY.read_text()), proposed_by="system:seed"
+                conn, rt.clock, org_id, load_ruleset(policy or POLICY.read_text()), proposed_by="system:seed"
             )
         if orgs_added or users_added:
             append(

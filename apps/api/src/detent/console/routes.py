@@ -287,7 +287,6 @@ def edit_destination(
 
 # ---------------------------------------------------------------------------------- S3: review loop
 SECTIONS_NOT_BUILT = {
-    "audit": ("Audit", "Searchable audit log, replay and evidence export (AUD-02, AUD-03)."),
     "evaluation": ("Evaluation", "Release-gate suites and the results report (EVL, slice S8)."),
 }
 
@@ -1397,11 +1396,13 @@ def demo_page(
 ) -> HTMLResponse:
     demo_only(user)
     from detent.demo.generations import current_generation
+    from detent.demo.packs import current_pack, packs
     from detent.demo.scenarios import SCENARIOS, recorded
 
     _demo_enabled(rt)
     with rt.engine.connect() as conn:
         gen = current_generation(conn, rt.settings.demo_org_id)
+        pack = current_pack(conn, user.org_id)
     results = {sid: recorded(rt, user.org_id, sid) for sid in SCENARIOS if sid != "reset"}
     return page(
         request,
@@ -1411,6 +1412,8 @@ def demo_page(
         scenarios=list(SCENARIOS.values()),
         results=results,
         generation=gen,
+        packs=packs(),
+        pack=pack,
         flash=request.query_params.get("result"),
         error=request.query_params.get("error"),
     )
@@ -1458,6 +1461,47 @@ def demo_run(
         return RedirectResponse("/console/act-as", status_code=303)
     note = " ".join(result.lines)[:600]
     return RedirectResponse(f"/console/demo?result={quote(note)}#{scenario_id}", status_code=303)
+
+
+@router.post("/demo/reset")
+def demo_reset_pack(
+    request: Request,
+    pack: str = Form("default"),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    """DEM-06: reset into a chosen scenario pack (payments lead only, like every reset)."""
+    demo_only(user)
+    from urllib.parse import quote
+
+    from detent.demo.generations import ResetRefused, reset_demo
+
+    _demo_enabled(rt)
+    try:
+        reset_demo(rt, actor=Actor(user.id, user.role.value), pack=pack)
+    except ResetRefused as exc:
+        return RedirectResponse(f"/console/demo?error={quote(str(exc)[:400])}", status_code=303)
+    request.session.pop("user_id", None)  # the new generation has its own users
+    return RedirectResponse("/console/act-as", status_code=303)
+
+
+@router.post("/demo/pack-batch")
+def demo_pack_batch(
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    user: ActingUser = Depends(acting_user),  # noqa: B008
+) -> RedirectResponse:
+    """DEM-06: run the current pack's short batch through the rules."""
+    demo_only(user)
+    from urllib.parse import quote
+
+    from detent.demo.packs import current_pack, run_pack_batch
+
+    _demo_enabled(rt)
+    with rt.engine.connect() as conn:
+        pack = current_pack(conn, user.org_id)
+    rows = run_pack_batch(rt, user.org_id, Actor(user.id, user.role.value), pack)
+    note = "; ".join(f"{r['ref']} {r['outcome']} (expected {r['expected']})" for r in rows)
+    return RedirectResponse(f"/console/demo?result={quote(note[:600])}", status_code=303)
 
 
 # ------------------------------------------------------------------------------------- AUD-02 replay

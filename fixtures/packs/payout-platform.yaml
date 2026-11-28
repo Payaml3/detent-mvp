@@ -1,0 +1,49 @@
+# DEM-06 scenario pack: a payout platform paying creators and suppliers by instant bank transfer.
+# Every name is invented and fictional. Selectable on reset (console Demo, or detent demo reset --pack).
+id: payout-platform
+label: "Payout platform"
+description: "Creator and supplier payouts in GBP and EUR over instant bank rails."
+platform: {name: "Creator Payouts Ltd (fictional)", mode: auto, fail_safe: manual_queue,
+           registered_account: "GB00 CRTR 0000 0000 0000 00 (fictional)"}
+policy_overrides: {}
+users:
+  - {id: usr_pl, name: "Priya (payments lead)", role: payments_lead}
+  - {id: usr_cl, name: "Marco (compliance lead)", role: compliance_lead}
+  - {id: usr_rv, name: "Sam (reviewer)", role: reviewer}
+  - {id: usr_bo, name: "Lea (backup owner)", role: backup_owner}
+  - {id: usr_oc, name: "DekernAI on-call", role: oncall}
+counterparties:
+  - id: cpt_ember
+    contact_email: "payouts@ember.example.invalid"
+    name: "Ember Studio Ltd (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: GB
+    history: {payment_count: 20, median_amount: {amount: "400.00", currency: GBP}}
+    destinations:
+      - {id: dst_ember_acct, kind: bank_account, network: banksim-fps, sort_code_masked: "**-**-11", first_seen_days_ago: 300, last_changed_days_ago: 300}
+  - id: cpt_fjord
+    contact_email: "payouts@fjord.example.invalid"
+    name: "Fjord Audio GmbH (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: DE
+    history: {payment_count: 15, median_amount: {amount: "600.00", currency: EUR}}
+    destinations:
+      - {id: dst_fjord_iban, kind: bank_account, network: banksim-sepa-inst, iban_masked: "DE44 **** **** 1200", first_seen_days_ago: 250, last_changed_days_ago: 2}   # CHANGED_DETAILS
+  - id: cpt_sanctioned
+    contact_email: "payouts@sanctioned.example.invalid"
+    name: "Example Sanctioned Trading Co (fictional)"   # on the mock screening list
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: XX
+    history: {payment_count: 4, median_amount: {amount: "300.00", currency: GBP}}
+    destinations:
+      - {id: dst_sanctioned_acct, kind: bank_account, network: banksim-fps, sort_code_masked: "**-**-99", first_seen_days_ago: 90, last_changed_days_ago: 90}
+user_accounts: []
+batch:
+  - {ref: pp1, counterparty: cpt_ember, amount: "450.00", currency: GBP, expect: EXECUTE}
+  - {ref: pp2, counterparty: cpt_ember, amount: "380.00", currency: GBP, expect: EXECUTE}
+  - {ref: pp3, counterparty: cpt_fjord, amount: "640.00", currency: EUR, expect: ESCALATE, reason: CHANGED_DETAILS}
+  - {ref: pp4, counterparty: cpt_ember, amount: "2600.00", currency: GBP, expect: ESCALATE, reason: ABOVE_NORM}
+  - {ref: pp5, counterparty: cpt_sanctioned, amount: "300.00", currency: GBP, expect: BLOCK, reason: SCREENING_HIT}

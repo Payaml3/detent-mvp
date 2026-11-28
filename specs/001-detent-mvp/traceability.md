@@ -1000,7 +1000,7 @@ Sources: [spec/03 §endpoints](../../spec/03-api.md#endpoints); [AUD-02 criteria
 | [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 0 | Console button and GET /v1/payment_intents/{id}/replay | done | `integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision`<br>`integration/test_console_ledger.py::test_payment_detail_has_replay_and_postings` |
 | [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 1 | Replay uses stored inputs and stored agent outputs and must reproduce the recorded decision; a mismatch raises an alert | done | `integration/test_replay.py::test_a_mismatch_raises_an_alert`<br>`integration/test_replay.py::test_decisions_cannot_be_edited`<br>`integration/test_agent_submit.py::test_agent_payment_replays_from_stored_output_without_a_model` |
 | [AUD-02](../../backlog/user-stories.md#aud-02) | S7 | 2 | Every payment in the demo data replays successfully (test) | done | `integration/test_replay.py::test_every_demo_payment_replays_to_its_recorded_decision` |
-| [AUD-03](../../backlog/user-stories.md#aud-03) | L | 0 | JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result | planned | integration: `apps/api/tests/integration/test_aud_03.py` |
+| [AUD-03](../../backlog/user-stories.md#aud-03) | L | 0 | JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result | done | `integration/test_evidence.py::test_pack_for_one_payment`<br>`integration/test_evidence.py::test_pack_for_a_range_and_bad_scopes`<br>`integration/test_evidence.py::test_a_broken_chain_is_reported`<br>`integration/test_evidence.py::test_console_exports_json_html_and_pdf` |
 
 ## FR-090 · Console (confirmed)
 
@@ -1125,7 +1125,7 @@ Sources: [DEM-06 criteria](../../backlog/user-stories.md#dem-06)
 
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
-| [DEM-06](../../backlog/user-stories.md#dem-06) | L | 0 | Each pack: platform, counterparties, rules and a short batch; selectable on reset | planned | scenario: `detent demo run (DEM-06)` |
+| [DEM-06](../../backlog/user-stories.md#dem-06) | L | 0 | Each pack: platform, counterparties, rules and a short batch; selectable on reset | done | `integration/test_scenario_packs.py::test_three_packs_each_with_platform_counterparties_rules_and_a_batch`<br>`integration/test_scenario_packs.py::test_reset_into_a_pack_and_its_batch_decides_as_expected`<br>`integration/test_scenario_packs.py::test_unknown_pack_is_refused`<br>`integration/test_scenario_packs.py::test_console_reset_with_a_pack` |
 
 ## FR-098 · Shadow (confirmed)
 
@@ -1152,8 +1152,8 @@ Sources: [spec/10 §runbooks-write-as-the-features-land](../../spec/10-security-
 | Story | Slice | # | Acceptance criterion | State | Test |
 |---|---|---|---|---|---|
 | [OPS-01](../../backlog/user-stories.md#ops-01) | L | 0 | Sev levels per spec; Sev 1 opened automatically by EXE-10 or manually; notification logged within 1 hour; root-cause field and linked replays | done | `integration/test_incidents.py::test_manual_incident_timeline_notification_root_cause_and_replay`<br>`integration/test_incidents.py::test_console_incidents_screens`<br>`integration/test_incidents.py::test_unauthorised_execution_opens_sev1_engages_the_kill_switch_and_notifies` |
-| [OPS-03](../../backlog/user-stories.md#ops-03) | L | 0 | Runbook in spec/10; one drill done and timed; audit hash chain verified after restore | planned | manual: `manual check, recorded in the PR description` |
-| [OPS-04](../../backlog/user-stories.md#ops-04) | L | 0 | docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap | planned | manual: `manual check, recorded in the PR description` |
+| [OPS-03](../../backlog/user-stories.md#ops-03) | L | 0 | Runbook in spec/10; one drill done and timed; audit hash chain verified after restore | done | `manual:spec/10 Runbooks 'Restore' and 'Restore drill log' (local drill 2026-11-28, 0.5 s)`<br>`integration/test_restore_drill.py::test_the_drill_restores_and_verifies_every_chain`<br>`integration/test_restore_drill.py::test_a_drill_never_targets_the_live_database` |
+| [OPS-04](../../backlog/user-stories.md#ops-04) | L | 0 | docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap | done | `unit/test_security_pack.py::test_security_pack_is_current`<br>`unit/test_security_pack.py::test_controls_have_tests_and_roadmap_is_labelled` |
 
 ## FR-100 · API (confirmed)
 

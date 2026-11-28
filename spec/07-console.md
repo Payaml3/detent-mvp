@@ -98,3 +98,16 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
   recommendation with the final decision for cases approved or rejected in the period, and lists disagreements with
   the agent's cited claims and the person's reason. `needs_information` and cases with no investigation are counted
   but not compared.
+
+## As built (L group 4: AUD-03, DEM-06)
+
+- **Audit (AUD-03):** `/console/audit` replaces the placeholder: the hash-chain check, the last 100 events (filter
+  by kind) and an evidence export for one payment or the payments created in a date range, as JSON, HTML or PDF
+  (`detent/audit/evidence.py`). A pack holds the inputs, every decision with its rule version and checks, the
+  people who approved or rejected, the state changes from the audit log, the attempts with transaction hashes and
+  explorer links, and the chain check result at build time. A broken chain is stated on the first page.
+- **Scenario packs (DEM-06):** the Demo screen shows which pack seeded the current generation and resets into
+  another (`POST /console/demo/reset`, payments lead only; `detent demo reset --pack <id>`). Packs live in
+  `fixtures/packs/`: payout platform, crypto service provider and marketplace, each with a fictional platform,
+  counterparties, rule overrides on the default rule set and a short batch. "Run this pack's batch" sends it through
+  the rules. The scripted spec/11 scenarios use the default pack.

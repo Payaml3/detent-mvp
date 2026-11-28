@@ -713,7 +713,7 @@
    "epic": "AUD",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "CON-01",
@@ -881,7 +881,7 @@
    "epic": "DEM",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "SHD-01",
@@ -930,14 +930,14 @@
    "epic": "OPS",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "OPS-04",
    "epic": "OPS",
    "slice": "L",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "API-01",

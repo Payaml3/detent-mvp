@@ -7,6 +7,17 @@ running it again shows what it did. Payouts go through the rules and the worker 
 never sends or approves anything. It only plays the outside world (fictional payers, faults on the next send).
 Current generation: <strong>{{ generation }}</strong> ({{ user.org_id }}).</p>
 {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<section class="card" data-section="packs">
+  <h2>Scenario pack</h2>
+  <p>This generation was seeded from the <strong>{{ (packs | selectattr('id', 'equalto', pack) | first).label }}</strong> pack.
+  The scripted scenarios below are written for the default pack; every pack has its own short batch.</p>
+  {% if pack != 'default' %}<form method="post" action="/console/demo/pack-batch" class="inline"><button>Run this pack's batch</button></form>{% endif %}
+  <form method="post" action="/console/demo/reset" class="filters">
+    <label>Reset into <select name="pack">{% for p in packs %}<option value="{{ p.id }}"{% if p.id == pack %} selected{% endif %}>{{ p.label }}: {{ p.description }}</option>{% endfor %}</select></label>
+    <button class="danger">Reset with this pack</button>
+  </form>
+  <p class="small muted">A reset starts a new generation; nothing is deleted. Payments lead only.</p>
+</section>
 {% if flash %}<p class="ok" role="status">{{ flash }}</p>{% endif %}
 <table>
   <thead><tr><th>Minute</th><th>Scenario</th><th>What it does</th><th>Result in this generation</th><th></th></tr></thead>

@@ -1134,8 +1134,8 @@
    "initiative": "Audit and replay",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1478,8 +1478,8 @@
    "initiative": "Demo data and scenarios",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1578,8 +1578,8 @@
    "initiative": "Operational controls",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },
@@ -1592,8 +1592,8 @@
    "initiative": "Operational controls",
    "slice": "L",
    "priority": "",
-   "status": "todo",
-   "progress": "0/1",
+   "status": "done",
+   "progress": "1/1",
    "deps": [],
    "dependents": []
   },

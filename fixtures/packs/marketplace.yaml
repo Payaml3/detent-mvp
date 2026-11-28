@@ -1,0 +1,57 @@
+# DEM-06 scenario pack: a marketplace paying its sellers in three currencies.
+# Every name is invented and fictional.
+id: marketplace
+label: "Marketplace"
+description: "Seller payouts in GBP, EUR and USDC, with a seller still in onboarding."
+platform: {name: "Bazaar Marketplace Ltd (fictional)", mode: auto, fail_safe: manual_queue,
+           registered_account: "GB00 BZAR 0000 0000 0000 00 (fictional)"}
+policy_overrides: {}
+users:
+  - {id: usr_pl, name: "Priya (payments lead)", role: payments_lead}
+  - {id: usr_cl, name: "Marco (compliance lead)", role: compliance_lead}
+  - {id: usr_rv, name: "Sam (reviewer)", role: reviewer}
+  - {id: usr_bo, name: "Lea (backup owner)", role: backup_owner}
+  - {id: usr_oc, name: "DekernAI on-call", role: oncall}
+counterparties:
+  - id: cpt_atelier
+    contact_email: "seller@atelier.example.invalid"
+    name: "Atelier Ceramics Ltd (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: GB
+    history: {payment_count: 60, median_amount: {amount: "120.00", currency: GBP}}
+    destinations:
+      - {id: dst_atelier_acct, kind: bank_account, network: banksim-fps, sort_code_masked: "**-**-21", first_seen_days_ago: 500, last_changed_days_ago: 500}
+  - id: cpt_dune
+    contact_email: "seller@dune.example.invalid"
+    name: "Dune Textiles SARL (fictional)"
+    kyb_status: verified
+    allowlisted: true
+    jurisdiction: FR
+    history: {payment_count: 10, median_amount: {amount: "300.00", currency: EUR}}
+    destinations:
+      - {id: dst_dune_iban, kind: bank_account, network: banksim-sepa-inst, iban_masked: "FR76 **** **** 0450", first_seen_days_ago: 120, last_changed_days_ago: 120}
+  - id: cpt_tide
+    contact_email: "seller@tide.example.invalid"
+    name: "Tide Prints Collective (fictional)"
+    kyb_status: pending
+    allowlisted: false
+    jurisdiction: NL
+    history: {payment_count: 0}
+    destinations:
+      - {id: dst_tide_base, kind: evm_wallet, network: base-sepolia, address: "{{WALLET_TIDE_BASE}}", first_seen_days_ago: 20, last_changed_days_ago: 20}
+  - id: cpt_ghost
+    contact_email: "seller@ghost.example.invalid"
+    name: "Ghost Goods Ltd (fictional)"
+    kyb_status: unknown
+    allowlisted: false
+    jurisdiction: GB
+    history: {payment_count: 0}
+    destinations:
+      - {id: dst_ghost_acct, kind: bank_account, network: banksim-fps, sort_code_masked: "**-**-66", first_seen_days_ago: 10, last_changed_days_ago: 10}
+user_accounts: []
+batch:
+  - {ref: mk1, counterparty: cpt_atelier, amount: "150.00", currency: GBP, expect: EXECUTE}
+  - {ref: mk2, counterparty: cpt_dune, amount: "320.00", currency: EUR, expect: EXECUTE}
+  - {ref: mk3, counterparty: cpt_tide, amount: "60.00", currency: USDC, network: base-sepolia, expect: ESCALATE, reason: [KYB_PENDING, NOT_ALLOWLISTED]}
+  - {ref: mk4, counterparty: cpt_ghost, amount: "40.00", currency: GBP, expect: BLOCK, reason: KYB_UNKNOWN}

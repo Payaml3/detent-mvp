@@ -20,7 +20,7 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | P2 Dashboard and sandbox | done | `main` |
 | P3 Docs and SDKs | done (Mintlify connection and SDK publishing wait on the founder) | `main` |
 | P4 Website launch | built: WEB-02, WEB-07 done; the access form posts to the live deploy. Open: the booking URL (WEB-06), the legal review and the founder's go-live call | `main` |
-| L After launch (Should and Could) | in progress: groups 1 to 3 built (INT-05, EXE-10, OPS-01, CON-10; SHD-01 to SHD-04, EXC-09, DSH-13; RAL-08 to RAL-10) | `main` |
+| L After launch (Should and Could) | done: groups 1 to 4 built (17 stories); exit check met | `main` |
 | U User payouts (D-40, 28 Nov) | todo: USR-01 to USR-04, after L | |
 
 Scope (D-37, 2026-11-23): the full MVP backlog, every slice above in order; it supersedes D-34 (prototype first).
@@ -192,7 +192,11 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
   routing skips an open circuit; the worker probes and closes it), RAL-09 mock rail connection with encrypted
   credentials (`detent/rails/connections.py`, `/console/rails/connect`), RAL-10 daily contract run that opens an
   issue on failure (`.github/workflows/rail-contracts.yml`, `tools/contract_report.py`). Migration 0018. See spec/06.
-- **Next:** L group 4 (AUD-03, OPS-03, OPS-04, DEM-06), then slice U (user payouts, D-40). · Model: strongest for EXE/RAL/money paths, mid-tier otherwise
+- **L group 4: built (2026-11-28):** AUD-03 evidence export (`/console/audit`, JSON, HTML and PDF), OPS-03 restore
+  drill (`detent ops restore-drill`, runbook and drill log in spec/10; the Neon point-in-time drill waits for the
+  hosted database), OPS-04 security pack (`docs/security.md` from `tools/build_security.py`, internal only), DEM-06
+  scenario packs (`fixtures/packs/`, selectable on reset). Slice L is complete.
+- **Next:** slice U (user payouts, D-40). · Model: strongest for EXE/RAL/money paths, mid-tier otherwise
 
 ## Open founder items
 

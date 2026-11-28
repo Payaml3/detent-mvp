@@ -492,3 +492,11 @@ RAL-09:
   1: ["integration/test_rail_connect.py::test_consent_screen_connects_and_disconnect_takes_the_rail_out_of_routing", "integration/test_rail_connect.py::test_only_the_payments_lead_connects"]
 RAL-10:
   0: ["unit/test_contract_report.py::test_the_workflow_runs_daily_and_opens_an_issue_on_failure", "unit/test_contract_report.py::test_failures_name_the_adapter_and_test", "unit/test_contract_report.py::test_a_clean_run_reports_nothing"]
+AUD-03:
+  0: ["integration/test_evidence.py::test_pack_for_one_payment", "integration/test_evidence.py::test_pack_for_a_range_and_bad_scopes", "integration/test_evidence.py::test_a_broken_chain_is_reported", "integration/test_evidence.py::test_console_exports_json_html_and_pdf"]
+OPS-03:
+  0: ["manual:spec/10 Runbooks 'Restore' and 'Restore drill log' (local drill 2026-11-28, 0.5 s)", "integration/test_restore_drill.py::test_the_drill_restores_and_verifies_every_chain", "integration/test_restore_drill.py::test_a_drill_never_targets_the_live_database"]
+OPS-04:
+  0: ["unit/test_security_pack.py::test_security_pack_is_current", "unit/test_security_pack.py::test_controls_have_tests_and_roadmap_is_labelled"]
+DEM-06:
+  0: ["integration/test_scenario_packs.py::test_three_packs_each_with_platform_counterparties_rules_and_a_batch", "integration/test_scenario_packs.py::test_reset_into_a_pack_and_its_batch_decides_as_expected", "integration/test_scenario_packs.py::test_unknown_pack_is_refused", "integration/test_scenario_packs.py::test_console_reset_with_a_pack"]

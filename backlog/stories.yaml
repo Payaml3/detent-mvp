@@ -1202,6 +1202,7 @@ stories:
   deps: [AUD-02]
   trace: [A2.Prove, A1.evidence]
   ms: L
+  done: [0]
 
 # ---------------- CON Console ----------------
 - id: CON-01
@@ -1554,6 +1555,7 @@ stories:
   deps: [DEM-01]
   trace: [MVP.scenarios]
   ms: L
+  done: [0]
 
 # ---------------- SHD Shadow mode ----------------
 - id: SHD-01
@@ -1655,6 +1657,7 @@ stories:
   deps: [FND-07]
   trace: [B5.resilience]
   ms: L
+  done: [0]
 - id: OPS-04
   epic: OPS
   title: Security pack draft
@@ -1668,6 +1671,7 @@ stories:
   deps: [EVL-07]
   trace: [B5.assurance, B5.security]
   ms: L
+  done: [0]
 
 # ---------------- API Public sandbox API ----------------
 - id: API-01

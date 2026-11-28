@@ -482,7 +482,7 @@
    "exit": "A shadow-phase report is produced from a CSV export and the mode-gate sign-off is recorded.",
    "stories": 17,
    "criteria": 23,
-   "criteria_done": 19
+   "criteria_done": 23
   },
   {
    "id": "U",

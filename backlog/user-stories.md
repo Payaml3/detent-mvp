@@ -903,7 +903,7 @@ _Every step is recorded append-only and any payment can be replayed and exported
 
 **Acceptance criteria**
 
-- [ ] JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result
+- [x] JSON plus a readable HTML or PDF: inputs, rule versions, decisions, approvers, state changes, transaction hashes with explorer links, and the hash-chain check result
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** AUD-02 · **Traces to:** A2.Prove, A1.evidence
 
@@ -1167,7 +1167,7 @@ _Fictional, repeatable demo data and a one-click scenario runner_ · layer: All 
 
 **Acceptance criteria**
 
-- [ ] Each pack: platform, counterparties, rules and a short batch; selectable on reset
+- [x] Each pack: platform, counterparties, rules and a short batch; selectable on reset
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** L After launch (Should and Could) · **Depends on:** DEM-01 · **Traces to:** MVP.scenarios
 
@@ -1245,7 +1245,7 @@ _The operating-model processes that need software: incidents, independence check
 
 **Acceptance criteria**
 
-- [ ] Runbook in spec/10; one drill done and timed; audit hash chain verified after restore
+- [x] Runbook in spec/10; one drill done and timed; audit hash chain verified after restore
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** FND-07 · **Traces to:** B5.resilience
 
@@ -1255,7 +1255,7 @@ _The operating-model processes that need software: incidents, independence check
 
 **Acceptance criteria**
 
-- [ ] docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap
+- [x] docs/security.md generated from spec/10, listing controls and their tests; roadmap items labelled as roadmap
 
 **Priority:** Could · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EVL-07 · **Traces to:** B5.assurance, B5.security
 

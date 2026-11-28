@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 153,
-   "done": 122,
-   "pct": 80
+   "done": 126,
+   "pct": 82
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 327,
-   "done": 293,
-   "pct": 90
+   "done": 297,
+   "pct": 91
   },
   {
    "order": 3,
@@ -33,16 +33,16 @@
   {
    "function": "03 Architecture",
    "measure": "Acceptance criteria done in the architect's epics",
-   "done": 33,
+   "done": 36,
    "total": 40,
-   "pct_done": 82
+   "pct_done": 90
   },
   {
    "function": "04 Engineering",
    "measure": "Acceptance criteria done in the engineers' epics",
-   "done": 227,
+   "done": 228,
    "total": 251,
-   "pct_done": 90
+   "pct_done": 91
   },
   {
    "function": "05 QA",
@@ -84,8 +84,8 @@
    "role": "architect",
    "stories": 3,
    "criteria": 7,
-   "criteria_done": 5,
-   "pct_done": 71
+   "criteria_done": 6,
+   "pct_done": 86
   },
   {
    "code": "CON",
@@ -102,8 +102,8 @@
    "role": "engineer",
    "stories": 6,
    "criteria": 7,
-   "criteria_done": 6,
-   "pct_done": 86
+   "criteria_done": 7,
+   "pct_done": 100
   },
   {
    "code": "DOC",
@@ -183,8 +183,8 @@
    "role": "architect",
    "stories": 4,
    "criteria": 4,
-   "criteria_done": 2,
-   "pct_done": 50
+   "criteria_done": 4,
+   "pct_done": 100
   },
   {
    "code": "POL",
@@ -986,9 +986,9 @@
    "function": "03 Architecture",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "CON-01",
@@ -1226,9 +1226,9 @@
    "function": "04 Engineering",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "SHD-01",
@@ -1296,9 +1296,9 @@
    "function": "03 Architecture",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "OPS-04",
@@ -1306,9 +1306,9 @@
    "function": "03 Architecture",
    "slice": "L",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "API-01",
