@@ -1,5 +1,4 @@
 ---
-import config from "../../site.config.mjs";
 import CodeSample from "./CodeSample.astro";
 // Landing UX §3.5: one tab per buying role (docs/product/customer-discovery.md). Absorbs the former Developers
 // and Security sections. Without script every panel shows, stacked; the script turns them into tabs.
@@ -10,7 +9,7 @@ const roles = [
       ["No retry pays twice", "One payment ID for life and at most one confirmed attempt, enforced in the database, not in a script."],
       ["A kill switch you own", "Stops every send at once. Only your payments lead can release it."],
     ],
-    link: { href: config.bookingUrl, label: "Book a demo" } },
+    link: { href: "/access/", label: "Request access" } },
   { id: "compliance", tab: "Compliance", title: "For the compliance lead",
     facts: [
       ["Your rules, versioned", "Every decision names the rule version it used. Approving a held payment runs the rules again first."],

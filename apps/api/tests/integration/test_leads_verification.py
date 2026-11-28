@@ -109,6 +109,39 @@ def test_without_a_sales_inbox_the_lead_is_stored_and_nothing_is_sent(
     assert lead["outbox_id"] is None
 
 
+def test_the_requester_gets_a_confirmation_that_repeats_nothing_they_typed(
+    web: TestClient, engine: Engine
+) -> None:
+    email = f"conf-{uuid.uuid4().hex[:8]}@fictional-payouts.example.test"
+    injected = {
+        **FORM,
+        "email": email,
+        "name": "Click http://evil.example.test now",
+        "use_case": "<b>buy</b>",
+    }
+    assert web.post("/access-requests", data=injected).status_code == 200
+    assert web.post("/access-requests", data=injected).status_code == 200  # a repeat within a day
+    with engine.connect() as conn:
+        mails = conn.execute(
+            text(
+                "SELECT body FROM outbox WHERE org_id=:o AND recipient=:e AND template='access_request.received'"
+            ),
+            {"o": OPERATOR_ORG, "e": email},
+        ).all()
+    (mail,) = mails  # one confirmation, even after a repeat
+    assert "NDA" in mail.body and "commercial call" in mail.body and "sandbox" in mail.body
+    assert "sales@dekern.example.test" in mail.body
+    assert "evil" not in mail.body and "<b>" not in mail.body
+
+
+def test_the_confirmation_carries_the_nda_link_when_one_is_set() -> None:
+    from detent.dashboard.leads import confirmation_body
+
+    with_link = make_settings("org_detent", nda_url="https://sign.example.test/nda")
+    assert "sign it now: https://sign.example.test/nda" in confirmation_body(with_link)
+    assert "sign it now" not in confirmation_body(NO_INBOX) and "our team" in confirmation_body(NO_INBOX)
+
+
 def test_admins_list_access_requests_and_change_their_status(
     web: TestClient, staff: Member, engine: Engine, clock: FrozenClock
 ) -> None:

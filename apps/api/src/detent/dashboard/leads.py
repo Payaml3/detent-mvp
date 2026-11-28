@@ -53,6 +53,27 @@ class AccessRequest:
         )
 
 
+def confirmation_body(settings: Settings) -> str:
+    """The fixed reply to the person who sent the form: what happens next (founder, 2026-11-28)."""
+    brand = settings.brand_name
+    reply_from = settings.sales_inbox or "our team"
+    nda = (
+        f"1. A short NDA to sign. You can sign it now: {settings.nda_url}\n"
+        if settings.nda_url
+        else "1. A short NDA to sign.\n"
+    )
+    return (
+        f"Thank you for your interest in {brand}.\n\n"
+        f"We've received your access request. We'll reply from {reply_from} with the next steps:\n"
+        f"{nda}"
+        "2. A commercial call about your platform, your deposits and your payouts.\n"
+        f"3. If {brand} is a fit, access to the sandbox and your client dashboard.\n\n"
+        f"{brand}: agentic payment controls.\n"
+        f"You're receiving this because this address was entered on the {brand} website's access form. "
+        "If that wasn't you, you can ignore this email."
+    )
+
+
 def submit(conn: Connection, clock: Clock, settings: Settings, req: AccessRequest) -> str | None:
     """Store the request and email the sales inbox. Returns the lead ID, or None when nothing was stored
     (a bot, or a repeat within a day)."""
@@ -110,6 +131,17 @@ def submit(conn: Connection, clock: Clock, settings: Settings, req: AccessReques
             "ob": outbox_id,
             "now": now,
         },
+    )
+    # The requester's confirmation. It repeats nothing they typed, so the form can't be used to send our
+    # email with someone else's text in it; a repeat within a day or a bot gets none (both return above).
+    send_email(
+        conn,
+        clock,
+        org_id=OPERATOR_ORG,
+        to=r.email,
+        template="access_request.received",
+        settings=settings,
+        body=confirmation_body(settings),
     )
     append(
         conn,

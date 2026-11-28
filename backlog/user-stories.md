@@ -1780,11 +1780,11 @@ _A public face that looks real and stays honest_ · layer: Go-to-market · track
 
 ### WEB-06 · Booking and access form
 
-**As a** prospect, **I want** to book a demo or request sandbox access, **so that** I can start a conversation in one click.
+**As a** prospect, **I want** to request access, **so that** I can start a conversation in one click.
 
 **Acceptance criteria**
 
-- [ ] Booking link to the founder's appointment page; access form posts to DSH-10
+- [x] One entry action, Request access (D-44; no booking page); access form posts to DSH-10 and the requester gets a confirmation email
 
 **Priority:** Must · **Estimate:** 0.25 d · **Milestone:** P4 Website launch · **Depends on:** DSH-10, WEB-01 · **Traces to:** D.ops_pages, D.sales_led
 

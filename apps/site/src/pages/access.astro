@@ -4,18 +4,18 @@ import PageHead from "../components/PageHead.astro";
 import config from "../../site.config.mjs";
 const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
 ---
-<Base title="Request access" description={`Request access to ${config.brandName}: tell us about your platform and start onboarding with a discovery call.`}>
-  <PageHead title="Request access." lead="Tell us about your platform and how you pay out today. We reply to book a discovery call, the first step of onboarding.">
+<Base title="Request access" description={`Request access to ${config.brandName}: tell us about your platform and start onboarding.`}>
+  <PageHead title="Request access." lead="Tell us about your platform and how you pay out today. You get an email straight away, and we reply with the next steps.">
     <Fragment slot="fragments">
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 1 · Discovery</p><p>A call and a demo on your rails, volumes and the rules you run today.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 2 · Contract and KYB</p><p>Our due diligence on your business, then the contract and data processing agreement.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 3 · Registration email</p><p>Your account owner gets a single-use invite to sign up.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 4 · Your dashboard</p><p>Keys, rules, team roles and the console in one place.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 1 · NDA</p><p>A short mutual NDA, signed online before we talk in detail.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 2 · Commercial call</p><p>A call and a demo on your rails, volumes and the rules you run today.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 3 · Approval</p><p>If it’s a fit, your account owner gets a single-use invite to sign up.</p></div>
+      <div class="frag" data-ui data-reveal><p class="frag-title">Step 4 · Sandbox and dashboard</p><p>Sandbox keys, rules, team roles and the console in one place.</p></div>
     </Fragment>
   </PageHead>
   <section class="section"><div class="wrap grid">
     <form class="form" data-reveal method="post" action={connected ? config.accessFormAction : undefined} data-access-form>
-      {!connected && <p class="notice" role="note">This form isn’t connected yet. Nothing you type is sent. Book a demo instead.</p>}
+      {!connected && <p class="notice" role="note">This form isn’t connected yet. Nothing you type is sent. Email {config.salesInbox} instead.</p>}
       <label>Name<input name="name" autocomplete="name" required /></label>
       <label>Work email<input name="email" type="email" autocomplete="email" required /></label>
       <label>Job title<input name="title" autocomplete="organization-title" /></label>
@@ -65,7 +65,7 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const note = form.querySelector(".notice");
-      if (note) note.textContent = "This form isn’t connected yet, so nothing was sent. Book a demo instead.";
+      if (note) note.textContent = "This form isn’t connected yet, so nothing was sent. Email the sales inbox instead.";
     });
   }
 </script>
