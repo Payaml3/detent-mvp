@@ -422,6 +422,16 @@ export function mountAgent(canvas) {
   const owner = { agent: () => agent, bubble: () => head, rules: () => rules, verdict: () => rules };
   const shift = { agent: "translate(-50%, 0)", rules: "translate(-50%, 0)", bubble: "translate(0, -50%)", verdict: "translate(-50%, 0)" };
   const proj = new THREE.Vector3();
+  // captions stop above the example-payment track, so a verdict never sits on the cards
+  const track = document.querySelector("[data-hero-cards] .track");
+  let floor = Infinity;
+  const measureFloor = () => {
+    const host = canvas.offsetParent;
+    floor = track && host && track.offsetParent !== null
+      ? track.getBoundingClientRect().top - host.getBoundingClientRect().top - 14 : Infinity;
+  };
+  measureFloor();
+  if (canvas.offsetParent) new ResizeObserver(measureFloor).observe(canvas.offsetParent);
   function placeLabels() {
     if (!labels.length) return;
     const w = canvas.clientWidth, h = canvas.clientHeight, ox = canvas.offsetLeft, oy = canvas.offsetTop;
@@ -433,7 +443,9 @@ export function mountAgent(canvas) {
     for (const el of labels) {
       const key = el.dataset.artLabel;
       owner[key]().localToWorld(proj.copy(anchor[key])).project(camera);
-      el.style.transform = `translate(${ox + (proj.x + 1) / 2 * w}px, ${oy + (1 - proj.y) / 2 * h}px) ${shift[key]}`;
+      let y = oy + (1 - proj.y) / 2 * h;
+      if (key !== "bubble" && y + el.offsetHeight > floor) y = floor - el.offsetHeight;
+      el.style.transform = `translate(${ox + (proj.x + 1) / 2 * w}px, ${y}px) ${shift[key]}`;
       el.hidden = false;
     }
   }
