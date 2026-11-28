@@ -45,7 +45,7 @@ Founder's flow (2026-11-26), with policy sign-off and shadow kept before any liv
 
 - **Entry offer:** "Request access" only (D-44, 2026-11-28: it replaced "Book a demo"; then NDA, commercial call and approval). Before that: "Book a demo" (primary) and "Request access" (secondary, the `/access/` onboarding intake
   that leads into discovery and KYB) replace "Get a free shadow report" on the site. "Talk to us" stays on the
-  plans (D-15). The site shows these seven phases where it showed the shadow-report offer.
+  plans (D-15). The site shows these phases where it showed the shadow-report offer, without phase 5 (founder, 2026-11-28: the site shows six phases, with no shadow phase).
 - **Plans:** Pilot, Growth and Scale stay; every plan says "Talk to us" (D-15 otherwise unchanged). The Pilot
   covers phases 3 to 6 on one rail.
 - **Shadow mode:** stays (D-24, SHD stories), used on live traffic in phase 5 and, where the client wants it,

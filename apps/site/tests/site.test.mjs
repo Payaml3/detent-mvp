@@ -112,10 +112,11 @@ test("developers: the code tabs are the docs' tested samples (WEB-04, DOC-04)", 
   assert.ok(flat(section).includes(flat(snippets.payout)), "payout.json");
 });
 
-test("onboarding: the seven phases of the client journey, plans 'Talk to us', no prices (B-04)", () => {
+test("onboarding: the six phases of the client journey, plans 'Talk to us', no prices (B-04)", () => {
   const html = read(PAGES.home);
   const section = text(html.split('data-section="onboarding"')[1].split("data-section=")[0]);
-  for (const phase of ["Discovery", "Contract and due diligence", "Sandbox integration", "Policy setup", "Shadow on live traffic", "Go-live", "Scale"]) assert.match(section, new RegExp(phase));
+  for (const phase of ["Discovery", "Contract and due diligence", "Sandbox integration", "Policy setup", "Go-live", "Scale"]) assert.match(section, new RegExp(phase));
+  assert.ok(!/Shadow on live traffic/i.test(section), "no shadow phase on the site (founder, 2026-11-28)");
   for (const plan of ["Pilot", "Growth", "Scale"]) assert.match(section, new RegExp(plan));
   assert.match(section, /Talk to us/);
   assert.ok(!/(free|Pilot|Growth|Scale)[^.]{0,40}[$£€]\s?\d/i.test(section), "no prices next to a plan");
@@ -133,15 +134,17 @@ test("sub-pages carry their required content", () => {
   for (const w of [/non-custodial/i, /audit/i, /replay/i, /kill switch/i, /EU/]) assert.match(sec, w);
   assert.match(sec, /SOC 2[^.]{0,40}planned/i);
   const dp = text(read(PAGES.partners));
-  assert.match(dp, /seven phases/i);
+  assert.match(dp, /six phases/i);
+  assert.ok(!/Shadow on live traffic|seven phases/i.test(dp), "no shadow phase (founder, 2026-11-28)");
   assert.match(dp, /data processing agreement/i);
   // WEB-02 criterion 1: data handling across the phases, the G-19 retention and the non-custodial line.
   for (const w of [/sandbox request logs are kept for 30 days/i, /append-only/i, /never hold/i]) assert.match(dp, w);
-  for (const n of ["Discovery", "Contract and due diligence", "Sandbox integration", "Policy setup", "Shadow on live traffic", "Go-live", "Scale"]) assert.ok(dp.includes(n), `onboarding phase ${n}`);
+  for (const n of ["Discovery", "Contract and due diligence", "Sandbox integration", "Policy setup", "Go-live", "Scale"]) assert.ok(dp.includes(n), `onboarding phase ${n}`);
   const acc = text(read(PAGES.access));
   for (const w of [/discovery/i, /KYB/, /registration email/i]) assert.match(acc, w);
   assert.ok(!/simulated rails|\.13|\.42|What would you like to test/i.test(acc), "access is the onboarding intake, not a sandbox sign-up");
   const prod = text(read(PAGES.product));
+  assert.match(prod, /every deposit and payout/i, "the product page covers deposits and payouts, not payouts only (founder, 2026-11-28)");
   for (const w of [/decision/i, /orchestration/i, /operations/i]) assert.match(prod, w);
 });
 

@@ -97,12 +97,12 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 4. **Built for irreversible payments:** "A failure can retry. A rejection can't. No retry ever becomes a second payment.", with the payment states shown and the kill switch.
 5. **Measured results:** shown only once `results.json` exists, each figure labelled "evaluation on synthetic data, [date]. Not production results.". Left out of the page until then.
 6. **Roles:** tabs for Payments, Compliance and Engineering. Engineering holds the 8-language code tab creating a payment intent (pre-launch label) and the sandbox access link; Compliance links to the Security page, which holds non-custodial, audit and replay, kill switch, EU hosting and the roadmap list.
-7. **Onboarding:** the seven phases of the client journey (docs/product/client-journey.md, B-04): discovery, contract and due diligence, sandbox integration, policy setup, shadow on live traffic, go-live, scale. Each shows both owners and its exit check; phases 4 to 6 are signed by the client, and the Pilot covers phases 3 to 6 on one rail. Paid plans (Pilot, Growth, Scale) are "Talk to us", with no prices. There is no free shadow report: shadow is a phase after the contract.
+7. **Onboarding:** the six phases shown on the site (docs/product/client-journey.md, B-04; the shadow phase is not shown, founder 2026-11-28): discovery, contract and due diligence, sandbox integration, policy setup, go-live, scale. Each shows both owners and its exit check; phases 4 to 6 are signed by the client, and the Pilot covers phases 3 to 6 on one rail. Paid plans (Pilot, Growth, Scale) are "Talk to us", with no prices. There is no free shadow report: shadow is a phase after the contract.
 8. **Use cases and FAQ:** payout platforms, crypto service providers, brokers and prop firms, marketplaces; then 8 questions (money and custody, does the AI approve, changing rails, who approves, timeouts, rails, how onboarding works, cost).
 9. **Close:** "Held until it's right. Sent exactly once." with both CTAs.
 10. **Footer:** docs, status, privacy, terms, contact.
 
-**Sub-pages:** Product, Security, and Onboarding (at `/design-partners/`: the seven phases in full, data handling and plans).
+**Sub-pages:** Product, Security, and Onboarding (at `/design-partners/`: the six phases in full, data handling and plans).
 
 **Honesty checklist (WEB-01 acceptance):**
 - Uses "agentic payment controls" (or "payment controls") and never "payments company" or "payment provider".
@@ -346,7 +346,7 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 
 ## As built (P4)
 
-- **Onboarding page (WEB-02):** `/design-partners/` ("Onboarding" in the menus) lists the seven phases from
+- **Onboarding page (WEB-02):** `/design-partners/` ("Onboarding" in the menus) lists the six phases from
   `apps/site/src/data/onboarding.mjs` and a "Your data" section: what data each phase uses, the append-only audit
   trail, the G-19 sandbox retention (request logs 30 days; other sandbox data until the organisation expires plus
   30 days) and that DekernAI never holds client funds or keys. G-19 still needs the founder's legal review.

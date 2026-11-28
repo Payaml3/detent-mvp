@@ -1,14 +1,14 @@
 ---
 import config from "../../site.config.mjs";
 import { phases, plans } from "../data/onboarding.mjs";
-// Landing UX §3.6: onboarding in seven phases (docs/product/client-journey.md, B-04), where the offer was.
+// Landing UX §3.6: onboarding in six phases (docs/product/client-journey.md, B-04), where the offer was.
 // The client signs every step that moves money closer to being sent. Plans stay "Talk to us" (D-15).
 const talk = `mailto:${config.salesInbox}`;
 ---
 <section class="section onboarding" id="onboarding" data-section="onboarding" aria-labelledby="onb-title">
   <div class="wrap">
     <div class="head">
-      <h2 id="onb-title" data-reveal>From first call to every rail, in seven phases.</h2>
+      <h2 id="onb-title" data-reveal>From first call to every rail, in six phases.</h2>
       <div class="side" data-reveal>
         <p class="lead">Each phase has an owner on both sides and an exit check. Nothing moves closer to being sent until you sign it.</p>
         <div class="actions">
@@ -33,7 +33,7 @@ const talk = `mailto:${config.salesInbox}`;
       ))}
     </ol>
     <p class="plans small soft" data-reveal>
-      The Pilot covers phases 3 to 6 on one rail. {plans.join(", ")}: a software fee per payment decided, never a share of the money you move. <a class="textlink" href={talk}>Talk to us</a>.
+      The Pilot covers phases 3 to 5 on one rail. {plans.join(", ")}: a software fee per payment decided, never a share of the money you move. <a class="textlink" href={talk}>Talk to us</a>.
     </p>
   </div>
 </section>

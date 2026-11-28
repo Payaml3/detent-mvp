@@ -37,11 +37,11 @@ const steps = [
 ];
 const agents = [
   { short: "Ins", name: "Instruction agent", layer: "Decision",
-    does: "Turns invoices and payout requests into payment proposals, each field quoted from the source.",
+    does: "Turns invoices, deposit notices and payout requests into payment proposals, each field quoted from the source.",
     value: "Nobody retypes invoices; anything unclear is flagged, never guessed.",
     limit: "Works only inside a signed mandate: named payees, a limit per payment and a total." },
   { short: "Inv", name: "Investigation agent", layer: "Operations",
-    does: "Gathers cited evidence for every payout your rules hold; uncited claims are removed.",
+    does: "Gathers cited evidence for every deposit or payout your rules hold; uncited claims are removed.",
     value: "Your reviewer opens the case with the notes already written.",
     limit: "It recommends; your reviewer approves or rejects, and your rules run again." },
   { short: "Rec", name: "Reconciliation agent", layer: "Operations",
