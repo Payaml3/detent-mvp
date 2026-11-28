@@ -45,12 +45,12 @@
       "cycle": "C1",
       "owner": "product",
       "status": "planned",
-      "why": "The business model rests on shadow report to pilot. Source: docs/product/business-model.md.",
+      "why": "The business model rests on onboarding to a paid pilot (B-04). Source: docs/product/client-journey.md.",
       "key_results": [
         {
           "id": "O2.1",
-          "metric": "Free shadow reports delivered on a real export",
-          "unit": "reports",
+          "metric": "Design partners through KYB and signed up in the dashboard",
+          "unit": "design partners",
           "baseline": 0,
           "target": 1,
           "current": 0
@@ -144,14 +144,14 @@
     },
     {
       "id": "I4",
-      "title": "Ask every interviewee for a 30-day anonymised payout export at the end of the call",
+      "title": "Ask every interviewee who fits to book a discovery call and start onboarding",
       "key_result": "O1.3",
       "owner": "research",
       "status": "planned"
     },
     {
       "id": "I5",
-      "title": "Define the shadow report format and produce it from an export with the existing import, decide and replay",
+      "title": "Take the first design partner through onboarding phases 1 and 2: discovery, then contract and KYB",
       "key_result": "O2.1",
       "owner": "product",
       "status": "planned",
@@ -159,7 +159,7 @@
     },
     {
       "id": "I6",
-      "title": "Book a second meeting with compliance for each platform that shares an export, and demo from the deployed instance",
+      "title": "Book a second meeting with compliance for each platform in discovery, and demo from the deployed instance",
       "key_result": "O2.2",
       "owner": "growth",
       "status": "planned"
