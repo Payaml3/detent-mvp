@@ -129,3 +129,8 @@ def test_client_members_cannot_invite_admins(
     assert post(web, "/admin/staff/invite", {"email": _email("x")}, page="/dashboard/").status_code == 404
     with engine.begin() as conn, pytest.raises(access.AccessError):
         access.invite_staff(conn, clock, SETTINGS, email=_email("y"), by=owner)
+
+
+def test_the_sign_in_page_links_back_to_request_access(web: TestClient) -> None:
+    page = web.get("/dashboard/login").text
+    assert 'href="https://dekernai.com/access/">Request access</a>' in page
