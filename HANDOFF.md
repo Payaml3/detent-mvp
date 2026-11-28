@@ -19,7 +19,7 @@ Previous: 2026-11-20, S9 code merged into `main` (PRs #6, #8) on the solo-to-sca
 | P1 Sandbox API and webhooks | done | `main` |
 | P2 Dashboard and sandbox | done | `main` |
 | P3 Docs and SDKs | done (Mintlify connection and SDK publishing wait on the founder) | `main` |
-| P4 Website launch | built: WEB-02, WEB-07 done; the access form posts to the live deploy. Open: the booking URL (WEB-06), the legal review and the founder's go-live call | `main` |
+| P4 Website launch | built: WEB-02, WEB-07 done; the access form posts to the live deploy. Open: the legal review and the founder's go-live call (WEB-06 done: Request access only, D-44) | `main` |
 | L After launch (Should and Could) | done: groups 1 to 4 built (17 stories); exit check met | `main` |
 | U User payouts (D-40, 28 Nov) | done: USR-01 to USR-04 built | `main` |
 | T AI team view (founder ask, 28 Nov) | done: CON-11 built | `main` |
@@ -177,7 +177,7 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 - **P4 rest: built (PR from `claude/project-thread-ci5zmu`, 2026-11-28):** WEB-02 criterion 1 (data handling on the
   onboarding page), WEB-06 access form to `https://app.dekernai.com/access-requests`, WEB-07 status page (`/status/` on
   the site, fed by `GET /status.json` in `detent/api/status.py`). See spec/08 "As built (P4)". To finish P4: the
-  booking URL into `bookingUrl` (WEB-06), the G-19 and legal-pages review, `indexable: true` at go-live (founder), and
+  G-19 and legal-pages review, `indexable: true` at go-live (founder), and
   `STATUS_DOCS_URL` on the deploy once the docs are published (an infra change: founder-approved label).
 - **L group 1: built (PR from `claude/project-thread-zzhxlz`, 2026-11-28):** INT-05 cancel (`detent/intents/cancel.py`,
   `POST /v1/payment_intents/{id}/cancel`, 409 `not_cancellable`), EXE-10 invariant monitor and OPS-01 incidents
@@ -234,7 +234,7 @@ The S0 to S7 work happened in one session: `DekernAI · S0–S7 build (done)`.
 - C-12, C-14, C-16, G-10, G-17 to G-20, G-23, G-25 Confirmed as proposed (D-38, 2026-11-24); G-19 retention still
   needs the founder's legal review before the P4 launch. With G-10 decided, user payouts (D-26) can be built; no story
   covers them yet and the API still returns 422 `user_payouts_unavailable`. Ask the founder which slice takes them.
-- Booking URL, inbox, final name and domain (`BRAND_NAME`), legal review of the site.
+- NDA signing link (`NDA_URL`, D-44), final name and domain (`BRAND_NAME`), legal review of the site.
 - Delete the stale remote branch `s3-unknown-resolved` (the proxy refused).
 - Delete the merged branches (all are in `main`): `m0-foundation`, `s1-decision-layer`, `s2-send-once`, `s3-review-loop`, `s3-unknown-resolved`, `s4-unknown-resolved`, `s5-agent-mandates`, `s6`, `s7`, `claude/project-thread-uhabrn`, `spec/001-detent-mvp`, `web/002-marketing-site`.
 

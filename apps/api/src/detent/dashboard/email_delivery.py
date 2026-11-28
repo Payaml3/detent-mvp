@@ -25,6 +25,7 @@ SUBJECTS = {
     "invite.account_owner": "You're invited to {brand}",
     "invite.member": "You're invited to join your team on {brand}",
     "access_request": "New access request from the {brand} website",
+    "access_request.received": "We've received your {brand} access request",
 }
 TIMEOUT_SECONDS = 15.0
 AUTH_SCHEME = "Zoho-enczapikey"

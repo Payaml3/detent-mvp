@@ -15,7 +15,6 @@ const year = 2026;
         <li><a href="/product/">Product</a></li>
         <li><a href="/security/">Security</a></li>
         <li><a href="/design-partners/">Onboarding</a></li>
-        <li><a href={config.bookingUrl}>Book a demo</a></li>
         <li><a href="/access/">Request access</a></li>
         <li><span class="soon">Docs <span class="soft small">(at launch)</span></span></li>
         <li><a href="/status/">Status</a></li>
@@ -33,8 +32,8 @@ const year = 2026;
       <a class="mail" href={`mailto:${config.salesInbox}`}>{config.salesInbox.startsWith("PLACEHOLDER") ? "sales inbox (to be set)" : config.salesInbox}</a>
     </div>
     <div class="tile mark" aria-hidden="true"><Logo height={96} /></div>
-    <a class="tile invite" href={config.bookingUrl}>
-      <span>Book a demo</span>
+    <a class="tile invite" href="/access/">
+      <span>Request access</span>
       <svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true"><path d="M10 38 L38 10 M16 10 H38 V32" fill="none" stroke="currentColor" stroke-width="4"/></svg>
     </a>
   </div>

@@ -4,15 +4,15 @@
    "order": 1,
    "level": "User stories",
    "total": 155,
-   "done": 133,
+   "done": 134,
    "pct": 86
   },
   {
    "order": 2,
    "level": "Acceptance criteria",
    "total": 331,
-   "done": 309,
-   "pct": 93
+   "done": 310,
+   "pct": 94
   },
   {
    "order": 3,
@@ -27,7 +27,7 @@
    "function": "00 Founder HQ",
    "measure": "Decisions resolved",
    "done": 49,
-   "total": 100,
+   "total": 101,
    "pct_done": 49
   },
   {
@@ -54,9 +54,9 @@
   {
    "function": "06 GTM",
    "measure": "Acceptance criteria done in the growth epics",
-   "done": 23,
+   "done": 24,
    "total": 24,
-   "pct_done": 96
+   "pct_done": 100
   }
  ],
  "initiatives": [
@@ -246,8 +246,8 @@
    "role": "growth",
    "stories": 9,
    "criteria": 12,
-   "criteria_done": 11,
-   "pct_done": 92
+   "criteria_done": 12,
+   "pct_done": 100
   },
   {
    "code": "WHK",
@@ -1736,9 +1736,9 @@
    "function": "06 GTM",
    "slice": "P4",
    "criteria": 1,
-   "criteria_done": 0,
+   "criteria_done": 1,
    "criteria_tested": 0,
-   "status": "To do"
+   "status": "Done"
   },
   {
    "story": "WEB-07",

@@ -90,7 +90,7 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 
 **Home page sections, in order** (structure and reasons: `docs/design/landing-page-ux.md`, approved in #59):
 
-1. **Hero:** "Every deposit and payout, decided by your rules." Category line: "Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules." The primary CTA is "Book a demo"; the secondary is "Talk to us" (B-04). The example payment plays through the three layers beside the agent and rules art. A small line: sits beside your rails, never holds funds or keys.
+1. **Hero:** "Every deposit and payout, decided by your rules." Category line: "Agentic payment controls: one layer that decides, orchestrates and operates every deposit and payout, under your rules." The one primary CTA is "Request access" (D-44, which replaced "Book a demo"); the secondary is "How onboarding works". The example payment plays through the three layers beside the agent and rules art. A small line: sits beside your rails, never holds funds or keys.
 2. **The problem:** "On rails you can't reverse, every mistake is permanent." Manual review queues, deposits credited wrong, retries that become double payments, decisions nobody can replay.
 3. **Sift. Settle. Prove.:** the three layers as one payment's life, with the same payment ID: your rules decide in each, agents do the groundwork. "Agents prepare. Your rules decide." is said here once.
 3a. **Change a rule, watch the decision:** the page's one live control. An auto-limit slider and three toggles (first payment, changed wallet, screening hit) re-decide the fictional $18,500 payout in the browser, using the spec/04 checks and reason codes. Labelled a simulation; without script the default decision shows.
@@ -352,8 +352,10 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   30 days) and that DekernAI never holds client funds or keys. G-19 still needs the founder's legal review.
 - **Access form (WEB-06):** `accessFormAction` in `apps/site/site.config.mjs` is the live deploy's
   `https://app.dekernai.com/access-requests` (DSH-10); a plain form post, so the visitor lands on the dashboard's
-  thank-you page. "Book a demo" stays an email to the sales inbox until the founder's booking URL replaces
-  `bookingUrl`; WEB-06 is done when it does.
+  thank-you page. "Request access" is the site's one entry action (D-44); there is no booking page. The
+  requester gets an automatic confirmation (`access_request.received`, `leads.confirmation_body`) that repeats
+  nothing they typed and lists the next steps: NDA (with the signing link once `NDA_URL` is set), commercial call,
+  then, if it fits, sandbox and dashboard access.
 - **Status page (WEB-07):** `GET /status.json` (`detent/api/status.py`) reports `sandbox_api`, `dashboard` and
   `docs` as `operational`, `down` or `not_monitored`, with `checked_at`. API and dashboard share the database check
   (one process); docs is an HTTP GET of `STATUS_DOCS_URL` (empty: not monitored). Results are reused for

@@ -1,5 +1,7 @@
 # Landing page: UX structure (DekernAI)
 
+> **Changed 2026-11-28 (D-44):** "Request access" is now the one primary action everywhere; "Book a demo" was removed. Read "Book a demo" below as "Request access".
+
 Status: **Proposed.** Becomes Approved when the founder merges the PR. Scope: the structure, flow and copy
 outline of the home page (`apps/site/src/pages/index.astro`). Visuals (palette, type, motif) come from the
 design-system work and are applied in a follow-up PR; nothing here changes code yet.

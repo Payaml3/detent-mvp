@@ -11,8 +11,6 @@ export default {
   siteUrl: "https://dekernai.com",
   // Pre-launch: pages carry noindex and robots.txt blocks crawlers. Set true at launch (founder decision).
   indexable: false,
-  // Until a Calendly link is set, Book a demo opens an email to the sales inbox (founder, 2026-11-27).
-  bookingUrl: "mailto:sales@dekernai.com?subject=Demo%20request",
   // WEB-06: the access form posts to the dashboard's DSH-10 endpoint on the live deploy (FND-07).
   accessFormAction: "https://app.dekernai.com/access-requests",
   // WEB-07: the status page reads the deploy's public health summary from the visitor's browser.

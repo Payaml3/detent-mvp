@@ -44,14 +44,14 @@ test("honesty: certifications appear only as roadmap items", () => {
   }
 });
 
-test("home: category wording, Book a demo as the main action, Request access beside it (B-04)", () => {
+test("home: category wording, Request access as the one main action (founder, 2026-11-28)", () => {
   const html = read(PAGES.home);
   assert.match(text(html), /agentic payment controls/i);
   const hero = html.split('data-section="hero"')[1].split("data-section=")[0];
   const buttons = [...hero.matchAll(/<a[^>]*class="([^"]*\bbutton\b[^"]*)"[^>]*>\s*([^<]+)/g)].map((m) => [m[1], m[2].trim()]);
-  assert.deepEqual(buttons[0], ["button", "Book a demo"], "the first hero button is Book a demo");
-  assert.ok(buttons.some(([cls, label]) => /secondary/.test(cls) && label === "Request access"), "Request access is the secondary button");
+  assert.deepEqual(buttons[0], ["button", "Request access"], "the first hero button is Request access");
   assert.match(hero, /href="\/access\/"[^>]*>\s*Request access/, "Request access leads to the onboarding intake");
+  for (const [p, html] of allHtml()) assert.ok(!/Book a demo/.test(html), `${p}: no Book a demo left`);
 });
 
 test("home: the sections of docs/design/landing-page-ux.md, in order", () => {

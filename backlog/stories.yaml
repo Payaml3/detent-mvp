@@ -2305,12 +2305,13 @@ stories:
   epic: WEB
   title: Booking and access form
   as: prospect
-  want: to book a demo or request sandbox access
+  want: to request access
   so: I can start a conversation in one click
   ac:
-    - "Booking link to the founder's appointment page; access form posts to DSH-10"
+    - "One entry action, Request access (D-44; no booking page); access form posts to DSH-10 and the requester gets a confirmation email"
   pri: Must
   est: 0.25
+  done: [0]
   deps: [DSH-10, WEB-01]
   trace: [D.ops_pages, D.sales_led]
   ms: P4
