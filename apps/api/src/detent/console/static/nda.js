@@ -12,7 +12,13 @@
   ctx.lineWidth = 2.5;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = "#111";
+  // Dark ink on an opaque white sheet, whatever the page theme, so the stored PNG reads anywhere.
+  const blank = () => {
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, pad.width, pad.height);
+    ctx.strokeStyle = "black";
+  };
+  blank();
   const point = (e) => {
     const r = pad.getBoundingClientRect();
     return [((e.clientX - r.left) * pad.width) / r.width, ((e.clientY - r.top) * pad.height) / r.height];
@@ -37,7 +43,7 @@
   pad.addEventListener("pointerup", stop);
   pad.addEventListener("pointercancel", stop);
   document.getElementById("nda-clear").addEventListener("click", () => {
-    ctx.clearRect(0, 0, pad.width, pad.height);
+    blank();
     drawn = false;
     field.value = "";
   });
