@@ -1,8 +1,8 @@
 ---
-interface Props { title: string; lead: string; }
-const { title, lead } = Astro.props;
+interface Props { title: string; lead: string; compact?: boolean; }
+const { title, lead, compact = false } = Astro.props;
 ---
-<section class="pagehead" aria-labelledby="page-title">
+<section class:list={["pagehead", { compact }]} aria-labelledby="page-title">
   <div class="dots" aria-hidden="true"></div>
   <div class="wrap inner">
     <h1 id="page-title" data-reveal>{title}</h1>
@@ -14,6 +14,8 @@ const { title, lead } = Astro.props;
 <style>
   .pagehead { position: relative; overflow: hidden; padding: 180px 0 80px; background:
     radial-gradient(60% 70% at 80% 20%, color-mix(in srgb, var(--interactive) 26%, transparent), transparent 70%), var(--bg); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */
+  /* A page whose main content is right below (the access form) keeps the head short. */
+  .pagehead.compact { padding: 140px 0 8px; }
   .dots { position: absolute; inset: 0; opacity: 0.45; pointer-events: none;
     background-image: radial-gradient(color-mix(in srgb, var(--interactive-soft) 40%, transparent) 1px, transparent 1.4px); background-size: 14px 14px; /* taste-skill-ignore: gradients allowed by founder decision D-19 */
     -webkit-mask-image: radial-gradient(45% 60% at 82% 25%, #000, transparent 75%); mask-image: radial-gradient(45% 60% at 82% 25%, #000, transparent 75%); } /* taste-skill-ignore: gradients allowed by founder decision D-19 */

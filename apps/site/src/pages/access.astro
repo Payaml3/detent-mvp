@@ -5,15 +5,9 @@ import config from "../../site.config.mjs";
 const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
 ---
 <Base title="Request access" description={`Request access to ${config.brandName}: tell us about your platform and start onboarding.`}>
-  <PageHead title="Request access." lead="Tell us about your platform and how you pay out today. You get an email straight away, and we reply with the next steps.">
-    <Fragment slot="fragments">
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 1 · NDA</p><p>A short mutual NDA, signed online before we talk in detail.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 2 · Commercial call</p><p>A call and a demo on your rails, volumes and the rules you run today.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 3 · Approval</p><p>If it’s a fit, your account owner gets a single-use invite to sign up.</p></div>
-      <div class="frag" data-ui data-reveal><p class="frag-title">Step 4 · Sandbox and dashboard</p><p>Sandbox keys, rules, team roles and the console in one place.</p></div>
-    </Fragment>
+  <PageHead compact title="Request access." lead="Tell us about your platform and how you pay out today. You get an email straight away, and we reply with the next steps.">
   </PageHead>
-  <section class="section"><div class="wrap grid">
+  <section class="section formsection"><div class="wrap grid">
     <form class="form" data-reveal method="post" action={connected ? config.accessFormAction : undefined} data-access-form>
       {!connected && <p class="notice" role="note">This form isn’t connected yet. Nothing you type is sent. Email {config.salesInbox} instead.</p>}
       <label>Name<input name="name" autocomplete="name" required /></label>
@@ -36,6 +30,13 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
       <p class="small soft">We use these details only to reply to your request and arrange a call. We don’t add you to a mailing list. <a class="textlink" href="/privacy/">How we handle your data</a></p>
     </form>
     <div class="aside" data-reveal>
+      <h2>How access works</h2>
+      <ol class="steps">
+        <li><strong>NDA.</strong> A short mutual NDA, signed online before we talk in detail.</li>
+        <li><strong>Commercial call.</strong> A call and a demo on your rails, volumes and the rules you run today.</li>
+        <li><strong>Approval.</strong> If it’s a fit, your account owner gets a single-use invite to sign up.</li>
+        <li><strong>Sandbox and dashboard.</strong> Sandbox keys, rules, team roles and the console in one place.</li>
+      </ol>
       <h2>What happens next</h2>
       <ul>
         <li>We reply to book a discovery call and a demo.</li>
@@ -56,6 +57,9 @@ const connected = !config.accessFormAction.startsWith("PLACEHOLDER");
   .notice { background: color-mix(in srgb, var(--wait) 12%, transparent); color: var(--wait); border-radius: 6px; padding: 10px 14px; font-size: 15px; }
   .aside { display: grid; gap: 20px; align-content: start; }
   .aside h2 { font-size: clamp(26px, 2.4vw, 36px); }
+  .formsection { padding-top: 32px; }
+  .steps { margin: 0; padding-left: 22px; display: grid; gap: 10px; color: var(--text-soft); font-size: 18px; }
+  .steps strong { color: var(--text); font-weight: 600; }
   .aside ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; color: var(--text-soft); font-size: 18px; }
   @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 </style>
