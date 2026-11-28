@@ -1,6 +1,7 @@
 """DekernAI admin screens (DSH-01, DSH-03; spec/08 "Admin").
 
-Only admins of the operator organisation reach them (`detent staff add` creates one; there is no other way).
+Only admins of the operator organisation reach them. The first comes from `detent staff add` or from the
+one-time invite to `FOUNDER_ADMIN_EMAIL`; after that, an admin invites others on the Admins screen.
 They create a client organisation after KYB, or an evaluation organisation with an expiry, invite its account
 owner, extend an evaluation, and suspend or reinstate an organisation. Every action is audited in the
 organisation it changes.
@@ -362,3 +363,50 @@ def verification_decide(
         resp.status_code = exc.status
         return resp
     return redirect("/admin/verifications")
+
+
+# ------------------------------------------------------------------------------------------ staff
+@router.get("/staff", response_class=HTMLResponse)
+def staff_list(
+    request: Request,
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+) -> HTMLResponse:
+    return _staff_page(request, rt, staff)
+
+
+def _staff_page(
+    request: Request,
+    rt: Runtime,
+    staff: Member,
+    *,
+    error: str | None = None,
+    email: str = "",
+    status: int = 200,
+) -> HTMLResponse:
+    with rt.engine.connect() as conn:
+        admins = access.list_members(conn, access.OPERATOR_ORG)
+        invites = [
+            i for i in access.list_invites(conn, rt.clock, access.OPERATOR_ORG) if i["state"] == "open"
+        ]
+    link = None if error else _pop_link(request, access.OPERATOR_ORG)
+    return page(request, rt, "admin_staff.html", staff, admins=admins, invites=invites, link=link,
+                error=error, email=email, status_code=status)  # fmt: skip
+
+
+@router.post("/staff/invite", response_model=None)
+def staff_invite(
+    request: Request,
+    email: str = Form(""),
+    rt: Runtime = Depends(runtime),  # noqa: B008
+    staff: Member = Depends(staff_member),  # noqa: B008
+) -> Response:
+    """A DekernAI admin invites another admin. The invite email carries a single-use link; the link is also
+    shown once here, to send by hand if the email doesn't arrive."""
+    try:
+        with transaction(rt.engine) as conn:
+            token = access.invite_staff(conn, rt.clock, rt.settings, email=email, by=staff)
+    except AccessError as exc:
+        return _staff_page(request, rt, staff, error=str(exc), email=email, status=exc.status)
+    _show_once(request, access.OPERATOR_ORG, access.invite_link(rt.settings, token))
+    return redirect("/admin/staff")

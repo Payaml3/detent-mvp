@@ -37,6 +37,7 @@ x-app-env: &app-env
   USDC_ADDRESS_BASE_SEPOLIA: ${USDC_ADDRESS_BASE_SEPOLIA:-0x036CbD53842c5426634e7929541eC2318f3dCF7e}
   USDC_ADDRESS_ETH_SEPOLIA: ${USDC_ADDRESS_ETH_SEPOLIA:-0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238}
   SALES_INBOX: ${SALES_INBOX:-}
+  FOUNDER_ADMIN_EMAIL: ${FOUNDER_ADMIN_EMAIL:-}   # first admin gets a one-time invite while none exists
   EMAIL_PROVIDER: ${EMAIL_PROVIDER:-outbox}       # zeptomail sends real email (D-43)
   ZEPTOMAIL_TOKEN: ${ZEPTOMAIL_TOKEN:-}           # the mail agent's Send Mail token; secret
   ZEPTOMAIL_API_URL: ${ZEPTOMAIL_API_URL:-https://cpaas.zoho.uk/v1.1/email}

@@ -22,7 +22,8 @@
       <nav class="nav" aria-label="Dashboard">
         {% if member.is_staff %}
           {% set links = [("/admin/", "Organisations"), ("/admin/organisations/new", "New organisation"),
-                          ("/admin/access-requests", "Access requests"), ("/admin/verifications", "Verifications")] %}
+                          ("/admin/access-requests", "Access requests"), ("/admin/verifications", "Verifications"),
+                          ("/admin/staff", "Admins")] %}
         {% else %}
           {% set links = [("/dashboard/", "Home"), ("/dashboard/team", "Team"), ("/dashboard/keys", "Keys"),
                           ("/dashboard/logs", "Request logs"), ("/dashboard/webhooks", "Webhooks"),

@@ -34,15 +34,16 @@ SETTINGS = make_settings(
 )
 
 
-def _mail(engine: Engine, org_id: str, to: str, template: str) -> str:
+def _mail(engine: Engine, org_id: str, to: str, template: str, about: str = "") -> str:
+    """The newest email of a kind to an address; ``about`` picks the one naming this client in a shared inbox."""
     with engine.connect() as conn:
         return str(
             conn.execute(
                 text(
                     "SELECT body FROM outbox WHERE org_id=:o AND recipient=:e AND template=:t "
-                    "ORDER BY created_at DESC, id DESC LIMIT 1"
+                    "AND strpos(body, :a) > 0 ORDER BY created_at DESC, id DESC LIMIT 1"
                 ),
-                {"o": org_id, "e": to, "t": template},
+                {"o": org_id, "e": to, "t": template, "a": about},
             ).scalar_one()
         )
 
@@ -61,7 +62,9 @@ def test_a_fictional_client_goes_from_the_access_form_to_a_verified_sandbox(
             "platform": "Payout platform", "rails": "Both", "message": "Two approvers today."}  # fmt: skip
     r = client.post("/access-requests", data=site_form)
     assert r.status_code == 200 and "Thank you" in r.text
-    assert "Robin Testwell" in _mail(engine, OPERATOR_ORG, "sales@dekern.example.test", "access_request")
+    assert "Robin Testwell" in _mail(
+        engine, OPERATOR_ORG, "sales@dekern.example.test", "access_request", email
+    )
     m = re.search(r"https://dash\.example\.test(/nda/[A-Za-z0-9_-]+)", _mail(engine, OPERATOR_ORG, email,
                   "access_request.received"))  # fmt: skip
     assert m, "the confirmation email carries the NDA link"
@@ -78,7 +81,7 @@ def test_a_fictional_client_goes_from_the_access_form_to_a_verified_sandbox(
     assert client.post(nda_path, data=data).status_code == 200
     assert "already signed" in client.get(nda_path).text
     assert "Quillfern" in _mail(engine, OPERATOR_ORG, email, "nda.signed_copy")
-    _mail(engine, OPERATOR_ORG, "sales@dekern.example.test", "nda.signed_notice")
+    _mail(engine, OPERATOR_ORG, "sales@dekern.example.test", "nda.signed_notice", email)
 
     # 3. The admin sees the request with "NDA signed", then (after the call and KYB) creates the evaluation org.
     with engine.begin() as conn:

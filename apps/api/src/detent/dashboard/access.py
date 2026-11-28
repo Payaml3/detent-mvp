@@ -385,8 +385,13 @@ def invite(
         },
     )
     link = invite_link(settings, token)
+    what = (
+        f"as a {settings.brand_name} admin"
+        if org_id == OPERATOR_ORG
+        else f"{org.name} as {role.value.replace('_', ' ')}"
+    )
     body = (
-        f"You're invited to join {org.name} as {role.value.replace('_', ' ')} in the {settings.brand_name} "
+        f"You're invited to join {what} in the {settings.brand_name} "
         f"agentic payment controls sandbox (prototype, test networks only).\n\n"
         f"Open this link within {settings.invite_days} days to confirm your email and set a "
         f"password:\n{link}\n\n"
@@ -768,6 +773,33 @@ def create_staff(conn: Connection, clock: Clock, *, email: str, display_name: st
         payload={"email": email},
     )
     return member
+
+
+def invite_staff(conn: Connection, clock: Clock, settings: Settings, *, email: str, by: Member) -> str:
+    """A DekernAI admin invites another admin by email (founder, 2026-11-28). The invite is single-use and
+    expires like any other; following it sets the new admin's own password. Returns the token."""
+    _require_staff(by)
+    ensure_operator_org(conn, clock)
+    return invite(conn, clock, settings, org_id=OPERATOR_ORG, email=email, role=STAFF_ROLE, by=by)
+
+
+_BOOTSTRAP = Member("system:bootstrap", OPERATOR_ORG, "", "DekernAI setup", STAFF_ROLE)
+
+
+def bootstrap_founder_admin(conn: Connection, clock: Clock, settings: Settings) -> str | None:
+    """The first admin without a terminal: while no DekernAI admin exists, ``FOUNDER_ADMIN_EMAIL`` gets a
+    one-time admin invite by email. Nothing happens once an admin exists, or while an invite is still open.
+    Returns the token when an invite was sent."""
+    email = (settings.founder_admin_email or "").strip()
+    if not email:
+        return None
+    ensure_operator_org(conn, clock)
+    load_org(conn, OPERATOR_ORG, lock=True)  # one bootstrap at a time, across instances
+    if list_members(conn, OPERATOR_ORG):
+        return None
+    if any(i["state"] == "open" for i in list_invites(conn, clock, OPERATOR_ORG)):
+        return None
+    return invite(conn, clock, settings, org_id=OPERATOR_ORG, email=email, role=STAFF_ROLE, by=_BOOTSTRAP)
 
 
 # ------------------------------------------------------------------------------------------ checks
