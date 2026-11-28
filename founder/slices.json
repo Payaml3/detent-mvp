@@ -201,6 +201,13 @@
    "status": "",
    "goal": "Payouts to the platform's own end users, decided under the user payout profile (spec/04, G-10, D-40).",
    "exit": "POST /v1/payment_intents with user_account_ref decides under the user payout profile (no 422 user_payouts_unavailable): a verified user's payout to their registered destination executes, user_verified false escalates, a changed destination escalates CHANGED_DETAILS, and the console, API, docs and SDKs show it."
+  },
+  {
+   "id": "T",
+   "name": "AI team view",
+   "status": "",
+   "goal": "Clients see their DekernAI agents as an AI team: limits, work and the people who decided on it (founder ask, 28 Nov).",
+   "exit": "The console and dashboard show the three agents with their limits and their latest work, each item with who resolved, approved or rejected it and what the policy decided; the page is read-only."
   }
  ],
  "stories": [
@@ -784,6 +791,13 @@
    "slice": "L",
    "criteria": 1,
    "done": 1
+  },
+  {
+   "id": "CON-11",
+   "epic": "CON",
+   "slice": "T",
+   "criteria": 3,
+   "done": 3
   },
   {
    "id": "EVL-01",

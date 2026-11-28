@@ -137,3 +137,11 @@ slices:
     user_payouts_unavailable): a verified user's payout to their registered destination executes, user_verified
     false escalates, a changed destination escalates CHANGED_DETAILS, and the console, API, docs and SDKs show it.
   stories: [USR-01, USR-02, USR-03, USR-04]
+
+- id: T
+  name: "AI team view"
+  goal: "Clients see their DekernAI agents as an AI team: limits, work and the people who decided on it (founder ask, 28 Nov)."
+  exit: >-
+    The console and dashboard show the three agents with their limits and their latest work, each item with who
+    resolved, approved or rejected it and what the policy decided; the page is read-only.
+  stories: [CON-11]

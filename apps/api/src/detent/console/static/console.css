@@ -204,3 +204,18 @@ form.inline { display: inline-flex; gap: 6px; align-items: center; margin: 0 6px
 form.inline select { width: auto; }
 fieldset { border: 0; padding: 0; margin: 0 0 12px; }
 .card form + form { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--rule); }
+
+/* ---------- CON-11 AI team ---------- */
+.agent-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.agent-head h2 { margin: 0; }
+.agent-avatar { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  font: 600 var(--fs-small)/1 var(--font-body); color: var(--pill-confirmed-ink); background: var(--pill-confirmed-bg); }
+.ai-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-gap); }
+.ai-feed { list-style: none; padding: 0; margin: 0; }
+.ai-feed > li { padding: 10px 0; border-top: 1px solid var(--rule); }
+.ai-item { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.ai-replies { margin: 6px 0 0 24px; padding-left: 12px; border-left: 2px solid var(--border); list-style: none; }
+.ai-replies li { margin: 2px 0; }
+.ai-accepted strong { color: var(--confirm); }
+.ai-rejected strong { color: var(--stop); }
+@media (max-width: 720px) { .ai-team { grid-template-columns: 1fr; } .ai-team > .card + .card { border-left: 0; border-top: 1px solid var(--border); } }

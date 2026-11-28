@@ -909,7 +909,7 @@ _Every step is recorded append-only and any payment can be replayed and exported
 
 ## CON · Back-office console
 
-_The screens where the 10-minute demo happens_ · layer: All three (console) · track: prototype · 10 stories · 4.75 days
+_The screens where the 10-minute demo happens_ · layer: All three (console) · track: prototype · 11 stories · 5.25 days
 
 ### CON-01 · Console shell and prototype labelling
 
@@ -1016,6 +1016,18 @@ _The screens where the 10-minute demo happens_ · layer: All three (console) · 
 - [x] Mode and fail-safe editable with the approvals from EXE-09; deadlines and weights shown read-only in the prototype
 
 **Priority:** Should · **Estimate:** 0.25 d · **Milestone:** L After launch (Should and Could) · **Depends on:** EXE-09 · **Traces to:** B5.failsafe, A3.gates
+
+### CON-11 · AI team view
+
+**As a** payments lead, **I want** to see the DekernAI agents that work for us as our AI team, with their limits, their work and what our people did with it, **so that** we know what each agent did, who approved or rejected it, and that the agents only propose while our rules decide.
+
+**Acceptance criteria**
+
+- [x] An AI team page shows the instruction, investigation and reconciliation agents, each with its job, what it may and may never do, who decides, and its limits (mandates in force, read-only tools, the daily AI budget), and says whether the agents call the model or use recorded stand-in answers
+- [x] Each agent's latest work is listed from agent_calls with typed fields only (no invoice or model free text), and under each item what followed from the audit log: flags resolved, the policy decision, the case or fix approved or rejected, with the person's name and role
+- [x] The page is read-only (no form, no audit write, no model call) and dashboard members reach it from the dashboard navigation for their own organisation, without demo-only links
+
+**Priority:** Should · **Estimate:** 0.5 d · **Milestone:** T AI team view · **Depends on:** CON-05, EXC-03, LED-06 · **Traces to:** A5.tools, A2.Mandate
 
 ## EVL · Evaluation harness
 
