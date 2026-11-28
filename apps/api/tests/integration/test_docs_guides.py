@@ -264,9 +264,9 @@ def test_the_shadow_to_auto_guide_holds(
 # ------------------------------------------------------------------------------------------------ DOC-05
 def test_try_it_reaches_only_the_sandbox() -> None:
     spec = json.loads((DOCS / "api" / "openapi.json").read_text())
+    # Exactly the hosted sandbox (sk_test_ keys only, test networks) and local development; nothing else.
+    assert [srv["url"] for srv in spec["servers"]] == ["https://app.dekernai.com", "http://localhost:8000"]
     for server in spec["servers"]:
-        url = server["url"]
-        assert url.startswith("http://localhost") or "sandbox" in url, url
         assert "variables" not in server  # the base URL can't be pointed anywhere else
     assert spec["security"] == [{"bearer": []}]
     assert spec["components"]["securitySchemes"]["bearer"] == {**spec["components"]["securitySchemes"]["bearer"],

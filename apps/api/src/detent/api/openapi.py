@@ -42,6 +42,10 @@ TAG_TEXT: dict[str, str] = {
 }
 
 
+# The hosted sandbox the docs' Try it panel calls (founder, 2026-11-28). It accepts sk_test_ keys only.
+SANDBOX_URL = "https://app.dekernai.com"
+
+
 def _ref(name: str) -> dict[str, str]:
     return {"$ref": REF + name}
 
@@ -517,10 +521,11 @@ def build(app: FastAPI) -> dict[str, Any]:
         },
         "servers": [
             {
-                "url": "http://localhost:8000",
-                "description": "Local development (make dev). "
-                "The public sandbox address is published at launch.",
-            }
+                "url": SANDBOX_URL,
+                "description": "The hosted sandbox: test networks and a simulated bank rail only. "
+                "Use the sandbox key you got from the dashboard.",
+            },
+            {"url": "http://localhost:8000", "description": "Local development (make dev)."},
         ],
         "security": [{"bearer": []}],
         "tags": [

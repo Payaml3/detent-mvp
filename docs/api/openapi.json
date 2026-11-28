@@ -12,8 +12,12 @@
   },
   "servers": [
     {
+      "url": "https://app.dekernai.com",
+      "description": "The hosted sandbox: test networks and a simulated bank rail only. Use the sandbox key you got from the dashboard."
+    },
+    {
       "url": "http://localhost:8000",
-      "description": "Local development (make dev). The public sandbox address is published at launch."
+      "description": "Local development (make dev)."
     }
   ],
   "security": [

@@ -2,7 +2,7 @@
 
 **Product:** agentic payment controls in three layers: decision, orchestration and operations (see `AGENTS.md`). **This spec covers:** the public API for all three layers. Decision: `/payment_intents`, `/decisions`, `/mandates`, `/policy`. Orchestration: `/send`, `/kill_switch`. Operations: `/exceptions`, `/deposit_intents`, `/reconciliation`, `/replay`, `/events`.
 
-Base URL (placeholder): `https://sandbox.api.<domain>/v1`. Every request uses TLS and carries `Authorization: Bearer sk_test_...`. The OpenAPI 3.1 file is generated from the code and then polished (API-05). This page is the contract it must match.
+Base URL (hosted sandbox, founder 2026-11-28): `https://app.dekernai.com/v1`. Every request uses TLS and carries `Authorization: Bearer sk_test_...`. The OpenAPI 3.1 file is generated from the code and then polished (API-05). This page is the contract it must match.
 
 ## Standards
 
