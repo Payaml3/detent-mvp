@@ -108,7 +108,8 @@ limits (read-only tools, untrusted text as data, a daily AI budget, recorded cal
 Above the cards, an animated team channel shows the agents working together on one sample payment: the instruction
 agent proposes, the rules escalate, the investigation agent brings cited facts, the reviewer approves, the rules run
 again and execute, orchestration sends once (no agent), and the reconciliation agent checks the ledger. Each message
-travels to the rules hub on the network beside the feed. Labelled as an illustration with sample data.
+travels to the rules bar on the network beside the feed; the network is drawn in three layer columns, so each
+agent sits in its layer, and each channel message names its layer. Labelled as an illustration with sample data.
 
 ### 4. Proof: "Built for payments you can't take back."
 

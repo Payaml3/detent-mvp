@@ -4,13 +4,20 @@ import config from "../../site.config.mjs";
 // your rules and your reviewer pass it along; a dot carries each message through your rules, which every step goes
 // through. Orchestration has no agent (invariants 5 and 6). Without script, or with reduced motion, the whole
 // conversation shows at once. Same agent names as the console's AI team page.
+// The network is drawn in the three layers, one column each; your rules run across all three as one bar.
+const layers = [
+  { id: "decision", n: 1, name: "Decision", x: 100 },
+  { id: "orchestration", n: 2, name: "Orchestration", x: 300 },
+  { id: "operations", n: 3, name: "Operations", x: 500 },
+];
+const BAR = 262;
 const nodes = {
-  ins: { x: 104, y: 112, kind: "agent", short: "Ins", label: "Instruction agent", sub: "decision" },
-  inv: { x: 456, y: 112, kind: "agent", short: "Inv", label: "Investigation agent", sub: "operations" },
-  rec: { x: 456, y: 368, kind: "agent", short: "Rec", label: "Reconciliation agent", sub: "operations" },
-  send: { x: 104, y: 368, kind: "engine", short: "Send", label: "Orchestration", sub: "no agent: rules only" },
-  you: { x: 280, y: 52, kind: "person", short: "S", label: "Sam, your reviewer", sub: "" },
-  rules: { x: 280, y: 240, kind: "rules", short: "", label: "Your rules", sub: "" },
+  ins: { x: 100, y: 132, layer: "Decision", kind: "agent", short: "Ins", label: "Instruction agent", sub: "proposes payments" },
+  you: { x: 100, y: 372, layer: "Decision", kind: "person", short: "S", label: "Sam, your reviewer", sub: "answers what's escalated" },
+  send: { x: 300, y: 132, layer: "Orchestration", kind: "engine", short: "Send", label: "No AI agent", sub: "routes and sends by your rules" },
+  inv: { x: 500, y: 132, layer: "Operations", kind: "agent", short: "Inv", label: "Investigation agent", sub: "evidence for held cases" },
+  rec: { x: 500, y: 382, layer: "Operations", kind: "agent", short: "Rec", label: "Reconciliation agent", sub: "proposes ledger fixes" },
+  rules: { x: 300, y: BAR, layer: "Decision", kind: "rules", short: "R", label: "Your rules", sub: "" },
 };
 const steps = [
   { from: "ins", who: "Instruction agent", tag: "proposes",
@@ -23,7 +30,7 @@ const steps = [
     say: "Read the raw facts first. Approved, with a reason." },
   { from: "rules", who: "Your rules", tag: "EXECUTE", chip: "ok",
     say: "Ran again on the active version before anything is sent: execute." },
-  { from: "send", who: "Orchestration", tag: "no agent",
+  { from: "send", who: "Orchestration", tag: "no AI agent",
     say: "Sent once on Base, the best rail by your policy. Confirmed." },
   { from: "rec", who: "Reconciliation agent", tag: "checks",
     say: "Ledger posting matches the transfer on chain. Nothing to fix." },
@@ -47,6 +54,10 @@ const hex = (x, y, r) => [0, 1, 2, 3, 4, 5].map((i) => {
   return `${(x + r * Math.cos(a)).toFixed(1)},${(y + r * Math.sin(a)).toFixed(1)}`;
 }).join(" ");
 const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
+// where each node's wire meets the rules bar
+const meet = Object.fromEntries(Object.entries(nodes).map(([k, n]) => [k, [n.x, k === "rules" ? BAR : n.y < BAR ? BAR - 22 : BAR + 22]]));
+// wires leave a node below its labels (top row) or above its body (bottom row), so they never cross text
+const leave = Object.fromEntries(Object.entries(nodes).map(([k, n]) => [k, [n.x, n.y < BAR ? n.y + 76 : n.y - 32]]));
 ---
 <section class="section ai-team" id="ai-team" data-section="ai-team" aria-labelledby="ai-team-title">
   <div class="wrap">
@@ -57,16 +68,16 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
 
     <figure class="stage" data-team-stage data-reveal>
       <div class="net" aria-hidden="true">
-        <svg viewBox="0 0 560 440">
-          <defs>
-            <radialGradient id="team-glow"><stop offset="0" stop-color="currentColor" stop-opacity="0.35" /><stop offset="1" stop-color="currentColor" stop-opacity="0" /></radialGradient>
-          </defs>
-          {outer.map(([id, n]) => <line class="wire" data-wire={id} x1={n.x} y1={n.y} x2={nodes.rules.x} y2={nodes.rules.y} />)}
-          <circle class="halo" cx={nodes.rules.x} cy={nodes.rules.y} r="92" fill="url(#team-glow)" />
-          <polygon class="rules-ring" points={hex(nodes.rules.x, nodes.rules.y, 58)} />
-          <polygon class="rules" data-node="rules" points={hex(nodes.rules.x, nodes.rules.y, 48)} />
-          <text class="rules-t" x={nodes.rules.x} y={nodes.rules.y - 3}>Your</text>
-          <text class="rules-t" x={nodes.rules.x} y={nodes.rules.y + 15}>rules</text>
+        <svg viewBox="0 0 600 470">
+          {layers.map((l) => (
+            <g class="layer-col" data-layer={l.id}>
+              <rect class="band" x={l.x - 96} y="4" width="192" height="462" rx="14" />
+              <text class="layer-n" x={l.x} y="34">{`${l.n} · ${l.name.toUpperCase()}`}</text>
+            </g>
+          ))}
+          {outer.map(([id, n]) => <line class="wire" data-wire={id} x1={leave[id][0]} y1={leave[id][1]} x2={meet[id][0]} y2={meet[id][1]} />)}
+          <rect class="rules" data-node="rules" x="16" y={BAR - 22} width="568" height="44" rx="22" />
+          <text class="rules-t" x="300" y={BAR + 5}>Your rules: every step passes through them</text>
           {outer.map(([id, n]) => (
             <g class={`node node-${n.kind}`} data-node={id}>
               <circle class="pulse" cx={n.x} cy={n.y} r="34" />
@@ -74,11 +85,11 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
               {n.kind === "engine" && <rect class="body" x={n.x - 28} y={n.y - 24} width="56" height="48" rx="8" />}
               {n.kind === "person" && <circle class="body" cx={n.x} cy={n.y} r="22" />}
               <text class="short" x={n.x} y={n.y + 5}>{n.short}</text>
-              <text class="lbl" x={n.x} y={n.y + (n.kind === "person" ? 40 : 50)}>{n.label}</text>
-              {n.sub && <text class="sub" x={n.x} y={n.y + 66}>{n.sub}</text>}
+              <text class="lbl" x={n.x} y={n.y + (n.kind === "person" ? 42 : 50)}>{n.label}</text>
+              {n.sub && <text class="sub" x={n.x} y={n.y + (n.kind === "person" ? 58 : 66)}>{n.sub}</text>}
             </g>
           ))}
-          <circle class="packet" data-packet r="6" cx={nodes.rules.x} cy={nodes.rules.y} />
+          <circle class="packet" data-packet r="6" cx="300" cy={BAR} />
         </svg>
       </div>
       <div class="chat">
@@ -86,9 +97,9 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
         <ol class="feed" data-feed aria-live="polite">
           {steps.map((s, i) => (
             <li class={`msg msg-${s.from}`} data-step={i} data-from={s.from}>
-              <span class={`av av-${nodes[s.from].kind}`} aria-hidden="true">{nodes[s.from].short || "R"}</span>
+              <span class={`av av-${nodes[s.from].kind}`} aria-hidden="true">{nodes[s.from].short}</span>
               <div class="bubble">
-                <p class="meta"><strong>{s.who}</strong><span class={`tag ${s.chip ? `tag-${s.chip}` : ""}`}>{s.tag}</span></p>
+                <p class="meta"><strong>{s.who}</strong><span class="in-layer" data-in-layer={nodes[s.from].layer.toLowerCase()}>{nodes[s.from].layer} layer</span><span class={`tag ${s.chip ? `tag-${s.chip}` : ""}`}>{s.tag}</span></p>
                 <p class="say">{s.say}</p>
               </div>
             </li>
@@ -117,7 +128,7 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
       <p><strong>In your console.</strong> The AI team page shows each agent’s limits, its recent work, and who on your team accepted or rejected it.</p>
     </div>
   </div>
-  <script type="application/json" data-team-nodes set:html={JSON.stringify(Object.fromEntries(Object.entries(nodes).map(([k, n]) => [k, [n.x, n.y]])))} />
+  <script type="application/json" data-team-nodes set:html={JSON.stringify(Object.fromEntries(Object.entries(nodes).map(([k, n]) => [k, [...leave[k], ...meet[k]]])))} />
 </section>
 <style>
   .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
@@ -129,15 +140,16 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
     margin: 0; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 8px; align-items: stretch;
     padding: 12px; border-radius: 18px; background: var(--text); color: var(--ink); }
   .net { display: grid; place-items: center; padding: 8px; }
-  .net svg { width: 100%; max-width: 560px; height: auto; overflow: visible; }
+  .net svg { width: 100%; max-width: 600px; height: auto; overflow: visible; }
+  .band { fill: color-mix(in srgb, var(--bg) 5%, var(--text)); stroke: var(--wire); stroke-width: 1; }
+  .layer-n { fill: var(--dim); font: 600 12px var(--font-body); letter-spacing: 0.12em; text-anchor: middle; }
   .wire { stroke: var(--wire); stroke-width: 2; transition: stroke 300ms; }
   .wire.on { stroke: var(--signal); stroke-dasharray: 6 6; animation: flow 700ms linear infinite; }
   @keyframes flow { to { stroke-dashoffset: -12; } }
-  .halo { color: var(--signal); opacity: 0.5; }
-  .rules-ring { fill: none; stroke: var(--wire); stroke-width: 2; }
-  .rules { fill: var(--bg); transition: fill 300ms; }
+  .rules { fill: var(--bg); stroke: var(--wire); stroke-width: 2; transition: fill 300ms; }
   .rules.on { fill: var(--signal); }
-  .rules-t { fill: var(--text); font: 600 15px var(--font-head); text-anchor: middle; }
+  .rules-t { fill: var(--text); font: 600 15px var(--font-head); text-anchor: middle; pointer-events: none; transition: fill 300ms; }
+  .rules.on + .rules-t { fill: var(--on-signal); }
   .node .body { fill: color-mix(in srgb, var(--bg) 10%, var(--text)); stroke: var(--wire); stroke-width: 2; transition: fill 300ms, stroke 300ms; }
   .node-agent .body { fill: var(--signal); stroke: none; }
   .node-engine .body { stroke-dasharray: 4 4; }
@@ -170,7 +182,8 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
   .av-engine { background: transparent; border: 1px dashed var(--dim); font-size: 9px; letter-spacing: -0.02em; }
   .bubble { padding: 10px 12px; border-radius: 4px 12px 12px 12px; background: color-mix(in srgb, var(--bg) 10%, var(--text)); }
   .msg-rules .bubble { background: color-mix(in srgb, var(--bg) 16%, var(--text)); }
-  .meta { display: flex; gap: 8px; align-items: center; font-size: var(--t-small); margin-bottom: 2px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: var(--t-small); margin-bottom: 2px; }
+  .in-layer { color: var(--dim); }
   .tag { padding: 1px 7px; border-radius: 999px; font-size: 11px; letter-spacing: 0.03em; color: var(--dim); border: 1px solid var(--wire); }
   .tag-wait { color: var(--text); background: var(--wait); border-color: transparent; }
   .tag-ok { color: var(--text); background: var(--ok); border-color: transparent; }
@@ -199,7 +212,7 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
   @media (max-width: 960px) {
     .head h2, .head .lead { grid-column: 1 / -1; }
     .stage { grid-template-columns: 1fr; }
-    .net svg { max-width: 420px; }
+    .net svg { max-width: 480px; }
     .chat { min-height: 0; }
     .team, .strip { grid-template-columns: 1fr; }
   }
@@ -223,8 +236,8 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
     const clear = () => {
       stage.querySelectorAll(".on").forEach((el) => el.classList.remove("on"));
     };
-    const travel = (from, to, ms) => new Promise((done) => {
-      const [x1, y1] = pos[from], [x2, y2] = pos[to], t0 = performance.now();
+    const travel = (from, ms) => new Promise((done) => {
+      const [x1, y1, x2, y2] = pos[from], t0 = performance.now();
       packet.classList.add("on");
       const frame = (t) => {
         const k = Math.min(1, (t - t0) / ms), e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
@@ -249,7 +262,7 @@ const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
           if (wire) wire.classList.add("on");
           if (from === "rules") rules.classList.add("on");
           typing.hidden = false;
-          if (from !== "rules") await travel(from, "rules", 650); else await sleep(650);
+          if (from !== "rules") await travel(from, 650); else await sleep(650);
           rules.classList.add("on");
           typing.hidden = true;
           m.classList.remove("hide");
