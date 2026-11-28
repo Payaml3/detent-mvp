@@ -97,6 +97,9 @@ def test_an_investigation_shows_who_approved_the_case(engine: Engine, clock: Fro
     )
     assert "Test reviewer" in team_map and "approved the case" in team_map
     assert "Nothing from the agents is waiting for a person." in team_map
+    for layer in ("decision", "orchestration", "operations"):
+        assert f'data-layer="{layer}"' in team_map
+    assert "No AI agent" in team_map and "prepares payments" in team_map and "proposes fixes" in team_map
 
 
 def test_the_overview_map_shows_work_waiting_for_a_person(engine: Engine, clock: FrozenClock) -> None:

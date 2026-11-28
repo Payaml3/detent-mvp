@@ -133,8 +133,10 @@ Fonts: Space Grotesk for headings, Inter for body text, JetBrains Mono for IDs, 
   `case.resolved`, `reconciliation.fix_applied`, `reconciliation.fix_rejected` and `payment.cancelled`, with the
   person's name and role. Each item links to its case, payment or reconciliation; the invoice proposal link is hidden
   for dashboard members (the invoice drop is demo-only).
-- **Overview team map:** the Overview opens with a map of the team: the three AI agents around "Your rules", with
-  "Your people" below. A red dashed line and dot mark an agent with work waiting for a person; beside the map,
+- **Overview team map:** the Overview opens with a map of the team in three columns, one per layer: the instruction
+  agent in decision, no AI agent in orchestration (routing, sending once and failover follow the rules only,
+  invariants 5 and 6), the investigation and reconciliation agents in operations. Each agent shows a few words on its
+  job. All connect to "Your rules", with "Your people" below. A red dashed line and dot mark an agent with work waiting for a person; beside the map,
   "Right now" lists that work and "Latest decisions on their work" lists the last four human decisions. Each node
   links to its agent on the AI team page. The map says "AI agents"; "agentic" stays the category word.
 - **Read-only:** the page has no form or button and writes nothing; it never calls a model (`detent/views/ai_team.py`).

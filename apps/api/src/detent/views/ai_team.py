@@ -30,11 +30,13 @@ class AgentProfile:
     never: tuple[str, ...]
     decides: str
     short: str = ""
+    task: str = ""  # a few words for the team map
 
 
 ROSTER: tuple[AgentProfile, ...] = (
     AgentProfile(
         kind="instruction",
+        task="prepares payments",
         short="Ins",
         actor="system:instruction_agent",
         name="Instruction agent",
@@ -47,6 +49,7 @@ ROSTER: tuple[AgentProfile, ...] = (
     ),
     AgentProfile(
         kind="investigation",
+        task="gathers evidence",
         short="Inv",
         actor="system:investigation_agent",
         name="Investigation agent",
@@ -59,6 +62,7 @@ ROSTER: tuple[AgentProfile, ...] = (
     ),
     AgentProfile(
         kind="reconciliation",
+        task="proposes fixes",
         short="Rec",
         actor="system:reconciliation_agent",
         name="Reconciliation agent",

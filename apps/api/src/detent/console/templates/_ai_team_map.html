@@ -1,31 +1,45 @@
-{# CON-11: the AI team map. Agents around your rules: they propose, the rules decide, people answer escalations. #}
+{# CON-11: the AI team map, by layer. Agents work in decision and operations; orchestration has no AI agent:
+   routing, sending once and failover follow the rules only (invariants 5 and 6). #}
 {% macro hex(x, y, r) %}{{ x }},{{ y - r }} {{ x + r * 0.866 }},{{ y - r / 2 }} {{ x + r * 0.866 }},{{ y + r / 2 }} {{ x }},{{ y + r }} {{ x - r * 0.866 }},{{ y + r / 2 }} {{ x - r * 0.866 }},{{ y - r / 2 }}{% endmacro %}
-{% set pos = {"instruction": (260, 58), "investigation": (78, 200), "reconciliation": (442, 200)} %}
+{% set pos = {"instruction": (110, 112), "investigation": (500, 112), "reconciliation": (620, 112)} %}
 {% set waiting_kinds = tm.waiting|map(attribute='0')|map(attribute='profile')|map(attribute='kind')|list %}
 <section class="card ai-map" data-section="ai-team-map">
   <h2><a href="/console/agents">Your AI team</a></h2>
-  <p class="small muted">Three AI agents propose; your rules decide; your people answer what the rules escalate. Red: an agent's work is waiting for a person.</p>
+  <p class="small muted">Three AI agents propose; your rules decide; your people answer what the rules escalate. Orchestration has no AI agent: routing and sending follow your rules only. Red: an agent's work is waiting for a person.</p>
   <div class="ai-map-grid">
-    <svg viewBox="0 0 520 390" role="img" aria-label="AI team map: three AI agents connected to your rules and your people">
+    <svg viewBox="0 0 680 430" role="img" aria-label="AI team map by layer: the instruction agent in decision, no AI agent in orchestration, the investigation and reconciliation agents in operations, all connected to your rules and your people">
+      <line x1="225" y1="14" x2="225" y2="200" class="ai-lane"/><line x1="440" y1="14" x2="440" y2="200" class="ai-lane"/>
+      <text x="110" y="30" class="ai-layer" data-layer="decision">DECISION</text>
+      <text x="332" y="30" class="ai-layer" data-layer="orchestration">ORCHESTRATION</text>
+      <text x="560" y="30" class="ai-layer" data-layer="operations">OPERATIONS</text>
       {% for m in tm.members %}{% set p = pos[m.profile.kind] %}{% set red = m.profile.kind in waiting_kinds %}
-      <line x1="{{ p[0] }}" y1="{{ p[1] }}" x2="260" y2="200" class="ai-link{{ ' ai-link-wait' if red }}"/>
+      <line x1="{{ p[0] }}" y1="{{ p[1] + 88 }}" x2="332" y2="290" class="ai-link{{ ' ai-link-wait' if red }}"/>
       {% endfor %}
-      <line x1="260" y1="200" x2="260" y2="334" class="ai-link{{ ' ai-link-wait' if tm.waiting }}"/>
-      <polygon points="{{ hex(260, 200, 46) }}" class="ai-hub-ring"/>
-      <polygon points="{{ hex(260, 200, 38) }}" class="ai-hub"/>
-      <text x="260" y="198" class="ai-hub-text">Your</text><text x="260" y="214" class="ai-hub-text">rules</text>
+      <line x1="332" y1="200" x2="332" y2="290" class="ai-link"/>
+      <line x1="332" y1="290" x2="332" y2="372" class="ai-link{{ ' ai-link-wait' if tm.waiting }}"/>
+      <g data-node="orchestration">
+        <rect x="302" y="84" width="60" height="56" rx="10" class="ai-engine"/>
+        <text x="332" y="117" class="ai-engine-text">Send</text>
+        <text x="332" y="160" class="ai-label">No AI agent</text>
+        <text x="332" y="176" class="ai-sub">routes and sends once,</text>
+        <text x="332" y="191" class="ai-sub">by your rules only</text>
+      </g>
+      <polygon points="{{ hex(332, 290, 46) }}" class="ai-hub-ring"/>
+      <polygon points="{{ hex(332, 290, 38) }}" class="ai-hub"/>
+      <text x="332" y="288" class="ai-hub-text">Your</text><text x="332" y="304" class="ai-hub-text">rules</text>
       {% for m in tm.members %}{% set p = pos[m.profile.kind] %}{% set red = m.profile.kind in waiting_kinds %}
       <a href="/console/agents#{{ m.profile.kind }}" data-node="{{ m.profile.kind }}">
         <polygon points="{{ hex(p[0], p[1], 27) }}" class="ai-node"/>
         <text x="{{ p[0] }}" y="{{ p[1] + 5 }}" class="ai-node-text">{{ m.profile.short }}</text>
         <circle cx="{{ p[0] + 21 }}" cy="{{ p[1] + 18 }}" r="5" class="{{ 'ai-dot-wait' if red else 'ai-dot' }}"/>
-        <text x="{{ p[0] }}" y="{{ p[1] + 46 }}" class="ai-label">{{ m.profile.name }}</text>
-        <text x="{{ p[0] }}" y="{{ p[1] + 62 }}" class="ai-sub">{% if red %}waiting for a person{% elif m.last_at %}{{ m.total }} item{{ 's' if m.total != 1 }} · last {{ m.last_at.strftime('%H:%M') }}{% else %}no work yet{% endif %}</text>
+        <text x="{{ p[0] }}" y="{{ p[1] + 48 }}" class="ai-label">{{ m.profile.name.split(' ')[0] }}</text>
+        <text x="{{ p[0] }}" y="{{ p[1] + 64 }}" class="ai-sub">{{ m.profile.task }}</text>
+        <text x="{{ p[0] }}" y="{{ p[1] + 79 }}" class="ai-sub{{ ' ai-sub-wait' if red }}">{% if red %}waiting for a person{% elif m.last_at %}{{ m.total }} item{{ 's' if m.total != 1 }} · {{ m.last_at.strftime('%H:%M') }}{% else %}no work yet{% endif %}</text>
       </a>
       {% endfor %}
-      <circle cx="260" cy="346" r="15" class="ai-people"/>
-      <text x="260" y="351" class="ai-people-text">{{ user.display_name[:1] if user else 'P' }}</text>
-      <text x="260" y="382" class="ai-label">Your people</text>
+      <circle cx="332" cy="386" r="15" class="ai-people"/>
+      <text x="332" y="391" class="ai-people-text">{{ user.display_name[:1] if user else 'P' }}</text>
+      <text x="332" y="422" class="ai-label">Your people</text>
     </svg>
     <div class="ai-map-side">
       <h3 class="small muted">Right now</h3>
