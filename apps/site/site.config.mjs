@@ -16,4 +16,6 @@ export default {
   // WEB-07: the status page reads the deploy's public health summary from the visitor's browser.
   statusUrl: "https://app.dekernai.com/status.json",
   salesInbox: "sales@dekernai.com",
+  // Developer docs on Mintlify, published from docs/ on every merge to main (founder, 2026-11-28).
+  docsUrl: "https://dekern-ai.mintlify.site",
 };

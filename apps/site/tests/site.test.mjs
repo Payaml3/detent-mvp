@@ -242,3 +242,8 @@ test("legal review 2026-11-28: no regulated-function claims; the access form say
   assert.match(text(access), /don.t add you to a mailing list/i);
   assert.match(text(read(PAGES.home)), /Pre-launch\./, "the footer says the product is pre-launch");
 });
+
+test("footer: Docs links to the published developer docs on every page", () => {
+  assert.ok(config.docsUrl.startsWith("https://"));
+  for (const [p, html] of allHtml()) assert.ok(html.includes(`href="${config.docsUrl}"`), p);
+});
