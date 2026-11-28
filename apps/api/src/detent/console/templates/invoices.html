@@ -24,7 +24,7 @@
     <td>{{ 'Claude API' if r.source == 'model' else 'Recorded response' }}</td>
     <td class="mono">{% if r.payment_id %}<a href="/console/payments/{{ r.payment_id }}">{{ r.payment_id }}</a>{% endif %}</td>
     <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td></tr>
-  {% else %}<tr><td colspan="5" class="muted">None yet.</td></tr>{% endfor %}
+  {% else %}<tr><td colspan="5" class="empty"><strong>None yet.</strong> <span>Paste an invoice above to see what the agent proposes.</span></td></tr>{% endfor %}
   </tbody>
 </table>
 {% endblock %}

@@ -39,7 +39,7 @@
 <table>
   <thead><tr><th>Run</th><th>Finished (UTC)</th><th class="num">Matched</th><th class="num">Counted</th><th class="num">Breaks</th><th class="num">Pending</th><th class="num">Rate</th></tr></thead>
   <tbody>{% for r in runs %}<tr><td class="mono">{{ r.id }}</td><td>{{ (r.finished_at or '')[:19] }}</td><td class="num">{{ r.matched }}</td><td class="num">{{ r.counted }}</td><td class="num">{{ r.breaks }}</td><td class="num">{{ r.pending }}</td><td class="num">{{ r.match_rate_bps // 100 }}.{{ '%02d' % (r.match_rate_bps % 100) }}%</td></tr>
-  {% else %}<tr><td colspan="7" class="muted">No runs yet.</td></tr>{% endfor %}</tbody>
+  {% else %}<tr><td colspan="7" class="empty"><strong>No runs yet.</strong> <span>Press Run now to match the ledger against each rail.</span></td></tr>{% endfor %}</tbody>
 </table>
 {% if decided %}
 <h2>Decided breaks</h2>

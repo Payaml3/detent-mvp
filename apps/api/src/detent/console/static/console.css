@@ -230,3 +230,8 @@ form.inline select { width: auto; }
 fieldset { border: 0; padding: 0; margin: 0 0 12px; }
 .card form + form { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--rule); }
 main:focus { outline: none; }
+
+/* empty states: say what is missing, then the next step (a sentence, with a link when there is one) */
+td.empty { padding: 28px 16px; color: var(--muted); }
+td.empty strong { display: block; margin-bottom: 4px; color: var(--text); font-weight: 500; }
+td.empty a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }

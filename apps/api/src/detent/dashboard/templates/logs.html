@@ -18,7 +18,7 @@
   <tr><td class="small"><a href="/dashboard/logs/{{ r.id }}">{{ r.at.strftime('%Y-%m-%d %H:%M:%S') }}</a></td><td class="mono">{{ r.method }}</td><td class="mono">{{ r.path }}</td>
     <td class="mono">{{ r.status }}</td><td class="small">{{ r.latency_ms }} ms</td><td class="mono">{{ r.payment_id or "" }}</td><td class="mono small">{{ r.request_id }}</td></tr>
   {% else %}
-  <tr><td colspan="7" class="muted">No requests match.</td></tr>
+  <tr><td colspan="7" class="empty"><strong>No requests match.</strong> <span>Calls made with your sandbox keys appear here.</span></td></tr>
   {% endfor %}
   </tbody>
 </table>

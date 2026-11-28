@@ -68,7 +68,7 @@
       {% if a.explorer_url %}· <a href="{{ a.explorer_url }}" rel="noopener noreferrer" target="_blank">explorer</a>{% elif a.simulated %}· simulated{% endif %}</div>{% else %}None{% endfor %}</td>
     <td class="small">{{ p.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td></tr>
   {% else %}
-  <tr><td colspan="5" class="muted">No payouts yet.</td></tr>
+  <tr><td colspan="5" class="empty"><strong>No payouts yet.</strong> <span>Force a scenario above to create one.</span></td></tr>
   {% endfor %}
   </tbody>
 </table>
