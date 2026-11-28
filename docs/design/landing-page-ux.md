@@ -105,6 +105,11 @@ the instruction agent (decision), the investigation and reconciliation agents (o
 agent does, what the client gets and what it can't do. A note says orchestration has no agent, then the built-in
 limits (read-only tools, untrusted text as data, a daily AI budget, recorded calls that replay without the model).
 
+Above the cards, an animated team channel shows the agents working together on one sample payment: the instruction
+agent proposes, the rules escalate, the investigation agent brings cited facts, the reviewer approves, the rules run
+again and execute, orchestration sends once (no agent), and the reconciliation agent checks the ledger. Each message
+travels to the rules hub on the network beside the feed. Labelled as an illustration with sample data.
+
 ### 4. Proof: "Built for payments you can't take back."
 
 Keep the current irreversible demo and its statement ("A failure can retry. A rejection can't. No retry ever

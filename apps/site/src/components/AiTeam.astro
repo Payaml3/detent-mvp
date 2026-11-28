@@ -1,40 +1,109 @@
 ---
 import config from "../../site.config.mjs";
-// The client's AI team (CON-11, spec/08 "AI team"): the three AI agents that come with the service, what each one
-// does for the client, and what it can never do. Agents work in decision and operations; orchestration has none
-// (invariants 5 and 6). Same names as the console's AI team page.
+// The client's AI team (WEB-09, CON-11): a live scene of the team at work on one sample payment. The three AI agents,
+// your rules and your reviewer pass it along; a dot carries each message through your rules, which every step goes
+// through. Orchestration has no agent (invariants 5 and 6). Without script, or with reduced motion, the whole
+// conversation shows at once. Same agent names as the console's AI team page.
+const nodes = {
+  ins: { x: 104, y: 112, kind: "agent", short: "Ins", label: "Instruction agent", sub: "decision" },
+  inv: { x: 456, y: 112, kind: "agent", short: "Inv", label: "Investigation agent", sub: "operations" },
+  rec: { x: 456, y: 368, kind: "agent", short: "Rec", label: "Reconciliation agent", sub: "operations" },
+  send: { x: 104, y: 368, kind: "engine", short: "Send", label: "Orchestration", sub: "no agent: rules only" },
+  you: { x: 280, y: 52, kind: "person", short: "S", label: "Sam, your reviewer", sub: "" },
+  rules: { x: 280, y: 240, kind: "rules", short: "", label: "Your rules", sub: "" },
+};
+const steps = [
+  { from: "ins", who: "Instruction agent", tag: "proposes",
+    say: "Read invoice INV-2026-0142. Proposing $18,500.00 USDC to Bluefin Components Ltd on Base, every field quoted from the invoice." },
+  { from: "rules", who: "Your rules", tag: "ESCALATED", chip: "wait",
+    say: "Hold for a person: first payment to this supplier, above the $10,000 auto limit." },
+  { from: "inv", who: "Investigation agent", tag: "evidence",
+    say: "Case ready for Sam. 4 cited facts: wallet unchanged since March, no screening hits, invoice matches the order. Recommends approval." },
+  { from: "you", who: "Sam, your reviewer", tag: "person",
+    say: "Read the raw facts first. Approved, with a reason." },
+  { from: "rules", who: "Your rules", tag: "EXECUTE", chip: "ok",
+    say: "Ran again on the active version before anything is sent: execute." },
+  { from: "send", who: "Orchestration", tag: "no agent",
+    say: "Sent once on Base, the best rail by your policy. Confirmed." },
+  { from: "rec", who: "Reconciliation agent", tag: "checks",
+    say: "Ledger posting matches the transfer on chain. Nothing to fix." },
+];
 const agents = [
   { short: "Ins", name: "Instruction agent", layer: "Decision",
-    does: "Reads a supplier invoice or payout request and prepares the payment: payee, amount, currency, network and wallet, each field quoted from the source.",
-    value: "Nobody retypes invoices. Anything unclear is flagged for a person, never guessed.",
+    does: "Turns invoices and payout requests into payment proposals, each field quoted from the source.",
+    value: "Nobody retypes invoices; anything unclear is flagged, never guessed.",
     limit: "Works only inside a signed mandate: named payees, a limit per payment and a total." },
   { short: "Inv", name: "Investigation agent", layer: "Operations",
-    does: "When your rules hold a payout, it gathers the evidence: the payee’s history, recent destination changes and earlier decisions. Every claim cites its source; uncited claims are removed.",
-    value: "Your reviewer opens the case with the notes already written and decides faster.",
-    limit: "It recommends; your reviewer approves or rejects, and approving runs your rules again." },
+    does: "Gathers cited evidence for every payout your rules hold; uncited claims are removed.",
+    value: "Your reviewer opens the case with the notes already written.",
+    limit: "It recommends; your reviewer approves or rejects, and your rules run again." },
   { short: "Rec", name: "Reconciliation agent", layer: "Operations",
-    does: "When the ledger and a rail disagree, it proposes the fix: which payment a stray deposit belongs to, or which account to credit, with its reasoning.",
-    value: "Every break arrives with a proposed answer, not a blank row in a spreadsheet.",
-    limit: "Only your payments lead applies a fix, and it is written as a new ledger entry." },
+    does: "Proposes the fix when the ledger and a rail disagree, with its reasoning.",
+    value: "Every break arrives with a proposed answer, not a blank spreadsheet row.",
+    limit: "Only your payments lead applies a fix, as a new ledger entry." },
 ];
-const limits = [
-  "Read-only tools, apart from each agent’s one proposal",
-  "Invoice text, names and notes are treated as data, never as instructions",
-  "A daily AI budget you can see",
-  "Every agent call is recorded and replays without calling the model",
-];
+const hex = (x, y, r) => [0, 1, 2, 3, 4, 5].map((i) => {
+  const a = (Math.PI / 3) * i - Math.PI / 2;
+  return `${(x + r * Math.cos(a)).toFixed(1)},${(y + r * Math.sin(a)).toFixed(1)}`;
+}).join(" ");
+const outer = Object.entries(nodes).filter(([id]) => id !== "rules");
 ---
 <section class="section ai-team" id="ai-team" data-section="ai-team" aria-labelledby="ai-team-title">
   <div class="wrap">
     <div class="head" data-reveal>
       <h2 id="ai-team-title">Your AI team comes with the service.</h2>
-      <p class="lead">{config.brandName} includes three AI agents that do the groundwork your payments team does by hand today. They read, check and draft. Your rules make every decision, and your people answer what the rules escalate.</p>
+      <p class="lead">{config.brandName} includes three AI agents that do the groundwork your payments team does by hand today. Watch them pass one payment along: they read, check and draft. Your rules make every decision, and your people answer what the rules escalate.</p>
     </div>
+
+    <figure class="stage" data-team-stage data-reveal>
+      <div class="net" aria-hidden="true">
+        <svg viewBox="0 0 560 440">
+          <defs>
+            <radialGradient id="team-glow"><stop offset="0" stop-color="currentColor" stop-opacity="0.35" /><stop offset="1" stop-color="currentColor" stop-opacity="0" /></radialGradient>
+          </defs>
+          {outer.map(([id, n]) => <line class="wire" data-wire={id} x1={n.x} y1={n.y} x2={nodes.rules.x} y2={nodes.rules.y} />)}
+          <circle class="halo" cx={nodes.rules.x} cy={nodes.rules.y} r="92" fill="url(#team-glow)" />
+          <polygon class="rules-ring" points={hex(nodes.rules.x, nodes.rules.y, 58)} />
+          <polygon class="rules" data-node="rules" points={hex(nodes.rules.x, nodes.rules.y, 48)} />
+          <text class="rules-t" x={nodes.rules.x} y={nodes.rules.y - 3}>Your</text>
+          <text class="rules-t" x={nodes.rules.x} y={nodes.rules.y + 15}>rules</text>
+          {outer.map(([id, n]) => (
+            <g class={`node node-${n.kind}`} data-node={id}>
+              <circle class="pulse" cx={n.x} cy={n.y} r="34" />
+              {n.kind === "agent" && <polygon class="body" points={hex(n.x, n.y, 30)} />}
+              {n.kind === "engine" && <rect class="body" x={n.x - 28} y={n.y - 24} width="56" height="48" rx="8" />}
+              {n.kind === "person" && <circle class="body" cx={n.x} cy={n.y} r="22" />}
+              <text class="short" x={n.x} y={n.y + 5}>{n.short}</text>
+              <text class="lbl" x={n.x} y={n.y + (n.kind === "person" ? 40 : 50)}>{n.label}</text>
+              {n.sub && <text class="sub" x={n.x} y={n.y + 66}>{n.sub}</text>}
+            </g>
+          ))}
+          <circle class="packet" data-packet r="6" cx={nodes.rules.x} cy={nodes.rules.y} />
+        </svg>
+      </div>
+      <div class="chat">
+        <p class="chat-top"><span class="live" aria-hidden="true"></span>Team channel · payment pay_01J…X9 <span class="soft">sample data</span></p>
+        <ol class="feed" data-feed aria-live="polite">
+          {steps.map((s, i) => (
+            <li class={`msg msg-${s.from}`} data-step={i} data-from={s.from}>
+              <span class={`av av-${nodes[s.from].kind}`} aria-hidden="true">{nodes[s.from].short || "R"}</span>
+              <div class="bubble">
+                <p class="meta"><strong>{s.who}</strong><span class={`tag ${s.chip ? `tag-${s.chip}` : ""}`}>{s.tag}</span></p>
+                <p class="say">{s.say}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p class="typing" data-typing hidden aria-hidden="true"><span></span><span></span><span></span></p>
+      </div>
+      <figcaption class="small soft cap">Illustration with sample data. Every message passes through your rules; no agent can send, retry or approve a payment.</figcaption>
+    </figure>
+
     <ol class="team">
-      {agents.map((a, i) => (
-        <li class="member" data-agent={a.short.toLowerCase()} data-reveal style={`--d:${i * 90}ms`}>
-          <p class="who"><span class="hex" aria-hidden="true">{a.short}</span><span><strong>{a.name}</strong><span class="layer">{a.layer} layer</span></span></p>
-          <p>{a.does}</p>
+      {agents.map((a) => (
+        <li class="member" data-agent={a.short.toLowerCase()} data-reveal>
+          <p class="who"><span class="hexa" aria-hidden="true">{a.short}</span><span><strong>{a.name}</strong><span class="layer">{a.layer} layer</span></span></p>
+          <p class="does">{a.does}</p>
           <dl>
             <div><dt>What you get</dt><dd>{a.value}</dd></div>
             <div><dt>What it can’t do</dt><dd>{a.limit}</dd></div>
@@ -42,38 +111,161 @@ const limits = [
         </li>
       ))}
     </ol>
-    <div class="foot" data-reveal>
-      <p class="none" data-layer="orchestration"><strong>Orchestration has no agent.</strong> Routing, sending exactly once and failover follow your rules only, so no AI ever moves money.</p>
-      <div class="limits">
-        <p class="small soft">Built-in limits for every agent</p>
-        <ul>{limits.map((l) => <li>{l}</li>)}</ul>
-      </div>
-      <p class="small soft see">In your console, the AI team page shows each agent’s limits, its recent work, and who on your team accepted or rejected it.</p>
+    <div class="strip" data-reveal>
+      <p data-layer="orchestration"><strong>Orchestration has no agent.</strong> Routing, sending exactly once and failover follow your rules only, so no AI ever moves money.</p>
+      <p><strong>Built-in limits.</strong> Read-only tools apart from each agent’s one proposal; invoice text treated as data, never instructions; a daily AI budget you can see; every call recorded and replayable without the model.</p>
+      <p><strong>In your console.</strong> The AI team page shows each agent’s limits, its recent work, and who on your team accepted or rejected it.</p>
     </div>
   </div>
+  <script type="application/json" data-team-nodes set:html={JSON.stringify(Object.fromEntries(Object.entries(nodes).map(([k, n]) => [k, [n.x, n.y]])))} />
 </section>
 <style>
   .head { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: end; margin-bottom: 40px; }
   .head h2 { grid-column: 1 / span 6; }
   .head .lead { grid-column: 7 / span 6; color: var(--text-soft); }
-  .team { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .member { padding: 32px; display: grid; gap: 18px; align-content: start; background: var(--surface); border-radius: var(--radius); }
-  .who { display: flex; gap: 14px; align-items: center; }
-  .who strong { display: block; font: 600 clamp(20px, 1.7vw, 24px)/1.2 var(--font-head); letter-spacing: -0.01em; }
+
+  /* the stage: a dark panel, like the spine's */
+  .stage { --ink: var(--bg); --dim: color-mix(in srgb, var(--bg) 55%, var(--text)); --wire: color-mix(in srgb, var(--bg) 18%, var(--text));
+    margin: 0; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 8px; align-items: stretch;
+    padding: 12px; border-radius: 18px; background: var(--text); color: var(--ink); }
+  .net { display: grid; place-items: center; padding: 8px; }
+  .net svg { width: 100%; max-width: 560px; height: auto; overflow: visible; }
+  .wire { stroke: var(--wire); stroke-width: 2; transition: stroke 300ms; }
+  .wire.on { stroke: var(--signal); stroke-dasharray: 6 6; animation: flow 700ms linear infinite; }
+  @keyframes flow { to { stroke-dashoffset: -12; } }
+  .halo { color: var(--signal); opacity: 0.5; }
+  .rules-ring { fill: none; stroke: var(--wire); stroke-width: 2; }
+  .rules { fill: var(--bg); transition: fill 300ms; }
+  .rules.on { fill: var(--signal); }
+  .rules-t { fill: var(--text); font: 600 15px var(--font-head); text-anchor: middle; }
+  .node .body { fill: color-mix(in srgb, var(--bg) 10%, var(--text)); stroke: var(--wire); stroke-width: 2; transition: fill 300ms, stroke 300ms; }
+  .node-agent .body { fill: var(--signal); stroke: none; }
+  .node-engine .body { stroke-dasharray: 4 4; }
+  .node .short { fill: var(--ink); font: 600 14px var(--font-head); text-anchor: middle; }
+  .node-agent .short { fill: var(--on-signal); }
+  .node .lbl { fill: var(--ink); font: 600 13px var(--font-body); text-anchor: middle; }
+  .node .sub { fill: var(--dim); font: 12px var(--font-body); text-anchor: middle; }
+  .node .pulse { fill: none; stroke: var(--signal); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .node.on .pulse { animation: pulse 1.4s var(--ease-out) infinite; }
+  .node.on:not(.node-agent) .body { stroke: var(--signal); }
+  @keyframes pulse { from { opacity: 0.9; transform: scale(0.8); } to { opacity: 0; transform: scale(1.5); } }
+  .packet { fill: var(--signal); opacity: 0; filter: drop-shadow(0 0 6px var(--signal)); }
+  .packet.on { opacity: 1; }
+
+  .chat { display: grid; grid-template-rows: auto 1fr auto; gap: 12px; padding: 20px; border-radius: 12px;
+    background: color-mix(in srgb, var(--bg) 6%, var(--text)); min-height: 440px; }
+  .chat-top { display: flex; align-items: center; gap: 8px; font-size: var(--t-small); color: var(--dim); }
+  .chat-top .soft { margin-left: auto; }
+  .live { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 25%, transparent); }
+  .feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; align-content: end; }
+  .msg { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; }
+  .msg.hide { display: none; }
+  .msg.new { animation: rise 420ms var(--ease-out); }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+  .av { display: grid; place-items: center; width: 30px; height: 30px; font: 600 11px var(--font-head); color: var(--ink);
+    background: color-mix(in srgb, var(--bg) 14%, var(--text)); border-radius: 8px; }
+  .av-agent { color: var(--on-signal); background: var(--signal); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); border-radius: 0; }
+  .av-person { border-radius: 50%; }
+  .av-rules { color: var(--text); background: var(--bg); }
+  .av-engine { background: transparent; border: 1px dashed var(--dim); font-size: 9px; letter-spacing: -0.02em; }
+  .bubble { padding: 10px 12px; border-radius: 4px 12px 12px 12px; background: color-mix(in srgb, var(--bg) 10%, var(--text)); }
+  .msg-rules .bubble { background: color-mix(in srgb, var(--bg) 16%, var(--text)); }
+  .meta { display: flex; gap: 8px; align-items: center; font-size: var(--t-small); margin-bottom: 2px; }
+  .tag { padding: 1px 7px; border-radius: 999px; font-size: 11px; letter-spacing: 0.03em; color: var(--dim); border: 1px solid var(--wire); }
+  .tag-wait { color: var(--text); background: var(--wait); border-color: transparent; }
+  .tag-ok { color: var(--text); background: var(--ok); border-color: transparent; }
+  .say { font-size: 15px; line-height: 1.45; color: var(--ink); }
+  .typing { display: flex; gap: 4px; padding-left: 40px; height: 10px; }
+  .typing[hidden] { display: none; }
+  .typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--dim); animation: blink 1s infinite; }
+  .typing span:nth-child(2) { animation-delay: 150ms; } .typing span:nth-child(3) { animation-delay: 300ms; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+  .cap { grid-column: 1 / -1; padding: 4px 8px 4px; color: var(--dim); }
+
+  .team { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .member { padding: 28px; display: grid; gap: 16px; align-content: start; background: var(--surface); border-radius: var(--radius); }
+  .who { display: flex; gap: 12px; align-items: center; }
+  .who strong { display: block; font: 600 clamp(19px, 1.6vw, 22px)/1.2 var(--font-head); letter-spacing: -0.01em; }
   .layer { display: block; color: var(--text-soft); font-size: var(--t-small); }
-  .hex { flex: none; display: grid; place-items: center; width: 46px; height: 52px; font: 600 15px var(--font-head);
-    color: var(--on-signal); background: var(--signal);
-    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
-  dl { margin: 0; display: grid; gap: 14px; }
+  .hexa { flex: none; display: grid; place-items: center; width: 40px; height: 46px; font: 600 13px var(--font-head);
+    color: var(--on-signal); background: var(--signal); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+  dl { margin: 0; display: grid; gap: 12px; }
   dt { font-size: var(--t-small); font-weight: 600; color: var(--text-soft); margin-bottom: 2px; }
   dd { margin: 0; }
-  .foot { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; margin-top: 32px; align-items: start; }
-  .none { grid-column: 1 / span 5; padding: 24px; border: 1px dashed var(--text-soft); border-radius: var(--radius); }
-  .limits { grid-column: 6 / span 4; }
-  .limits ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
-  .see { grid-column: 10 / span 3; }
+  .strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 28px; color: var(--text-soft); }
+  .strip strong { color: var(--text); }
+  .strip p:first-child { padding-left: 14px; border-left: 2px dashed var(--signal); }
+
   @media (max-width: 960px) {
-    .head h2, .head .lead, .none, .limits, .see { grid-column: 1 / -1; }
-    .team { grid-template-columns: 1fr; }
+    .head h2, .head .lead { grid-column: 1 / -1; }
+    .stage { grid-template-columns: 1fr; }
+    .net svg { max-width: 420px; }
+    .chat { min-height: 0; }
+    .team, .strip { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wire.on, .node.on .pulse, .typing span, .msg.new { animation: none; }
   }
 </style>
+<script>
+  // Plays the conversation in a loop while the stage is on screen. Without script, or with reduced motion,
+  // every message shows at once.
+  const stage = document.querySelector("[data-team-stage]");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (stage && !reduce && "IntersectionObserver" in window) {
+    const pos = JSON.parse(document.querySelector("[data-team-nodes]").textContent);
+    const msgs = [...stage.querySelectorAll("[data-step]")];
+    const typing = stage.querySelector("[data-typing]");
+    const packet = stage.querySelector("[data-packet]");
+    const rules = stage.querySelector('.rules[data-node="rules"]');
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    let visible = false, running = false;
+    const clear = () => {
+      stage.querySelectorAll(".on").forEach((el) => el.classList.remove("on"));
+    };
+    const travel = (from, to, ms) => new Promise((done) => {
+      const [x1, y1] = pos[from], [x2, y2] = pos[to], t0 = performance.now();
+      packet.classList.add("on");
+      const frame = (t) => {
+        const k = Math.min(1, (t - t0) / ms), e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+        packet.setAttribute("cx", String(x1 + (x2 - x1) * e));
+        packet.setAttribute("cy", String(y1 + (y2 - y1) * e));
+        if (k < 1) requestAnimationFrame(frame); else { packet.classList.remove("on"); done(); }
+      };
+      requestAnimationFrame(frame);
+    });
+    const play = async () => {
+      if (running) return;
+      running = true;
+      while (visible) {
+        msgs.forEach((m) => m.classList.add("hide"));
+        for (const m of msgs) {
+          if (!visible) break;
+          const from = m.dataset.from;
+          clear();
+          const node = stage.querySelector(`.node[data-node="${from}"]`);
+          if (node) node.classList.add("on");
+          const wire = stage.querySelector(`[data-wire="${from}"]`);
+          if (wire) wire.classList.add("on");
+          if (from === "rules") rules.classList.add("on");
+          typing.hidden = false;
+          if (from !== "rules") await travel(from, "rules", 650); else await sleep(650);
+          rules.classList.add("on");
+          typing.hidden = true;
+          m.classList.remove("hide");
+          m.classList.add("new");
+          await sleep(2300);
+          m.classList.remove("new");
+        }
+        clear();
+        await sleep(3200);
+      }
+      msgs.forEach((m) => m.classList.remove("hide"));
+      running = false;
+    };
+    new IntersectionObserver((entries) => {
+      visible = entries.some((e) => e.isIntersecting);
+      if (visible) play();
+    }, { threshold: 0.35 }).observe(stage);
+  }
+</script>
