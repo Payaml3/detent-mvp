@@ -166,7 +166,10 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     transition: border-color 400ms, transform 500ms var(--ease-out), box-shadow 500ms var(--ease-out); }
   .card > :not(.fx) { transition: opacity 400ms; }
   .card[data-mode="pending"] { border-style: dashed; }
-  .card[data-mode="pending"] > :not(.card-name, .card-q) { opacity: 0.28; }
+  .card[data-mode="pending"] > :not(.card-name, .card-q) { opacity: 0.55; }
+  /* a layer still waiting shows its shapes in grey, not a washed-out green: nothing is verified yet */
+  .card[data-mode="pending"] .chain i, .card[data-mode="pending"] .chain i + i::before { background: color-mix(in srgb, var(--text-soft) 35%, transparent); }
+  .card[data-mode="pending"] .seal { visibility: hidden; }
   .card[data-mode="active"] { border-color: var(--signal); transform: translateY(-6px); box-shadow: 0 28px 48px -30px color-mix(in srgb, var(--signal) 80%, transparent); }
   .card-name { display: flex; gap: 8px; align-items: baseline; font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
   .word { color: var(--interactive); font: 600 15px/1 var(--font-head); }
@@ -277,7 +280,6 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .cards { grid-template-columns: 1fr; gap: 10px; }
     .track { display: none; }
     .card[data-mode="active"] { transform: translateY(-3px); }
-    .card[data-mode="pending"] > :not(.card-name, .card-q) { opacity: 0.4; }
     .art-tool, .art-bubble { display: none; } /* phones: fewer captions so the figure reads at a glance */
     .headline { font-size: clamp(28px, 7.8vw, 52px); }
     .line, .line > span { display: inline; animation: none; white-space: normal; }
@@ -316,7 +318,15 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
       const latest = [...phases.slice(0, i + 1)].reverse().find((x) => x.layer === id);
       const k = order.indexOf(id);
       card.dataset.mode = k === at ? "active" : k < at ? "done" : "pending";
-      if (!latest) continue;
+      if (!latest) {
+        // a layer the payment hasn't reached yet says so, instead of showing its final state early
+        card.querySelector("[data-agent-line]").textContent = `Waits for ${cards[order[k - 1]].querySelector(".word").textContent}.`;
+        card.querySelector("[data-rule-line]").textContent = "Nothing happens here until the step before it is done.";
+        const chip = card.querySelector("[data-chip]");
+        chip.textContent = "WAITING";
+        chip.className = "chip st-RECEIVED";
+        continue;
+      }
       card.dataset.state = latest.status;
       card.querySelector("[data-agent-line]").textContent = latest.agent;
       card.querySelector("[data-rule-line]").textContent = latest.rule;
