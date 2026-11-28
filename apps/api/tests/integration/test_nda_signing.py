@@ -61,12 +61,17 @@ def _sign(web: TestClient, path: str, **over: str) -> Any:
     return web.post(path, data=data, headers={"user-agent": "pytest-browser"})
 
 
-def test_the_shipped_draft_is_not_open_for_signing(web: TestClient, engine: Engine) -> None:
-    # The text in the package still has [placeholders]: no link is sent and no page opens.
-    assert not nda.current().ready
+def test_a_draft_with_placeholders_is_not_open_for_signing(
+    web: TestClient, engine: Engine, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The shipped text is final; a text with any [placeholder] sends no link and opens no page.
+    assert nda.current().ready
+    _email_addr, live = _request(web, engine)
+    assert live is not None
+    monkeypatch.setattr(nda, "current", lambda: nda.Nda("draft", "Between [company name] and DekernAI."))
     _email_addr, path = _request(web, engine)
     assert path is None
-    assert web.get("/nda/anything").status_code == 404
+    assert web.get(live).status_code == 404
 
 
 def test_signing_stores_one_record_and_emails_both_copies(
