@@ -23,7 +23,7 @@ const layers = [
     </div>
     <p class="pid-row" data-reveal>One payment ID for life: <span class="pid">{PAYMENT_ID}</span></p>
     <div class="stage-wrap">
-    <div class="stage" aria-hidden="true"><canvas data-spine-stage></canvas>{layers.map((l, i) => <span class="stage-label small" data-stage-label={i} hidden><b>{l.word}</b> {l.name.toLowerCase()}</span>)}<p class="small stage-cap">Scroll: one payment through the three layers</p></div>
+    <div class="stage" aria-hidden="true"><canvas data-spine-stage></canvas>{layers.map((l, i) => <span class="stage-label small" data-stage-label={i} hidden><b>{l.word}</b> {l.name.toLowerCase()}</span>)}<p class="small stage-cap"><span class="cap-wide">Scroll: one</span><span class="cap-narrow">One</span> payment through the three layers</p></div>
     <ol class="cols">
       {layers.map((l, i) => (
         <li class="col" data-card data-layer-status={l.status} style={`--d:${i * 90}ms`}>
@@ -50,13 +50,16 @@ const layers = [
   .pid-row { color: var(--text-soft); }
   .pid { color: var(--text); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; word-break: break-all; }
   .stage-wrap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; align-items: start; }
-  .stage { grid-column: 1 / span 6; position: sticky; top: 96px; height: min(78vh, 680px); border-radius: 14px; overflow: hidden; background: var(--text); }
+  .stage { grid-column: 1 / span 6; position: sticky; top: 96px; height: min(78vh, 680px); }
   .stage canvas { width: 100%; height: 100%; display: block; }
-  .stage-label { position: absolute; left: 0; top: 0; padding: 4px 10px; border-radius: 999px; white-space: nowrap; pointer-events: none;
-    color: color-mix(in srgb, var(--bg) 60%, var(--text)); background: color-mix(in srgb, var(--bg) 6%, var(--text)); transition: color 300ms, background 300ms; }
-  .stage-label b { font-weight: 600; }
-  .stage-label.on { color: var(--on-signal); background: var(--signal); }
-  .stage-cap { position: absolute; left: 20px; bottom: 16px; color: color-mix(in srgb, var(--bg) 70%, var(--text)); }
+  .stage-label { position: absolute; left: 0; top: 0; padding: 5px 12px; border-radius: 999px; white-space: nowrap; pointer-events: none;
+    color: var(--text-soft); background: var(--surface); box-shadow: 0 0 0 1px var(--line), 0 6px 18px -10px color-mix(in srgb, var(--text) 40%, transparent);
+    transition: color 300ms, background 300ms, box-shadow 300ms; }
+  .stage-label b { font-weight: 600; color: var(--text); }
+  .stage-label.on { color: var(--on-signal); background: var(--signal); box-shadow: 0 8px 22px -10px var(--signal); }
+  .stage-label.on b { color: var(--on-signal); }
+  .stage-cap { position: absolute; left: 0; bottom: 4px; color: var(--text-soft); }
+  .cap-narrow { display: none; }
   .cols { grid-column: 7 / span 6; list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .col { min-height: 42vh; transition: box-shadow 300ms var(--ease-out); }
   .col.on { box-shadow: inset 4px 0 0 var(--signal); }
@@ -70,7 +73,10 @@ const layers = [
   dd { margin: 0; }
   @media (max-width: 900px) {
     .head h2, .statement { grid-column: 1 / -1; }
-    .stage { display: none; }
+    .stage { grid-column: 1 / -1; position: relative; top: auto; height: clamp(340px, 92vw, 460px); margin-bottom: 8px; }
+    .stage-label { padding: 4px 10px; }
+    .cap-wide { display: none; }
+    .cap-narrow { display: inline; }
     .cols { grid-column: 1 / -1; }
     .col { min-height: 0; }
     .col { padding: 24px; }
@@ -80,15 +86,24 @@ const layers = [
   const canvas = document.querySelector("[data-spine-stage]");
   const cols = [...document.querySelectorAll("[data-layer-status]")];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const narrow = matchMedia("(max-width: 900px)").matches;
   if (canvas && getComputedStyle(canvas.parentElement).display !== "none") {
     import("../scripts/layers3d.js").then(({ mountLayers }) => {
       const stage = mountLayers(canvas);
+      if (!stage) { canvas.parentElement.remove(); return; }
       const pick = (col) => {
         cols.forEach((c) => c.classList.toggle("on", c === col));
-        stage?.setState(col.dataset.layerStatus, col.dataset.layerStatus === "CONFIRMED");
+        stage.setState(col.dataset.layerStatus);
       };
+      if (narrow) {
+        // phones: the stage sits above the cards, so it walks through the three layers by itself
+        let i = 0;
+        stage.setState(cols[0].dataset.layerStatus);
+        if (!reduce) setInterval(() => { i = (i + 1) % cols.length; stage.setState(cols[i].dataset.layerStatus); }, 3600);
+        return;
+      }
       pick(cols[0]);
-      // the layer card nearest the middle of the screen lights its plate in the stage
+      // the layer card nearest the middle of the screen lights its slab in the stage
       const io = new IntersectionObserver((entries) => { for (const e of entries) if (e.isIntersecting) pick(e.target); }, { rootMargin: "-45% 0px -45% 0px" });
       cols.forEach((c) => io.observe(c));
       if (reduce) pick(cols[2]);
