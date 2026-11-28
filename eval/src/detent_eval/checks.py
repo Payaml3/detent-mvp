@@ -375,15 +375,7 @@ def expectations(  # noqa: PLR0912, PLR0915 - one block per assertion keyword
         if alias and env.world.chain is not None:
             addr = env.payees[alias]
             bal = env.world.chain.balance(addr)
-            n = c.execute(
-                text(
-                    "SELECT count(*) FROM attempts a JOIN payment_intents p ON p.org_id=a.org_id AND "
-                    "p.id=a.payment_id JOIN destinations d ON d.org_id=p.org_id AND d.id=p.destination_id "
-                    "WHERE a.org_id=:o AND lower(d.address)=:a AND a.status IN "
-                    "('SUBMITTED','UNKNOWN','CONFIRMED')"
-                ),
-                {"o": org, "a": addr.lower()},
-            ).scalar_one()
+            n = _live_attempts_paying(c, env.world.chain, org, addr)
             if bal or n:
                 fails.append(f"{alias} wallet received {bal} minor units ({n} attempts)")
         for pair in want.get("same_decision", []):
@@ -429,3 +421,40 @@ def expectations(  # noqa: PLR0912, PLR0915 - one block per assertion keyword
             if got_a != want["proposal_amount"]:
                 fails.append(f"proposal amount {got_a}, expected {want['proposal_amount']}")
     return fails
+
+
+def _live_attempts_paying(c: Any, chain: Any, org: str, addr: str) -> int:
+    """Live attempts (SUBMITTED, UNKNOWN or CONFIRMED) whose transfer pays ``addr``.
+
+    A destination row is changed in place, so its current address is not where an earlier attempt sent
+    the money: in the wallet-change race the worker can send to the approved address a moment before the
+    change commits. Where the attempt has a transaction on the chain, the recipient is read from that
+    transaction itself. Without one (not broadcast, or a non-chain rail) the destination's current address
+    is used, which can only over-count: the check stays strict."""
+    rows = c.execute(
+        text(
+            "SELECT a.tx_hash, lower(d.address) AS current FROM attempts a JOIN payment_intents p "
+            "ON p.org_id=a.org_id AND p.id=a.payment_id JOIN destinations d ON d.org_id=p.org_id "
+            "AND d.id=p.destination_id WHERE a.org_id=:o AND a.status IN ('SUBMITTED','UNKNOWN','CONFIRMED')"
+        ),
+        {"o": org},
+    ).all()
+    want = addr.lower()
+    n = 0
+    for r in rows:
+        paid = _transfer_recipient(chain, r.tx_hash) if r.tx_hash else None
+        if (paid or r.current) == want:
+            n += 1
+    return n
+
+
+def _transfer_recipient(chain: Any, tx_hash: str) -> str | None:
+    """The recipient of the token transfer in ``tx_hash``, read from the chain; None if it can't be read."""
+    try:
+        tx = chain.w3().eth.get_transaction(tx_hash)
+        fn, args = chain.token().decode_function_input(tx["input"])
+    except Exception:  # not on the chain yet, or not a token call: fall back (strict)
+        return None
+    if fn.fn_name != "transfer" or str(tx["to"]).lower() != str(chain.usdc).lower():
+        return None
+    return str(args["to"]).lower()
