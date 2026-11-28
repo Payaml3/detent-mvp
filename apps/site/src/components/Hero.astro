@@ -121,12 +121,16 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
   .cards .card { --text: var(--ink); --bg: var(--paper); --text-soft: var(--ink-soft); color: var(--text); }
   .hero .secondary { color: var(--paper); border-color: var(--paper); background: transparent; }
   .hero .secondary:hover { background: color-mix(in srgb, var(--paper) 12%, transparent); }
-  .art { position: absolute; right: 0; top: 0; width: 58%; height: 74%; pointer-events: none; }
+  /* The art owns the space right of the text column and never sits under the headline: its left edge is the
+     end of the 8-of-12 intro column (wrap 1360px, gutter, 24px gaps) plus one gap. */
+  .art { --art-left: calc((100% - min(100%, 1360px)) / 2 + var(--gutter) + (min(100%, 1360px) - 2 * var(--gutter) + 24px) * 2 / 3);
+    position: absolute; left: var(--art-left); top: 0; width: calc(100% - var(--art-left)); max-width: none; height: 74%; pointer-events: none; }
   .hero-grid { position: relative; z-index: 2; min-height: max(760px, 100svh); display: grid; grid-template-columns: repeat(12, 1fr);
     grid-template-rows: 1fr auto; column-gap: 24px; row-gap: 56px; padding-top: 136px; padding-bottom: 48px; pointer-events: none; }
   .hero-grid > * { pointer-events: auto; }
-  .intro { grid-column: 1 / span 7; display: grid; gap: 28px; align-content: start; }
-  .headline { font-size: clamp(44px, 4.6vw, 80px); line-height: 0.98; }
+  .intro { grid-column: 1 / span 8; display: grid; gap: 28px; align-content: start; container-type: inline-size; }
+  /* the longer line is about 12 em wide, so 8cqi keeps it inside the intro column at every width */
+  .headline { font-size: clamp(36px, 8cqi, 80px); line-height: 0.98; }
   .line > span { white-space: nowrap; }
   .line { display: block; overflow: hidden; padding-bottom: 0.06em; }
   .line > span { display: inline-block; animation: rise 900ms var(--ease-out) both; }
@@ -260,18 +264,22 @@ const category = config.category.charAt(0).toUpperCase() + config.category.slice
     .token-slot, .track-fill, .packet-lane { transition: none; }
   }
   @media (max-width: 1100px) {
-    .art { width: 60%; height: 52%; top: 10%; opacity: 0.55; }
-    .intro { grid-column: 1 / span 9; }
+    /* tablets and phones: the grid steps aside (display: contents) so the art gets its own full-width band above
+       the headline and never sits behind the text. The canvas stays a child of .hero, so its labels still place
+       by offsetTop. */
+    .hero { display: flex; flex-direction: column; padding: 88px var(--gutter) 48px; }
+    .hero-grid { display: contents; }
+    .art { order: 1; position: relative; inset: auto; width: calc(100% + 2 * var(--gutter)); height: clamp(260px, 46vw, 440px);
+      margin: 0 calc(-1 * var(--gutter)) 8px; opacity: 1; }
+    .intro { order: 2; position: relative; z-index: 2; }
+    .headline { font-size: clamp(36px, 6.4cqi, 64px); }
+    .cards { order: 3; position: relative; z-index: 2; margin-top: 56px; }
   }
   @media (max-width: 680px) {
-    /* phones: the grid steps aside (display: contents) so the art leads the first screen, full width, above the
-       headline. The canvas stays a child of .hero, so its labels still place by offsetTop. */
-    .hero { display: flex; flex-direction: column; padding: 72px var(--gutter) 40px; }
-    .hero-grid { display: contents; }
-    .art { order: 1; position: relative; inset: auto; width: calc(100% + 2 * var(--gutter)); height: clamp(260px, 74vw, 340px);
-      margin: 0 calc(-1 * var(--gutter)) 4px; opacity: 1; }
-    .intro { order: 2; position: relative; z-index: 2; gap: 20px; }
-    .cards { order: 3; position: relative; z-index: 2; margin-top: 40px; }
+    .hero { padding: 72px var(--gutter) 40px; }
+    .art { height: clamp(260px, 74vw, 340px); margin-bottom: 4px; }
+    .intro { gap: 20px; }
+    .cards { margin-top: 40px; }
     .art-bubble { width: 150px; font-size: 10.5px; padding: 6px 9px; }
     .art-verdict { max-width: 200px; font-size: 12px; padding: 6px 10px; }
     .art-label { font-size: 12px; }
