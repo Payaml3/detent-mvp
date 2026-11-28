@@ -8,7 +8,7 @@
 
 | Layer | Question it answers | What it does |
 |---|---|---|
-| **1. Decision** | Should this payment happen? | Execute, escalate or block every pay-in and pay-out, under rules the client owns |
+| **1. Decision** | Should this payment happen? | Execute, escalate or block every deposit and payout, under rules the client owns |
 | **2. Orchestration** | How and where does it go? | Picks the best rail by policy, sends it exactly once, fails over only on technical errors, and has a kill switch |
 | **3. Operations** | What happens around it? | Exceptions queue, reconciliation across rails, and audit with replay |
 
@@ -21,7 +21,7 @@ AI agents work across all three, preparing intents, investigating escalations an
 | Buyers (heads of payments, compliance) | "Agentic payment controls" |
 | Investors and analysts | "Payment operations software, with orchestration and AI agents" |
 | Regulators and contracts | "A technology service provider" (an ICT third-party provider under DORA), never a payment service provider |
-| Developers | "A decision and orchestration API for pay-ins and pay-outs" |
+| Developers | "A decision and orchestration API for deposits and payouts" |
 
 ## Rules for wording
 

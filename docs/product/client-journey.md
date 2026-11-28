@@ -47,7 +47,7 @@ Founder's flow (2026-11-26), with policy sign-off and shadow kept before any liv
   that leads into discovery and KYB) replace "Get a free shadow report" on the site. "Talk to us" stays on the
   plans (D-15). The site shows these phases where it showed the shadow-report offer, without phase 5 (founder, 2026-11-28: the site shows six phases, with no shadow phase).
 - **Plans:** Pilot, Growth and Scale stay; every plan says "Talk to us" (D-15 otherwise unchanged). The Pilot
-  covers phases 3 to 6 on one rail.
+  covers phases 3 to 6 on one rail (phases 3 to 5 in the site's six-phase numbering).
 - **Shadow mode:** stays (D-24, SHD stories), used on live traffic in phase 5 and, where the client wants it,
   on an exported month during policy setup to calibrate rule set v1. It is never a free pre-sale product.
 - **Targets (B7):** "under 10 days from pilot signed to shadow live" now reads as phase 2 exit to phase 5

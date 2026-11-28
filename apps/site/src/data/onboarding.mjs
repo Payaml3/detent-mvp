@@ -2,8 +2,8 @@
 // each with an owner and an exit check. The client signs every exit check that moves money closer to being
 // sent (phases 4 and 5). The site shows no shadow phase (founder, 2026-11-28). There is no free pre-sale report.
 export const phases = [
-  { n: 1, name: "Discovery", what: "A discovery call and a live demo. We check the fit together: your rails, your volumes and how your rules work today.",
-    us: "Founder", you: "Head of payments", exit: "Both sides want to go ahead; NDA signed" },
+  { n: 1, name: "Discovery", what: "A mutual NDA, then a commercial call with a live demo. We check the fit together: your rails, your volumes and how your rules work today.",
+    us: "Founder", you: "Head of payments", exit: "NDA signed; both sides want to go ahead" },
   { n: 2, name: "Contract and due diligence", what: "Our due diligence on your business (KYB). Master agreement, data processing agreement and the clause that says you own the rules. We agree the pilot scope: rail, volumes and dates.",
     us: "Founder and counsel", you: "Legal and compliance", exit: "Contract and DPA signed; pilot scope agreed" },
   { n: 3, name: "Sandbox integration", what: "Your organisation, invites and sandbox keys. Your engineers integrate the API and webhooks, and trigger every path with the sandbox values.",

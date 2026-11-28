@@ -2,14 +2,14 @@
 const layers = [
   {
     id: "decision", name: "Decision", question: "Should this payment happen?",
-    body: "Execute, escalate or block every pay-in and payout under rules your compliance lead approved. Mandate, KYB, screening, travel rule, limits, daily caps and unusual-activity checks, each with its reason and evidence.",
+    body: "Execute, escalate or block every deposit and payout under rules your compliance lead approved. Mandate, KYB, screening, travel rule, limits, daily caps and unusual-activity checks, each with its reason and evidence.",
     modules: ["Intent", "Mandate", "Decide", "Policy"],
     agentTitle: "Instruction agent",
     agent: "Proposed $18,500.00 USDC to Bluefin Components Ltd from INV-2026-0142. Network Base, wallet matches the registry. No flags.",
     cite: "Every field quoted from the invoice; the rules decide.",
   },
   {
-    id: "orchestration", name: "Orchestration", question: "How and where should it execute?",
+    id: "orchestration", name: "Orchestration", question: "How and where does it go?",
     body: "Picks the best rail by policy, sends exactly once, fails over only on technical errors, and stops everything when the kill switch is on. A timeout becomes UNKNOWN, never FAILED.",
     modules: ["Route", "Execute", "Connect"],
     agentTitle: "Investigation agent",
@@ -17,7 +17,7 @@ const layers = [
     cite: "Cites the receipt and the rail’s status; it can’t retry or approve.",
   },
   {
-    id: "operations", name: "Operations", question: "How is it monitored, reconciled and proven?",
+    id: "operations", name: "Operations", question: "Can you show what happened?",
     body: "An exceptions queue with owners and deadlines, one ledger reconciled across rails, and an audit log where every payment replays to the decision it got.",
     modules: ["Exceptions", "Reconcile", "Prove"],
     agentTitle: "Reconciliation agent",
