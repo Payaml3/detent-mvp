@@ -12,6 +12,14 @@ from detent.agents.llm import AnthropicLLM
 from detent.agents.tools import TOOLS
 
 
+class FakeBadRequest(Exception):
+    status_code = 400
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+        self.body = {"type": "error", "error": {"type": "invalid_request_error", "message": message}}
+
+
 class FakeMessages:
     def __init__(self, replies: list[Any]) -> None:
         self.replies = replies
@@ -19,7 +27,10 @@ class FakeMessages:
 
     def create(self, **kw: Any) -> Any:
         self.requests.append(kw)
-        return self.replies.pop(0)
+        r = self.replies.pop(0)
+        if isinstance(r, Exception):
+            raise r
+        return r
 
 
 def reply(stop: str, content: list[Any], model: str = "claude-sonnet-5-5") -> Any:
@@ -30,6 +41,8 @@ def llm_with(replies: list[Any]) -> tuple[AnthropicLLM, FakeMessages]:
     fake = FakeMessages(replies)
     a = AnthropicLLM.__new__(AnthropicLLM)
     a._client = NS(beta=NS(messages=fake))  # type: ignore[attr-defined]
+    a._anthropic = NS(BadRequestError=FakeBadRequest)  # type: ignore[attr-defined]
+    a._too_large = set()  # type: ignore[attr-defined]
     return a, fake
 
 
@@ -109,3 +122,28 @@ def test_tool_arguments_keep_only_strings() -> None:
         tool_handler=lambda n, args: (seen.append(args), "[]")[1],
     )
     assert seen == [{"x": "y"}]
+
+
+def test_grammar_too_large_falls_back_to_plain_json_and_remembers() -> None:
+    too_large = FakeBadRequest("The compiled grammar is too large, which would cause performance issues.")
+    answer = '```json\n{"ok": true}\n```'
+    a, fake = llm_with(
+        [
+            too_large,
+            reply("end_turn", [NS(type="text", text=answer)]),
+            reply("end_turn", [NS(type="text", text="{}")]),
+        ]
+    )
+    r = a.complete(model="m", system="sys", user="u", schema=SCHEMA)
+    assert json.loads(r.raw_text) == {"ok": True}
+    first, second = fake.requests[0], fake.requests[1]
+    assert "output_config" in first and "output_config" not in second
+    assert second["system"].startswith("sys") and '"additionalProperties":false' in second["system"]
+    a.complete(model="m", system="sys", user="u", schema=SCHEMA)  # the same schema is not tried again
+    assert "output_config" not in fake.requests[2]
+
+
+def test_other_bad_requests_still_raise() -> None:
+    a, _ = llm_with([FakeBadRequest("max_tokens: too large")])
+    with pytest.raises(FakeBadRequest):
+        a.complete(model="m", system="s", user="u", schema=SCHEMA)
