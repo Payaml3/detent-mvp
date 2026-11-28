@@ -80,9 +80,12 @@ class Settings(BaseSettings):
     banksim_url: str = "http://localhost:8100"
     rail_timeout_seconds: float = 10.0  # how long an adapter waits for a rail's answer before UNKNOWN
     faultproxy_url: str = "http://localhost:8200"
-    email_provider: str = (
-        "outbox"  # the production provider is an open founder decision; only "outbox" exists
-    )
+    # "outbox": emails are stored only (development, tests, the demo). "zeptomail": dashboard emails (invites,
+    # the sales inbox notice) are also sent through Zoho ZeptoMail by the worker (founder, 2026-11-28).
+    email_provider: str = "outbox"
+    zeptomail_token: SecretStr = SecretStr("")  # the mail agent's Send Mail token; set on the server only
+    zeptomail_api_url: str = "https://api.zeptomail.eu/v1.1/email"  # EU data centre
+    email_from: str = "notifications@dekernai.com"
     # P2: where invite links point (the dashboard's public address once deployed; spec/08 dashboard.<domain>).
     dashboard_url: str = "http://localhost:8000"
     invite_days: int = 7  # DSH-01, DSH-11: invites are single-use and expire after 7 days
@@ -183,11 +186,7 @@ class Settings(BaseSettings):
             raise ValueError("WORKER_EXTRA_HANDLER_MODULES is only allowed with APP_ENV=test")
         if self.webhook_allow_private_urls and self.app_env not in ("dev", "test"):
             raise ValueError("WEBHOOK_ALLOW_PRIVATE_URLS is only allowed with APP_ENV=dev or test")
-        if self.email_provider != "outbox":
-            raise ValueError(
-                "EMAIL_PROVIDER: only 'outbox' exists; the transactional email provider is an open "
-                "founder decision"
-            )
+        self._check_email()
         if not 1 <= self.invite_days <= 30 or not 1 <= self.evaluation_days <= 365:
             raise ValueError("INVITE_DAYS must be 1 to 30 and EVALUATION_DAYS 1 to 365")
         if self.sandbox_daily_payments < 1 or self.sandbox_daily_investigations < 1:
@@ -219,6 +218,12 @@ class Settings(BaseSettings):
     @property
     def is_demo(self) -> bool:
         return self.app_env == "demo"
+
+    def _check_email(self) -> None:
+        if self.email_provider not in ("outbox", "zeptomail"):
+            raise ValueError("EMAIL_PROVIDER must be 'outbox' or 'zeptomail'")
+        if self.email_provider == "zeptomail" and not self.zeptomail_token.get_secret_value():
+            raise ValueError("EMAIL_PROVIDER=zeptomail needs ZEPTOMAIL_TOKEN (the mail agent's send token)")
 
     def secret_values(self) -> list[str]:
         """Every configured secret value, for log redaction."""

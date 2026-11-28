@@ -41,6 +41,7 @@ class Worker:
         importlib.import_module("detent.exceptions.investigation_job")  # case.investigate (EXC-03)
         importlib.import_module("detent.webhooks.delivery")  # webhook.deliver (WHK-03)
         importlib.import_module("detent.incidents.jobs")  # invariants.check (EXE-10)
+        importlib.import_module("detent.dashboard.email_delivery")  # email.send (ZeptoMail)
         for mod in rt.settings.worker_extra_handler_modules:
             importlib.import_module(mod)
 

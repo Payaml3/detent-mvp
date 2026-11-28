@@ -4,9 +4,9 @@ The form is public, so everything in it is untrusted text: lengths are capped, i
 goes to a model, and nothing in it is followed. A form with the hidden `website` field filled in is treated as
 a bot: it gets the same thank-you and nothing is stored. The same work email within a day is not stored twice.
 
-Until the founder chooses a transactional email provider (an open decision), "emailed" means the outbox
-(G-02), like every other dashboard email. With no `SALES_INBOX` set, the lead is stored and the admin inbox
-says nothing was sent.
+"Emailed" means the notice went to the outbox (G-02), like every other dashboard email; with
+`EMAIL_PROVIDER=zeptomail` the worker then sends it (`dashboard/email.py`). With no `SALES_INBOX` set, the
+lead is stored and the admin inbox says nothing was sent.
 """
 
 from __future__ import annotations
@@ -86,6 +86,7 @@ def submit(conn: Connection, clock: Clock, settings: Settings, req: AccessReques
             org_id=OPERATOR_ORG,
             to=settings.sales_inbox,
             template="access_request",
+            settings=settings,
             body=(
                 "A new access request from the website (untrusted text from a public form).\n\n"
                 f"Name: {r.name}\nWork email: {r.email}\nCompany: {r.company}\nRole: {r.role}\n"

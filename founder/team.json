@@ -1779,8 +1779,8 @@
    "initiative": "Developer dashboard",
    "slice": "P2",
    "priority": "",
-   "status": "in_progress",
-   "progress": "2/3",
+   "status": "done",
+   "progress": "3/3",
    "deps": [],
    "dependents": []
   },

@@ -130,8 +130,8 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   expired one keeps `organisation_expired`) and a read-only dashboard.
 - **Invites and sign-up (DSH-01, DSH-02, DSH-11):** an invite stores only a SHA-256 of a 256-bit token. Opening the
   link confirms the email; the person sets a password (argon2id, at least 12 characters, not containing the email).
-  An invite to the same address replaces the open one. Until the founder chooses an email provider, invites go to
-  the outbox and the admin sees the owner's link once on the organisation page.
+  An invite to the same address replaces the open one. Invites go to the outbox and the admin sees the owner's link
+  once on the organisation page; with `EMAIL_PROVIDER=zeptomail` (D-42) the worker also emails them.
 - **Sign-in:** one email signs in to one organisation. Attempts are limited per email (10 a minute) and per client
   address (30). A new session on every sign-in; every page reloads the member, so removal or a role change takes
   effect at once. Every form carries a per-session CSRF token; redirects after sign-in stay on site.
@@ -139,8 +139,12 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
   takes away the account owner role. The last account owner can't be demoted or removed (database trigger, plus a
   lock on the organisation row against two owners demoting each other). Removing a member revokes their API keys
   at once. Members are never deleted.
-- **Not yet:** the transactional email provider (DSH-02 criterion 2 stays open), and the sandbox and verification
-  pages (later P2 groups; the checklist links to them). Keys, logs, webhooks and usage: P2 group 2 below.
+- **Email (DSH-02 criterion 2, D-42):** `dashboard/email.send_email` writes every dashboard email to the outbox in
+  the caller's transaction. With `EMAIL_PROVIDER=zeptomail` the row's channel is `email` and an `email.send` job
+  (`dashboard/email_delivery.py`) posts it to ZeptoMail's EU API from `EMAIL_FROM`: 2xx stores `sent_at` and the
+  provider's request ID; 429, 5xx and network errors retry with the worker's backoff; other 4xx are stored in
+  `last_error` and not retried. Console notices to counterparties stay `email_mock` whatever the provider.
+- **Not yet (at the time):** the sandbox and verification pages (later P2 groups; the checklist links to them). Keys, logs, webhooks and usage: P2 group 2 below.
 
 ## As built (P2 group 2)
 
@@ -374,7 +378,7 @@ Python (`sdks/python`) and TypeScript (`sdks/typescript`), generated from `opena
 ## Needed from the founder before M8 to M11
 
 - the name and domain
-- a transactional email provider
+- a transactional email provider (chosen: ZeptoMail, D-42)
 - an always-on hosting tier for the sandbox
 - a Mintlify account
 - the booking page link

@@ -5,8 +5,8 @@ They create a client organisation after KYB, or an evaluation organisation with 
 owner, extend an evaluation, and suspend or reinstate an organisation. Every action is audited in the
 organisation it changes.
 
-Until the founder chooses a transactional email provider, an invite goes to the outbox and the admin sees its
-link once, here, to send by hand.
+An invite goes to the outbox (and, with `EMAIL_PROVIDER=zeptomail`, is emailed by the worker); the admin also
+sees its link once, here, to send by hand if the email doesn't arrive.
 """
 
 from __future__ import annotations
