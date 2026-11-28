@@ -1252,28 +1252,28 @@
    "epic": "USR",
    "slice": "U",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "USR-02",
    "epic": "USR",
    "slice": "U",
    "criteria": 2,
-   "done": 0
+   "done": 2
   },
   {
    "id": "USR-03",
    "epic": "USR",
    "slice": "U",
    "criteria": 1,
-   "done": 0
+   "done": 1
   },
   {
    "id": "USR-04",
    "epic": "USR",
    "slice": "U",
    "criteria": 2,
-   "done": 0
+   "done": 2
   }
  ]
 }

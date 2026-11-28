@@ -30,6 +30,7 @@ from detent.policy.facts import (
     ScreeningResult,
     TravelRuleFacts,
     Unavailable,
+    UserFacts,
 )
 from detent.policy.schema import load_ruleset
 
@@ -68,7 +69,9 @@ def facts_from_json(f: dict[str, Any]) -> Facts:
         source=f["source"],
         amount=_money(f["amount"]),  # type: ignore[arg-type]
         network=f["network"],
-        counterparty=CounterpartyFacts(
+        counterparty=None
+        if cp is None
+        else CounterpartyFacts(
             cp["id"],
             cp["name"],
             cp["kyb_status"],
@@ -100,6 +103,14 @@ def facts_from_json(f: dict[str, Any]) -> Facts:
         else Unavailable(**md)
         if _unavailable(md)
         else MandateFacts(md["id"], md["valid"], md.get("reason"), md.get("evidence")),
+        user=None
+        if not f.get("user")
+        else UserFacts(
+            f["user"]["ref"],
+            bool(f["user"]["verified"]),
+            f["user"]["verified_set_by"],
+            _dt(f["user"]["verified_set_at"]),
+        ),
     )
 
 

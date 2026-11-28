@@ -1,0 +1,61 @@
+---
+title: "Pay your own users"
+description: "Register an end user's one payout destination, then pay it under the user payout profile."
+---
+
+A payout to one of your own end users uses `user_account_ref` instead of `counterparty_id`. It is decided under
+the **user payout profile**: the checks about business counterparties (KYB status, allowlist, first payment,
+above norm and the per-counterparty daily cap) do not apply, and every safety check still runs: screening,
+allowed networks, limits, the platform daily cap, new and changed destination, and resubmission after a block.
+
+Your users' own KYC stays with you. The rules read only your typed `user_verified` flag, and a payout to a user
+whose flag is false escalates `USER_NOT_VERIFIED`.
+
+## 1. Register the user and their destination
+
+Each user account has exactly one destination. The call needs a key with the `intents:create` scope; an agent's
+key cannot register user accounts.
+
+```bash
+curl -s -X PUT "$DEKERNAI_BASE_URL/v1/user_accounts/u-1001" \
+  -H "Authorization: Bearer $DEKERNAI_API_KEY" -H "Content-Type: application/json" \
+  -d '{"user_verified": true, "holder_name": "Ada Example (fictional)",
+       "destination": {"kind": "evm_wallet", "network": "base-sepolia",
+                       "address": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a"}}'
+```
+
+```json registered
+{"object": "user_account", "user_account_ref": "u-1001", "user_verified": true,
+ "verified_set_by": "usr_...", "verified_set_at": "2026-12-01T09:00:00+00:00",
+ "destination": {"id": "dst_...", "kind": "evm_wallet", "network": "base-sepolia", "address": "0x1a1a..."}}
+```
+
+For a bank payout, send `{"kind": "bank_account", "network": "banksim-fps", "account_masked": "GB** **** 1234"}`.
+`holder_name` is optional. Above the travel-rule threshold it is the beneficiary's name, so without it the payout
+escalates `TRAVEL_RULE_MISSING`.
+
+Calling the same endpoint again updates the account:
+
+- **A different destination replaces the old one** under the same `dst_` ID. The change is in the audit log with
+  the old and new details, and the next payout escalates `CHANGED_DETAILS`.
+- **A changed `user_verified`** is stored with who set it and when.
+- Sending the same values again changes nothing.
+
+## 2. Pay the user
+
+```bash
+curl -s -X POST "$DEKERNAI_BASE_URL/v1/payment_intents" \
+  -H "Authorization: Bearer $DEKERNAI_API_KEY" -H "Idempotency-Key: $(uuidgen)" \
+  -H "Content-Type: application/json" \
+  -d '{"kind": "payout", "source": "platform", "user_account_ref": "u-1001",
+       "destination": {"kind": "evm_wallet", "network": "base-sepolia",
+                       "address": "0x1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a"},
+       "amount": {"amount": "50.00", "currency": "USDC"}}'
+```
+
+The destination must be the user's registered one, or the request is refused with `validation_error` and nothing
+is created. A newly registered destination escalates `NEW_WALLET` until it is older than your rules' window.
+User payouts come from your platform: an agent intent always pays a counterparty.
+
+<Note>The decision lists every check. The ones the user payout profile skips are `NOT_EVALUATED` with the note
+"user payout profile". In the console, user payouts show the user account reference and the profile.</Note>

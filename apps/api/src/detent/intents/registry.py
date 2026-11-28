@@ -98,16 +98,58 @@ def seed_registry(conn: Connection, clock: Clock, org_id: str, fixture: Path = F
                     "lc": now - timedelta(days=d["last_changed_days_ago"]),
                 },
             )
-    if added:
+    users_added = _seed_users(conn, now, org_id, data.get("user_accounts") or [], wallets)
+    if added or users_added:
         append(
             conn,
             clock,
             org_id=org_id,
             actor=Actor.system("seed"),
             kind="registry.seeded",
-            payload={"counterparties_added": added},
+            payload={"counterparties_added": added, "user_accounts_added": users_added},
         )
     return wallets
+
+
+def _seed_users(
+    conn: Connection, now: Any, org_id: str, users: list[dict[str, Any]], wallets: dict[str, str]
+) -> int:
+    """The fictional end users and their one destination each (slice U test values). Idempotent."""
+    added = 0
+    for u in users:
+        d = u.get("destination")
+        if d is None or "user_verified" not in u:
+            continue
+        res = conn.execute(
+            text(
+                "INSERT INTO user_accounts (org_id, ref, holder_name, user_verified, verified_set_by, "
+                "verified_set_at, created_at) VALUES (:o, :r, :n, :v, 'system:seed', :t, :t) "
+                "ON CONFLICT (org_id, ref) DO NOTHING RETURNING ref"
+            ),
+            {"o": org_id, "r": u["account_ref"], "n": u.get("name"), "v": bool(u["user_verified"]), "t": now},
+        ).scalar_one_or_none()
+        if res is None:
+            continue
+        added += 1
+        conn.execute(
+            text(
+                "INSERT INTO destinations (id, org_id, user_account_ref, kind, network, address, "
+                "account_masked, verified, first_seen_at, last_changed_at, last_changed_by) VALUES (:id, :o, "
+                ":r, :k, :n, :a, :m, true, :fs, :lc, 'system:seed') ON CONFLICT (org_id, id) DO NOTHING"
+            ),
+            {
+                "id": d["id"],
+                "o": org_id,
+                "r": u["account_ref"],
+                "k": d["kind"],
+                "n": d["network"],
+                "a": _fill(d.get("address"), wallets),
+                "m": d.get("account_masked"),
+                "fs": now - timedelta(days=d["first_seen_days_ago"]),
+                "lc": now - timedelta(days=d["last_changed_days_ago"]),
+            },
+        )
+    return added
 
 
 def update_destination(

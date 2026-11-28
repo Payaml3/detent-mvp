@@ -214,3 +214,22 @@ def test_verify_webhook_returns_the_event_and_refuses_bad_signatures() -> None:
             verify_webhook("whsec_a", bad, body, now=now)
     with pytest.raises(WebhookSignatureError):
         verify_webhook("whsec_a", header, body + b" ", now=1764756000)  # the body changed
+
+
+def test_user_accounts_register_with_put_and_no_idempotency_key() -> None:  # USR-03
+    seen: list[httpx.Request] = []
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        seen.append(req)
+        return httpx.Response(200, json={"object": "user_account", "user_account_ref": "u-1"})
+
+    c, _ = client(handler)
+    body: Any = {
+        "user_verified": True,
+        "destination": {"kind": "evm_wallet", "network": "base-sepolia", "address": "0x" + "1a" * 20},
+    }
+    assert c.user_accounts.register("u-1", body)["user_account_ref"] == "u-1"
+    c.user_accounts.retrieve("u-1")
+    put, get = seen
+    assert put.method == "PUT" and put.url.raw_path == b"/v1/user_accounts/u-1"
+    assert json.loads(put.content) == body and get.method == "GET"

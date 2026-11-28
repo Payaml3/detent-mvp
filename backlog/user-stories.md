@@ -1672,8 +1672,8 @@ _Payouts to the platform's own end users, under the user payout profile_ · laye
 
 **Acceptance criteria**
 
-- [ ] One destination per user_account_ref (G-10); registering a different one replaces it, is audited and the next payout escalates CHANGED_DETAILS
-- [ ] user_verified is a typed boolean the platform supplies; it is stored with who set it and when
+- [x] One destination per user_account_ref (G-10); registering a different one replaces it, is audited and the next payout escalates CHANGED_DETAILS
+- [x] user_verified is a typed boolean the platform supplies; it is stored with who set it and when
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** U User payouts · **Depends on:** INT-04 · **Traces to:** A2.Intent
 
@@ -1683,8 +1683,8 @@ _Payouts to the platform's own end users, under the user payout profile_ · laye
 
 **Acceptance criteria**
 
-- [ ] kyb_status, allowlist, unusual.first_payment and unusual.above_norm are skipped; screening, allowed_networks, limits, daily caps (platform scope), new_wallet, changed_details and resubmission_after_block run
-- [ ] user_verified false escalates USER_NOT_VERIFIED; the 422 user_payouts_unavailable is gone
+- [x] kyb_status, allowlist, unusual.first_payment and unusual.above_norm are skipped; screening, allowed_networks, limits, daily caps (platform scope), new_wallet, changed_details and resubmission_after_block run
+- [x] user_verified false escalates USER_NOT_VERIFIED; the 422 user_payouts_unavailable is gone
 
 **Priority:** Should · **Estimate:** 0.75 d · **Milestone:** U User payouts · **Depends on:** USR-01, POL-08 · **Traces to:** A2.Decide, A2.Policy
 
@@ -1694,7 +1694,7 @@ _Payouts to the platform's own end users, under the user payout profile_ · laye
 
 **Acceptance criteria**
 
-- [ ] Payments, payment detail and exceptions show the user account reference and "user payout profile"; the OpenAPI file, docs guide and SDKs carry user_account_ref
+- [x] Payments, payment detail and exceptions show the user account reference and "user payout profile"; the OpenAPI file, docs guide and SDKs carry user_account_ref
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** U User payouts · **Depends on:** USR-02 · **Traces to:** A2.Intent
 
@@ -1704,8 +1704,8 @@ _Payouts to the platform's own end users, under the user payout profile_ · laye
 
 **Acceptance criteria**
 
-- [ ] Eval scenarios: unverified user, changed destination, cap breach, duplicate payout under one payment ID; 0 unauthorised executions
-- [ ] Sandbox organisations are seeded with fictional user accounts and their destinations
+- [x] Eval scenarios: unverified user, changed destination, cap breach, duplicate payout under one payment ID; 0 unauthorised executions
+- [x] Sandbox organisations are seeded with fictional user accounts and their destinations
 
 **Priority:** Should · **Estimate:** 0.5 d · **Milestone:** U User payouts · **Depends on:** USR-02 · **Traces to:** A2.Decide
 

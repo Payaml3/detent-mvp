@@ -173,6 +173,10 @@ def intent_body(env: Env, a: dict[str, Any]) -> dict[str, Any]:
         "destination": destination(env, a.get("dest", default_dest)),
         "amount": {"amount": str(a.get("amount", "50.00")), "currency": currency},
     }
+    if "user" in a:  # a payout to one of the platform's own end users (slice U)
+        del body["counterparty_id"]
+        body["user_account_ref"] = a["user"]
+        body["destination"] = destination(env, a.get("dest", "local"))
     for k in ("reference", "notes", "mandate_id", "allow_network_switch", "travel_rule"):
         if k in a:
             body[k] = ref(env, a[k])
@@ -736,6 +740,39 @@ def change_destination(env: Env, a: dict[str, Any]) -> dict[str, Any]:
             address=address,
         )
     return {"address": address}
+
+
+@step("register_user")
+def register_user(env: Env, a: dict[str, Any]) -> dict[str, Any]:
+    """PUT /v1/user_accounts/{ref}: an end user's one destination (an alias) and the typed user_verified flag.
+    ``age_days`` makes the destination as old as that (registered long ago), so NEW_WALLET does not fire."""
+    ref_ = a.get("ref", "u-eval-1")
+    body: dict[str, Any] = {
+        "user_verified": bool(a.get("verified", True)),
+        "destination": destination(env, a.get("dest", "local")),
+    }
+    body["destination"].pop("destination_id", None)
+    if a.get("holder_name"):
+        body["holder_name"] = a["holder_name"]
+    r = _client(env).put(
+        f"/v1/user_accounts/{ref_}",
+        json=body,
+        headers={"Authorization": f"Bearer {env.keys[a.get('key', 'lead')]}"},
+    )
+    if a.get("expect_http") is None and r.status_code != 200:
+        raise StepFailed(f"registering {ref_} failed: {r.status_code} {r.text[:200]}")
+    _expect_http(r, a)
+    if r.status_code == 200 and a.get("age_days"):
+        then = env.clock.now() - timedelta(days=int(a["age_days"]))
+        with env.engine.begin() as c:
+            c.execute(
+                text(
+                    "UPDATE destinations SET first_seen_at=:t, last_changed_at=:t "
+                    "WHERE org_id=:o AND user_account_ref=:r"
+                ),
+                {"t": then, "o": env.org_id, "r": ref_},
+            )
+    return {"http": r.status_code}
 
 
 @step("kill_switch")

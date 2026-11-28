@@ -29,7 +29,6 @@ people and may change. Quote `request_id` when you contact DekernAI; it is also 
 | `currency_network_mismatch` | 422 | The currency is not available on the chosen network. | Pick a network that carries the currency. |
 | `invalid_amount` | 422 | The amount is not a positive decimal string with the currency's precision. | Send the amount as a string such as `"18500.00"`. |
 | `mandate_invalid` | 422 | The mandate is unknown, revoked, expired or not signed for this agent. | Use an active mandate ID for the agent's key. |
-| `user_payouts_unavailable` | 422 | Payouts to end users are not available in the sandbox yet. | Pay a counterparty instead. |
 | `invalid_mode` | 422 | The execution mode is not one of `shadow`, `assist` or `auto`. | Send one of the three modes. |
 | `invalid_url` | 422 | The webhook URL is not https://, carries credentials, or points at a private address. | Use a public https:// URL. |
 | `unknown_event_type` | 422 | An event type is not one of the documented types. | Use the types listed in the webhooks reference, or "*" for all. |

@@ -492,7 +492,7 @@
    "exit": "POST /v1/payment_intents with user_account_ref decides under the user payout profile (no 422 user_payouts_unavailable): a verified user's payout to their registered destination executes, user_verified false escalates, a changed destination escalates CHANGED_DETAILS, and the console, API, docs and SDKs show it.",
    "stories": 4,
    "criteria": 7,
-   "criteria_done": 0
+   "criteria_done": 7
   }
  ],
  "blockers": [

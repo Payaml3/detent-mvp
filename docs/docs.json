@@ -20,6 +20,7 @@
             "group": "Guides",
             "pages": [
               "guides/agent-supplier-invoice",
+              "guides/user-payouts",
               "guides/credit-deposits",
               "guides/handle-unknown",
               "guides/approve-escalations",

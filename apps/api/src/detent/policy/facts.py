@@ -34,6 +34,17 @@ class CounterpartyFacts:
 
 
 @dataclass(frozen=True, slots=True)
+class UserFacts:
+    """An end user of the platform (USR-01, G-10). The platform owns the user's KYC; the policy reads only
+    its typed ``user_verified`` flag."""
+
+    ref: str
+    verified: bool
+    verified_set_by: str
+    verified_set_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
 class DestinationFacts:
     id: str | None  # None when the address was not registered before this intent (G-01)
     registered: bool
@@ -77,7 +88,7 @@ class Facts:
     source: Literal["platform", "agent"]
     amount: Money
     network: str
-    counterparty: CounterpartyFacts
+    counterparty: CounterpartyFacts | None  # None for a user payout
     destination: DestinationFacts
     screening: ScreeningResult | Unavailable
     travel_rule: TravelRuleFacts | Unavailable
@@ -85,3 +96,8 @@ class Facts:
     used_today_counterparty: Money | Unavailable
     recent_block_id: str | None
     mandate: MandateFacts | Unavailable | None
+    user: UserFacts | None = None  # set for a user payout (spec/04 User payouts)
+
+    @property
+    def profile(self) -> Literal["counterparty", "user"]:
+        return "user" if self.user is not None else "counterparty"
